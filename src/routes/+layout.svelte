@@ -15,7 +15,9 @@
 	);
 
 	onMount(() => {
-		if (!$page.params.time) goto(`/${spaces[0].name.replace(' ', '-')}/today`);
+		const goToDefaultSpace = () => goto(`/${spaces[0].name.replace(' ', '-')}/today`);
+
+		if (!space) goToDefaultSpace();
 	});
 </script>
 

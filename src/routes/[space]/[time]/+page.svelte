@@ -4,43 +4,13 @@
 
 	interface PageData extends SpaceData_int {
 		time: string;
-		space: string;
 	}
 
 	export let data: PageData;
 </script>
 
 <div class="w-full stack gap-3">
-	<div class="center text-xl hStack gap-2">
-		<p class="capitalize text-opacity-40 text-black">{data.space}</p>
-		<p>:</p>
-		<p class="capitalize">{data.time}</p>
-	</div>
 	<div class="w-full stack gap-6 text-xs sm:text-sm md:text-md">
-		<div class="flex-col sm:flex-row center gap-2">
-			<div class="w-full sm:w-10/12 bg-white p-2 stack rounded-md">
-				<input
-					type="text"
-					placeholder="Subject"
-					class="outline-0 text-opacity-30 w-4/12 h-[30px] text-black"
-				/>
-				<div
-					class="w-full outline-0 input min-h-[30px] flex items-center break-normal"
-					role="textbox"
-					contenteditable
-					on:input={(e) => console.log(e.target.innerText)}
-				/>
-			</div>
-			<div class="hStack gap-2 center w-2/12">
-				<button class="bg-white bg-opacity-70 rounded-sm p-1"
-					><Icon icon="system-uicons:reset" height="25px" /></button
-				>
-				<button class="bg-white bg-opacity-70 rounded-sm p-1"
-					><Icon icon="mdi:tick" height="25px" /></button
-				>
-			</div>
-		</div>
-		<hr />
 		<div class="flex-col sm:flex-row center gap-2">
 			<div class="w-full sm:w-10/12 bg-white p-2 stack gap-2 rounded-md">
 				<p class="text-opacity-20 text-black">Test subject</p>
