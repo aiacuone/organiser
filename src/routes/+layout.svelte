@@ -30,7 +30,7 @@
 				<a
 					href="/{spaceName}/today"
 					class={`capitalize bg-neutral-500 px-3 rounded-md  ${
-						$space?.name === _space.name ? 'ring-1 ring-opacity-10 ring-black' : 'border-0'
+						$space?.name === _space.name ? 'ring ring-opacity-10 ring-black' : 'border-0'
 					}`}
 					style="background:{_space.color}">{_space.name}</a
 				>
@@ -46,7 +46,9 @@
 				{@const timeName = option.name.replace(' ', '-')}
 				<a
 					href="/{$space?.name.replace(' ', '-')}/{timeName}"
-					class="capitalize bg-neutral-200 px-3 rounded-md">{option.name}</a
+					class="capitalize bg-neutral-200 px-3 rounded-md {$page.params.time === timeName
+						? 'ring ring-black ring-opacity-10'
+						: 'ring-0'}">{option.name}</a
 				>
 			{/each}
 		</div>

@@ -1,8 +1,9 @@
 <script lang="ts">
-	import type { SpaceData_int } from '../../../types/general';
+	import type { SpaceData_int, Space_int } from '../../../types/general';
 	import Icon from '@iconify/svelte';
 	import NewNote from '../../../components/Note/New.svelte';
 	import { getContext } from 'svelte';
+	import type { Readable } from 'svelte/store';
 
 	interface PageData extends SpaceData_int {
 		time: string;
@@ -10,7 +11,7 @@
 
 	export let data: PageData;
 
-	const space = getContext('space');
+	const space: Readable<Space_int> = getContext('space');
 </script>
 
 <div class="h-full center stack">
