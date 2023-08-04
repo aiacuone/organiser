@@ -7,7 +7,9 @@
 	const { spaces, options } = data;
 
 	const space = derived(page, ($page) =>
-		data.spaces.find((space) => space.name === $page.params.space.replace('-', ' '))
+		$page.params.space
+			? data.spaces.find((space) => space.name === $page.params.replace('-', ' '))
+			: spaces[0]
 	);
 </script>
 
