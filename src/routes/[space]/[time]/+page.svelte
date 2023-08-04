@@ -2,7 +2,12 @@
 	import type { SpaceData_int } from '../../../types/general';
 	import Icon from '@iconify/svelte';
 
-	export let data: SpaceData_int;
+	interface PageData extends SpaceData_int {
+		time: string;
+		space: string;
+	}
+
+	export let data: PageData;
 </script>
 
 <div class="w-full stack gap-3">
