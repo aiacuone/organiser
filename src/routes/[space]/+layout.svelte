@@ -10,7 +10,10 @@
 </script>
 
 <div class="h-full center">
-	<div class="w-11/12 center rounded-md p-4 max-w-screen-lg" style="background:{$space.color}">
+	<div
+		class="w-full sm:w-11/12 center rounded-md py-2 sm:p-4 max-w-screen-lg"
+		style="background:{$space.color}"
+	>
 		<slot />
 	</div>
 </div>
