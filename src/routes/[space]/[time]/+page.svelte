@@ -6,9 +6,10 @@
 </script>
 
 <div class="w-full stack gap-3">
-	<div class="center text-xl">
-		<p class="capitalize font-bold">{data.space}</p>
-		<p class="capitalize">: {data.time}</p>
+	<div class="center text-xl hStack gap-2">
+		<p class="capitalize text-opacity-40 text-black">{data.space}</p>
+		<p>:</p>
+		<p class="capitalize">{data.time}</p>
 	</div>
 	<div class="w-full stack gap-6 text-xs sm:text-sm md:text-md">
 		<div class="flex-col sm:flex-row center gap-2">
