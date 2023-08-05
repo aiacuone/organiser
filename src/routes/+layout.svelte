@@ -6,7 +6,7 @@
 	import { onMount, setContext } from 'svelte';
 	import { goto } from '$app/navigation';
 	export let data: SpaceData_int;
-	const { spaces, options } = data;
+	const { spaces, times } = data;
 
 	const space: Readable<Space_int | undefined> = derived(page, ($page) =>
 		$page.params.space
@@ -42,13 +42,13 @@
 	</div>
 	<footer class=" py-2" style="background:{$space?.color}">
 		<div class="hStack center capitalize gap-4">
-			{#each options as option}
-				{@const timeName = option.name.replace(' ', '-')}
+			{#each times as time}
+				{@const timeName = time.name.replace(' ', '-')}
 				<a
 					href="/{$space?.name.replace(' ', '-')}/{timeName}"
 					class="capitalize bg-neutral-200 px-3 rounded-md {$page.params.time === timeName
 						? 'ring ring-black ring-opacity-10'
-						: 'ring-0'}">{option.name}</a
+						: 'ring-0'}">{time.name}</a
 				>
 			{/each}
 		</div>

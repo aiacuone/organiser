@@ -1,3 +1,5 @@
+export type Time = 'today' | 'yesterday' | 'history';
+
 export interface Space_int {
 	name: string;
 	color: string;
@@ -5,17 +7,17 @@ export interface Space_int {
 }
 
 export interface Option_int {
-	name: 'today' | 'yesterday' | 'history';
+	name: Time;
 }
 
 export interface Note_int {
 	id: string;
 	title: string;
 	content: string;
-	timestamp: number;
+	date: Date;
 }
 
 export interface SpaceData_int {
 	spaces: Array<Space_int>;
-	options: Array<Option_int>;
+	times: Array<Option_int>;
 }
