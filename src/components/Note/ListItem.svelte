@@ -15,10 +15,10 @@
 	</NoteContentContainer>
 	<NoteButtonContainer>
 		<NoteButton>
-			<Icon icon="mdi:pencil" height="25px" />
+			<Icon icon="mdi:pencil" height="20px" />
 		</NoteButton>
 		<NoteButton>
-			<Icon icon="akar-icons:cross" height="25px" />
+			<Icon icon="akar-icons:cross" height="20px" />
 		</NoteButton>
 	</NoteButtonContainer>
 </div>

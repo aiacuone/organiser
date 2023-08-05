@@ -8,7 +8,7 @@
 </script>
 
 <div
-	class="flex-col sm:flex-row center gap-2 p-4 w-full bg-red-500 rounded-md"
+	class="flex-col sm:flex-row center gap-2 p-2 w-full rounded-md"
 	style="background:{background}"
 >
 	<NoteContentContainer>
@@ -26,10 +26,10 @@
 	</NoteContentContainer>
 	<NoteButtonContainer>
 		<NoteButton>
-			<Icon icon="system-uicons:reset" height="25px" />
+			<Icon icon="system-uicons:reset" height="20px" />
 		</NoteButton>
 		<NoteButton>
-			<Icon icon="mdi:tick" height="25px" />
+			<Icon icon="mdi:tick" height="20px" />
 		</NoteButton>
 	</NoteButtonContainer>
 </div>
