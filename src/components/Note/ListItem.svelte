@@ -5,6 +5,7 @@
 	import NoteButton from './Button.svelte';
 
 	export let subject: string;
+	export let content: string;
 	export let onClickEdit: () => void;
 	export let onClickDelete: () => void;
 </script>
@@ -13,7 +14,7 @@
 	<NoteContentContainer>
 		<p class="text-opacity-20 text-black">{subject}</p>
 		<p class="bg-white flex items-center">
-			<slot />
+			{content}
 		</p>
 	</NoteContentContainer>
 	<NoteButtonContainer>
