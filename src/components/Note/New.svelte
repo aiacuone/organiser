@@ -14,13 +14,9 @@
 	style="background:{background}"
 >
 	<NoteContentContainer>
-		<input
-			type="text"
-			placeholder="Subject"
-			class="outline-0 text-opacity-30 w-4/12 h-[30px] text-black"
-		/>
+		<input type="text" placeholder="Subject" class="outline-0 text-opacity-30 w-4/12 text-black" />
 		<div
-			class="w-full outline-0 input min-h-[30px] flex items-center break-normal"
+			class="w-full outline-0 input flex items-center break-normal"
 			role="textbox"
 			contenteditable
 			on:input={(e) => console.log(e.target.innerText)}
