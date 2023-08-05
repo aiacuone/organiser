@@ -3,7 +3,10 @@
 	import NoteButtonContainer from './ButtonContainer.svelte';
 	import NoteContentContainer from './ContentContainer.svelte';
 	import NoteButton from './Button.svelte';
+
 	export let subject: string;
+	export let onClickEdit: () => void;
+	export let onClickDelete: () => void;
 </script>
 
 <div class="flex-col sm:flex-row center gap-2">
@@ -14,10 +17,10 @@
 		</p>
 	</NoteContentContainer>
 	<NoteButtonContainer>
-		<NoteButton>
+		<NoteButton onClick={onClickEdit}>
 			<Icon icon="mdi:pencil" height="20px" />
 		</NoteButton>
-		<NoteButton>
+		<NoteButton onClick={onClickDelete}>
 			<Icon icon="akar-icons:cross" height="20px" />
 		</NoteButton>
 	</NoteButtonContainer>

@@ -5,6 +5,8 @@
 	import NoteButton from './Button.svelte';
 
 	export let background: string;
+	export let onClickTick: () => void;
+	export let onClickReset: () => void;
 </script>
 
 <div
@@ -25,10 +27,10 @@
 		/>
 	</NoteContentContainer>
 	<NoteButtonContainer>
-		<NoteButton>
+		<NoteButton onClick={onClickReset}>
 			<Icon icon="system-uicons:reset" height="20px" />
 		</NoteButton>
-		<NoteButton>
+		<NoteButton onClick={onClickTick}>
 			<Icon icon="mdi:tick" height="20px" />
 		</NoteButton>
 	</NoteButtonContainer>
