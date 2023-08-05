@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
+	import NoteButtonContainer from './ButtonContainer.svelte';
+	import NoteContentContainer from './ContentContainer.svelte';
 
 	export let background: string;
 </script>
@@ -8,7 +10,7 @@
 	class="flex-col sm:flex-row center gap-2 p-4 w-full bg-red-500 rounded-md"
 	style="background:{background}"
 >
-	<div class="w-full sm:w-10/12 bg-white p-2 stack rounded-md">
+	<NoteContentContainer>
 		<input
 			type="text"
 			placeholder="Subject"
@@ -20,13 +22,13 @@
 			contenteditable
 			on:input={(e) => console.log(e.target.innerText)}
 		/>
-	</div>
-	<div class="hStack gap-2 center w-2/12">
+	</NoteContentContainer>
+	<NoteButtonContainer>
 		<button class="bg-white bg-opacity-70 rounded-sm p-1"
 			><Icon icon="system-uicons:reset" height="25px" /></button
 		>
 		<button class="bg-white bg-opacity-70 rounded-sm p-1"
 			><Icon icon="mdi:tick" height="25px" /></button
 		>
-	</div>
+	</NoteButtonContainer>
 </div>
