@@ -2,6 +2,7 @@
 	import Icon from '@iconify/svelte';
 	import NoteButtonContainer from './ButtonContainer.svelte';
 	import NoteContentContainer from './ContentContainer.svelte';
+	import NoteButton from './Button.svelte';
 	export let subject: string;
 </script>
 
@@ -13,11 +14,11 @@
 		</p>
 	</NoteContentContainer>
 	<NoteButtonContainer>
-		<button class="bg-white bg-opacity-70 rounded-sm p-1"
-			><Icon icon="mdi:pencil" height="25px" /></button
-		>
-		<button class="bg-white bg-opacity-70 rounded-sm p-1"
-			><Icon icon="akar-icons:cross" height="25px" /></button
-		>
+		<NoteButton>
+			<Icon icon="mdi:pencil" height="25px" />
+		</NoteButton>
+		<NoteButton>
+			<Icon icon="akar-icons:cross" height="25px" />
+		</NoteButton>
 	</NoteButtonContainer>
 </div>

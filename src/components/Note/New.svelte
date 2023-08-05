@@ -2,6 +2,7 @@
 	import Icon from '@iconify/svelte';
 	import NoteButtonContainer from './ButtonContainer.svelte';
 	import NoteContentContainer from './ContentContainer.svelte';
+	import NoteButton from './Button.svelte';
 
 	export let background: string;
 </script>
@@ -24,11 +25,11 @@
 		/>
 	</NoteContentContainer>
 	<NoteButtonContainer>
-		<button class="bg-white bg-opacity-70 rounded-sm p-1"
-			><Icon icon="system-uicons:reset" height="25px" /></button
-		>
-		<button class="bg-white bg-opacity-70 rounded-sm p-1"
-			><Icon icon="mdi:tick" height="25px" /></button
-		>
+		<NoteButton>
+			<Icon icon="system-uicons:reset" height="25px" />
+		</NoteButton>
+		<NoteButton>
+			<Icon icon="mdi:tick" height="25px" />
+		</NoteButton>
 	</NoteButtonContainer>
 </div>
