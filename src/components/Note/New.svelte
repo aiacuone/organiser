@@ -5,8 +5,27 @@
 	import NoteButton from './Button.svelte';
 
 	export let background: string;
-	export let onClickTick: () => void;
-	export let onClickReset: () => void;
+	export let onClickAccept: () => void;
+	export let contentValue: string;
+	export let subjectValue: string;
+
+	// used this because bind the value of the element is causing issues
+	let contentInput: HTMLDivElement;
+
+	const onInputChange = (e) => {
+		contentValue = e.target.innerText;
+	};
+
+	const onClickReset = () => {
+		contentInput.innerText = '';
+		subjectValue = '';
+	};
+
+	const _onClickAccept = () => {
+		onClickAccept();
+		contentInput.innerText = '';
+		subjectValue = '';
+	};
 </script>
 
 <div
@@ -14,19 +33,25 @@
 	style="background:{background}"
 >
 	<NoteContentContainer>
-		<input type="text" placeholder="Subject" class="outline-0 text-opacity-30 w-4/12 text-black" />
+		<input
+			type="text"
+			placeholder="Subject"
+			class="outline-0 text-opacity-30 w-4/12 text-black text-sm"
+			bind:value={subjectValue}
+		/>
 		<div
-			class="w-full outline-0 input flex items-center break-normal"
+			class="w-full outline-0 input flex items-center break-normal text-sm"
 			role="textbox"
 			contenteditable
-			on:input={(e) => console.log(e.target.innerText)}
+			on:input={onInputChange}
+			bind:this={contentInput}
 		/>
 	</NoteContentContainer>
 	<NoteButtonContainer>
 		<NoteButton onClick={onClickReset}>
 			<Icon icon="system-uicons:reset" height="20px" />
 		</NoteButton>
-		<NoteButton onClick={onClickTick}>
+		<NoteButton onClick={_onClickAccept}>
 			<Icon icon="mdi:tick" height="20px" />
 		</NoteButton>
 	</NoteButtonContainer>

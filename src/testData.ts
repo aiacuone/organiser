@@ -24,7 +24,7 @@ export const testData = {
 					title: 'test 3',
 					content: 'test content for note test 3 aventus',
 					date: new Date()
-				}, // replicate this 6 more times
+				},
 				{
 					id: uuidv4(),
 					title: 'test 4',

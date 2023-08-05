@@ -20,10 +20,7 @@
 	const space: Readable<Space_int> = getContext('space');
 
 	const onAddNewNote = () => {
-		console.log('add new note');
-	};
-	const onResetNewNote = () => {
-		console.log('reset new note');
+		console.log('add new note', { subject: newNoteSubjectValue, content: newNoteContentValue });
 	};
 	const onEditNote = (id: string) => {
 		console.log('edit note', id);
@@ -52,32 +49,42 @@
 
 		return data[$page.params.time as Time];
 	});
+
+	let newNoteContentValue: string = '';
+	let newNoteSubjectValue: string = '';
 </script>
 
 <div class="h-full center stack">
-	<div class="stack gap-6 w-full px-2 max-w-screen-md">
+	<div class="stack gap-2 w-full px-2 max-w-screen-md">
 		<div class="center text-xl hStack gap-2">
 			<p class="capitalize text-opacity-40 text-black">{$space.name}</p>
 			<p class="text-opacity-40 text-black">-</p>
 			<p class="capitalize">{data.time}</p>
 		</div>
-		{#if $page.params.time === 'today'}
-			<NewNote background={$space.color} onClickTick={onAddNewNote} onClickReset={onResetNewNote} />
-		{/if}
-		<div class="w-full center rounded-md p-2" style="background:{$space?.color}">
-			<div class="w-full stack gap-2 text-xs sm:text-sm md:text-md">
-				{#if $filteredNotes.length === 0}
-					<p class="text-opacity-40 text-black text-center">No notes for this date</p>
-				{:else}
-					{#each $filteredNotes as note}
-						<NoteListItem
-							subject={note.title}
-							content={note.content}
-							onClickEdit={() => onEditNote(note.id)}
-							onClickDelete={() => onDeleteNote(note.id)}
-						/>
-					{/each}
-				{/if}
+		<div class="stack gap-6">
+			{#if $page.params.time === 'today'}
+				<NewNote
+					background={$space.color}
+					onClickAccept={onAddNewNote}
+					bind:contentValue={newNoteContentValue}
+					bind:subjectValue={newNoteSubjectValue}
+				/>
+			{/if}
+			<div class="w-full center rounded-md p-2" style="background:{$space?.color}">
+				<div class="w-full stack gap-2 text-xs sm:text-sm md:text-md">
+					{#if $filteredNotes.length === 0}
+						<p class="text-opacity-40 text-black text-center text-lg">No notes for this date</p>
+					{:else}
+						{#each $filteredNotes as note}
+							<NoteListItem
+								subject={note.title}
+								content={note.content}
+								onClickEdit={() => onEditNote(note.id)}
+								onClickDelete={() => onDeleteNote(note.id)}
+							/>
+						{/each}
+					{/if}
+				</div>
 			</div>
 		</div>
 	</div>
