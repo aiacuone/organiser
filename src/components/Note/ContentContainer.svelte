@@ -1,3 +1,3 @@
-<div class="flex-1 bg-white p-2 stack rounded-md min-h-[65px]">
+<div class="flex-1 bg-white p-2 stack rounded-md min-h-[70px]">
 	<slot />
 </div>

@@ -49,10 +49,28 @@
 	</NoteContentContainer>
 	<NoteButtonContainer>
 		<NoteButton onClick={onClickReset}>
-			<Icon icon="system-uicons:reset" height="20px" />
+			<Icon icon="system-uicons:reset" height="17px" />
 		</NoteButton>
 		<NoteButton onClick={_onClickAccept}>
-			<Icon icon="mdi:tick" height="20px" />
+			<Icon icon="mdi:tick" height="17px" />
 		</NoteButton>
 	</NoteButtonContainer>
 </div>
+
+<style>
+	::placeholder {
+		/* Chrome, Firefox, Opera, Safari 10.1+ */
+		color: #00000040;
+		opacity: 1; /* Firefox */
+	}
+
+	:-ms-input-placeholder {
+		/* Internet Explorer 10-11 */
+		color: #00000040;
+	}
+
+	::-ms-input-placeholder {
+		/* Microsoft Edge */
+		color: #00000040;
+	}
+</style>

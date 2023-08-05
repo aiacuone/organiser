@@ -19,10 +19,10 @@
 	</NoteContentContainer>
 	<NoteButtonContainer>
 		<NoteButton onClick={onClickEdit}>
-			<Icon icon="mdi:pencil" height="20px" />
+			<Icon icon="mdi:pencil" height="17px" />
 		</NoteButton>
 		<NoteButton onClick={onClickDelete}>
-			<Icon icon="akar-icons:cross" height="20px" />
+			<Icon icon="akar-icons:cross" height="17px" />
 		</NoteButton>
 	</NoteButtonContainer>
 </div>
