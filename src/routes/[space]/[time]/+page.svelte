@@ -29,7 +29,7 @@
 		console.log('delete note', id);
 	};
 
-	const filteredNotes = derived(page, ($page) => {
+	const filteredNotes = derived([page, space], ([$page, $space]) => {
 		const filterTodaysNotes = (note: Note_int) => {
 			const { string: todaysDateString } = getTodaysDayMonthYear();
 			const { string: noteDateString } = getDayMonthYearFromDate(note.date);
@@ -62,7 +62,7 @@
 			<p class="capitalize">{data.time}</p>
 		</div>
 		<div class="stack gap-6">
-			{#if $page.params.time === 'today'}
+			{#if $page.params.time === 'today' || $page.params.time === 'yesterday'}
 				<NewNote
 					background={$space.color}
 					onClickAccept={onAddNewNote}
