@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Note_int, SpaceData_int, Space_int, Time } from '../../../types/general';
-	import NewNote from '../../../components/Note/New.svelte';
-	import NoteListItem from '../../../components/Note/ListItem.svelte';
+	import NewNote from '../../../components/Note/NewNote.svelte';
+	import NoteListItem from '../../../components/Note/NoteListItem.svelte';
 	import { getContext } from 'svelte';
 	import { derived, type Readable } from 'svelte/store';
 	import { page } from '$app/stores';
@@ -79,6 +79,7 @@
 							<NoteListItem
 								subject={note.title}
 								content={note.content}
+								id={note.id}
 								onClickEdit={() => onEditNote(note.id)}
 								onClickDelete={() => onDeleteNote(note.id)}
 							/>

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import NoteButtonContainer from './ButtonContainer.svelte';
-	import NoteContentContainer from './ContentContainer.svelte';
-	import NoteButton from './Button.svelte';
+	import NoteButtonContainer from './NoteButtonContainer.svelte';
+	import NoteContentContainer from './NoteContentContainer.svelte';
+	import NoteButton from './NoteButton.svelte';
 
 	export let background: string;
 	export let onClickAccept: () => void;
@@ -36,7 +36,7 @@
 		<input
 			type="text"
 			placeholder="Subject"
-			class="outline-0 text-opacity-30 w-4/12 text-black text-sm"
+			class="outline-0 text-opacity-30 w-full text-black text-sm"
 			bind:value={subjectValue}
 		/>
 		<div
