@@ -5,6 +5,7 @@
 	import { page } from '$app/stores';
 	import { onMount, setContext } from 'svelte';
 	import { goto } from '$app/navigation';
+	import HeaderFooterLink from '../components/HeaderFooterLink.svelte';
 	export let data: SpaceData_int;
 	const { spaces, times } = data;
 
@@ -24,15 +25,13 @@
 
 <div class="stack h-screen">
 	<header class="center py-2" style="background:{$space?.color}">
-		<div class="hStack gap-4">
+		<div class="hStack gap-2 sm:gap-4">
 			{#each spaces as _space}
 				{@const spaceName = _space.name.replace(' ', '-')}
-				<a
+				<HeaderFooterLink
 					href="/{spaceName}/today"
-					class={`capitalize bg-neutral-500 px-3 rounded-md  ${
-						$space?.name === _space.name ? 'ring ring-opacity-10 ring-black' : 'border-0'
-					}`}
-					style="background:{_space.color}">{_space.name}</a
+					isSelected={$space?.name === _space.name}
+					style="background:{_space.color}">{_space.name}</HeaderFooterLink
 				>
 			{/each}
 		</div>
@@ -41,14 +40,12 @@
 		<slot />
 	</div>
 	<footer class=" py-2" style="background:{$space?.color}">
-		<div class="hStack center capitalize gap-4">
+		<div class="hStack center capitalize gap-2 sm:gap-4">
 			{#each times as time}
 				{@const timeName = time.name.replace(' ', '-')}
-				<a
+				<HeaderFooterLink
 					href="/{$space?.name.replace(' ', '-')}/{timeName}"
-					class="capitalize bg-neutral-200 px-3 rounded-md {$page.params.time === timeName
-						? 'ring ring-black ring-opacity-10'
-						: 'ring-0'}">{time.name}</a
+					isSelected={$page.params.time === timeName}>{time.name}</HeaderFooterLink
 				>
 			{/each}
 		</div>
