@@ -39,7 +39,7 @@
 	<input
 		type="text"
 		placeholder="Subject"
-		class="outline-0 text-opacity-30 w-4/12 text-black text-sm"
+		class="outline-0 text-opacity-30 w-full text-black text-sm"
 		bind:value={subjectValue}
 		bind:this={subjectInput}
 	/>

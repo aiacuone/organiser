@@ -29,7 +29,7 @@
 </script>
 
 <div
-	class="flex-col sm:flex-row center gap-2 p-2 w-full rounded-md"
+	class="flex-col sm:flex-row center gap-2 p-2 w-full rounded-sm"
 	style="background:{background}"
 >
 	<NoteContentContainer>

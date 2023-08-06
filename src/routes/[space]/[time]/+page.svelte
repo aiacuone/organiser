@@ -70,10 +70,10 @@
 					bind:subjectValue={newNoteSubjectValue}
 				/>
 			{/if}
-			<div class="w-full center rounded-md p-2" style="background:{$space?.color}">
+			<div class="w-full center rounded-sm p-2" style="background:{$space?.color}">
 				<div class="w-full stack gap-2 text-xs sm:text-sm md:text-md">
 					{#if $filteredNotes.length === 0}
-						<p class="text-opacity-40 text-black text-center text-lg">No notes for this date</p>
+						<p class="text-opacity-40 text-black text-center">No notes for this date</p>
 					{:else}
 						{#each $filteredNotes as note}
 							<NoteListItem
