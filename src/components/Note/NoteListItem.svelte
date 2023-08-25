@@ -5,6 +5,7 @@
 	import NoteButton from './NoteButton.svelte';
 	import EditNote from './EditNote.svelte';
 	import { getDayMonthYearFromDate } from '../../utils';
+	import Timestamp from './Timestamp.svelte';
 
 	export let subject: string;
 	export let content: string;
@@ -38,18 +39,15 @@
 			bind:contentValue={editNoteContentValue}
 			bind:subjectValue={editNoteSubjectValue}
 			onClickAccept={onAcceptEdit}
+			{date}
 		/>
 	{:else}
 		<NoteContentContainer>
 			<p class="text-opacity-20 text-black">{subject}</p>
-			<p class="bg-white flex items-center">
+			<p class="bg-white break-words">
 				{content}
 			</p>
-			<div class="hStack text-xs text-opacity-20 text-black gap-2 pt-5">
-				<p>{dayString}</p>
-				<p>{`${day}-${month}-${year}`}</p>
-				<p>{`${hour}:${minutes}`}</p>
-			</div>
+			<Timestamp {date} />
 		</NoteContentContainer>
 		<NoteButtonContainer>
 			<NoteButton onClick={_onClickEdit}>

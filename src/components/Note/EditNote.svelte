@@ -4,6 +4,7 @@
 	import NoteButtonContainer from './NoteButtonContainer.svelte';
 	import NoteContentContainer from './NoteContentContainer.svelte';
 	import { onMount } from 'svelte';
+	import Timestamp from './Timestamp.svelte';
 
 	export let initialSubjectValue: string;
 	export let initialContentValue: string;
@@ -11,6 +12,7 @@
 	export let subjectValue = initialSubjectValue;
 	export let id: string;
 	export let onClickAccept: () => void = () => {};
+	export let date: Date;
 
 	const onClickReset = () => {
 		subjectValue = initialSubjectValue;
@@ -44,12 +46,13 @@
 		bind:this={subjectInput}
 	/>
 	<div
-		class="w-full outline-0 input flex items-center break-normal text-sm"
+		class="w-full outline-0 input break-words text-sm"
 		role="textbox"
 		contenteditable
 		on:input={onInputChange}
 		bind:this={contentInput}
 	/>
+	<Timestamp {date} />
 </NoteContentContainer>
 <NoteButtonContainer>
 	<NoteButton onClick={onClickReset}>
