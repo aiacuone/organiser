@@ -4,16 +4,20 @@
 	import NoteContentContainer from './NoteContentContainer.svelte';
 	import NoteButton from './NoteButton.svelte';
 	import EditNote from './EditNote.svelte';
+	import { getDayMonthYearFromDate } from '../../utils';
 
 	export let subject: string;
 	export let content: string;
 	export let onClickEdit: () => void;
 	export let onClickDelete: () => void;
 	export let id: string;
+	export let date: Date;
 
 	let isEditing = false;
 	let editNoteContentValue: string;
 	let editNoteSubjectValue: string;
+
+	$: ({ dayString, day, month, year, hour, minutes } = getDayMonthYearFromDate(date));
 
 	const _onClickEdit = () => {
 		onClickEdit();
@@ -41,6 +45,11 @@
 			<p class="bg-white flex items-center">
 				{content}
 			</p>
+			<div class="hStack text-xs text-opacity-20 text-black gap-2 pt-5">
+				<p>{dayString}</p>
+				<p>{`${day}-${month}-${year}`}</p>
+				<p>{`${hour}:${minutes}`}</p>
+			</div>
 		</NoteContentContainer>
 		<NoteButtonContainer>
 			<NoteButton onClick={_onClickEdit}>

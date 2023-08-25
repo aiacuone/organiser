@@ -41,13 +41,15 @@
 			return noteDateString === yesterdayDateString;
 		};
 
-		const data: Record<Time, Note_int[]> = {
+		const filteredTimeNotes: Record<Time, Note_int[]> = {
 			today: $space.notes.filter(filterTodaysNotes),
 			yesterday: $space.notes.filter(filterYesterdaysNotes),
 			history: $space.notes
 		};
 
-		return data[$page.params.time as Time];
+		const time = $page.params.time as Time;
+
+		return filteredTimeNotes[time];
 	});
 
 	let newNoteContentValue: string = '';
@@ -82,6 +84,7 @@
 								id={note.id}
 								onClickEdit={() => onEditNote(note.id)}
 								onClickDelete={() => onDeleteNote(note.id)}
+								date={note.date}
 							/>
 						{/each}
 					{/if}
