@@ -19,25 +19,29 @@ const collection = await getCollection('aiacuone');
 export const createNote = async ({
 	id,
 	title,
-	content
+	content,
+	space
 }: {
 	id: string;
 	title: string;
 	content: string;
+	space: string;
 }) => {
-	console.log('createNote', { id, title, content });
+	console.log('createNote', { id, title, content, space });
 };
 
 export const updateNote = async ({
 	id,
 	title,
-	content
+	content,
+	space
 }: {
 	id: string;
 	title: string;
 	content: string;
+	space: string;
 }) => {
-	console.log('updateNote', { id, title, content });
+	console.log('updateNote', { id, title, content, space });
 };
 
 export const deleteNote = async (id: string) => {

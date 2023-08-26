@@ -1,10 +1,12 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import NoteContentContainer from './NoteContentContainer.svelte';
 	import Timestamp from './Timestamp.svelte';
 	import NoteButtonContainer from './NoteButtonContainer.svelte';
 	import NoteButton from './NoteButton.svelte';
+	import type { Readable } from 'svelte/motion';
+	import type { Space_int } from '$lib/types';
 
 	export let initialTitleValue: string;
 	export let initialContentValue: string;
@@ -19,12 +21,14 @@
 		contentInput.innerText = initialContentValue;
 	};
 
+	const space: Readable<Space_int> = getContext('space');
+	console.log({ space: $space });
 	const _onClickAccept = () => {
 		onClickAccept();
 		async function updateNote() {
 			await fetch(`/note/${id}`, {
 				method: 'PATCH',
-				body: JSON.stringify({ title: titleValue, content: contentValue, id }),
+				body: JSON.stringify({ title: titleValue, content: contentValue, id, space: $space.name }),
 				headers: {
 					'Content-Type': 'application/json'
 				}

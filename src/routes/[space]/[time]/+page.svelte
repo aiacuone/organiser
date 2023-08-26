@@ -24,7 +24,11 @@
 		async function createNote() {
 			await fetch(`/note/${uuidv4()}`, {
 				method: 'POST',
-				body: JSON.stringify({ title: newNoteTitleValue, content: newNoteContentValue }),
+				body: JSON.stringify({
+					title: newNoteTitleValue,
+					content: newNoteContentValue,
+					space: $space.name
+				}),
 				headers: {
 					'Content-Type': 'application/json'
 				}
