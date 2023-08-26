@@ -4,24 +4,19 @@
 	import NoteContentContainer from './NoteContentContainer.svelte';
 	import NoteButton from './NoteButton.svelte';
 	import EditNote from './EditNote.svelte';
-	import { getDayMonthYearFromDate } from '../../utils';
 	import Timestamp from './Timestamp.svelte';
 
-	export let subject: string;
+	export let title: string;
 	export let content: string;
-	export let onClickEdit: () => void;
 	export let onClickDelete: () => void;
 	export let id: string;
 	export let date: Date;
 
 	let isEditing = false;
 	let editNoteContentValue: string;
-	let editNoteSubjectValue: string;
-
-	$: ({ dayString, day, month, year, hour, minutes } = getDayMonthYearFromDate(date));
+	let editNoteTitleValue: string;
 
 	const _onClickEdit = () => {
-		onClickEdit();
 		isEditing = true;
 	};
 
@@ -33,17 +28,17 @@
 <div class="flex-col sm:flex-row center gap-2">
 	{#if isEditing}
 		<EditNote
-			initialSubjectValue={subject}
+			initialTitleValue={title}
 			initialContentValue={content}
 			{id}
 			bind:contentValue={editNoteContentValue}
-			bind:subjectValue={editNoteSubjectValue}
+			bind:titleValue={editNoteTitleValue}
 			onClickAccept={onAcceptEdit}
 			{date}
 		/>
 	{:else}
 		<NoteContentContainer>
-			<p class="text-opacity-20 text-black">{subject}</p>
+			<p class="text-opacity-20 text-black">{title}</p>
 			<p class="bg-white break-words">
 				{content}
 			</p>

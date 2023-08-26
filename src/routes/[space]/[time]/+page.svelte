@@ -10,6 +10,7 @@
 		getTodaysDayMonthYear,
 		getYesterdaysDayMonthYear
 	} from '../../../utils';
+	import { v4 as uuidv4 } from 'uuid';
 
 	interface PageData extends SpaceData_int {
 		time: string;
@@ -19,13 +20,29 @@
 
 	const space: Readable<Space_int> = getContext('space');
 
-	const onAddNewNote = () => {
-		console.log('add new note', { subject: newNoteSubjectValue, content: newNoteContentValue });
+	const onCreateNote = () => {
+		async function createNote() {
+			await fetch(`/note/${uuidv4()}`, {
+				method: 'POST',
+				body: JSON.stringify({ title: newNoteTitleValue, content: newNoteContentValue }),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+		}
+		createNote();
 	};
-	const onEditNote = (id: string) => {
-		console.log('edit note', id);
-	};
+
 	const onDeleteNote = (id: string) => {
+		async function deleteNote() {
+			await fetch(`/note/${id}`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+		}
+		deleteNote();
 		console.log('delete note', id);
 	};
 
@@ -53,7 +70,7 @@
 	});
 
 	let newNoteContentValue: string = '';
-	let newNoteSubjectValue: string = '';
+	let newNoteTitleValue: string = '';
 
 	let headerContainer: number;
 	let parentContainerHeight: number;
@@ -72,9 +89,9 @@
 			{#if $page.params.time === 'today' || $page.params.time === 'yesterday'}
 				<NewNote
 					background={$space.color}
-					onClickAccept={onAddNewNote}
+					onClickAccept={onCreateNote}
 					bind:contentValue={newNoteContentValue}
-					bind:subjectValue={newNoteSubjectValue}
+					bind:subjectValue={newNoteTitleValue}
 				/>
 			{/if}
 		</div>
@@ -89,10 +106,9 @@
 					{:else}
 						{#each $filteredNotes as note}
 							<NoteListItem
-								subject={note.title}
+								title={note.title}
 								content={note.content}
 								id={note.id}
-								onClickEdit={() => onEditNote(note.id)}
 								onClickDelete={() => onDeleteNote(note.id)}
 								date={note.date}
 							/>

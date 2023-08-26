@@ -6,26 +6,35 @@
 	import { onMount } from 'svelte';
 	import Timestamp from './Timestamp.svelte';
 
-	export let initialSubjectValue: string;
+	export let initialTitleValue: string;
 	export let initialContentValue: string;
 	export let contentValue: string = '';
-	export let subjectValue = initialSubjectValue;
+	export let titleValue = initialTitleValue;
 	export let id: string;
 	export let onClickAccept: () => void = () => {};
 	export let date: Date;
 
 	const onClickReset = () => {
-		subjectValue = initialSubjectValue;
+		titleValue = initialTitleValue;
 		contentInput.innerText = initialContentValue;
 	};
 
 	const _onClickAccept = () => {
 		onClickAccept();
-		console.log('accept edit', { subjectValue, contentValue, id, date: new Date() });
+		async function updateNote() {
+			await fetch(`/note/${id}`, {
+				method: 'PATCH',
+				body: JSON.stringify({ title: titleValue, content: contentValue, id }),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+		}
+		updateNote();
 	};
 
 	let contentInput: HTMLDivElement;
-	let subjectInput: HTMLDivElement;
+	let titleInput: HTMLDivElement;
 
 	const onInputChange = (e) => {
 		contentValue = e.target.innerText;
@@ -33,7 +42,7 @@
 
 	onMount(() => {
 		contentInput.innerText = initialContentValue;
-		subjectInput.focus();
+		titleInput.focus();
 	});
 </script>
 
@@ -42,8 +51,8 @@
 		type="text"
 		placeholder="Subject"
 		class="outline-0 text-opacity-30 w-full text-black text-sm"
-		bind:value={subjectValue}
-		bind:this={subjectInput}
+		bind:value={titleValue}
+		bind:this={titleInput}
 	/>
 	<div
 		class="w-full outline-0 input break-words text-sm"
