@@ -41,6 +41,7 @@
 		async function deleteNote() {
 			await fetch(`/note/${id}`, {
 				method: 'DELETE',
+				body: JSON.stringify({ space: $space.name }),
 				headers: {
 					'Content-Type': 'application/json'
 				}

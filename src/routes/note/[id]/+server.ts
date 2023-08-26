@@ -8,9 +8,11 @@ export async function PATCH({ params, request, cookies }) {
 	return new Response(null, { status: 204 });
 }
 
-export async function DELETE({ params, cookies }) {
+export async function DELETE({ params, request, cookies }) {
 	const { id } = params;
-	deleteNote(id);
+	const { space } = await request.json();
+
+	deleteNote({ id, space });
 
 	return new Response(null, { status: 204 });
 }

@@ -1,5 +1,5 @@
 import { getCollection } from '$lib/server';
-import { testData } from '../testData';
+// import { testData } from '../testData';
 
 export const load = async (req: Request, res: Response) => {
 	const collection = await getCollection('aiacuone');
@@ -10,11 +10,11 @@ export const load = async (req: Request, res: Response) => {
 	const timesDocument = await collection.findOne({ name: 'times' });
 	const times = timesDocument?.data;
 
-	return {
-		...testData
-	};
 	// return {
-	// 	spaces,
-	// 	times
+	// 	...testData
 	// };
+	return {
+		spaces,
+		times
+	};
 };

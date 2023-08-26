@@ -27,7 +27,10 @@ export const createNote = async ({
 	content: string;
 	space: string;
 }) => {
-	console.log('createNote', { id, title, content, space });
+	collection.updateOne(
+		{ name: 'spaces', 'data.name': space },
+		{ $push: { 'data.$.notes': { id, title, content, date: new Date() } } }
+	);
 };
 
 export const updateNote = async ({
@@ -42,8 +45,15 @@ export const updateNote = async ({
 	space: string;
 }) => {
 	console.log('updateNote', { id, title, content, space });
+	// collection.updateOne(
+	// 	{ name: 'spaces', 'data.name': space },
+	// 	{ $set: { 'data.$.notes': { id, title, content } } }
+	// );
 };
 
-export const deleteNote = async (id: string) => {
-	console.log('deleteNote', id);
+export const deleteNote = async ({ id, space }: { id: string; space: string }) => {
+	collection.updateOne(
+		{ name: 'spaces', 'data.name': space },
+		{ $pull: { 'data.$.notes': { id } } }
+	);
 };
