@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { derived, type Readable } from 'svelte/store';
 	import '../app.css';
-	import type { SpaceData_int, Space_int } from '../types/general';
 	import { page } from '$app/stores';
 	import { onMount, setContext } from 'svelte';
 	import { goto } from '$app/navigation';
-	import HeaderFooterLink from '../components/HeaderFooterLink.svelte';
+	import HeaderFooterLink from '../lib/components/HeaderFooterLink.svelte';
+	import type { Space_int, SpaceData_int } from '$lib/types/general';
 	export let data: SpaceData_int;
 	const { spaces, times } = data;
 

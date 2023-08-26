@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import NoteButtonContainer from './NoteButtonContainer.svelte';
-	import NoteContentContainer from './NoteContentContainer.svelte';
-	import NoteButton from './NoteButton.svelte';
 	import EditNote from './EditNote.svelte';
+	import NoteContentContainer from './NoteContentContainer.svelte';
+	import NoteButtonContainer from './NoteButtonContainer.svelte';
+	import NoteButton from './NoteButton.svelte';
 	import Timestamp from './Timestamp.svelte';
 
 	export let title: string;
@@ -16,7 +16,7 @@
 	let editNoteContentValue: string;
 	let editNoteTitleValue: string;
 
-	const _onClickEdit = () => {
+	const onClickEdit = () => {
 		isEditing = true;
 	};
 
@@ -45,7 +45,7 @@
 			<Timestamp {date} />
 		</NoteContentContainer>
 		<NoteButtonContainer>
-			<NoteButton onClick={_onClickEdit}>
+			<NoteButton onClick={onClickEdit}>
 				<Icon icon="mdi:pencil" height="17px" />
 			</NoteButton>
 			<NoteButton onClick={onClickDelete}>

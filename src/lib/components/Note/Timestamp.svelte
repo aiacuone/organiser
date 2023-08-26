@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getDayMonthYearFromDate } from '../../utils';
+	import { getDayMonthYearFromDate } from '$lib/utils';
 
 	export let date: Date;
 

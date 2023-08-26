@@ -1,16 +1,16 @@
 <script lang="ts">
-	import type { Note_int, SpaceData_int, Space_int, Time } from '../../../types/general';
-	import NewNote from '../../../components/Note/NewNote.svelte';
-	import NoteListItem from '../../../components/Note/NoteListItem.svelte';
+	import type { Note_int, SpaceData_int, Space_int, Time } from '$lib/types/general';
 	import { getContext } from 'svelte';
 	import { derived, type Readable } from 'svelte/store';
 	import { page } from '$app/stores';
+	import { v4 as uuidv4 } from 'uuid';
+	import NewNote from '$lib/components/Note/NewNote.svelte';
+	import NoteListItem from '$lib/components/Note/NoteListItem.svelte';
 	import {
 		getDayMonthYearFromDate,
 		getTodaysDayMonthYear,
 		getYesterdaysDayMonthYear
-	} from '../../../utils';
-	import { v4 as uuidv4 } from 'uuid';
+	} from '$lib/utils';
 
 	interface PageData extends SpaceData_int {
 		time: string;

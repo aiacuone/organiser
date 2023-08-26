@@ -1,14 +1,14 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import NoteButton from './NoteButton.svelte';
-	import NoteButtonContainer from './NoteButtonContainer.svelte';
-	import NoteContentContainer from './NoteContentContainer.svelte';
 	import { onMount } from 'svelte';
+	import NoteContentContainer from './NoteContentContainer.svelte';
 	import Timestamp from './Timestamp.svelte';
+	import NoteButtonContainer from './NoteButtonContainer.svelte';
+	import NoteButton from './NoteButton.svelte';
 
 	export let initialTitleValue: string;
 	export let initialContentValue: string;
-	export let contentValue: string = '';
+	export let contentValue: string = initialContentValue;
 	export let titleValue = initialTitleValue;
 	export let id: string;
 	export let onClickAccept: () => void = () => {};
