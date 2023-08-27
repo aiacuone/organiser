@@ -6,6 +6,8 @@
 	import { goto } from '$app/navigation';
 	import HeaderFooterLink from '../lib/components/HeaderFooterLink.svelte';
 	import type { Space_int, SpaceData_int } from '$lib/types/general';
+	import { QueryClient, QueryClientProvider, useMutation } from '@sveltestack/svelte-query';
+	import { createNote } from '$lib/api/notesLocalApi';
 	export let data: SpaceData_int;
 	const { spaces, times } = data;
 
@@ -21,8 +23,6 @@
 		const isHomePage = $page.url.pathname === '/';
 		if (isHomePage) goToDefaultSpace();
 	});
-
-	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 
 	const queryClient = new QueryClient();
 </script>

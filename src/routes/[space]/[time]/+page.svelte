@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Note_int, SpaceData_int, Space_int, Time } from '$lib/types/general';
-	import { getContext } from 'svelte';
+	import { getContext, setContext } from 'svelte';
 	import { derived, type Readable } from 'svelte/store';
 	import { page } from '$app/stores';
 	import NewNote from '$lib/components/Note/NewNote.svelte';
@@ -41,11 +41,14 @@
 			: $spaces.data?.[0]
 	);
 
+	setContext('space', space);
+
 	const createNoteMutation = useMutation(createNote, {
 		onSuccess: (data) => {
 			queryClient.setQueryData('spaces', data);
 		}
 	});
+
 	const deleteNoteMutation = useMutation(deleteNote, {
 		onSuccess: (data) => {
 			queryClient.setQueryData('spaces', data);

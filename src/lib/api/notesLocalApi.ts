@@ -37,3 +37,26 @@ export async function deleteNote({ id, space }: { id: string; space: string }) {
 	const { spaces } = await response.json();
 	return spaces;
 }
+
+export async function updateNote({
+	title,
+	content,
+	space,
+	id
+}: {
+	title: string;
+	content: string;
+	space: string;
+	id: string;
+}) {
+	const response = await fetch(`/note/${id}`, {
+		method: 'PATCH',
+		body: JSON.stringify({ title, content, id, space }),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	});
+
+	const { spaces } = await response.json();
+	return spaces;
+}
