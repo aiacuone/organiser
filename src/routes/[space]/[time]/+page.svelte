@@ -36,7 +36,7 @@
 		}
 	);
 
-	const space: Readable<Space_int | undefined> = derived(page, ($page) =>
+	const space: Readable<Space_int | undefined> = derived([page, spaces], ([$page, $spaces]) =>
 		$page.params.space
 			? $spaces.data?.find((space) => space.name === $page.params.space.replace('-', ' '))
 			: $spaces.data?.[0]
@@ -44,8 +44,7 @@
 
 	const mutation = useMutation(createNote, {
 		onSuccess: (data) => {
-			console.log({ data });
-			queryClient.invalidateQueries('spaces');
+			queryClient.setQueryData('spaces', data);
 		}
 	});
 
