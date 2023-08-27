@@ -44,11 +44,24 @@ export const updateNote = async ({
 	content: string;
 	space: string;
 }) => {
-	console.log('updateNote', { id, title, content, space });
-	// collection.updateOne(
-	// 	{ name: 'spaces', 'data.name': space },
-	// 	{ $set: { 'data.$.notes': { id, title, content } } }
-	// );
+	const updatedNote = {
+		id,
+		title,
+		content,
+		date: new Date()
+	};
+
+	collection.updateOne(
+		{ name: 'spaces', 'data.name': space },
+		{
+			$set: {
+				'data.$.notes.$[note]': updatedNote
+			}
+		},
+		{
+			arrayFilters: [{ 'note.id': id }]
+		}
+	);
 };
 
 export const deleteNote = async ({ id, space }: { id: string; space: string }) => {

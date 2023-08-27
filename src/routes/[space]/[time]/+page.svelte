@@ -48,7 +48,6 @@
 			});
 		}
 		deleteNote();
-		console.log('delete note', id);
 	};
 
 	const filteredNotes = derived([page, space], ([$page, $space]) => {
