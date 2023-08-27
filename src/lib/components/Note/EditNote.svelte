@@ -16,6 +16,7 @@
 	export let titleValue = initialTitleValue;
 	export let id: string;
 	export let onClickAccept: () => void = () => {};
+	export let onClickReset: () => void = () => {};
 	export let date: Date;
 
 	const space: Readable<Space_int> = getContext('space');
@@ -28,9 +29,10 @@
 		}
 	});
 
-	const onClickReset = () => {
+	const _onClickReset = () => {
 		titleValue = initialTitleValue;
 		contentInput.innerText = initialContentValue;
+		onClickReset();
 	};
 
 	const _onClickAccept = () => {
@@ -56,7 +58,7 @@
 	});
 </script>
 
-<NoteContentContainer>
+<NoteContentContainer className="min-h-[110px]">
 	<input
 		type="text"
 		placeholder="Subject"
@@ -74,7 +76,7 @@
 	<Timestamp {date} />
 </NoteContentContainer>
 <NoteButtonContainer>
-	<NoteButton onClick={onClickReset}>
+	<NoteButton onClick={_onClickReset}>
 		<Icon icon="system-uicons:reset" height="17px" />
 	</NoteButton>
 	<NoteButton onClick={_onClickAccept}>

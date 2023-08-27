@@ -5,23 +5,34 @@
 	import NoteButtonContainer from './NoteButtonContainer.svelte';
 	import NoteButton from './NoteButton.svelte';
 	import Timestamp from './Timestamp.svelte';
+	import Button from '../Button.svelte';
 
 	export let title: string;
 	export let content: string;
-	export let onClickDelete: () => void;
+	export let onConfirmDelete: () => void;
 	export let id: string;
 	export let date: Date;
 
 	let isEditing = false;
 	let editNoteContentValue: string;
 	let editNoteTitleValue: string;
+	let isConfirmingDelete = false;
+
+	const onStopEditing = () => {
+		isEditing = false;
+	};
 
 	const onClickEdit = () => {
 		isEditing = true;
 	};
 
-	const onAcceptEdit = () => {
-		isEditing = false;
+	const onClickDelete = () => {
+		isConfirmingDelete = true;
+	};
+
+	const _onConfirmDelete = () => {
+		onConfirmDelete();
+		isConfirmingDelete = false;
 	};
 </script>
 
@@ -33,16 +44,29 @@
 			{id}
 			bind:contentValue={editNoteContentValue}
 			bind:titleValue={editNoteTitleValue}
-			onClickAccept={onAcceptEdit}
+			onClickAccept={onStopEditing}
 			{date}
+			onClickReset={onStopEditing}
 		/>
 	{:else}
-		<NoteContentContainer>
-			<p class="text-opacity-20 text-black">{title}</p>
-			<p class="bg-white break-words">
-				{content}
-			</p>
-			<Timestamp {date} />
+		<NoteContentContainer className="min-h-[110px]">
+			{#if isConfirmingDelete}
+				<NoteContentContainer className=" center">
+					<div class="gap-3 w-full center stack">
+						<p>Are you sure you want to delete</p>
+						<div class="hStack gap-3">
+							<Button onClick={_onConfirmDelete}>Yes</Button>
+							<Button onClick={() => (isConfirmingDelete = false)}>No</Button>
+						</div>
+					</div>
+				</NoteContentContainer>
+			{:else}
+				<p class="text-opacity-20 text-black">{title}</p>
+				<p class="bg-white break-words">
+					{content}
+				</p>
+				<Timestamp {date} />
+			{/if}
 		</NoteContentContainer>
 		<NoteButtonContainer>
 			<NoteButton onClick={onClickEdit}>

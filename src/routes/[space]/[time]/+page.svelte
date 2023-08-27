@@ -134,7 +134,7 @@
 								title={note.title}
 								content={note.content}
 								id={note.id}
-								onClickDelete={() => onClickDelete(note.id)}
+								onConfirmDelete={() => onClickDelete(note.id)}
 								date={note.date}
 							/>
 						{/each}
