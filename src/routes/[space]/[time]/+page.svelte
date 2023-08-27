@@ -14,7 +14,6 @@
 		useMutation,
 		useQuery,
 		useQueryClient,
-		type MutationFunction,
 		type UseQueryStoreResult
 	} from '@sveltestack/svelte-query';
 	import { createNote, deleteNote } from '$lib/api/notesLocalApi';
@@ -42,14 +41,19 @@
 			: $spaces.data?.[0]
 	);
 
-	const mutation = useMutation(createNote, {
+	const createNoteMutation = useMutation(createNote, {
+		onSuccess: (data) => {
+			queryClient.setQueryData('spaces', data);
+		}
+	});
+	const deleteNoteMutation = useMutation(deleteNote, {
 		onSuccess: (data) => {
 			queryClient.setQueryData('spaces', data);
 		}
 	});
 
 	const onClickAccept = () => {
-		$mutation.mutate({
+		$createNoteMutation.mutate({
 			title: newNoteTitleValue,
 			content: newNoteContentValue,
 			space: $space?.name ?? ''
@@ -57,7 +61,7 @@
 	};
 
 	const onClickDelete = (id: string) => {
-		deleteNote({
+		$deleteNoteMutation.mutate({
 			id,
 			space: $space?.name ?? ''
 		});
