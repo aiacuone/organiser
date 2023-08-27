@@ -70,3 +70,17 @@ export const deleteNote = async ({ id, space }: { id: string; space: string }) =
 		{ $pull: { 'data.$.notes': { id } } }
 	);
 };
+
+export const getSpaces = async () => {
+	const spacesDocument = await collection.findOne({ name: 'spaces' });
+	const spaces = spacesDocument?.data;
+
+	return spaces;
+};
+
+export const getTimes = async () => {
+	const timesDocument = await collection.findOne({ name: 'times' });
+	const times = timesDocument?.data;
+
+	return times;
+};

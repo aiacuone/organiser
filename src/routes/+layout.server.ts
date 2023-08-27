@@ -1,14 +1,10 @@
-import { getCollection } from '$lib/server';
+import { getSpaces, getTimes } from '$lib/server';
 // import { testData } from '../testData';
 
 export const load = async (req: Request, res: Response) => {
-	const collection = await getCollection('aiacuone');
+	const spaces = getSpaces();
 
-	const spacesDocument = await collection.findOne({ name: 'spaces' });
-	const spaces = spacesDocument?.data;
-
-	const timesDocument = await collection.findOne({ name: 'times' });
-	const times = timesDocument?.data;
+	const times = getTimes();
 
 	// return {
 	// 	...testData
