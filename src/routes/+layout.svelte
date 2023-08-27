@@ -6,8 +6,7 @@
 	import { goto } from '$app/navigation';
 	import HeaderFooterLink from '../lib/components/HeaderFooterLink.svelte';
 	import type { Space_int, SpaceData_int } from '$lib/types/general';
-	import { QueryClient, QueryClientProvider, useMutation } from '@sveltestack/svelte-query';
-	import { createNote } from '$lib/api/notesLocalApi';
+	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	export let data: SpaceData_int;
 	const { spaces, times } = data;
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Note_int, SpaceData_int, Space_int, Time } from '$lib/types/general';
-	import { getContext, setContext } from 'svelte';
+	import { setContext } from 'svelte';
 	import { derived, type Readable } from 'svelte/store';
 	import { page } from '$app/stores';
 	import NewNote from '$lib/components/Note/NewNote.svelte';
