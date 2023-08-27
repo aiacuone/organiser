@@ -21,33 +21,39 @@
 		const isHomePage = $page.url.pathname === '/';
 		if (isHomePage) goToDefaultSpace();
 	});
+
+	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
+
+	const queryClient = new QueryClient();
 </script>
 
-<div class="stack h-screen">
-	<header class="center py-2" style="background:{$space?.color}">
-		<div class="hStack gap-2 sm:gap-4">
-			{#each spaces as _space}
-				{@const spaceName = _space.name.replace(' ', '-')}
-				<HeaderFooterLink
-					href="/{spaceName}/today"
-					isSelected={$space?.name === _space.name}
-					style="background:{_space.color}">{_space.name}</HeaderFooterLink
-				>
-			{/each}
+<QueryClientProvider client={queryClient}>
+	<div class="stack h-screen">
+		<header class="center py-2" style="background:{$space?.color}">
+			<div class="hStack gap-2 sm:gap-4">
+				{#each spaces as _space}
+					{@const spaceName = _space.name.replace(' ', '-')}
+					<HeaderFooterLink
+						href="/{spaceName}/today"
+						isSelected={$space?.name === _space.name}
+						style="background:{_space.color}">{_space.name}</HeaderFooterLink
+					>
+				{/each}
+			</div>
+		</header>
+		<div class="bg-neutral-100 flex-1">
+			<slot />
 		</div>
-	</header>
-	<div class="bg-neutral-100 flex-1">
-		<slot />
+		<footer class=" py-2" style="background:{$space?.color}">
+			<div class="hStack center capitalize gap-2 sm:gap-4">
+				{#each times as time}
+					{@const timeName = time.name.replace(' ', '-')}
+					<HeaderFooterLink
+						href="/{$space?.name.replace(' ', '-')}/{timeName}"
+						isSelected={$page.params.time === timeName}>{time.name}</HeaderFooterLink
+					>
+				{/each}
+			</div>
+		</footer>
 	</div>
-	<footer class=" py-2" style="background:{$space?.color}">
-		<div class="hStack center capitalize gap-2 sm:gap-4">
-			{#each times as time}
-				{@const timeName = time.name.replace(' ', '-')}
-				<HeaderFooterLink
-					href="/{$space?.name.replace(' ', '-')}/{timeName}"
-					isSelected={$page.params.time === timeName}>{time.name}</HeaderFooterLink
-				>
-			{/each}
-		</div>
-	</footer>
-</div>
+</QueryClientProvider>

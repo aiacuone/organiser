@@ -3,7 +3,6 @@
 	import { getContext } from 'svelte';
 	import { derived, type Readable } from 'svelte/store';
 	import { page } from '$app/stores';
-	import { v4 as uuidv4 } from 'uuid';
 	import NewNote from '$lib/components/Note/NewNote.svelte';
 	import NoteListItem from '$lib/components/Note/NoteListItem.svelte';
 	import {
@@ -11,6 +10,15 @@
 		getTodaysDayMonthYear,
 		getYesterdaysDayMonthYear
 	} from '$lib/utils';
+	import {
+		useMutation,
+		useQuery,
+		useQueryClient,
+		type MutationFunction,
+		type UseQueryStoreResult
+	} from '@sveltestack/svelte-query';
+	import { createNote, deleteNote } from '$lib/api/notesLocalApi';
+	import { getSpaces } from '$lib/api/spaceLocalApi';
 
 	interface PageData extends SpaceData_int {
 		time: string;
@@ -18,39 +26,46 @@
 
 	export let data: PageData;
 
-	const space: Readable<Space_int> = getContext('space');
+	const queryClient = useQueryClient();
 
-	const onCreateNote = () => {
-		async function createNote() {
-			await fetch(`/note/${uuidv4()}`, {
-				method: 'POST',
-				body: JSON.stringify({
-					title: newNoteTitleValue,
-					content: newNoteContentValue,
-					space: $space.name
-				}),
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
+	const spaces: UseQueryStoreResult<unknown, any, Space_int[], 'spaces'> = useQuery(
+		'spaces',
+		getSpaces,
+		{
+			initialData: data.spaces
 		}
-		createNote();
+	);
+
+	const space: Readable<Space_int | undefined> = derived(page, ($page) =>
+		$page.params.space
+			? $spaces.data?.find((space) => space.name === $page.params.space.replace('-', ' '))
+			: $spaces.data?.[0]
+	);
+
+	const mutation = useMutation(createNote, {
+		onSuccess: (data) => {
+			console.log({ data });
+			queryClient.invalidateQueries('spaces');
+		}
+	});
+
+	const onClickAccept = () => {
+		$mutation.mutate({
+			title: newNoteTitleValue,
+			content: newNoteContentValue,
+			space: $space?.name ?? ''
+		});
 	};
 
-	const onDeleteNote = (id: string) => {
-		async function deleteNote() {
-			await fetch(`/note/${id}`, {
-				method: 'DELETE',
-				body: JSON.stringify({ space: $space.name }),
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-		}
-		deleteNote();
+	const onClickDelete = (id: string) => {
+		deleteNote({
+			id,
+			space: $space?.name ?? ''
+		});
 	};
 
 	const filteredNotes = derived([page, space], ([$page, $space]) => {
+		if (!$space) return [];
 		const filterTodaysNotes = (note: Note_int) => {
 			const { string: todaysDateString } = getTodaysDayMonthYear();
 			const { string: noteDateString } = getDayMonthYearFromDate(note.date);
@@ -86,14 +101,14 @@
 	<div class="stack gap-2 w-full px-2 max-w-screen-md h-full sm:h-auto justify-center">
 		<div bind:clientHeight={headerContainer}>
 			<div class="center text-xl hStack gap-2">
-				<p class="capitalize text-opacity-40 text-black">{$space.name}</p>
+				<p class="capitalize text-opacity-40 text-black">{$space?.name}</p>
 				<p class="text-opacity-40 text-black">-</p>
 				<p class="capitalize">{data.time}</p>
 			</div>
 			{#if $page.params.time === 'today' || $page.params.time === 'yesterday'}
 				<NewNote
-					background={$space.color}
-					onClickAccept={onCreateNote}
+					background={$space?.color ?? ''}
+					{onClickAccept}
 					bind:contentValue={newNoteContentValue}
 					bind:subjectValue={newNoteTitleValue}
 				/>
@@ -113,7 +128,7 @@
 								title={note.title}
 								content={note.content}
 								id={note.id}
-								onClickDelete={() => onDeleteNote(note.id)}
+								onClickDelete={() => onClickDelete(note.id)}
 								date={note.date}
 							/>
 						{/each}

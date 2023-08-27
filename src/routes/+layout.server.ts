@@ -3,7 +3,6 @@ import { getSpaces, getTimes } from '$lib/server';
 
 export const load = async (req: Request, res: Response) => {
 	const spaces = getSpaces();
-
 	const times = getTimes();
 
 	// return {
