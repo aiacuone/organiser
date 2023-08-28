@@ -7,6 +7,8 @@
 	import NoteButton from './NoteButton.svelte';
 	import type { Readable } from 'svelte/motion';
 	import type { Space_int } from '$lib/types';
+	import { updateNote } from '$lib/api/notesLocalApi';
+	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 
 	export let initialTitleValue: string;
 	export let initialContentValue: string;
@@ -14,27 +16,33 @@
 	export let titleValue = initialTitleValue;
 	export let id: string;
 	export let onClickAccept: () => void = () => {};
+	export let onClickReset: () => void = () => {};
 	export let date: Date;
 
-	const onClickReset = () => {
+	const space: Readable<Space_int> = getContext('space');
+
+	const queryClient = useQueryClient();
+
+	const updateNoteMutation = useMutation(updateNote, {
+		onSuccess: (data) => {
+			queryClient.setQueryData('spaces', data);
+		}
+	});
+
+	const _onClickReset = () => {
 		titleValue = initialTitleValue;
 		contentInput.innerText = initialContentValue;
+		onClickReset();
 	};
 
-	const space: Readable<Space_int> = getContext('space');
-	console.log({ space: $space });
 	const _onClickAccept = () => {
 		onClickAccept();
-		async function updateNote() {
-			await fetch(`/note/${id}`, {
-				method: 'PATCH',
-				body: JSON.stringify({ title: titleValue, content: contentValue, id, space: $space.name }),
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-		}
-		updateNote();
+		$updateNoteMutation.mutate({
+			id,
+			title: titleValue,
+			content: contentValue,
+			space: $space.name
+		});
 	};
 
 	let contentInput: HTMLDivElement;
@@ -50,7 +58,7 @@
 	});
 </script>
 
-<NoteContentContainer>
+<NoteContentContainer className="min-h-[110px]">
 	<input
 		type="text"
 		placeholder="Subject"
@@ -68,7 +76,7 @@
 	<Timestamp {date} />
 </NoteContentContainer>
 <NoteButtonContainer>
-	<NoteButton onClick={onClickReset}>
+	<NoteButton onClick={_onClickReset}>
 		<Icon icon="system-uicons:reset" height="17px" />
 	</NoteButton>
 	<NoteButton onClick={_onClickAccept}>

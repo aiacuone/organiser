@@ -1,4 +1,5 @@
 import { MONGO_URL } from '$env/static/private';
+import type { Space_int } from '$lib/types';
 import { MongoClient } from 'mongodb';
 
 export const getDatabase = async () => {
@@ -26,11 +27,13 @@ export const createNote = async ({
 	title: string;
 	content: string;
 	space: string;
-}) => {
-	collection.updateOne(
+}): Promise<{ spaces: Space_int[] }> => {
+	await collection.updateOne(
 		{ name: 'spaces', 'data.name': space },
 		{ $push: { 'data.$.notes': { id, title, content, date: new Date() } } }
 	);
+	const spaces = await getSpaces();
+	return { spaces };
 };
 
 export const updateNote = async ({
@@ -43,7 +46,7 @@ export const updateNote = async ({
 	title: string;
 	content: string;
 	space: string;
-}) => {
+}): Promise<{ spaces: Space_int[] }> => {
 	const updatedNote = {
 		id,
 		title,
@@ -51,7 +54,7 @@ export const updateNote = async ({
 		date: new Date()
 	};
 
-	collection.updateOne(
+	await collection.updateOne(
 		{ name: 'spaces', 'data.name': space },
 		{
 			$set: {
@@ -62,13 +65,24 @@ export const updateNote = async ({
 			arrayFilters: [{ 'note.id': id }]
 		}
 	);
+
+	const spaces = await getSpaces();
+	return { spaces };
 };
 
-export const deleteNote = async ({ id, space }: { id: string; space: string }) => {
-	collection.updateOne(
+export const deleteNote = async ({
+	id,
+	space
+}: {
+	id: string;
+	space: string;
+}): Promise<{ spaces: Space_int[] }> => {
+	await collection.updateOne(
 		{ name: 'spaces', 'data.name': space },
 		{ $pull: { 'data.$.notes': { id } } }
 	);
+	const spaces = await getSpaces();
+	return { spaces };
 };
 
 export const getSpaces = async () => {

@@ -1,4 +1,4 @@
-export type Time = 'today' | 'yesterday' | 'history';
+export type Time_type = 'today' | 'yesterday' | 'history';
 
 export interface Space_int {
 	name: string;
@@ -7,7 +7,7 @@ export interface Space_int {
 }
 
 export interface Option_int {
-	name: Time;
+	name: Time_type;
 }
 
 export interface Note_int {
