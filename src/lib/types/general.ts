@@ -1,4 +1,8 @@
-export type Time_type = 'today' | 'yesterday' | 'history';
+export enum Time_enum {
+	Today = 'today',
+	Yesterday = 'yesterday',
+	History = 'history'
+}
 
 export interface Space_int {
 	name: string;
@@ -7,7 +11,7 @@ export interface Space_int {
 }
 
 export interface Option_int {
-	name: Time_type;
+	name: Time_enum;
 }
 
 export interface Note_int {

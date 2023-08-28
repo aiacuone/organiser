@@ -5,18 +5,21 @@ const resource = 'note';
 export async function createNote({
 	title,
 	content,
-	space
+	space,
+	date
 }: {
 	title: string;
 	content: string;
 	space: string;
+	date: Date;
 }) {
 	const response = await fetch(`/${resource}/${uuidv4()}`, {
 		method: 'POST',
 		body: JSON.stringify({
 			title,
 			content,
-			space
+			space,
+			date
 		}),
 		headers: {
 			'Content-Type': 'application/json'
