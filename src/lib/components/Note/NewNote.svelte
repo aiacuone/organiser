@@ -3,13 +3,14 @@
 	import NoteButtonContainer from './NoteButtonContainer.svelte';
 	import NoteContentContainer from './NoteContentContainer.svelte';
 	import NoteButton from './NoteButton.svelte';
+	import { afterUpdate, onMount } from 'svelte';
 
 	export let background: string;
 	export let onClickAccept: () => void;
 	export let contentValue: string;
-	export let subjectValue: string;
 
 	// used this because bind the value of the element is causing issues
+	let titleInput: HTMLInputElement;
 	let contentInput: HTMLDivElement;
 
 	const onInputChange = (e) => {
@@ -18,14 +19,42 @@
 
 	const onClickReset = () => {
 		contentInput.innerText = '';
-		subjectValue = '';
+		titleInput.value = '';
 	};
 
-	const _onClickAccept = () => {
+	const onAccept = () => {
 		onClickAccept();
 		contentInput.innerText = '';
-		subjectValue = '';
+		titleInput.value = '';
 	};
+
+	onMount(() => {
+		const onKeyDown = (e) => {
+			const test = document.getElementById('new-note-title-input');
+			const key = e.key;
+			const keyMethods: Record<string, () => void> = {
+				Enter: () => {
+					onAccept();
+				},
+				ArrowUp: () => {
+					titleInput.focus();
+				},
+				ArrowDown: () => {
+					contentInput.focus();
+				},
+				Tab: () => {
+					e.preventDefault();
+					document.activeElement === titleInput ? contentInput.focus() : titleInput.focus();
+				}
+			};
+			keyMethods[key]?.();
+		};
+
+		document.addEventListener('keydown', onKeyDown);
+		return () => {
+			document.removeEventListener('keydown', onKeyDown);
+		};
+	});
 </script>
 
 <div
@@ -34,12 +63,14 @@
 >
 	<NoteContentContainer>
 		<input
+			id="new-note-title-input"
 			type="text"
-			placeholder="Subject"
+			placeholder="Title"
 			class="outline-0 text-opacity-30 w-full text-black text-sm"
-			bind:value={subjectValue}
+			bind:this={titleInput}
 		/>
 		<div
+			id="new-note-content-input"
 			class="w-full outline-0 input flex items-center break-normal text-sm"
 			role="textbox"
 			contenteditable
@@ -51,7 +82,7 @@
 		<NoteButton onClick={onClickReset}>
 			<Icon icon="system-uicons:reset" height="17px" />
 		</NoteButton>
-		<NoteButton onClick={_onClickAccept}>
+		<NoteButton onClick={onAccept}>
 			<Icon icon="mdi:tick" height="17px" />
 		</NoteButton>
 	</NoteButtonContainer>

@@ -122,7 +122,6 @@
 			return filteredTimeNotes[time];
 		}
 	);
-	$: $filteredNotes, console.log($filteredNotes);
 
 	let newNoteContentValue: string = '';
 	let newNoteTitleValue: string = '';
@@ -153,8 +152,8 @@
 			<NewNote
 				background={$space?.color ?? ''}
 				{onClickAccept}
+				bind:titleValue={newNoteTitleValue}
 				bind:contentValue={newNoteContentValue}
-				bind:subjectValue={newNoteTitleValue}
 			/>
 		</div>
 		<div class="stack gap-6">
