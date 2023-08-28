@@ -21,6 +21,7 @@
 	} from '@sveltestack/svelte-query';
 	import { createNote, deleteNote } from '$lib/api/notesLocalApi';
 	import { getSpaces } from '$lib/api/spaceLocalApi';
+	import { editNoteContentInputValue } from '$lib/stores';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -67,7 +68,7 @@
 
 		$createNoteMutation.mutate({
 			title: newNoteTitleValue,
-			content: newNoteContentValue,
+			content: $editNoteContentInputValue,
 			space: $space?.name ?? '',
 			date: timeData[data.time]
 		});
@@ -123,7 +124,6 @@
 		}
 	);
 
-	let newNoteContentValue: string = '';
 	let newNoteTitleValue: string = '';
 
 	let headerContainer: number;
@@ -153,7 +153,6 @@
 				background={$space?.color ?? ''}
 				{onClickAccept}
 				bind:titleValue={newNoteTitleValue}
-				bind:contentValue={newNoteContentValue}
 			/>
 		</div>
 		<div class="stack gap-6">

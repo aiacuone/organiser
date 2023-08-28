@@ -6,6 +6,7 @@
 	import NoteButton from './NoteButton.svelte';
 	import Timestamp from './Timestamp.svelte';
 	import Button from '../Button.svelte';
+	import { onMount } from 'svelte';
 
 	export let title: string;
 	export let content: string;
@@ -34,6 +35,11 @@
 		onConfirmDelete();
 		isConfirmingDelete = false;
 	};
+
+	let contentTextarea: HTMLTextAreaElement;
+	onMount(() => {
+		contentTextarea.style.height = contentTextarea.scrollHeight + 'px';
+	});
 </script>
 
 <div class="flex-col sm:flex-row center gap-2">
@@ -51,20 +57,21 @@
 	{:else}
 		<NoteContentContainer className="min-h-[110px]">
 			{#if isConfirmingDelete}
-				<NoteContentContainer className=" center">
-					<div class="gap-3 w-full center stack">
-						<p>Are you sure you want to delete</p>
-						<div class="hStack gap-3">
-							<Button onClick={_onConfirmDelete}>Yes</Button>
-							<Button onClick={() => (isConfirmingDelete = false)}>No</Button>
-						</div>
+				<div class="gap-3 w-full center stack">
+					<p>Are you sure you want to delete</p>
+					<div class="hStack gap-3">
+						<Button onClick={_onConfirmDelete}>Yes</Button>
+						<Button onClick={() => (isConfirmingDelete = false)}>No</Button>
 					</div>
-				</NoteContentContainer>
+				</div>
 			{:else}
 				<p class="text-opacity-20 text-black">{title}</p>
-				<p class="bg-white break-words">
-					{content}
-				</p>
+				<textarea
+					disabled
+					class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden h-[20px] bg-white"
+					value={content}
+					bind:this={contentTextarea}
+				/>
 				<Timestamp {date} />
 			{/if}
 		</NoteContentContainer>

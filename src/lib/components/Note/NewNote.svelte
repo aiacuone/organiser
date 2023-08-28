@@ -3,14 +3,15 @@
 	import NoteButtonContainer from './NoteButtonContainer.svelte';
 	import NoteContentContainer from './NoteContentContainer.svelte';
 	import NoteButton from './NoteButton.svelte';
-	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
+	import { editNoteContentInputValue } from '$lib/stores';
 
 	export let background: string;
 	export let onClickAccept: () => void;
+	export let titleValue: string;
 
 	// used this because bind the value of the element is causing issues
-	let titleInput: HTMLTextAreaElement;
+	let titleInput: HTMLInputElement;
 	let contentInput: HTMLTextAreaElement;
 
 	const onClickReset = () => {
@@ -20,8 +21,8 @@
 
 	const onAccept = () => {
 		onClickAccept();
-		contentInput.innerText = '';
-		titleInput.value = '';
+		titleValue = $editNoteContentInputValue = '';
+		contentInput.style.height = '20px';
 	};
 
 	const pressedKeys: Writable<Record<string, boolean>> = writable({});
@@ -35,7 +36,7 @@
 			e.preventDefault(); // Prevent the default Enter behavior
 
 			const cursorPosition = textarea.selectionStart;
-			const text = textarea.value;
+			const text = $editNoteContentInputValue;
 			const lines = text.split('\n');
 			const currentLineIndex = text.substr(0, cursorPosition).split('\n').length - 1;
 
@@ -47,7 +48,7 @@
 				lines[currentLineIndex] = updatedLine;
 
 				// Update textarea value with modified lines
-				textarea.value = lines.join('\n');
+				$editNoteContentInputValue = lines.join('\n');
 
 				// Adjust cursor position
 				textarea.selectionStart = lineStart + 3;
@@ -58,7 +59,7 @@
 		const keyMethods: Record<string, () => void> = {
 			Enter: () => {
 				e.preventDefault();
-				textarea.value += '\n';
+				$editNoteContentInputValue += '\n';
 				textarea.style.height = textarea.scrollHeight + 'px';
 			},
 			ArrowUp: () => {
@@ -69,7 +70,7 @@
 			},
 			Tab: () => {
 				e.preventDefault();
-				textarea === titleInput ? contentInput.focus() : titleInput.focus();
+				textarea === contentInput ? titleInput.focus() : contentInput.focus();
 			}
 		};
 		keyMethods[key]?.();
@@ -85,13 +86,11 @@
 	style="background:{background}"
 >
 	<NoteContentContainer>
-		<textarea
+		<input
 			placeholder="Title"
 			class="outline-0 text-opacity-30 w-full text-black text-sm resize-none overflow-x-hidden h-[20px]"
 			bind:this={titleInput}
-			on:input={() => autoExpand(titleInput)}
-			on:keydown={(e) => onKeydown(e, titleInput)}
-			on:keyup={() => ($pressedKeys = {})}
+			bind:value={titleValue}
 		/>
 		<textarea
 			placeholder="Content"
@@ -100,6 +99,7 @@
 			on:input={() => autoExpand(contentInput)}
 			on:keydown={(e) => onKeydown(e, contentInput)}
 			on:keyup={() => ($pressedKeys = {})}
+			bind:value={$editNoteContentInputValue}
 		/>
 	</NoteContentContainer>
 	<NoteButtonContainer>
