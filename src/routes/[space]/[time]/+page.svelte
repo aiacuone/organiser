@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Note_int, SpaceData_int, Space_int, Time } from '$lib/types/general';
+	import type { Note_int, SpaceData_int, Space_int, Time_type } from '$lib/types/general';
 	import { setContext } from 'svelte';
 	import { derived, type Readable } from 'svelte/store';
 	import { page } from '$app/stores';
@@ -20,7 +20,7 @@
 	import { getSpaces } from '$lib/api/spaceLocalApi';
 
 	interface PageData extends SpaceData_int {
-		time: string;
+		time: Time_type;
 	}
 
 	export let data: PageData;
@@ -83,13 +83,13 @@
 			return noteDateString === yesterdayDateString;
 		};
 
-		const filteredTimeNotes: Record<Time, Note_int[]> = {
+		const filteredTimeNotes: Record<Time_type, Note_int[]> = {
 			today: $space.notes.filter(filterTodaysNotes),
 			yesterday: $space.notes.filter(filterYesterdaysNotes),
 			history: $space.notes
 		};
 
-		const time = $page.params.time as Time;
+		const time = $page.params.time as Time_type;
 
 		return filteredTimeNotes[time];
 	});
