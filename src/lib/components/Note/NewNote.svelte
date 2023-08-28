@@ -3,19 +3,15 @@
 	import NoteButtonContainer from './NoteButtonContainer.svelte';
 	import NoteContentContainer from './NoteContentContainer.svelte';
 	import NoteButton from './NoteButton.svelte';
-	import { afterUpdate, onMount } from 'svelte';
+	import { onMount } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
 
 	export let background: string;
 	export let onClickAccept: () => void;
-	export let contentValue: string;
 
 	// used this because bind the value of the element is causing issues
-	let titleInput: HTMLInputElement;
-	let contentInput: HTMLDivElement;
-
-	const onInputChange = (e) => {
-		contentValue = e.target.innerText;
-	};
+	let titleInput: HTMLTextAreaElement;
+	let contentInput: HTMLTextAreaElement;
 
 	const onClickReset = () => {
 		contentInput.innerText = '';
@@ -28,33 +24,60 @@
 		titleInput.value = '';
 	};
 
-	onMount(() => {
-		const onKeyDown = (e) => {
-			const test = document.getElementById('new-note-title-input');
-			const key = e.key;
-			const keyMethods: Record<string, () => void> = {
-				Enter: () => {
-					onAccept();
-				},
-				ArrowUp: () => {
-					titleInput.focus();
-				},
-				ArrowDown: () => {
-					contentInput.focus();
-				},
-				Tab: () => {
-					e.preventDefault();
-					document.activeElement === titleInput ? contentInput.focus() : titleInput.focus();
-				}
-			};
-			keyMethods[key]?.();
-		};
+	const pressedKeys: Writable<Record<string, boolean>> = writable({});
 
-		document.addEventListener('keydown', onKeyDown);
-		return () => {
-			document.removeEventListener('keydown', onKeyDown);
+	const onKeydown = (e: KeyboardEvent, textarea: HTMLTextAreaElement) => {
+		const key = e.key;
+		$pressedKeys[key] = true;
+
+		// ⌘ + 8
+		if ($pressedKeys['Meta'] && $pressedKeys['8']) {
+			e.preventDefault(); // Prevent the default Enter behavior
+
+			const cursorPosition = textarea.selectionStart;
+			const text = textarea.value;
+			const lines = text.split('\n');
+			const currentLineIndex = text.substr(0, cursorPosition).split('\n').length - 1;
+
+			const lineStart = text.lastIndexOf('\n', cursorPosition - 1) + 1;
+
+			if (lines[currentLineIndex].trim() !== '') {
+				// Add a new line to the list
+				const updatedLine = `• ${lines[currentLineIndex]}`;
+				lines[currentLineIndex] = updatedLine;
+
+				// Update textarea value with modified lines
+				textarea.value = lines.join('\n');
+
+				// Adjust cursor position
+				textarea.selectionStart = lineStart + 3;
+				textarea.selectionEnd = lineStart + 3;
+			}
+		}
+
+		const keyMethods: Record<string, () => void> = {
+			Enter: () => {
+				e.preventDefault();
+				textarea.value += '\n';
+				textarea.style.height = textarea.scrollHeight + 'px';
+			},
+			ArrowUp: () => {
+				// e.preventDefault();
+			},
+			ArrowDown: () => {
+				// e.preventDefault();
+			},
+			Tab: () => {
+				e.preventDefault();
+				textarea === titleInput ? contentInput.focus() : titleInput.focus();
+			}
 		};
-	});
+		keyMethods[key]?.();
+	};
+
+	const autoExpand = (textarea: HTMLTextAreaElement) => {
+		textarea.style.height = textarea.scrollHeight + 'px';
+	};
 </script>
 
 <div
@@ -62,20 +85,21 @@
 	style="background:{background}"
 >
 	<NoteContentContainer>
-		<input
-			id="new-note-title-input"
-			type="text"
+		<textarea
 			placeholder="Title"
-			class="outline-0 text-opacity-30 w-full text-black text-sm"
+			class="outline-0 text-opacity-30 w-full text-black text-sm resize-none overflow-x-hidden h-[20px]"
 			bind:this={titleInput}
+			on:input={() => autoExpand(titleInput)}
+			on:keydown={(e) => onKeydown(e, titleInput)}
+			on:keyup={() => ($pressedKeys = {})}
 		/>
-		<div
-			id="new-note-content-input"
-			class="w-full outline-0 input flex items-center break-normal text-sm"
-			role="textbox"
-			contenteditable
-			on:input={onInputChange}
+		<textarea
+			placeholder="Content"
+			class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden h-[20px]"
 			bind:this={contentInput}
+			on:input={() => autoExpand(contentInput)}
+			on:keydown={(e) => onKeydown(e, contentInput)}
+			on:keyup={() => ($pressedKeys = {})}
 		/>
 	</NoteContentContainer>
 	<NoteButtonContainer>
