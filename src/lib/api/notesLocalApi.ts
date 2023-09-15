@@ -1,3 +1,4 @@
+import { axios } from '$lib/general/axios';
 import { v4 as uuidv4 } from 'uuid';
 
 const resource = 'note';
@@ -13,31 +14,21 @@ export async function createNote({
 	space: string;
 	date: Date;
 }) {
-	const response = await fetch(`/${resource}/${uuidv4()}`, {
-		method: 'POST',
-		body: JSON.stringify({
-			title,
-			content,
-			space,
-			date
-		}),
-		headers: {
-			'Content-Type': 'application/json'
-		}
+	const response = await axios.post(`${resource}/${uuidv4()}`, {
+		title,
+		content,
+		space,
+		date
 	});
-	const { spaces } = await response.json();
+	const spaces = response.data.spaces;
 	return spaces;
 }
 
 export async function deleteNote({ id, space }: { id: string; space: string }) {
-	const response = await fetch(`/${resource}/${id}`, {
-		method: 'DELETE',
-		body: JSON.stringify({ space }),
-		headers: {
-			'Content-Type': 'application/json'
-		}
+	const response = await axios.delete(`/${resource}/${id}`, {
+		data: { space }
 	});
-	const { spaces } = await response.json();
+	const spaces = response.data.spaces;
 	return spaces;
 }
 
@@ -52,14 +43,13 @@ export async function updateNote({
 	space: string;
 	id: string;
 }) {
-	const response = await fetch(`/note/${id}`, {
-		method: 'PATCH',
-		body: JSON.stringify({ title, content, id, space }),
-		headers: {
-			'Content-Type': 'application/json'
-		}
+	const response = await axios.patch(`/${resource}/${id}`, {
+		title,
+		content,
+		space,
+		id
 	});
 
-	const { spaces } = await response.json();
+	const spaces = response.data.spaces;
 	return spaces;
 }

@@ -1,13 +1,10 @@
+import { axios } from '$lib/general/axios';
+
 const resource = 'space';
 
 export async function getSpaces() {
-	const response = await fetch(`/${resource}`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	});
-	const { spaces } = await response.json();
+	const response = await axios.get(`${resource}`);
 
+	const spaces = response.data.spaces;
 	return spaces;
 }
