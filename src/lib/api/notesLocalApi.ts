@@ -40,20 +40,23 @@ export async function updateNote({
 	content,
 	space,
 	id,
-	time
+	time,
+	date
 }: {
 	title: string;
 	content: string;
 	space: string;
 	id: string;
 	time: number;
+	date: Date;
 }) {
 	const response = await axios.patch(`/${resource}/${id}`, {
 		title,
 		content,
 		space,
 		id,
-		time
+		time,
+		date
 	});
 
 	const spaces = response.data.spaces;

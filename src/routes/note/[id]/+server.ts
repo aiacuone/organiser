@@ -2,8 +2,8 @@ import { createNote, deleteNote, updateNote } from '$lib';
 
 export async function PATCH({ params, request }) {
 	const { id } = params;
-	const { title, content, space, time } = await request.json();
-	const { spaces } = await updateNote({ id, title, content, space, time });
+	const { title, content, space, time, date } = await request.json();
+	const { spaces } = await updateNote({ id, title, content, space, time, date });
 
 	return new Response(JSON.stringify({ spaces }), { status: 200 });
 }

@@ -2,6 +2,6 @@
 	export let onClick: () => void = () => {};
 </script>
 
-<button on:click={onClick} class="bg-gray-200 py-1 px-5 rounded">
+<button on:click={onClick} class="bg-gray-200 py-1 px-5 rounded self-center">
 	<slot />
 </button>

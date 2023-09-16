@@ -41,7 +41,8 @@
 			title: titleValue,
 			content: contentValue,
 			space: $space.name,
-			time
+			time,
+			date
 		});
 	};
 

@@ -40,7 +40,7 @@
 				{/each}
 			</div>
 		</header>
-		<div class="bg-neutral-100 flex-1">
+		<div class="flex-1">
 			<slot />
 		</div>
 		<footer class=" py-2" style="background:{$space?.color}">

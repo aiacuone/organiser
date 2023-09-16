@@ -45,19 +45,21 @@ export const updateNote = async ({
 	title,
 	content,
 	space,
-	time
+	time,
+	date
 }: {
 	id: string;
 	title: string;
 	content: string;
 	space: string;
 	time: number;
+	date: Date;
 }): Promise<{ spaces: Space_int[] }> => {
 	const updatedNote = {
 		id,
 		title,
 		content,
-		date: new Date(),
+		date,
 		time
 	};
 

@@ -22,6 +22,8 @@
 	import { createNote, deleteNote } from '$lib/api/notesLocalApi';
 	import { getSpaces } from '$lib/api/spaceLocalApi';
 	import { editNoteContentInputValue } from '$lib/stores';
+	import Button from '$lib/components/Button.svelte';
+	import Timestamp from '$lib/components/Note/Timestamp.svelte';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -129,6 +131,21 @@
 	let parentContainerHeight: number;
 	let notesContainerHeight: number;
 	$: parentContainerHeight, (notesContainerHeight = parentContainerHeight - headerContainer - 30);
+
+	let exportedNotesModal: HTMLDialogElement;
+
+	let showInNotesModalCheckboxes: Record<string, boolean> = {
+		times: false,
+		dates: false
+	};
+
+	let notesModalTextArea: HTMLDivElement;
+	const copy = () => {
+		const clipboardItem = new ClipboardItem({
+			'text/plain': new Blob([notesModalTextArea.innerText.trim()], { type: 'text/plain' })
+		});
+		navigator.clipboard.write([clipboardItem]);
+	};
 </script>
 
 <div class="h-full center stack" bind:clientHeight={parentContainerHeight}>
@@ -139,15 +156,16 @@
 				<p class="text-opacity-40 text-black">-</p>
 				<p class="capitalize">{data.time}</p>
 			</div>
-			{#if $page.params.time === 'history'}
-				<div class="center">
+			<div class="center hStack gap-3">
+				{#if $page.params.time === 'history'}
 					<input
 						type="date"
 						class="border border-gray-300 px-5 py-1 rounded"
 						bind:value={$datePickerValue}
 					/>
-				</div>
-			{/if}
+				{/if}
+				<Button onClick={() => exportedNotesModal.showModal()}>Export</Button>
+			</div>
 			<NewNote background={$space?.color ?? ''} {onClickAccept} />
 		</div>
 		<div class="stack gap-6">
@@ -175,3 +193,46 @@
 		</div>
 	</div>
 </div>
+
+<dialog
+	bind:this={exportedNotesModal}
+	class="w-full max-w-[800px] p-5 sm:p-10 rounded-md h-screen sm:h-[auto]"
+>
+	<div class="stack justify-end h-full">
+		<div class="hStack gap-3 justify-end align-center text-xs">
+			<p>Show:</p>
+			{#each Object.keys(showInNotesModalCheckboxes) as checkbox}
+				<label class="center gap-1">
+					{checkbox}
+					<input type="checkbox" bind:checked={showInNotesModalCheckboxes[checkbox]} />
+				</label>
+			{/each}
+		</div>
+		<div class="stack gap-10 center h-full">
+			<div class="stack gap-4" bind:this={notesModalTextArea}>
+				{#each $filteredNotes as note, $index}
+					{@const $last = $filteredNotes.length - 1 === $index}
+					<div class="stack">
+						<p class="capitalize">{note.title}</p>
+						<p class="text-xs py-2 capitalize">{note.content}</p>
+						{#if showInNotesModalCheckboxes.dates}
+							<p class="text-opacity-30 text-black text-xs">
+								<Timestamp date={note.date} />
+							</p>
+						{/if}
+						{#if showInNotesModalCheckboxes.times}
+							<p class="text-opacity-30 text-black text-xs">{note.time} h</p>
+						{/if}
+					</div>
+					{#if !$last}
+						<hr class="border-gray-100" />
+					{/if}
+				{/each}
+			</div>
+			<div class="flex flex-col sm:flex-row gap-4 center">
+				<Button onClick={copy}>Copy</Button>
+				<Button onClick={() => exportedNotesModal.close()}>Close</Button>
+			</div>
+		</div>
+	</div>
+</dialog>
