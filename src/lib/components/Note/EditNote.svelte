@@ -1,14 +1,12 @@
 <script lang="ts">
-	import Icon from '@iconify/svelte';
 	import { getContext, onMount } from 'svelte';
 	import NoteContentContainer from './NoteContentContainer.svelte';
-	import Timestamp from './Timestamp.svelte';
-	import NoteButtonContainer from './NoteButtonContainer.svelte';
-	import NoteButton from './NoteButton.svelte';
 	import type { Readable } from 'svelte/motion';
 	import type { Space_int } from '$lib/types';
 	import { updateNote } from '$lib/api/notesLocalApi';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
+	import TimestampAndTime from './TimestampAndTime.svelte';
+	import EditOrAddButtons from './EditOrAddButtons.svelte';
 
 	export let initialTitleValue: string;
 	export let initialContentValue: string;
@@ -18,6 +16,7 @@
 	export let onClickAccept: () => void = () => {};
 	export let onClickReset: () => void = () => {};
 	export let date: Date;
+	export let time: number;
 
 	const space: Readable<Space_int> = getContext('space');
 
@@ -41,7 +40,8 @@
 			id,
 			title: titleValue,
 			content: contentValue,
-			space: $space.name
+			space: $space.name,
+			time
 		});
 	};
 
@@ -56,6 +56,11 @@
 		contentInput.innerText = initialContentValue;
 		titleInput.focus();
 	});
+
+	const onChangeTime = (increaseOrDecrease: 'increase' | 'decrease') => {
+		if (time === 0.5 && increaseOrDecrease === 'decrease') return;
+		increaseOrDecrease === 'increase' ? (time = time + 0.5) : (time = time - 0.5);
+	};
 </script>
 
 <NoteContentContainer className="min-h-[110px]">
@@ -73,13 +78,8 @@
 		on:input={onInputChange}
 		bind:this={contentInput}
 	/>
-	<Timestamp {date} />
+	<div class="pt-3">
+		<TimestampAndTime {date} {time} />
+	</div>
 </NoteContentContainer>
-<NoteButtonContainer>
-	<NoteButton onClick={_onClickReset}>
-		<Icon icon="system-uicons:reset" height="17px" />
-	</NoteButton>
-	<NoteButton onClick={_onClickAccept}>
-		<Icon icon="mdi:tick" height="17px" />
-	</NoteButton>
-</NoteButtonContainer>
+<EditOrAddButtons onClickReset={_onClickReset} onAccept={_onClickAccept} {time} {onChangeTime} />

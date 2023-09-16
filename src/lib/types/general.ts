@@ -19,6 +19,7 @@ export interface Note_int {
 	title: string;
 	content: string;
 	date: Date;
+	time: number;
 }
 
 export interface SpaceData_int {

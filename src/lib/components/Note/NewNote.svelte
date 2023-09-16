@@ -1,18 +1,18 @@
 <script lang="ts">
-	import Icon from '@iconify/svelte';
-	import NoteButtonContainer from './NoteButtonContainer.svelte';
 	import NoteContentContainer from './NoteContentContainer.svelte';
-	import NoteButton from './NoteButton.svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { editNoteContentInputValue } from '$lib/stores';
+	import EditOrAddButtons from './EditOrAddButtons.svelte';
 
 	export let background: string;
-	export let onClickAccept: () => void;
-	export let titleValue: string;
+	export let onClickAccept: ({ title, time }: { title: string; time: number }) => void;
+
+	export let time: number = 0.5;
 
 	// used this because bind the value of the element is causing issues
 	let titleInput: HTMLInputElement;
 	let contentInput: HTMLTextAreaElement;
+	let titleValue: string = '';
 
 	const onClickReset = () => {
 		contentInput.innerText = '';
@@ -20,9 +20,10 @@
 	};
 
 	const onAccept = () => {
-		onClickAccept();
+		onClickAccept({ title: titleValue, time });
 		titleValue = $editNoteContentInputValue = '';
 		contentInput.style.height = '20px';
+		time = 0.5;
 	};
 
 	const pressedKeys: Writable<Record<string, boolean>> = writable({});
@@ -79,6 +80,11 @@
 	const autoExpand = (textarea: HTMLTextAreaElement) => {
 		textarea.style.height = textarea.scrollHeight + 'px';
 	};
+
+	const onChangeTime = (increaseOrDecrease: 'increase' | 'decrease') => {
+		if (time === 0.5 && increaseOrDecrease === 'decrease') return;
+		increaseOrDecrease === 'increase' ? (time = time + 0.5) : (time = time - 0.5);
+	};
 </script>
 
 <div
@@ -102,14 +108,7 @@
 			bind:value={$editNoteContentInputValue}
 		/>
 	</NoteContentContainer>
-	<NoteButtonContainer>
-		<NoteButton onClick={onClickReset}>
-			<Icon icon="system-uicons:reset" height="17px" />
-		</NoteButton>
-		<NoteButton onClick={onAccept}>
-			<Icon icon="mdi:tick" height="17px" />
-		</NoteButton>
-	</NoteButtonContainer>
+	<EditOrAddButtons {onClickReset} {onAccept} {time} {onChangeTime} />
 </div>
 
 <style>

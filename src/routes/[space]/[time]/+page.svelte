@@ -4,7 +4,7 @@
 	import { derived, writable, type Readable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
 	import NewNote from '$lib/components/Note/NewNote.svelte';
-	import NoteListItem from '$lib/components/Note/NoteListItem.svelte';
+	import Note from '$lib/components/Note/Note.svelte';
 	import {
 		getDate2DaysEarlier,
 		getDateFromHyphenatedString,
@@ -59,7 +59,7 @@
 		}
 	});
 
-	const onClickAccept = () => {
+	const onClickAccept = ({ title, time }: { title: string; time: number }) => {
 		const timeData: Record<Time_enum, Date> = {
 			[Time_enum.Today]: new Date(),
 			[Time_enum.Yesterday]: getYesterdaysDate(),
@@ -67,10 +67,11 @@
 		};
 
 		$createNoteMutation.mutate({
-			title: newNoteTitleValue,
+			title,
 			content: $editNoteContentInputValue,
 			space: $space?.name ?? '',
-			date: timeData[data.time]
+			date: timeData[data.time],
+			time
 		});
 	};
 
@@ -124,8 +125,6 @@
 		}
 	);
 
-	let newNoteTitleValue: string = '';
-
 	let headerContainer: number;
 	let parentContainerHeight: number;
 	let notesContainerHeight: number;
@@ -149,11 +148,7 @@
 					/>
 				</div>
 			{/if}
-			<NewNote
-				background={$space?.color ?? ''}
-				{onClickAccept}
-				bind:titleValue={newNoteTitleValue}
-			/>
+			<NewNote background={$space?.color ?? ''} {onClickAccept} />
 		</div>
 		<div class="stack gap-6">
 			<div
@@ -165,12 +160,13 @@
 						<p class="text-opacity-40 text-black text-center">No notes for this date</p>
 					{:else}
 						{#each $filteredNotes as note}
-							<NoteListItem
+							<Note
 								title={note.title}
 								content={note.content}
 								id={note.id}
 								onConfirmDelete={() => onClickDelete(note.id)}
 								date={note.date}
+								time={note.time}
 							/>
 						{/each}
 					{/if}

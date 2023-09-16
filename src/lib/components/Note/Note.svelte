@@ -4,15 +4,16 @@
 	import NoteContentContainer from './NoteContentContainer.svelte';
 	import NoteButtonContainer from './NoteButtonContainer.svelte';
 	import NoteButton from './NoteButton.svelte';
-	import Timestamp from './Timestamp.svelte';
 	import Button from '../Button.svelte';
 	import { onMount } from 'svelte';
+	import TimestampAndTime from './TimestampAndTime.svelte';
 
 	export let title: string;
 	export let content: string;
 	export let onConfirmDelete: () => void;
 	export let id: string;
 	export let date: Date;
+	export let time: number;
 
 	let isEditing = false;
 	let editNoteContentValue: string;
@@ -53,6 +54,7 @@
 			onClickAccept={onStopEditing}
 			{date}
 			onClickReset={onStopEditing}
+			{time}
 		/>
 	{:else}
 		<NoteContentContainer className="min-h-[110px]">
@@ -72,7 +74,9 @@
 					value={content}
 					bind:this={contentTextarea}
 				/>
-				<Timestamp {date} />
+				<div class="pt-3">
+					<TimestampAndTime {date} {time} />
+				</div>
 			{/if}
 		</NoteContentContainer>
 		<NoteButtonContainer>
