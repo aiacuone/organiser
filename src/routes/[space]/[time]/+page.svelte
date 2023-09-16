@@ -164,7 +164,10 @@
 						bind:value={$datePickerValue}
 					/>
 				{/if}
-				<Button onClick={() => exportedNotesModal.showModal()}>Export</Button>
+				<Button
+					onClick={() => exportedNotesModal.showModal()}
+					isDisabled={$filteredNotes.length === 0}>Export</Button
+				>
 			</div>
 			<NewNote background={$space?.color ?? ''} {onClickAccept} />
 		</div>
