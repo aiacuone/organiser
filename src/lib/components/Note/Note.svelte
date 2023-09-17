@@ -18,8 +18,6 @@
 	export let reference: string;
 
 	let isEditing = false;
-	let editNoteContentValue: string;
-	let editNoteTitleValue: string;
 	let isConfirmingDelete = false;
 
 	const onStopEditing = () => {
@@ -39,6 +37,21 @@
 		isConfirmingDelete = false;
 	};
 
+	const onAcceptEdit = ({
+		title: _title,
+		content: _content,
+		reference: _reference
+	}: {
+		title: string;
+		content: string;
+		reference: string;
+	}) => {
+		isEditing = false;
+		title = _title;
+		content = _content;
+		reference = _reference;
+	};
+
 	let contentInput: HTMLTextAreaElement;
 	onMount(() => {
 		contentInput.style.height = contentInput.scrollHeight + 'px';
@@ -50,14 +63,12 @@
 		<EditNote
 			initialTitleValue={title}
 			initialContentValue={content}
+			initialReferenceValue={reference}
 			{id}
-			bind:contentValue={editNoteContentValue}
-			bind:titleValue={editNoteTitleValue}
-			onClickAccept={onStopEditing}
+			onClickAccept={onAcceptEdit}
 			{date}
 			onClickReset={onStopEditing}
 			{time}
-			referenceValue={reference}
 		/>
 	{:else}
 		<NoteContentContainer className="min-h-[110px]">

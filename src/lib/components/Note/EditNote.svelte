@@ -7,21 +7,40 @@
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import TimestampAndTime from './TimestampAndTime.svelte';
 	import EditOrAddButtons from './EditOrAddButtons.svelte';
+	import NoteInputs from './NoteInputs.svelte';
 
 	export let initialTitleValue: string;
 	export let initialContentValue: string;
-	export let contentValue: string = initialContentValue;
-	export let titleValue = initialTitleValue;
+	export let initialReferenceValue: string;
 	export let id: string;
-	export let onClickAccept: () => void = () => {};
+	export let onClickAccept: ({
+		title,
+		content,
+		reference
+	}: {
+		title: string;
+		content: string;
+		reference: string;
+	}) => void = () => {};
 	export let onClickReset: () => void = () => {};
 	export let date: Date;
 	export let time: number;
-	export let referenceValue: string;
 
 	const space: Readable<Space_int> = getContext('space');
 
 	const queryClient = useQueryClient();
+
+	let titleInput: HTMLInputElement;
+	let contentInput: HTMLTextAreaElement;
+	let referenceInput: HTMLInputElement;
+
+	onMount(() => {
+		contentInput.value = initialContentValue;
+		titleInput.value = initialTitleValue;
+		referenceInput.value = initialReferenceValue;
+
+		titleInput.focus();
+	});
 
 	const updateNoteMutation = useMutation(updateNote, {
 		onSuccess: (data) => {
@@ -30,36 +49,31 @@
 	});
 
 	const _onClickReset = () => {
-		titleValue = initialTitleValue;
+		titleInput.value = initialTitleValue;
 		contentInput.innerText = initialContentValue;
 		onClickReset();
 	};
 
 	const _onClickAccept = () => {
-		onClickAccept();
+		const title = titleInput.value;
+		const content = contentInput.value;
+		const reference = referenceInput.value;
+
+		onClickAccept({
+			title,
+			content,
+			reference
+		});
 		$updateNoteMutation.mutate({
+			title,
+			content,
+			reference,
 			id,
-			title: titleValue,
-			content: contentValue,
 			space: $space.name,
 			time,
-			date,
-			reference: referenceValue
+			date
 		});
 	};
-
-	let contentInput: HTMLDivElement;
-	let titleInput: HTMLDivElement;
-	let referenceInput: HTMLDivElement;
-
-	const onInputChange = (e) => {
-		contentValue = e.target.innerText;
-	};
-
-	onMount(() => {
-		contentInput.innerText = initialContentValue;
-		titleInput.focus();
-	});
 
 	const onChangeTime = (increaseOrDecrease: 'increase' | 'decrease') => {
 		if (time === 0.5 && increaseOrDecrease === 'decrease') return;
@@ -68,29 +82,9 @@
 </script>
 
 <NoteContentContainer className="min-h-[110px]">
-	<input
-		type="text"
-		placeholder="Subject"
-		class="outline-0 text-opacity-30 w-full text-black text-sm"
-		bind:value={titleValue}
-		bind:this={titleInput}
-	/>
-	<div
-		class="w-full outline-0 input break-words text-sm"
-		role="textbox"
-		contenteditable
-		on:input={onInputChange}
-		bind:this={contentInput}
-	/>
+	<NoteInputs bind:titleInput bind:contentInput bind:referenceInput />
 	<div class="pt-3">
 		<TimestampAndTime {date} {time} />
 	</div>
-	<input
-		type="text"
-		placeholder="Reference"
-		class="outline-0 text-opacity-30 w-full text-black text-sm"
-		bind:value={referenceValue}
-		bind:this={referenceInput}
-	/>
 </NoteContentContainer>
 <EditOrAddButtons onClickReset={_onClickReset} onAccept={_onClickAccept} {time} {onChangeTime} />
