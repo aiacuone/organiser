@@ -72,6 +72,8 @@
 	const autoExpand = (textarea: HTMLTextAreaElement) => {
 		textarea.style.height = textarea.scrollHeight + 'px';
 	};
+
+	const showReference = !!readOnlyValues && !readOnlyValues.reference ? false : true;
 </script>
 
 <input
@@ -89,12 +91,16 @@
 	on:keyup={() => ($pressedKeys = {})}
 	disabled={!!readOnlyValues}
 />
+<!-- Using tailwind display to conditionally render due to error when updating values -->
 <input
 	placeholder="Reference"
-	class="outline-0 text-opacity-30 w-full text-black text-sm resize-none overflow-x-hidden h-[20px] disabled:bg-white"
+	class="outline-0 text-opacity-30 w-full text-black text-sm resize-none overflow-x-hidden h-[20px] disabled:bg-white {showReference
+		? 'block'
+		: 'hidden'}"
 	bind:this={referenceInput}
 	disabled={!!readOnlyValues}
 />
+
 {#if !!timestampData}
 	<div class="pt-3">
 		<TimestampAndTime date={timestampData.date} time={timestampData.time} />

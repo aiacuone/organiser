@@ -13,10 +13,10 @@
 <div class="flex gap-8 sm:gap-2 w-full sm:w-auto center">
 	<NoteButtonContainer>
 		<NoteButton onClick={onClickReset}>
-			<Icon icon="system-uicons:reset" height="17px" />
+			<Icon icon={icons.reset} height="17px" />
 		</NoteButton>
 		<NoteButton onClick={onAccept}>
-			<Icon icon="mdi:tick" height="17px" />
+			<Icon icon={icons.tick} height="17px" />
 		</NoteButton>
 	</NoteButtonContainer>
 	<div class="center flex-row sm:flex-col gap-2 sm:gap-[1px] flex-row-reverse">

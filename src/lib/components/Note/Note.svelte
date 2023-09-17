@@ -7,6 +7,7 @@
 	import Button from '../Button.svelte';
 	import { onMount } from 'svelte';
 	import NoteInputs from './NoteInputs.svelte';
+	import { icons } from '$lib/general/icons';
 
 	export let title: string;
 	export let content: string;
@@ -59,9 +60,11 @@
 	onMount(() => {
 		contentInput.style.height = contentInput.scrollHeight + 'px';
 	});
+
+	let containerHeight: number;
 </script>
 
-<div class="flex-col sm:flex-row center gap-2">
+<div class="flex-col sm:flex-row center gap-2" bind:clientHeight={containerHeight}>
 	{#if isEditing}
 		<EditNote
 			initialTitleValue={title}
@@ -74,9 +77,9 @@
 			{time}
 		/>
 	{:else}
-		<NoteContentContainer className="min-h-[110px]">
+		<NoteContentContainer style={`height:${containerHeight}px`}>
 			{#if isConfirmingDelete}
-				<div class="gap-3 w-full center stack">
+				<div class="gap-3 w-full center stack h-full">
 					<p>Are you sure you want to delete</p>
 					<div class="hStack gap-3">
 						<Button onClick={_onConfirmDelete}>Yes</Button>
@@ -95,10 +98,10 @@
 		</NoteContentContainer>
 		<NoteButtonContainer>
 			<NoteButton onClick={onClickEdit}>
-				<Icon icon="mdi:pencil" height="17px" />
+				<Icon icon={icons.edit} height="17px" />
 			</NoteButton>
 			<NoteButton onClick={onClickDelete}>
-				<Icon icon="akar-icons:cross" height="17px" />
+				<Icon icon={icons.delete} height="17px" />
 			</NoteButton>
 		</NoteButtonContainer>
 	{/if}
