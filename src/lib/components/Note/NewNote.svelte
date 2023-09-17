@@ -1,8 +1,8 @@
 <script lang="ts">
 	import NoteContentContainer from './NoteContentContainer.svelte';
-	import { writable, type Writable } from 'svelte/store';
 	import { editNoteContentInputValue } from '$lib/stores';
 	import EditOrAddButtons from './EditOrAddButtons.svelte';
+	import NoteInputs from './NoteInputs.svelte';
 
 	export let background: string;
 	export let onClickAccept: ({
@@ -21,8 +21,6 @@
 	let titleInput: HTMLInputElement;
 	let contentInput: HTMLTextAreaElement;
 	let referenceInput: HTMLInputElement;
-	let titleValue: string = '';
-	let referenceValue: string = '';
 
 	const onClickReset = () => {
 		contentInput.innerText = '';
@@ -31,65 +29,10 @@
 	};
 
 	const onAccept = () => {
-		onClickAccept({ title: titleValue, time, reference: referenceValue });
-		titleValue = $editNoteContentInputValue = '';
+		onClickAccept({ title: titleInput.value, time, reference: referenceInput.value });
+		titleInput.value = $editNoteContentInputValue = referenceInput.value = '';
 		contentInput.style.height = '20px';
 		time = 0.5;
-	};
-
-	const pressedKeys: Writable<Record<string, boolean>> = writable({});
-
-	const onKeydown = (e: KeyboardEvent, textarea: HTMLTextAreaElement) => {
-		const key = e.key;
-		$pressedKeys[key] = true;
-
-		// ⌘ + 8
-		if ($pressedKeys['Meta'] && $pressedKeys['8']) {
-			e.preventDefault(); // Prevent the default Enter behavior
-
-			const cursorPosition = textarea.selectionStart;
-			const text = $editNoteContentInputValue;
-			const lines = text.split('\n');
-			const currentLineIndex = text.substr(0, cursorPosition).split('\n').length - 1;
-
-			const lineStart = text.lastIndexOf('\n', cursorPosition - 1) + 1;
-
-			if (lines[currentLineIndex].trim() !== '') {
-				// Add a new line to the list
-				const updatedLine = `• ${lines[currentLineIndex]}`;
-				lines[currentLineIndex] = updatedLine;
-
-				// Update textarea value with modified lines
-				$editNoteContentInputValue = lines.join('\n');
-
-				// Adjust cursor position
-				textarea.selectionStart = lineStart + 3;
-				textarea.selectionEnd = lineStart + 3;
-			}
-		}
-
-		const keyMethods: Record<string, () => void> = {
-			Enter: () => {
-				e.preventDefault();
-				$editNoteContentInputValue += '\n';
-				textarea.style.height = textarea.scrollHeight + 'px';
-			},
-			ArrowUp: () => {
-				// e.preventDefault();
-			},
-			ArrowDown: () => {
-				// e.preventDefault();
-			},
-			Tab: () => {
-				e.preventDefault();
-				textarea === contentInput ? titleInput.focus() : contentInput.focus();
-			}
-		};
-		keyMethods[key]?.();
-	};
-
-	const autoExpand = (textarea: HTMLTextAreaElement) => {
-		textarea.style.height = textarea.scrollHeight + 'px';
 	};
 
 	const onChangeTime = (increaseOrDecrease: 'increase' | 'decrease') => {
@@ -103,27 +46,7 @@
 	style="background:{background}"
 >
 	<NoteContentContainer>
-		<input
-			placeholder="Title"
-			class="outline-0 text-opacity-30 w-full text-black text-sm resize-none overflow-x-hidden h-[20px]"
-			bind:this={titleInput}
-			bind:value={titleValue}
-		/>
-		<textarea
-			placeholder="Content"
-			class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden h-[20px] my-2"
-			bind:this={contentInput}
-			on:input={() => autoExpand(contentInput)}
-			on:keydown={(e) => onKeydown(e, contentInput)}
-			on:keyup={() => ($pressedKeys = {})}
-			bind:value={$editNoteContentInputValue}
-		/>
-		<input
-			placeholder="Reference"
-			class="outline-0 text-opacity-30 w-full text-black text-sm resize-none overflow-x-hidden h-[20px]"
-			bind:this={referenceInput}
-			bind:value={referenceValue}
-		/>
+		<NoteInputs bind:titleInput bind:contentInput bind:referenceInput />
 	</NoteContentContainer>
 	<EditOrAddButtons {onClickReset} {onAccept} {time} {onChangeTime} />
 </div>

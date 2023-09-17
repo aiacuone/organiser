@@ -7,6 +7,7 @@
 	import Button from '../Button.svelte';
 	import { onMount } from 'svelte';
 	import TimestampAndTime from './TimestampAndTime.svelte';
+	import NoteInputs from './NoteInputs.svelte';
 
 	export let title: string;
 	export let content: string;
@@ -69,17 +70,10 @@
 					</div>
 				</div>
 			{:else}
-				<p class="text-opacity-20 text-black">{title}</p>
-				<textarea
-					disabled
-					class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden h-[20px] bg-white"
-					value={content}
-					bind:this={contentTextarea}
-				/>
+				<NoteInputs readOnlyValues={{ title, content, reference }} />
 				<div class="pt-3">
 					<TimestampAndTime {date} {time} />
 				</div>
-				<p>{reference}</p>
 			{/if}
 		</NoteContentContainer>
 		<NoteButtonContainer>
