@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
+	import TimestampAndTime from './TimestampAndTime.svelte';
 
 	export let titleInput: HTMLInputElement;
 	export let contentInput: HTMLTextAreaElement;
 	export let referenceInput: HTMLInputElement;
 	export let readOnlyValues: { title: string; content: string; reference: string } | undefined =
 		undefined;
+	export let timestampData: { date: Date; time: number } | undefined = undefined;
 
 	onMount(() => {
 		if (readOnlyValues) {
@@ -93,3 +95,8 @@
 	bind:this={referenceInput}
 	disabled={!!readOnlyValues}
 />
+{#if !!timestampData}
+	<div class="pt-3">
+		<TimestampAndTime date={timestampData.date} time={timestampData.time} />
+	</div>
+{/if}

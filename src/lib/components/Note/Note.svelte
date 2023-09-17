@@ -81,10 +81,11 @@
 					</div>
 				</div>
 			{:else}
-				<NoteInputs readOnlyValues={{ title, content, reference }} bind:contentInput />
-				<div class="pt-3">
-					<TimestampAndTime {date} {time} />
-				</div>
+				<NoteInputs
+					readOnlyValues={{ title, content, reference }}
+					bind:contentInput
+					timestampData={{ date, time }}
+				/>
 			{/if}
 		</NoteContentContainer>
 		<NoteButtonContainer>

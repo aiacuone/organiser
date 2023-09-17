@@ -82,9 +82,11 @@
 </script>
 
 <NoteContentContainer className="min-h-[110px]">
-	<NoteInputs bind:titleInput bind:contentInput bind:referenceInput />
-	<div class="pt-3">
-		<TimestampAndTime {date} {time} />
-	</div>
+	<NoteInputs
+		bind:titleInput
+		bind:contentInput
+		bind:referenceInput
+		timestampData={{ date, time }}
+	/>
 </NoteContentContainer>
 <EditOrAddButtons onClickReset={_onClickReset} onAccept={_onClickAccept} {time} {onChangeTime} />
