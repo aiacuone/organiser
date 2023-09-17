@@ -10,10 +10,6 @@
 		undefined;
 	export let timestampData: { date: Date; time: number } | undefined = undefined;
 
-	const autoExpand = (textarea: HTMLTextAreaElement) => {
-		textarea.style.height = textarea.scrollHeight + 'px';
-	};
-
 	onMount(() => {
 		if (readOnlyValues) {
 			contentInput.value = readOnlyValues.content;
@@ -21,8 +17,6 @@
 			referenceInput.value = readOnlyValues.reference;
 		}
 	});
-
-	$: contentInput, contentInput && autoExpand(contentInput);
 
 	const pressedKeys: Writable<Record<string, boolean>> = writable({});
 
@@ -89,10 +83,10 @@
 	placeholder="Content"
 	class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden my-2 disabled:bg-white"
 	bind:this={contentInput}
-	on:input={() => contentInput && autoExpand(contentInput)}
 	on:keydown={(e) => contentInput && onKeydown(e, contentInput)}
 	on:keyup={() => ($pressedKeys = {})}
 	disabled={areInputsDisabled}
+	style={`height: ${contentInput?.scrollHeight}px`}
 />
 <!-- Using tailwind display to conditionally render due to error when updating values -->
 <input
