@@ -10,6 +10,10 @@
 		undefined;
 	export let timestampData: { date: Date; time: number } | undefined = undefined;
 
+	const autoExpand = (textarea: HTMLTextAreaElement) => {
+		textarea.style.height = textarea.scrollHeight + 'px';
+	};
+
 	onMount(() => {
 		if (readOnlyValues) {
 			contentInput.value = readOnlyValues.content;
@@ -17,6 +21,8 @@
 			referenceInput.value = readOnlyValues.reference;
 		}
 	});
+
+	$: contentInput, contentInput && autoExpand(contentInput);
 
 	const pressedKeys: Writable<Record<string, boolean>> = writable({});
 
@@ -69,28 +75,27 @@
 		keyMethods[key]?.();
 	};
 
-	const autoExpand = (textarea: HTMLTextAreaElement) => {
-		textarea.style.height = textarea.scrollHeight + 'px';
-	};
-
 	const showReference = !!readOnlyValues && !readOnlyValues.reference ? false : true;
+	const areInputsDisabled = !!readOnlyValues;
 </script>
 
 <input
 	placeholder="Title"
 	class="outline-0 text-opacity-30 w-full text-black text-sm resize-none overflow-x-hidden h-[20px] disabled:bg-white"
 	bind:this={titleInput}
-	disabled={!!readOnlyValues}
+	disabled={areInputsDisabled}
 />
-<textarea
-	placeholder="Content"
-	class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden h-[20px] my-2 disabled:bg-white"
-	bind:this={contentInput}
-	on:input={() => contentInput && autoExpand(contentInput)}
-	on:keydown={(e) => contentInput && onKeydown(e, contentInput)}
-	on:keyup={() => ($pressedKeys = {})}
-	disabled={!!readOnlyValues}
-/>
+<div>
+	<textarea
+		placeholder="Content"
+		class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden my-2 disabled:bg-white"
+		bind:this={contentInput}
+		on:input={() => contentInput && autoExpand(contentInput)}
+		on:keydown={(e) => contentInput && onKeydown(e, contentInput)}
+		on:keyup={() => ($pressedKeys = {})}
+		disabled={areInputsDisabled}
+	/>
+</div>
 <!-- Using tailwind display to conditionally render due to error when updating values -->
 <input
 	placeholder="Reference"
@@ -98,7 +103,7 @@
 		? 'block'
 		: 'hidden'}"
 	bind:this={referenceInput}
-	disabled={!!readOnlyValues}
+	disabled={areInputsDisabled}
 />
 
 {#if !!timestampData}
