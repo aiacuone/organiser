@@ -6,7 +6,7 @@
 	import NoteButton from './NoteButton.svelte';
 	import Button from '../Button.svelte';
 	import { onMount } from 'svelte';
-	import TimestampAndTime from './TimestampAndTime.svelte';
+	import NoteInputs from './NoteInputs.svelte';
 
 	export let title: string;
 	export let content: string;
@@ -17,8 +17,6 @@
 	export let reference: string;
 
 	let isEditing = false;
-	let editNoteContentValue: string;
-	let editNoteTitleValue: string;
 	let isConfirmingDelete = false;
 
 	const onStopEditing = () => {
@@ -38,9 +36,28 @@
 		isConfirmingDelete = false;
 	};
 
-	let contentTextarea: HTMLTextAreaElement;
+	const onAcceptEdit = ({
+		title: _title,
+		content: _content,
+		reference: _reference
+	}: {
+		title: string;
+		content: string;
+		reference: string;
+	}) => {
+		isEditing = false;
+		title = _title;
+		content = _content;
+		reference = _reference;
+	};
+
+	// Not all these are used, shows error if not included
+	let titleInput: HTMLInputElement;
+	let contentInput: HTMLTextAreaElement;
+	let referenceInput: HTMLInputElement;
+
 	onMount(() => {
-		contentTextarea.style.height = contentTextarea.scrollHeight + 'px';
+		contentInput.style.height = contentInput.scrollHeight + 'px';
 	});
 </script>
 
@@ -49,14 +66,12 @@
 		<EditNote
 			initialTitleValue={title}
 			initialContentValue={content}
+			initialReferenceValue={reference}
 			{id}
-			bind:contentValue={editNoteContentValue}
-			bind:titleValue={editNoteTitleValue}
-			onClickAccept={onStopEditing}
+			onClickAccept={onAcceptEdit}
 			{date}
 			onClickReset={onStopEditing}
 			{time}
-			referenceValue={reference}
 		/>
 	{:else}
 		<NoteContentContainer className="min-h-[110px]">
@@ -69,17 +84,13 @@
 					</div>
 				</div>
 			{:else}
-				<p class="text-opacity-20 text-black">{title}</p>
-				<textarea
-					disabled
-					class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden h-[20px] bg-white"
-					value={content}
-					bind:this={contentTextarea}
+				<NoteInputs
+					readOnlyValues={{ title, content, reference }}
+					bind:titleInput
+					bind:contentInput
+					bind:referenceInput
+					timestampData={{ date, time }}
 				/>
-				<div class="pt-3">
-					<TimestampAndTime {date} {time} />
-				</div>
-				<p>{reference}</p>
 			{/if}
 		</NoteContentContainer>
 		<NoteButtonContainer>
