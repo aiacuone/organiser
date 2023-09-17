@@ -85,17 +85,15 @@
 	bind:this={titleInput}
 	disabled={areInputsDisabled}
 />
-<div>
-	<textarea
-		placeholder="Content"
-		class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden my-2 disabled:bg-white"
-		bind:this={contentInput}
-		on:input={() => contentInput && autoExpand(contentInput)}
-		on:keydown={(e) => contentInput && onKeydown(e, contentInput)}
-		on:keyup={() => ($pressedKeys = {})}
-		disabled={areInputsDisabled}
-	/>
-</div>
+<textarea
+	placeholder="Content"
+	class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden my-2 disabled:bg-white"
+	bind:this={contentInput}
+	on:input={() => contentInput && autoExpand(contentInput)}
+	on:keydown={(e) => contentInput && onKeydown(e, contentInput)}
+	on:keyup={() => ($pressedKeys = {})}
+	disabled={areInputsDisabled}
+/>
 <!-- Using tailwind display to conditionally render due to error when updating values -->
 <input
 	placeholder="Reference"
