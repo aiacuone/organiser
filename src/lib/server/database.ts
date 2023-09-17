@@ -23,7 +23,8 @@ export const createNote = async ({
 	content,
 	space,
 	date,
-	time
+	time,
+	reference
 }: {
 	id: string;
 	title: string;
@@ -31,10 +32,11 @@ export const createNote = async ({
 	space: string;
 	date: Date;
 	time: number;
+	reference: string;
 }): Promise<{ spaces: Space_int[] }> => {
 	await collection.updateOne(
 		{ name: 'spaces', 'data.name': space },
-		{ $push: { 'data.$.notes': { id, title, content, date, time } } }
+		{ $push: { 'data.$.notes': { id, title, content, date, time, reference } } }
 	);
 	const spaces = await getSpaces();
 	return { spaces };
@@ -46,7 +48,8 @@ export const updateNote = async ({
 	content,
 	space,
 	time,
-	date
+	date,
+	reference
 }: {
 	id: string;
 	title: string;
@@ -54,13 +57,15 @@ export const updateNote = async ({
 	space: string;
 	time: number;
 	date: Date;
+	reference: string;
 }): Promise<{ spaces: Space_int[] }> => {
 	const updatedNote = {
 		id,
 		title,
 		content,
 		date,
-		time
+		time,
+		reference
 	};
 
 	await collection.updateOne(

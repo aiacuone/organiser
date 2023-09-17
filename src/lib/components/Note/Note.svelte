@@ -14,6 +14,7 @@
 	export let id: string;
 	export let date: Date;
 	export let time: number;
+	export let reference: string;
 
 	let isEditing = false;
 	let editNoteContentValue: string;
@@ -55,6 +56,7 @@
 			{date}
 			onClickReset={onStopEditing}
 			{time}
+			referenceValue={reference}
 		/>
 	{:else}
 		<NoteContentContainer className="min-h-[110px]">
@@ -77,6 +79,7 @@
 				<div class="pt-3">
 					<TimestampAndTime {date} {time} />
 				</div>
+				<p>{reference}</p>
 			{/if}
 		</NoteContentContainer>
 		<NoteButtonContainer>

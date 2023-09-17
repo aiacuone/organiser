@@ -61,7 +61,15 @@
 		}
 	});
 
-	const onClickAccept = ({ title, time }: { title: string; time: number }) => {
+	const onClickAccept = ({
+		title,
+		time,
+		reference
+	}: {
+		title: string;
+		time: number;
+		reference: string;
+	}) => {
 		const timeData: Record<Time_enum, Date> = {
 			[Time_enum.Today]: new Date(),
 			[Time_enum.Yesterday]: getYesterdaysDate(),
@@ -73,7 +81,8 @@
 			content: $editNoteContentInputValue,
 			space: $space?.name ?? '',
 			date: timeData[data.time],
-			time
+			time,
+			reference
 		});
 	};
 
@@ -188,6 +197,7 @@
 								onConfirmDelete={() => onClickDelete(note.id)}
 								date={note.date}
 								time={note.time}
+								reference={note.reference}
 							/>
 						{/each}
 					{/if}

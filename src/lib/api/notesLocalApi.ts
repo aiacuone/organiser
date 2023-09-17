@@ -8,20 +8,23 @@ export async function createNote({
 	content,
 	space,
 	date,
-	time
+	time,
+	reference
 }: {
 	title: string;
 	content: string;
 	space: string;
 	date: Date;
 	time: number;
+	reference: string;
 }) {
 	const response = await axios.post(`${resource}/${uuidv4()}`, {
 		title,
 		content,
 		space,
 		date,
-		time
+		time,
+		reference
 	});
 	const spaces = response.data.spaces;
 	return spaces;
@@ -41,7 +44,8 @@ export async function updateNote({
 	space,
 	id,
 	time,
-	date
+	date,
+	reference
 }: {
 	title: string;
 	content: string;
@@ -49,6 +53,7 @@ export async function updateNote({
 	id: string;
 	time: number;
 	date: Date;
+	reference: string;
 }) {
 	const response = await axios.patch(`/${resource}/${id}`, {
 		title,
@@ -56,7 +61,8 @@ export async function updateNote({
 		space,
 		id,
 		time,
-		date
+		date,
+		reference
 	});
 
 	const spaces = response.data.spaces;

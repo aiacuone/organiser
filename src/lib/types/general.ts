@@ -20,6 +20,7 @@ export interface Note_int {
 	content: string;
 	date: Date;
 	time: number;
+	reference: string;
 }
 
 export interface SpaceData_int {

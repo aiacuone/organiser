@@ -17,6 +17,7 @@
 	export let onClickReset: () => void = () => {};
 	export let date: Date;
 	export let time: number;
+	export let referenceValue: string;
 
 	const space: Readable<Space_int> = getContext('space');
 
@@ -42,12 +43,14 @@
 			content: contentValue,
 			space: $space.name,
 			time,
-			date
+			date,
+			reference: referenceValue
 		});
 	};
 
 	let contentInput: HTMLDivElement;
 	let titleInput: HTMLDivElement;
+	let referenceInput: HTMLDivElement;
 
 	const onInputChange = (e) => {
 		contentValue = e.target.innerText;
@@ -82,5 +85,12 @@
 	<div class="pt-3">
 		<TimestampAndTime {date} {time} />
 	</div>
+	<input
+		type="text"
+		placeholder="Reference"
+		class="outline-0 text-opacity-30 w-full text-black text-sm"
+		bind:value={referenceValue}
+		bind:this={referenceInput}
+	/>
 </NoteContentContainer>
 <EditOrAddButtons onClickReset={_onClickReset} onAccept={_onClickAccept} {time} {onChangeTime} />

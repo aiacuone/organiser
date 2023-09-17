@@ -5,22 +5,33 @@
 	import EditOrAddButtons from './EditOrAddButtons.svelte';
 
 	export let background: string;
-	export let onClickAccept: ({ title, time }: { title: string; time: number }) => void;
+	export let onClickAccept: ({
+		title,
+		time,
+		reference
+	}: {
+		title: string;
+		time: number;
+		reference: string;
+	}) => void;
 
 	export let time: number = 0.5;
 
 	// used this because bind the value of the element is causing issues
 	let titleInput: HTMLInputElement;
 	let contentInput: HTMLTextAreaElement;
+	let referenceInput: HTMLInputElement;
 	let titleValue: string = '';
+	let referenceValue: string = '';
 
 	const onClickReset = () => {
 		contentInput.innerText = '';
 		titleInput.value = '';
+		referenceInput.value = '';
 	};
 
 	const onAccept = () => {
-		onClickAccept({ title: titleValue, time });
+		onClickAccept({ title: titleValue, time, reference: referenceValue });
 		titleValue = $editNoteContentInputValue = '';
 		contentInput.style.height = '20px';
 		time = 0.5;
@@ -100,12 +111,18 @@
 		/>
 		<textarea
 			placeholder="Content"
-			class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden h-[20px]"
+			class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden h-[20px] my-2"
 			bind:this={contentInput}
 			on:input={() => autoExpand(contentInput)}
 			on:keydown={(e) => onKeydown(e, contentInput)}
 			on:keyup={() => ($pressedKeys = {})}
 			bind:value={$editNoteContentInputValue}
+		/>
+		<input
+			placeholder="Reference"
+			class="outline-0 text-opacity-30 w-full text-black text-sm resize-none overflow-x-hidden h-[20px]"
+			bind:this={referenceInput}
+			bind:value={referenceValue}
 		/>
 	</NoteContentContainer>
 	<EditOrAddButtons {onClickReset} {onAccept} {time} {onChangeTime} />
