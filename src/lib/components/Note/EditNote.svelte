@@ -5,7 +5,6 @@
 	import type { Space_int } from '$lib/types';
 	import { updateNote } from '$lib/api/notesLocalApi';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
-	import TimestampAndTime from './TimestampAndTime.svelte';
 	import EditOrAddButtons from './EditOrAddButtons.svelte';
 	import NoteInputs from './NoteInputs.svelte';
 

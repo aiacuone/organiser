@@ -6,7 +6,6 @@
 	import NoteButton from './NoteButton.svelte';
 	import Button from '../Button.svelte';
 	import { onMount } from 'svelte';
-	import TimestampAndTime from './TimestampAndTime.svelte';
 	import NoteInputs from './NoteInputs.svelte';
 
 	export let title: string;
@@ -52,7 +51,11 @@
 		reference = _reference;
 	};
 
+	// Not all these are used, shows error if not included
+	let titleInput: HTMLInputElement;
 	let contentInput: HTMLTextAreaElement;
+	let referenceInput: HTMLInputElement;
+
 	onMount(() => {
 		contentInput.style.height = contentInput.scrollHeight + 'px';
 	});
@@ -83,7 +86,9 @@
 			{:else}
 				<NoteInputs
 					readOnlyValues={{ title, content, reference }}
+					bind:titleInput
 					bind:contentInput
+					bind:referenceInput
 					timestampData={{ date, time }}
 				/>
 			{/if}
