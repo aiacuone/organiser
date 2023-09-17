@@ -12,7 +12,6 @@
 
 	onMount(() => {
 		if (readOnlyValues) {
-			contentInput.value = readOnlyValues.content;
 			titleInput.value = readOnlyValues.title;
 			referenceInput.value = readOnlyValues.reference;
 		}
@@ -79,19 +78,34 @@
 	bind:this={titleInput}
 	disabled={areInputsDisabled}
 />
+
+<div class={areInputsDisabled ? 'block' : 'hidden'}>
+	{#if !!readOnlyValues?.content}
+		{#each readOnlyValues?.content.split('\n') as line}
+			<div class="flex items-center">
+				<span class="text-black text-sm">{line}</span>
+			</div>
+		{/each}
+	{/if}
+</div>
+
+<!-- Using tailwind display to conditionally render due to error when updating values -->
 <textarea
 	placeholder="Content"
-	class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden my-2 disabled:bg-white"
+	class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden my-2 disabled:bg-white h-[20px] {areInputsDisabled
+		? 'hidden'
+		: 'block'}"
 	bind:this={contentInput}
 	on:keydown={(e) => contentInput && onKeydown(e, contentInput)}
 	on:keyup={() => ($pressedKeys = {})}
 	disabled={areInputsDisabled}
-	style={`height: ${contentInput?.scrollHeight}px`}
+	style={`height:${contentInput?.scrollHeight}px`}
 />
 <!-- Using tailwind display to conditionally render due to error when updating values -->
+<!-- DO NOT TRY TO USE TEXT AREA FOR THIS. had issues with setting height when components mounts, had to use input instead -->
 <input
 	placeholder="Reference"
-	class="outline-0 text-opacity-30 w-full text-black text-sm resize-none overflow-x-hidden h-[20px] disabled:bg-white {showReference
+	class="outline-0 text-opacity-30 w-full text-black text-sm overflow-x-hidden disabled:bg-white {showReference
 		? 'block'
 		: 'hidden'}"
 	bind:this={referenceInput}
