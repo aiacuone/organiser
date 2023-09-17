@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { editNoteContentInputValue } from '$lib/stores';
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 
@@ -28,7 +27,7 @@
 			e.preventDefault(); // Prevent the default Enter behavior
 
 			const cursorPosition = textarea.selectionStart;
-			const text = $editNoteContentInputValue;
+			const text = contentInput.value;
 			const lines = text.split('\n');
 			const currentLineIndex = text.substr(0, cursorPosition).split('\n').length - 1;
 
@@ -40,7 +39,7 @@
 				lines[currentLineIndex] = updatedLine;
 
 				// Update textarea value with modified lines
-				$editNoteContentInputValue = lines.join('\n');
+				contentInput.value = lines.join('\n');
 
 				// Adjust cursor position
 				textarea.selectionStart = lineStart + 3;
@@ -51,7 +50,7 @@
 		const keyMethods: Record<string, () => void> = {
 			Enter: () => {
 				e.preventDefault();
-				$editNoteContentInputValue += '\n';
+				contentInput.value += '\n';
 				textarea.style.height = textarea.scrollHeight + 'px';
 			},
 			ArrowUp: () => {
@@ -86,7 +85,6 @@
 	on:input={() => contentInput && autoExpand(contentInput)}
 	on:keydown={(e) => contentInput && onKeydown(e, contentInput)}
 	on:keyup={() => ($pressedKeys = {})}
-	bind:value={$editNoteContentInputValue}
 	disabled={!!readOnlyValues}
 />
 <input

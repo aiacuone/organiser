@@ -1,6 +1,5 @@
 <script lang="ts">
 	import NoteContentContainer from './NoteContentContainer.svelte';
-	import { editNoteContentInputValue } from '$lib/stores';
 	import EditOrAddButtons from './EditOrAddButtons.svelte';
 	import NoteInputs from './NoteInputs.svelte';
 
@@ -8,29 +7,35 @@
 	export let onClickAccept: ({
 		title,
 		time,
-		reference
+		reference,
+		content
 	}: {
 		title: string;
 		time: number;
 		reference: string;
+		content: string;
 	}) => void;
 
 	export let time: number = 0.5;
 
-	// used this because bind the value of the element is causing issues
 	let titleInput: HTMLInputElement;
 	let contentInput: HTMLTextAreaElement;
 	let referenceInput: HTMLInputElement;
 
 	const onClickReset = () => {
-		contentInput.innerText = '';
+		contentInput.value = '';
 		titleInput.value = '';
 		referenceInput.value = '';
 	};
 
 	const onAccept = () => {
-		onClickAccept({ title: titleInput.value, time, reference: referenceInput.value });
-		titleInput.value = $editNoteContentInputValue = referenceInput.value = '';
+		onClickAccept({
+			title: titleInput.value,
+			content: contentInput.value,
+			reference: referenceInput.value,
+			time
+		});
+		titleInput.value = contentInput.value = referenceInput.value = '';
 		contentInput.style.height = '20px';
 		time = 0.5;
 	};

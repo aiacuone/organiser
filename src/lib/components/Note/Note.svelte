@@ -39,9 +39,9 @@
 		isConfirmingDelete = false;
 	};
 
-	let contentTextarea: HTMLTextAreaElement;
+	let contentInput: HTMLTextAreaElement;
 	onMount(() => {
-		contentTextarea.style.height = contentTextarea.scrollHeight + 'px';
+		contentInput.style.height = contentInput.scrollHeight + 'px';
 	});
 </script>
 
@@ -70,7 +70,7 @@
 					</div>
 				</div>
 			{:else}
-				<NoteInputs readOnlyValues={{ title, content, reference }} />
+				<NoteInputs readOnlyValues={{ title, content, reference }} bind:contentInput />
 				<div class="pt-3">
 					<TimestampAndTime {date} {time} />
 				</div>

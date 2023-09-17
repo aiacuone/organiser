@@ -21,7 +21,6 @@
 	} from '@sveltestack/svelte-query';
 	import { createNote, deleteNote } from '$lib/api/notesLocalApi';
 	import { getSpaces } from '$lib/api/spaceLocalApi';
-	import { editNoteContentInputValue } from '$lib/stores';
 	import Button from '$lib/components/Button.svelte';
 	import Timestamp from '$lib/components/Note/Timestamp.svelte';
 
@@ -64,11 +63,13 @@
 	const onClickAccept = ({
 		title,
 		time,
-		reference
+		reference,
+		content
 	}: {
 		title: string;
 		time: number;
 		reference: string;
+		content: string;
 	}) => {
 		const timeData: Record<Time_enum, Date> = {
 			[Time_enum.Today]: new Date(),
@@ -78,7 +79,7 @@
 
 		$createNoteMutation.mutate({
 			title,
-			content: $editNoteContentInputValue,
+			content,
 			space: $space?.name ?? '',
 			date: timeData[data.time],
 			time,
