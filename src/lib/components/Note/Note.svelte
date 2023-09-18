@@ -7,6 +7,8 @@
 	import NoteButton from './NoteButton.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
+	import type { Readable } from 'svelte/store';
+	import type { Space_int } from '$lib/types';
 
 	export let title: string;
 	export let content: string;
@@ -16,7 +18,7 @@
 	export let time: number;
 	export let reference: string;
 
-	const spaceColor = getContext('spaceColor');
+	const space: Readable<Space_int> = getContext('space');
 
 	let isEditing = false;
 	let isConfirmingDelete = false;
@@ -116,7 +118,7 @@
 					<div class="-bottom-3 absolute">
 						<button
 							on:click={() => (showMoreButtons = true)}
-							style="background:{spaceColor}"
+							style="background:{$space.color}"
 							class="px-1 rounded-sm"
 						>
 							<Icon icon={icons.moreHorizontal} width="20px" color="black" />

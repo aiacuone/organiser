@@ -1,17 +1,19 @@
 <script lang="ts">
+	import type { Space_int } from '$lib/types';
 	import { getContext } from 'svelte';
+	import type { Readable } from 'svelte/store';
 
 	export let onClick: () => void = () => {};
 
 	let button;
-	const spaceColor = getContext('spaceColor');
+	const space: Readable<Space_int> = getContext('space');
 </script>
 
 <button
 	class="rounded-md p-1 h-[25px] w-[30px] center"
 	on:click={onClick}
 	bind:this={button}
-	style="background:{spaceColor}"
+	style="background:{$space.color}"
 >
 	<slot />
 </button>

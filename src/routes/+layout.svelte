@@ -16,7 +16,6 @@
 			: spaces[0]
 	);
 	setContext('space', space);
-	setContext('spaceColor', $space?.color);
 
 	onMount(() => {
 		const goToDefaultSpace = () => goto(`/${spaces[0].name.replace(' ', '-')}/today`);
