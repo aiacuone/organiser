@@ -80,7 +80,7 @@
 <div class="flex-col sm:flex-row flex">
 	<input
 		placeholder="Title"
-		class="outline-0 flex-1 text-xs sm:text-sm resize-none disabled:bg-white"
+		class="outline-0 flex-1 text-xs sm:text-sm resize-none disabled:bg-white font-bold"
 		bind:this={titleInput}
 		disabled={isReadOnlyNote}
 	/>
