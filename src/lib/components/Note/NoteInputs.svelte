@@ -2,9 +2,6 @@
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import Timestamp from './Timestamp.svelte';
-	import Icon from '@iconify/svelte';
-	import { icons } from '$lib/general/icons';
-	import NoteButton from './NoteButton.svelte';
 
 	export let titleInput: HTMLInputElement;
 	export let contentInput: HTMLTextAreaElement;
@@ -12,8 +9,6 @@
 	export let readOnlyValues: { title: string; content: string; reference: string } | undefined =
 		undefined;
 	export let timestampData: { date: Date; time: number } | undefined = undefined;
-	export let onClickEdit: (() => void) | undefined = undefined;
-	export let onClickDelete: (() => void) | undefined = undefined;
 	export let isEditing = false;
 
 	onMount(() => {
@@ -80,7 +75,6 @@
 
 	const showReference = !!readOnlyValues && !readOnlyValues.reference ? false : true;
 	const isReadOnlyNote = !!readOnlyValues;
-	let moreDialog: HTMLDialogElement;
 </script>
 
 <div class="flex-row flex relative">
@@ -90,23 +84,6 @@
 		bind:this={titleInput}
 		disabled={isReadOnlyNote}
 	/>
-	{#if isReadOnlyNote}
-		<button on:click={() => moreDialog.show()}>
-			<Icon icon={icons.moreHorizontal} width="25px" color="black" />
-		</button>
-	{/if}
-	<div class="absolute right-[65px] -top-1">
-		<dialog bind:this={moreDialog}>
-			<div class="hStack gap-2">
-				<NoteButton onClick={onClickEdit}>
-					<Icon icon={icons.edit} height="17px" />
-				</NoteButton>
-				<NoteButton onClick={onClickDelete}>
-					<Icon icon={icons.delete} height="17px" />
-				</NoteButton>
-			</div>
-		</dialog>
-	</div>
 </div>
 
 <div class="flex flex-row">

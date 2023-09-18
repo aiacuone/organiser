@@ -2,8 +2,11 @@
 	import EditNote from './EditNote.svelte';
 	import NoteContentContainer from './NoteContentContainer.svelte';
 	import Button from '../Button.svelte';
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import NoteInputs from './NoteInputs.svelte';
+	import NoteButton from './NoteButton.svelte';
+	import Icon from '@iconify/svelte';
+	import { icons } from '$lib/general/icons';
 
 	export let title: string;
 	export let content: string;
@@ -13,19 +16,26 @@
 	export let time: number;
 	export let reference: string;
 
+	const spaceColor = getContext('spaceColor');
+
 	let isEditing = false;
 	let isConfirmingDelete = false;
+	let containerHeight: number;
+	let showMoreButtons = false;
 
 	const onStopEditing = () => {
 		isEditing = false;
+		showMoreButtons = false;
 	};
 
 	const onClickEdit = () => {
 		isEditing = true;
+		showMoreButtons = false;
 	};
 
 	const onClickDelete = () => {
 		isConfirmingDelete = true;
+		showMoreButtons = false;
 	};
 
 	const _onConfirmDelete = () => {
@@ -56,11 +66,9 @@
 	onMount(() => {
 		contentInput.style.height = contentInput.scrollHeight + 'px';
 	});
-
-	let containerHeight: number;
 </script>
 
-<div class="flex-col sm:flex-row center gap-1" bind:clientHeight={containerHeight}>
+<div class="flex-col sm:flex-row center gap-1 relative" bind:clientHeight={containerHeight}>
 	{#if isEditing}
 		<EditNote
 			initialTitleValue={title}
@@ -89,10 +97,33 @@
 					bind:contentInput
 					bind:referenceInput
 					timestampData={{ date, time }}
-					{onClickEdit}
-					{onClickDelete}
 				/>
 			{/if}
+
+			<div class="z-10 w-full center">
+				{#if showMoreButtons}
+					<div class="absolute -bottom-3">
+						<div class="hStack gap-2">
+							<NoteButton onClick={onClickEdit}>
+								<Icon icon={icons.edit} height="17px" />
+							</NoteButton>
+							<NoteButton onClick={onClickDelete}>
+								<Icon icon={icons.delete} height="17px" />
+							</NoteButton>
+						</div>
+					</div>
+				{:else}
+					<div class="-bottom-3 absolute">
+						<button
+							on:click={() => (showMoreButtons = true)}
+							style="background:{spaceColor}"
+							class="px-1 rounded-sm"
+						>
+							<Icon icon={icons.moreHorizontal} width="20px" color="black" />
+						</button>
+					</div>
+				{/if}
+			</div>
 		</NoteContentContainer>
 	{/if}
 </div>
