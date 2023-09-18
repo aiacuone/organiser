@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import TimestampAndTime from './TimestampAndTime.svelte';
 	import Timestamp from './Timestamp.svelte';
 
 	export let titleInput: HTMLInputElement;
@@ -10,6 +9,7 @@
 	export let readOnlyValues: { title: string; content: string; reference: string } | undefined =
 		undefined;
 	export let timestampData: { date: Date; time: number } | undefined = undefined;
+	export let isEditing = false;
 
 	onMount(() => {
 		if (readOnlyValues) {
@@ -77,30 +77,31 @@
 	const isReadOnlyNote = !!readOnlyValues;
 </script>
 
-<div class="flex-col sm:flex-row flex">
+<div class="{isReadOnlyNote ? 'flex-row' : 'flex-col'} flex relative">
 	<input
 		placeholder="Title"
 		class="outline-0 flex-1 text-xs sm:text-sm resize-none disabled:bg-white font-bold"
 		bind:this={titleInput}
 		disabled={isReadOnlyNote}
 	/>
+	<input
+		placeholder="Reference"
+		class="outline-0 text-opacity-30 text-black text-xs sm:text-sm overflow-x-hidden disabled:bg-white {showReference
+			? 'block'
+			: 'hidden'} {isReadOnlyNote ? 'text-right' : 'text-left'}"
+		bind:this={referenceInput}
+		disabled={isReadOnlyNote}
+	/>
+</div>
 
-	{#if !!timestampData}
+{#if !!timestampData}
+	<div class="flex-1">
 		<div class="hStack gap-2 flex-wrap text-opacity-30 text-black">
 			<Timestamp date={timestampData.date} className="flex flex-row gap-1 flex-wrap" />
 			<p>{timestampData.time}</p>
 		</div>
-	{/if}
-</div>
-
-<input
-	placeholder="Reference"
-	class="outline-0 text-opacity-30 w-full text-black text-xs sm:text-sm overflow-x-hidden disabled:bg-white {showReference
-		? 'block'
-		: 'hidden'}"
-	bind:this={referenceInput}
-	disabled={isReadOnlyNote}
-/>
+	</div>
+{/if}
 
 <!-- Using tailwind display to conditionally render due to error when updating values -->
 <!-- DO NOT TRY TO USE TEXT AREA FOR THIS. had issues with setting height when components mounts, had to use input instead -->

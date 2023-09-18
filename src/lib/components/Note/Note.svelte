@@ -1,13 +1,14 @@
 <script lang="ts">
-	import Icon from '@iconify/svelte';
 	import EditNote from './EditNote.svelte';
 	import NoteContentContainer from './NoteContentContainer.svelte';
-	import NoteButtonContainer from './NoteButtonContainer.svelte';
-	import NoteButton from './NoteButton.svelte';
 	import Button from '../Button.svelte';
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import NoteInputs from './NoteInputs.svelte';
+	import NoteButton from './NoteButton.svelte';
+	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
+	import type { Readable } from 'svelte/store';
+	import type { Space_int } from '$lib/types';
 
 	export let title: string;
 	export let content: string;
@@ -17,19 +18,26 @@
 	export let time: number;
 	export let reference: string;
 
+	const space: Readable<Space_int> = getContext('space');
+
 	let isEditing = false;
 	let isConfirmingDelete = false;
+	let containerHeight: number;
+	let showMoreButtons = false;
 
 	const onStopEditing = () => {
 		isEditing = false;
+		showMoreButtons = false;
 	};
 
 	const onClickEdit = () => {
 		isEditing = true;
+		showMoreButtons = false;
 	};
 
 	const onClickDelete = () => {
 		isConfirmingDelete = true;
+		showMoreButtons = false;
 	};
 
 	const _onConfirmDelete = () => {
@@ -60,11 +68,9 @@
 	onMount(() => {
 		contentInput.style.height = contentInput.scrollHeight + 'px';
 	});
-
-	let containerHeight: number;
 </script>
 
-<div class="flex-col sm:flex-row center gap-2" bind:clientHeight={containerHeight}>
+<div class="flex-col sm:flex-row center gap-1 relative" bind:clientHeight={containerHeight}>
 	{#if isEditing}
 		<EditNote
 			initialTitleValue={title}
@@ -77,7 +83,7 @@
 			{time}
 		/>
 	{:else}
-		<NoteContentContainer style={`height:${containerHeight}px`}>
+		<NoteContentContainer style={`height:${containerHeight}px`} className="pb-6">
 			{#if isConfirmingDelete}
 				<div class="gap-3 w-full center stack h-full">
 					<p>Are you sure you want to delete</p>
@@ -95,14 +101,29 @@
 					timestampData={{ date, time }}
 				/>
 			{/if}
+
+			<div class="z-10 w-full center">
+				{#if showMoreButtons}
+					<div class="absolute bottom-0">
+						<div class="hStack gap-2">
+							<NoteButton onClick={onClickEdit}>
+								<Icon icon={icons.edit} height="17px" />
+							</NoteButton>
+							<NoteButton onClick={onClickDelete}>
+								<Icon icon={icons.delete} height="17px" />
+							</NoteButton>
+						</div>
+					</div>
+				{:else if !isConfirmingDelete}
+					<button
+						on:click={() => (showMoreButtons = true)}
+						style="background:{$space.color}"
+						class="px-1 rounded-sm bottom-0 absolute h-[15px] w-[35px]"
+					>
+						<!-- <Icon icon={icons.moreHorizontal} width="20px" color="black" /> -->
+					</button>
+				{/if}
+			</div>
 		</NoteContentContainer>
-		<NoteButtonContainer>
-			<NoteButton onClick={onClickEdit}>
-				<Icon icon={icons.edit} height="17px" />
-			</NoteButton>
-			<NoteButton onClick={onClickDelete}>
-				<Icon icon={icons.delete} height="17px" />
-			</NoteButton>
-		</NoteButtonContainer>
 	{/if}
 </div>
