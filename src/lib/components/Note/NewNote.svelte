@@ -52,7 +52,7 @@
 >
 	<NoteContentContainer className="relative">
 		<NoteInputs bind:titleInput bind:contentInput bind:referenceInput />
-		<div class="absolute -bottom-[12px] center w-full">
+		<div class="absolute -bottom-[0px] center w-full">
 			<EditOrAddButtons {onClickReset} {onAccept} {time} {onChangeTime} />
 		</div>
 	</NoteContentContainer>

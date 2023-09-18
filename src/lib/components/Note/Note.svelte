@@ -83,7 +83,7 @@
 			{time}
 		/>
 	{:else}
-		<NoteContentContainer style={`height:${containerHeight}px`}>
+		<NoteContentContainer style={`height:${containerHeight}px`} className="pb-6">
 			{#if isConfirmingDelete}
 				<div class="gap-3 w-full center stack h-full">
 					<p>Are you sure you want to delete</p>
@@ -104,7 +104,7 @@
 
 			<div class="z-10 w-full center">
 				{#if showMoreButtons}
-					<div class="absolute -bottom-3">
+					<div class="absolute bottom-0">
 						<div class="hStack gap-2">
 							<NoteButton onClick={onClickEdit}>
 								<Icon icon={icons.edit} height="17px" />
@@ -114,16 +114,14 @@
 							</NoteButton>
 						</div>
 					</div>
-				{:else}
-					<div class="-bottom-3 absolute">
-						<button
-							on:click={() => (showMoreButtons = true)}
-							style="background:{$space.color}"
-							class="px-1 rounded-sm"
-						>
-							<Icon icon={icons.moreHorizontal} width="20px" color="black" />
-						</button>
-					</div>
+				{:else if !isConfirmingDelete}
+					<button
+						on:click={() => (showMoreButtons = true)}
+						style="background:{$space.color}"
+						class="px-1 rounded-sm bottom-0 absolute h-[15px] w-[35px]"
+					>
+						<!-- <Icon icon={icons.moreHorizontal} width="20px" color="black" /> -->
+					</button>
 				{/if}
 			</div>
 		</NoteContentContainer>

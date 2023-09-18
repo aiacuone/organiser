@@ -86,9 +86,8 @@
 		bind:contentInput
 		bind:referenceInput
 		timestampData={{ date, time }}
-		isEditing
 	/>
-	<div class="absolute -bottom-[12px] center w-full z-10">
+	<div class="absolute -bottom-[0px] center w-full z-10">
 		<EditOrAddButtons
 			onClickReset={_onClickReset}
 			onAccept={_onClickAccept}
