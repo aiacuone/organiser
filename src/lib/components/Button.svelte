@@ -5,9 +5,9 @@
 
 <button
 	on:click={onClick}
-	class="bg-gray-200 py-1 px-5 rounded self-center {isDisabled ? 'opacity-40' : ''} {isDisabled
-		? 'cursor-not-allowed'
-		: ''}"
+	class="text-sm bg-gray-200 py-[2px] px-3 rounded self-center {isDisabled
+		? 'opacity-40'
+		: ''} {isDisabled ? 'cursor-not-allowed' : ''}"
 	disabled={isDisabled}
 >
 	<slot />

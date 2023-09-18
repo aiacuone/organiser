@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import TimestampAndTime from './TimestampAndTime.svelte';
+	import Timestamp from './Timestamp.svelte';
 
 	export let titleInput: HTMLInputElement;
 	export let contentInput: HTMLTextAreaElement;
@@ -68,24 +69,46 @@
 		keyMethods[key]?.();
 	};
 
+	const autoExpand = (textarea: HTMLTextAreaElement) => {
+		textarea.style.height = textarea.scrollHeight + 'px';
+	};
+
 	const showReference = !!readOnlyValues && !readOnlyValues.reference ? false : true;
-	const areInputsDisabled = !!readOnlyValues;
+	const isReadOnlyNote = !!readOnlyValues;
 </script>
 
+<div class="flex-col sm:flex-row flex">
+	<input
+		placeholder="Title"
+		class="outline-0 flex-1 text-xs sm:text-sm resize-none disabled:bg-white"
+		bind:this={titleInput}
+		disabled={isReadOnlyNote}
+	/>
+
+	{#if !!timestampData}
+		<div class="hStack gap-2 flex-wrap text-opacity-30 text-black">
+			<Timestamp date={timestampData.date} className="flex flex-row gap-1 flex-wrap" />
+			<p>{timestampData.time}</p>
+		</div>
+	{/if}
+</div>
+
 <input
-	placeholder="Title"
-	class="outline-0 text-opacity-30 w-full text-black text-sm resize-none overflow-x-hidden h-[20px] disabled:bg-white"
-	bind:this={titleInput}
-	disabled={areInputsDisabled}
+	placeholder="Reference"
+	class="outline-0 text-opacity-30 w-full text-black text-xs sm:text-sm overflow-x-hidden disabled:bg-white {showReference
+		? 'block'
+		: 'hidden'}"
+	bind:this={referenceInput}
+	disabled={isReadOnlyNote}
 />
 
 <!-- Using tailwind display to conditionally render due to error when updating values -->
 <!-- DO NOT TRY TO USE TEXT AREA FOR THIS. had issues with setting height when components mounts, had to use input instead -->
-<div class="{areInputsDisabled ? 'block' : 'hidden'} my-2">
+<div class="{isReadOnlyNote ? 'block' : 'hidden'} my-2">
 	{#if !!readOnlyValues?.content}
 		{#each readOnlyValues?.content.split('\n') as line}
 			<div class="flex items-center">
-				<span class="text-black text-sm">{line}</span>
+				<span class="text-black text-xs sm:text-sm">{line}</span>
 			</div>
 		{/each}
 	{/if}
@@ -94,27 +117,13 @@
 <!-- Using tailwind display to conditionally render due to error when updating values -->
 <textarea
 	placeholder="Content"
-	class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden my-2 disabled:bg-white h-[20px] {areInputsDisabled
+	class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden my-2 disabled:bg-white h-[20px] {isReadOnlyNote
 		? 'hidden'
 		: 'block'}"
 	bind:this={contentInput}
 	on:keydown={(e) => contentInput && onKeydown(e, contentInput)}
 	on:keyup={() => ($pressedKeys = {})}
-	disabled={areInputsDisabled}
+	on:input={() => autoExpand(contentInput)}
+	disabled={isReadOnlyNote}
 	style={`height:${contentInput?.scrollHeight}px`}
 />
-
-<input
-	placeholder="Reference"
-	class="outline-0 text-opacity-30 w-full text-black text-sm overflow-x-hidden disabled:bg-white {showReference
-		? 'block'
-		: 'hidden'}"
-	bind:this={referenceInput}
-	disabled={areInputsDisabled}
-/>
-
-{#if !!timestampData}
-	<div class="pt-3">
-		<TimestampAndTime date={timestampData.date} time={timestampData.time} />
-	</div>
-{/if}

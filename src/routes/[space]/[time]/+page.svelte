@@ -161,10 +161,16 @@
 <div class="h-full center stack" bind:clientHeight={parentContainerHeight}>
 	<div class="stack gap-2 w-full px-2 max-w-screen-md h-full sm:h-auto justify-center">
 		<div bind:clientHeight={headerContainer} class="stack gap-2">
-			<div class="center text-xl hStack gap-2">
-				<p class="capitalize text-opacity-40 text-black">{$space?.name}</p>
-				<p class="text-opacity-40 text-black">-</p>
-				<p class="capitalize">{data.time}</p>
+			<div class="hStack gap-4 center">
+				<div class="center text-xl hStack gap-2">
+					<p class="capitalize text-opacity-40 text-black">{$space?.name}</p>
+					<p class="text-opacity-40 text-black">-</p>
+					<p class="capitalize">{data.time}</p>
+				</div>
+				<Button
+					onClick={() => exportedNotesModal.showModal()}
+					isDisabled={$filteredNotes.length === 0}>Export</Button
+				>
 			</div>
 			<div class="center hStack gap-3">
 				{#if $page.params.time === 'history'}
@@ -174,19 +180,16 @@
 						bind:value={$datePickerValue}
 					/>
 				{/if}
-				<Button
-					onClick={() => exportedNotesModal.showModal()}
-					isDisabled={$filteredNotes.length === 0}>Export</Button
-				>
 			</div>
-			<NewNote background={$space?.color ?? ''} {onClickAccept} />
 		</div>
 		<div class="stack gap-6">
 			<div
 				class="w-full rounded-sm p-2 overflow-y-scroll hide-scrollbar"
 				style="background:{$space?.color}; max-height:{notesContainerHeight}px"
 			>
-				<div class="w-full stack gap-2 text-xs sm:text-sm md:text-md">
+				<div
+					class="w-full stack gap-2 text-xs sm:text-sm md:text-md max-h-[60vh] overflow-y-scroll hide-scrollbar"
+				>
 					{#if $filteredNotes.length === 0}
 						<p class="text-opacity-40 text-black text-center">No notes for this date</p>
 					{:else}
@@ -205,6 +208,7 @@
 				</div>
 			</div>
 		</div>
+		<NewNote background={$space?.color ?? ''} {onClickAccept} />
 	</div>
 </div>
 
