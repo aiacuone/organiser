@@ -93,19 +93,10 @@
 					bind:contentInput
 					bind:referenceInput
 					timestampData={{ date, time }}
+					{onClickEdit}
+					{onClickDelete}
 				/>
 			{/if}
 		</NoteContentContainer>
-		<!-- <div class="center bg-white bg-opacity-20 rounded-md py-1">
-			<Icon icon={icons.moreVertical} width="25px" color="black" />
-		</div> -->
-		<!-- <NoteButtonContainer>
-			<NoteButton onClick={onClickEdit}>
-				<Icon icon={icons.edit} height="17px" />
-			</NoteButton>
-			<NoteButton onClick={onClickDelete}>
-				<Icon icon={icons.delete} height="17px" />
-			</NoteButton>
-		</NoteButtonContainer> -->
 	{/if}
 </div>
