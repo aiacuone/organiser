@@ -79,7 +79,9 @@
 	disabled={areInputsDisabled}
 />
 
-<div class={areInputsDisabled ? 'block' : 'hidden'}>
+<!-- Using tailwind display to conditionally render due to error when updating values -->
+<!-- DO NOT TRY TO USE TEXT AREA FOR THIS. had issues with setting height when components mounts, had to use input instead -->
+<div class="{areInputsDisabled ? 'block' : 'hidden'} my-2">
 	{#if !!readOnlyValues?.content}
 		{#each readOnlyValues?.content.split('\n') as line}
 			<div class="flex items-center">
@@ -101,8 +103,7 @@
 	disabled={areInputsDisabled}
 	style={`height:${contentInput?.scrollHeight}px`}
 />
-<!-- Using tailwind display to conditionally render due to error when updating values -->
-<!-- DO NOT TRY TO USE TEXT AREA FOR THIS. had issues with setting height when components mounts, had to use input instead -->
+
 <input
 	placeholder="Reference"
 	class="outline-0 text-opacity-30 w-full text-black text-sm overflow-x-hidden disabled:bg-white {showReference
