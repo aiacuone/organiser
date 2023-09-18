@@ -64,7 +64,7 @@
 	let containerHeight: number;
 </script>
 
-<div class="flex-col sm:flex-row center gap-2" bind:clientHeight={containerHeight}>
+<div class="flex-col sm:flex-row center gap-1" bind:clientHeight={containerHeight}>
 	{#if isEditing}
 		<EditNote
 			initialTitleValue={title}
@@ -96,13 +96,16 @@
 				/>
 			{/if}
 		</NoteContentContainer>
-		<NoteButtonContainer>
+		<!-- <div class="center bg-white bg-opacity-20 rounded-md py-1">
+			<Icon icon={icons.moreVertical} width="25px" color="black" />
+		</div> -->
+		<!-- <NoteButtonContainer>
 			<NoteButton onClick={onClickEdit}>
 				<Icon icon={icons.edit} height="17px" />
 			</NoteButton>
 			<NoteButton onClick={onClickDelete}>
 				<Icon icon={icons.delete} height="17px" />
 			</NoteButton>
-		</NoteButtonContainer>
+		</NoteButtonContainer> -->
 	{/if}
 </div>

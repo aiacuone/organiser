@@ -52,8 +52,8 @@
 >
 	<NoteContentContainer>
 		<NoteInputs bind:titleInput bind:contentInput bind:referenceInput />
+		<EditOrAddButtons {onClickReset} {onAccept} {time} {onChangeTime} />
 	</NoteContentContainer>
-	<EditOrAddButtons {onClickReset} {onAccept} {time} {onChangeTime} />
 </div>
 
 <style>

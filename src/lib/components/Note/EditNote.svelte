@@ -87,5 +87,5 @@
 		bind:referenceInput
 		timestampData={{ date, time }}
 	/>
+	<EditOrAddButtons onClickReset={_onClickReset} onAccept={_onClickAccept} {time} {onChangeTime} />
 </NoteContentContainer>
-<EditOrAddButtons onClickReset={_onClickReset} onAccept={_onClickAccept} {time} {onChangeTime} />

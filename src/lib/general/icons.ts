@@ -4,5 +4,7 @@ export const icons = {
 	reset: 'system-uicons:reset',
 	tick: 'mdi:tick',
 	edit: 'mdi:pencil',
-	delete: 'akar-icons:cross'
+	delete: 'akar-icons:cross',
+	moreHorizontal: 'ri:more-fill',
+	moreVertical: 'ri:more-2-fill'
 };
