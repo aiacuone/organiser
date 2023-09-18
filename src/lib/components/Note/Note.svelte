@@ -1,13 +1,9 @@
 <script lang="ts">
-	import Icon from '@iconify/svelte';
 	import EditNote from './EditNote.svelte';
 	import NoteContentContainer from './NoteContentContainer.svelte';
-	import NoteButtonContainer from './NoteButtonContainer.svelte';
-	import NoteButton from './NoteButton.svelte';
 	import Button from '../Button.svelte';
 	import { onMount } from 'svelte';
 	import NoteInputs from './NoteInputs.svelte';
-	import { icons } from '$lib/general/icons';
 
 	export let title: string;
 	export let content: string;

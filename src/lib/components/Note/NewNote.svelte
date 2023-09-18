@@ -50,9 +50,11 @@
 	class="flex-col sm:flex-row center gap-2 p-1 w-full rounded-md"
 	style="background:{background}"
 >
-	<NoteContentContainer>
+	<NoteContentContainer className="relative">
 		<NoteInputs bind:titleInput bind:contentInput bind:referenceInput />
-		<EditOrAddButtons {onClickReset} {onAccept} {time} {onChangeTime} />
+		<div class="absolute -bottom-[12px] center w-full">
+			<EditOrAddButtons {onClickReset} {onAccept} {time} {onChangeTime} />
+		</div>
 	</NoteContentContainer>
 </div>
 

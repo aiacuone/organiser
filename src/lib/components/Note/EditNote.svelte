@@ -80,12 +80,20 @@
 	};
 </script>
 
-<NoteContentContainer className="min-h-[110px]">
+<NoteContentContainer className="min-h-[110px] relative">
 	<NoteInputs
 		bind:titleInput
 		bind:contentInput
 		bind:referenceInput
 		timestampData={{ date, time }}
+		isEditing
 	/>
-	<EditOrAddButtons onClickReset={_onClickReset} onAccept={_onClickAccept} {time} {onChangeTime} />
+	<div class="absolute -bottom-[12px] center w-full z-10">
+		<EditOrAddButtons
+			onClickReset={_onClickReset}
+			onAccept={_onClickAccept}
+			{time}
+			{onChangeTime}
+		/>
+	</div>
 </NoteContentContainer>

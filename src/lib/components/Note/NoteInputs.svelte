@@ -14,6 +14,7 @@
 	export let timestampData: { date: Date; time: number } | undefined = undefined;
 	export let onClickEdit: (() => void) | undefined = undefined;
 	export let onClickDelete: (() => void) | undefined = undefined;
+	export let isEditing = false;
 
 	onMount(() => {
 		if (readOnlyValues) {
@@ -94,7 +95,7 @@
 			<Icon icon={icons.moreHorizontal} width="25px" color="black" />
 		</button>
 	{/if}
-	<div class="absolute right-20">
+	<div class="absolute right-[65px] -top-1">
 		<dialog bind:this={moreDialog}>
 			<div class="hStack gap-2">
 				<NoteButton onClick={onClickEdit}>
@@ -122,7 +123,7 @@
 		placeholder="Reference"
 		class="outline-0 text-opacity-30 text-black text-xs sm:text-sm overflow-x-hidden disabled:bg-white {showReference
 			? 'block'
-			: 'hidden'} {isReadOnlyNote ? 'text-right' : 'text-left'}"
+			: 'hidden'} {isReadOnlyNote || isEditing ? 'text-right' : 'text-left'}"
 		bind:this={referenceInput}
 		disabled={isReadOnlyNote}
 	/>
