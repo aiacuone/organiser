@@ -50,21 +50,21 @@
 		}
 
 		const keyMethods: Record<string, () => void> = {
-			Enter: () => {
-				e.preventDefault();
-				contentInput.value += '\n';
-				textarea.style.height = textarea.scrollHeight + 'px';
-			},
-			ArrowUp: () => {
-				// e.preventDefault();
-			},
-			ArrowDown: () => {
-				// e.preventDefault();
-			},
-			Tab: () => {
-				e.preventDefault();
-				textarea === contentInput ? titleInput?.focus() : contentInput?.focus();
-			}
+			// Enter: () => {
+			// 	e.preventDefault();
+			// 	contentInput.value += '\n';
+			// 	textarea.style.height = textarea.scrollHeight + 'px';
+			// },
+			// ArrowUp: () => {
+			// 	// e.preventDefault();
+			// },
+			// ArrowDown: () => {
+			// 	// e.preventDefault();
+			// },
+			// Tab: () => {
+			// 	e.preventDefault();
+			// 	textarea === contentInput ? titleInput?.focus() : contentInput?.focus();
+			// }
 		};
 		keyMethods[key]?.();
 	};
@@ -94,7 +94,7 @@
 	/>
 </div>
 
-{#if !!timestampData}
+{#if !!timestampData && !isEditing}
 	<div class="flex-1">
 		<div class="hStack gap-2 flex-wrap text-opacity-30 text-black">
 			<Timestamp date={timestampData.date} className="flex flex-row gap-1 flex-wrap" />
@@ -118,7 +118,7 @@
 <!-- Using tailwind display to conditionally render due to error when updating values -->
 <textarea
 	placeholder="Content"
-	class="outline-0 w-full text-black text-sm resize-none overflow-x-hidden my-2 disabled:bg-white h-[20px] {isReadOnlyNote
+	class="pb-6 outline-0 w-full text-black text-sm resize-none overflow-x-hidden my-2 disabled:bg-white h-[20px] {isReadOnlyNote
 		? 'hidden'
 		: 'block'}"
 	bind:this={contentInput}

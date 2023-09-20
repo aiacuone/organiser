@@ -45,6 +45,10 @@
 		isConfirmingDelete = false;
 	};
 
+	const onStopShowingMoreButtons = () => {
+		showMoreButtons = false;
+	};
+
 	const onAcceptEdit = ({
 		title: _title,
 		content: _content,
@@ -79,7 +83,7 @@
 			{id}
 			onClickAccept={onAcceptEdit}
 			{date}
-			onClickReset={onStopEditing}
+			{onStopEditing}
 			{time}
 		/>
 	{:else}
@@ -112,6 +116,9 @@
 							<NoteButton onClick={onClickDelete}>
 								<Icon icon={icons.delete} height="17px" />
 							</NoteButton>
+							<NoteButton onClick={onStopShowingMoreButtons}>
+								<Icon icon={icons.exit} height="20px" />
+							</NoteButton>
 						</div>
 					</div>
 				{:else if !isConfirmingDelete}
@@ -119,9 +126,7 @@
 						on:click={() => (showMoreButtons = true)}
 						style="background:{$space.color}"
 						class="px-1 rounded-sm bottom-0 absolute h-[15px] w-[35px]"
-					>
-						<!-- <Icon icon={icons.moreHorizontal} width="20px" color="black" /> -->
-					</button>
+					/>
 				{/if}
 			</div>
 		</NoteContentContainer>

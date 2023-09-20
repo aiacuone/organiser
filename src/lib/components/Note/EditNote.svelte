@@ -21,7 +21,7 @@
 		content: string;
 		reference: string;
 	}) => void = () => {};
-	export let onClickReset: () => void = () => {};
+	export let onStopEditing: () => void = () => {};
 	export let date: Date;
 	export let time: number;
 
@@ -50,7 +50,12 @@
 	const _onClickReset = () => {
 		titleInput.value = initialTitleValue;
 		contentInput.innerText = initialContentValue;
-		onClickReset();
+	};
+
+	const onExitEdit = () => {
+		titleInput.value = initialTitleValue;
+		contentInput.innerText = initialContentValue;
+		onStopEditing();
 	};
 
 	const _onClickAccept = () => {
@@ -86,6 +91,7 @@
 		bind:contentInput
 		bind:referenceInput
 		timestampData={{ date, time }}
+		isEditing
 	/>
 	<div class="absolute -bottom-[0px] center w-full z-10">
 		<EditOrAddButtons
@@ -93,6 +99,8 @@
 			onAccept={_onClickAccept}
 			{time}
 			{onChangeTime}
+			onClickExit={onExitEdit}
+			showExitButton
 		/>
 	</div>
 </NoteContentContainer>

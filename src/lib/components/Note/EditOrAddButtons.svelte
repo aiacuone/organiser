@@ -7,6 +7,8 @@
 	export let onAccept: () => void;
 	export let time: number = 0.5;
 	export let onChangeTime: (type: 'increase' | 'decrease') => void = () => {};
+	export let onClickExit: () => void;
+	export let showExitButton: boolean = false;
 </script>
 
 <div class="flex gap-2 w-full sm:w-auto center">
@@ -16,13 +18,20 @@
 	<NoteButton onClick={onClickReset}>
 		<Icon icon={icons.reset} height="17px" />
 	</NoteButton>
-	<NoteButton onClick={() => onChangeTime('increase')}>
-		<Icon icon={icons.up} height="17px" />
-	</NoteButton>
-	<p class="text-base text-center min-w-[25px] bg-white w-[35px]">
-		{time}
-	</p>
-	<NoteButton onClick={() => onChangeTime('decrease')}>
-		<Icon icon={icons.down} height="17px" />
-	</NoteButton>
+	<div class="hStack">
+		<NoteButton onClick={() => onChangeTime('decrease')}>
+			<Icon icon={icons.leftArrow} height="13px" />
+		</NoteButton>
+		<p class="text-base text-center min-w-[25px] bg-white w-[35px]">
+			{time}
+		</p>
+		<NoteButton onClick={() => onChangeTime('increase')}>
+			<Icon icon={icons.rightArrow} height="13px" />
+		</NoteButton>
+	</div>
+	{#if showExitButton}
+		<NoteButton onClick={onClickExit}>
+			<Icon icon={icons.exit} height="20px" />
+		</NoteButton>
+	{/if}
 </div>

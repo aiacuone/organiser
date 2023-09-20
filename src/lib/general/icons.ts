@@ -4,7 +4,10 @@ export const icons = {
 	reset: 'system-uicons:reset',
 	tick: 'mdi:tick',
 	edit: 'mdi:pencil',
-	delete: 'akar-icons:cross',
+	delete: 'ic:baseline-delete',
 	moreHorizontal: 'ri:more-fill',
-	moreVertical: 'ri:more-2-fill'
+	moreVertical: 'ri:more-2-fill',
+	leftArrow: 'bxs:left-arrow',
+	rightArrow: 'bxs:right-arrow',
+	exit: 'iconamoon:exit-thin'
 };
