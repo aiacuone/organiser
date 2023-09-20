@@ -9,6 +9,7 @@
 	export let onChangeTime: (type: 'increase' | 'decrease') => void = () => {};
 	export let onClickExit: () => void;
 	export let showExitButton: boolean = false;
+	export let onClickDelete: () => void;
 </script>
 
 <div class="flex gap-2 w-full sm:w-auto center">
@@ -29,9 +30,13 @@
 			<Icon icon={icons.rightArrow} height="13px" />
 		</NoteButton>
 	</div>
+
 	{#if showExitButton}
 		<NoteButton onClick={onClickExit}>
 			<Icon icon={icons.exit} height="20px" />
+		</NoteButton>
+		<NoteButton onClick={onClickDelete}>
+			<Icon icon={icons.delete} height="17px" />
 		</NoteButton>
 	{/if}
 </div>

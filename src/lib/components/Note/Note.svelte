@@ -4,9 +4,6 @@
 	import Button from '../Button.svelte';
 	import { getContext, onMount } from 'svelte';
 	import NoteInputs from './NoteInputs.svelte';
-	import NoteButton from './NoteButton.svelte';
-	import Icon from '@iconify/svelte';
-	import { icons } from '$lib/general/icons';
 	import type { Readable } from 'svelte/store';
 	import type { Space_int } from '$lib/types';
 
@@ -30,23 +27,14 @@
 		showMoreButtons = false;
 	};
 
-	const onClickEdit = () => {
-		isEditing = true;
-		showMoreButtons = false;
-	};
-
-	const onClickDelete = () => {
+	const onDeleteNote = () => {
+		isEditing = false;
 		isConfirmingDelete = true;
-		showMoreButtons = false;
 	};
 
 	const _onConfirmDelete = () => {
 		onConfirmDelete();
 		isConfirmingDelete = false;
-	};
-
-	const onStopShowingMoreButtons = () => {
-		showMoreButtons = false;
 	};
 
 	const onAcceptEdit = ({
@@ -85,6 +73,7 @@
 			{date}
 			{onStopEditing}
 			{time}
+			{onDeleteNote}
 		/>
 	{:else}
 		<NoteContentContainer style={`height:${containerHeight}px`} className="pb-6">
@@ -105,29 +94,12 @@
 					timestampData={{ date, time }}
 				/>
 			{/if}
-
 			<div class="z-10 w-full center">
-				{#if showMoreButtons}
-					<div class="absolute bottom-0">
-						<div class="hStack gap-2">
-							<NoteButton onClick={onClickEdit}>
-								<Icon icon={icons.edit} height="17px" />
-							</NoteButton>
-							<NoteButton onClick={onClickDelete}>
-								<Icon icon={icons.delete} height="17px" />
-							</NoteButton>
-							<NoteButton onClick={onStopShowingMoreButtons}>
-								<Icon icon={icons.exit} height="20px" />
-							</NoteButton>
-						</div>
-					</div>
-				{:else if !isConfirmingDelete}
-					<button
-						on:click={() => (showMoreButtons = true)}
-						style="background:{$space.color}"
-						class="px-1 rounded-sm bottom-0 absolute h-[15px] w-[35px]"
-					/>
-				{/if}
+				<button
+					on:click={() => (isEditing = true)}
+					style="background:{$space.color}"
+					class="px-1 rounded-sm bottom-0 absolute h-[15px] w-[35px]"
+				/>
 			</div>
 		</NoteContentContainer>
 	{/if}

@@ -24,6 +24,7 @@
 	export let onStopEditing: () => void = () => {};
 	export let date: Date;
 	export let time: number;
+	export let onDeleteNote: () => void;
 
 	const space: Readable<Space_int> = getContext('space');
 
@@ -101,6 +102,7 @@
 			{onChangeTime}
 			onClickExit={onExitEdit}
 			showExitButton
+			onClickDelete={onDeleteNote}
 		/>
 	</div>
 </NoteContentContainer>
