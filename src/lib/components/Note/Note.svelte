@@ -94,7 +94,7 @@
 					timestampData={{ date, time }}
 				/>
 			{/if}
-			<div class="z-10 w-full center">
+			<div class="z-10 w-full center mt-2">
 				<button
 					on:click={() => (isEditing = true)}
 					style="background:{$space.color}"
