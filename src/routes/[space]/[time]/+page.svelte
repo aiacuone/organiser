@@ -162,8 +162,8 @@
 <div class="flex-1 center stack" bind:clientHeight={parentContainerHeight}>
 	<div class="stack gap-2 w-full px-2 max-w-screen-md h-full sm:h-auto justify-center flex-1">
 		<div bind:clientHeight={headerContainer} class="stack gap-2">
-			<div class="hStack gap-4 center">
-				<div class="center text-xl hStack gap-2">
+			<div class="hStack gap-1 sm:gap-2 center">
+				<div class="center text-base sm:text-xl hStack gap-1 sm:gap-2">
 					<p class="capitalize text-opacity-40">{$space?.name}</p>
 					<p class="text-opacity-40">-</p>
 					<p class="capitalize">{data.time}</p>
