@@ -163,11 +163,12 @@
 		<div bind:clientHeight={headerContainer} class="stack gap-2">
 			<div class="hStack gap-4 center">
 				<div class="center text-xl hStack gap-2">
-					<p class="capitalize text-opacity-40 text-black">{$space?.name}</p>
-					<p class="text-opacity-40 text-black">-</p>
+					<p class="capitalize text-opacity-40">{$space?.name}</p>
+					<p class="text-opacity-40">-</p>
 					<p class="capitalize">{data.time}</p>
 				</div>
 				<Button
+					className="text-black"
 					onClick={() => exportedNotesModal.showModal()}
 					isDisabled={$filteredNotes.length === 0}>Export</Button
 				>

@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import Timestamp from './Timestamp.svelte';
+	import { darkMode } from '$lib/stores';
 
 	export let titleInput: HTMLInputElement;
 	export let contentInput: HTMLTextAreaElement;
@@ -75,18 +76,22 @@
 
 	const showReference = !!readOnlyValues && !readOnlyValues.reference ? false : true;
 	const isReadOnlyNote = !!readOnlyValues;
+
+	$: inputTextStyles = $darkMode.boolean
+		? `placeholder-white placeholder-opacity-30`
+		: `placeholder-black placeholder-opacity-30`;
 </script>
 
 <div class="{isReadOnlyNote ? 'flex-row' : 'flex-col'} flex relative">
 	<input
 		placeholder="Title"
-		class="outline-0 flex-1 text-xs sm:text-sm resize-none disabled:bg-white font-bold"
+		class="{inputTextStyles} bg-transparent outline-0 flex-1 text-xs sm:text-sm resize-none disabled:bg-transparent font-bold"
 		bind:this={titleInput}
 		disabled={isReadOnlyNote}
 	/>
 	<input
 		placeholder="Reference"
-		class="outline-0 text-opacity-30 text-black text-xs sm:text-sm overflow-x-hidden disabled:bg-white {showReference
+		class="{inputTextStyles} bg-transparent outline-0 text-opacity-30 text-xs sm:text-sm overflow-x-hidden disabled:bg-transparent {showReference
 			? 'block'
 			: 'hidden'} {isReadOnlyNote ? 'text-right' : 'text-left'}"
 		bind:this={referenceInput}
@@ -96,7 +101,11 @@
 
 {#if !!timestampData && !isEditing}
 	<div class="flex-1">
-		<div class="hStack gap-2 flex-wrap text-opacity-30 text-black">
+		<div
+			class="hStack gap-2 flex-wrap text-opacity-30 {$darkMode.boolean
+				? `text-${$darkMode.darkStyles.color}`
+				: `text-${$darkMode.lightStyles.color}`}"
+		>
 			<Timestamp date={timestampData.date} className="flex flex-row gap-1 flex-wrap" />
 			<p>{timestampData.time}</p>
 		</div>
@@ -109,7 +118,7 @@
 	{#if !!readOnlyValues?.content}
 		{#each readOnlyValues?.content.split('\n') as line}
 			<div class="flex items-center">
-				<span class="text-black text-xs sm:text-sm">{line}</span>
+				<span class="text-xs sm:text-sm">{line}</span>
 			</div>
 		{/each}
 	{/if}
@@ -118,7 +127,7 @@
 <!-- Using tailwind display to conditionally render due to error when updating values -->
 <textarea
 	placeholder="Content"
-	class="pb-6 outline-0 w-full text-black text-sm resize-none overflow-x-hidden my-2 disabled:bg-white h-[20px] {isReadOnlyNote
+	class="{inputTextStyles} bg-transparent pb-6 outline-0 w-full text-sm resize-none overflow-x-hidden my-2 disabled:bg-transparent h-[20px] {isReadOnlyNote
 		? 'hidden'
 		: 'block'}"
 	bind:this={contentInput}

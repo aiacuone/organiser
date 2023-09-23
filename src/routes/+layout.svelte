@@ -7,6 +7,10 @@
 	import HeaderFooterLink from '../lib/components/HeaderFooterLink.svelte';
 	import type { Space_int, SpaceData_int } from '$lib/types/general';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
+	import { darkMode } from '$lib/stores';
+	import Icon from '@iconify/svelte';
+	import { icons } from '$lib/general/icons';
+
 	export let data: SpaceData_int;
 	const { spaces, times } = data;
 
@@ -24,6 +28,17 @@
 	});
 
 	const queryClient = new QueryClient();
+
+	const onClickDarkMode = () => {
+		localStorage.setItem('isDarkMode', new Boolean(!$darkMode.boolean).toString());
+		$darkMode.boolean = !$darkMode.boolean;
+	};
+
+	onMount(() => {
+		localStorage.getItem('isDarkMode') === 'true'
+			? ($darkMode.boolean = true)
+			: ($darkMode.boolean = false);
+	});
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -35,14 +50,29 @@
 					<HeaderFooterLink
 						href="/{spaceName}/today"
 						isSelected={$space?.name === _space.name}
-						style="background:{_space.color}">{_space.name}</HeaderFooterLink
+						style="background:{_space.color};color:black">{_space.name}</HeaderFooterLink
 					>
 				{/each}
 			</div>
 		</header>
-		<div class="flex-1">
+		<main
+			class="flex-1 p-2"
+			style={$darkMode.boolean ? $darkMode.darkStyles.string : $darkMode.lightStyles.string}
+		>
+			<div class="flex justify-end">
+				<button on:click={onClickDarkMode}>
+					<Icon
+						icon={icons.darkMode}
+						height="30px"
+						width="30px"
+						class={$darkMode.boolean
+							? `color-${$darkMode.darkStyles.color}`
+							: `color-${$darkMode.lightStyles.color}`}
+					/>
+				</button>
+			</div>
 			<slot />
-		</div>
+		</main>
 		<footer class=" py-2" style="background:{$space?.color}">
 			<div class="hStack center capitalize gap-2 sm:gap-4">
 				{#each times as time}

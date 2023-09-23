@@ -9,5 +9,6 @@ export const icons = {
 	moreVertical: 'ri:more-2-fill',
 	leftArrow: 'bxs:left-arrow',
 	rightArrow: 'bxs:right-arrow',
-	exit: 'iconamoon:exit-thin'
+	exit: 'iconamoon:exit-thin',
+	darkMode: 'gg:dark-mode'
 };
