@@ -33,10 +33,10 @@
 
 	{#if showExitButton}
 		<NoteButton onClick={onClickExit}>
-			<Icon icon={icons.exit} height="20px" />
+			<Icon icon={icons.exit} height="20px" color="black" />
 		</NoteButton>
 		<NoteButton onClick={onClickDelete}>
-			<Icon icon={icons.delete} height="17px" />
+			<Icon icon={icons.delete} height="17px" color="black" />
 		</NoteButton>
 	{/if}
 </div>

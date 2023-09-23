@@ -137,10 +137,11 @@
 		}
 	);
 
-	let headerContainer: number;
-	let parentContainerHeight: number;
-	let notesContainerHeight: number;
-	$: parentContainerHeight, (notesContainerHeight = parentContainerHeight - headerContainer - 30);
+	$: headerContainer = 0;
+	$: parentContainerHeight = 0;
+	$: newNoteContainerHeight = 0;
+
+	$: notesContainerHeight = parentContainerHeight - headerContainer - newNoteContainerHeight - 30;
 
 	let exportedNotesModal: HTMLDialogElement;
 
@@ -158,8 +159,8 @@
 	};
 </script>
 
-<div class="h-full center stack" bind:clientHeight={parentContainerHeight}>
-	<div class="stack gap-2 w-full px-2 max-w-screen-md h-full sm:h-auto justify-center">
+<div class="flex-1 center stack" bind:clientHeight={parentContainerHeight}>
+	<div class="stack gap-2 w-full px-2 max-w-screen-md h-full sm:h-auto justify-center flex-1">
 		<div bind:clientHeight={headerContainer} class="stack gap-2">
 			<div class="hStack gap-4 center">
 				<div class="center text-xl hStack gap-2">
@@ -177,7 +178,7 @@
 				{#if $page.params.time === 'history'}
 					<input
 						type="date"
-						class="border border-gray-300 px-5 py-1 rounded"
+						class="border border-gray-300 px-5 py-1 rounded text-black"
 						bind:value={$datePickerValue}
 					/>
 				{/if}
@@ -186,10 +187,11 @@
 		<div class="stack gap-6">
 			<div
 				class="w-full rounded-md p-1 overflow-y-scroll hide-scrollbar"
-				style="background:{$space?.color}; max-height:{notesContainerHeight}px"
+				style="background:{$space?.color}"
 			>
 				<div
-					class="w-full stack gap-1 text-xs sm:text-sm md:text-md max-h-[60vh] overflow-y-scroll hide-scrollbar"
+					class="w-full h-full stack gap-1 text-xs sm:text-sm md:text-md overflow-y-scroll hide-scrollbar"
+					style="max-height:{notesContainerHeight}px"
 				>
 					{#if $filteredNotes.length === 0}
 						<p class="text-opacity-40 text-black text-center">No notes for this date</p>
@@ -209,7 +211,9 @@
 				</div>
 			</div>
 		</div>
-		<NewNote background={$space?.color ?? ''} {onClickAccept} />
+		<div bind:clientHeight={newNoteContainerHeight}>
+			<NewNote background={$space?.color ?? ''} {onClickAccept} />
+		</div>
 	</div>
 </div>
 

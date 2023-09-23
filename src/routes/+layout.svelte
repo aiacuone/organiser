@@ -56,15 +56,15 @@
 			</div>
 		</header>
 		<main
-			class="flex-1 p-2"
+			class="flex-1 p-2 flex flex-col"
 			style={$darkMode.boolean ? $darkMode.darkStyles.string : $darkMode.lightStyles.string}
 		>
 			<div class="flex justify-end">
 				<button on:click={onClickDarkMode}>
 					<Icon
 						icon={icons.darkMode}
-						height="30px"
-						width="30px"
+						height="25px"
+						width="25px"
 						class={$darkMode.boolean
 							? `color-${$darkMode.darkStyles.color}`
 							: `color-${$darkMode.lightStyles.color}`}
