@@ -7,7 +7,7 @@
 	$: ({ dayString, day, month, year, hour, minutes } = getDayMonthYearFromDate(date));
 </script>
 
-<div class="sm:gap-2 gap-none {className}">
+<div class="sm:gap-2 gap-none flex {className}">
 	<p>{dayString}</p>
 	<p>{`${day}-${month}-${year}`}</p>
 	<p>{`${hour}:${minutes}`}</p>

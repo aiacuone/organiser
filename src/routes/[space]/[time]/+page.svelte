@@ -23,6 +23,7 @@
 	import { getSpaces } from '$lib/api/spaceLocalApi';
 	import Button from '$lib/components/Button.svelte';
 	import Timestamp from '$lib/components/Note/Timestamp.svelte';
+	import { darkMode } from '$lib/stores';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -145,9 +146,20 @@
 
 	let exportedNotesModal: HTMLDialogElement;
 
-	let showInNotesModalCheckboxes: Record<string, boolean> = {
+	const defaultModalCheckboxes = {
+		bullets: true,
+		'include title': true,
+		'include reference': true,
+		titles: false,
 		times: false,
-		dates: false
+		dates: false,
+		dividers: false
+	};
+
+	let showInNotesModalCheckboxes: Record<string, boolean> = { ...defaultModalCheckboxes };
+
+	const resetCheckboxes = () => {
+		showInNotesModalCheckboxes = { ...defaultModalCheckboxes };
 	};
 
 	let notesModalTextArea: HTMLDivElement;
@@ -157,12 +169,17 @@
 		});
 		navigator.clipboard.write([clipboardItem]);
 	};
+	$: modalContainerHeight = 0;
+	$: modalCheckboxContainerHeight = 0;
+	$: modalButtonContainerHeight = 0;
+	$: modalMainContentHeight =
+		modalContainerHeight - modalCheckboxContainerHeight - modalButtonContainerHeight - 20;
 </script>
 
 <div class="flex-1 center stack" bind:clientHeight={parentContainerHeight}>
 	<div class="stack gap-2 w-full px-2 max-w-screen-md h-full sm:h-auto justify-center flex-1">
 		<div bind:clientHeight={headerContainer} class="stack gap-2">
-			<div class="hStack gap-1 sm:gap-2 center">
+			<div class="hStack gap-1 sm:gap-2 center flex-wrap">
 				<div class="center text-base sm:text-xl hStack gap-1 sm:gap-2">
 					<p class="capitalize text-opacity-40">{$space?.name}</p>
 					<p class="text-opacity-40">-</p>
@@ -178,7 +195,7 @@
 				{#if $page.params.time === 'history'}
 					<input
 						type="date"
-						class="border border-gray-300 px-5 py-1 rounded text-black"
+						class="border border-gray-300 px-5 py-[1px] rounded text-black"
 						bind:value={$datePickerValue}
 					/>
 				{/if}
@@ -220,42 +237,85 @@
 <dialog
 	bind:this={exportedNotesModal}
 	class="w-full max-w-[800px] p-5 sm:p-10 rounded-md h-screen sm:h-[auto]"
+	style={$darkMode.boolean ? $darkMode.darkStyles.string : $darkMode.lightStyles.string}
 >
-	<div class="stack justify-end h-full">
-		<div class="hStack gap-3 justify-end align-center text-xs">
-			<p>Show:</p>
-			{#each Object.keys(showInNotesModalCheckboxes) as checkbox}
-				<label class="center gap-1">
-					{checkbox}
-					<input type="checkbox" bind:checked={showInNotesModalCheckboxes[checkbox]} />
-				</label>
-			{/each}
+	<div class="stack justify-end h-full gap-4" bind:clientHeight={modalContainerHeight}>
+		<div class="stack gap-2">
+			<div
+				class="hStack gap-3 justify-end align-center text-xs flex-wrap"
+				bind:clientHeight={modalCheckboxContainerHeight}
+			>
+				<p>Show:</p>
+				{#each Object.keys(showInNotesModalCheckboxes) as checkbox}
+					<label class="center gap-1 capitalize">
+						{checkbox}
+						<input type="checkbox" bind:checked={showInNotesModalCheckboxes[checkbox]} />
+					</label>
+				{/each}
+			</div>
+			<Button className="text-black text-xs self-end" onClick={resetCheckboxes}>Reset</Button>
 		</div>
-		<div class="stack gap-10 center h-full">
-			<div class="stack gap-4" bind:this={notesModalTextArea}>
+		<div
+			class="stack gap-10 center h-full overflow-y-scroll hide-scrollbar"
+			style="height:{modalMainContentHeight}px"
+		>
+			<div class="stack gap-2 sm:gap-4" bind:this={notesModalTextArea}>
 				{#each $filteredNotes as note, $index}
 					{@const $last = $filteredNotes.length - 1 === $index}
-					<div class="stack">
-						<p class="capitalize">{note.title}</p>
-						<p class="text-xs py-2 capitalize">{note.content}</p>
-						{#if showInNotesModalCheckboxes.dates}
-							<p class="text-opacity-30 text-black text-xs">
-								<Timestamp date={note.date} />
+					<div class="stack text-xs sm:text-sm">
+						{#if showInNotesModalCheckboxes.titles}
+							<p class="capitalize font-bold">{note.title}</p>
+						{/if}
+						<div class="flex">
+							<p class="capitalize">
+								{#if showInNotesModalCheckboxes.bullets}
+									•
+								{/if}
+								{#if showInNotesModalCheckboxes['include title'] && note.title}
+									<b>{note.title}.</b>
+								{/if}
+								{#if showInNotesModalCheckboxes['include reference'] && note.reference}
+									<b>{note.reference}.</b>
+								{/if}
+								{note.content}
 							</p>
+						</div>
+						{#if showInNotesModalCheckboxes.dates}
+							<div
+								class="text-opacity-30 {$darkMode.boolean
+									? `text-${$darkMode.darkStyles.color}`
+									: `text-${$darkMode.lightStyles.color}`}"
+							>
+								<Timestamp date={note.date} />
+							</div>
 						{/if}
 						{#if showInNotesModalCheckboxes.times}
-							<p class="text-opacity-30 text-black text-xs">{note.time} h</p>
+							<p
+								class="text-opacity-30 text-xs {$darkMode.boolean
+									? `text-${$darkMode.darkStyles.color}`
+									: `text-${$darkMode.lightStyles.color}`}"
+							>
+								{note.time} h
+							</p>
 						{/if}
 					</div>
-					{#if !$last}
+					{#if !$last && showInNotesModalCheckboxes.dividers}
 						<hr class="border-gray-100" />
 					{/if}
 				{/each}
 			</div>
-			<div class="flex flex-col sm:flex-row gap-4 center">
-				<Button onClick={copy}>Copy</Button>
-				<Button onClick={() => exportedNotesModal.close()}>Close</Button>
-			</div>
+		</div>
+		<div class="flex flex-wrap gap-4 center" bind:clientHeight={modalButtonContainerHeight}>
+			<Button onClick={copy} className="text-black">Copy</Button>
+			<Button onClick={() => exportedNotesModal.close()} className="text-black">Close</Button>
 		</div>
 	</div>
 </dialog>
+
+<style>
+	li {
+		list-style-type: disc;
+		list-style-position: inside;
+		list-style-color: white;
+	}
+</style>
