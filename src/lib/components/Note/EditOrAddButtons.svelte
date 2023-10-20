@@ -19,7 +19,7 @@
 	<NoteButton onClick={onClickReset}>
 		<Icon icon={icons.reset} height="17px" color="black" />
 	</NoteButton>
-	<div class="hStack">
+	<div class="hstack">
 		<NoteButton onClick={() => onChangeTime('decrease')}>
 			<Icon icon={icons.leftArrow} height="13px" color="black" />
 		</NoteButton>

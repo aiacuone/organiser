@@ -3,8 +3,7 @@
 	import { setContext } from 'svelte';
 	import { derived, writable, type Readable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
-	import NewNote from '$lib/components/Note/NewNote.svelte';
-	import Note from '$lib/components/Note/Note.svelte';
+
 	import {
 		getDate2DaysEarlier,
 		getDateFromHyphenatedString,
@@ -24,12 +23,20 @@
 	import Button from '$lib/components/Button.svelte';
 	import Timestamp from '$lib/components/Note/Timestamp.svelte';
 	import { darkMode } from '$lib/stores';
+	import HeaderFooterLink from '$lib/components/HeaderFooterLink.svelte';
+	import { icons } from '$lib/general/icons';
+	import Icon from '@iconify/svelte';
+	import Important from '$lib/components/Logs/Important.svelte';
+	import Log from '$lib/components/Logs/Log.svelte';
+	import Todo from '$lib/components/Logs/Todo.svelte';
+	import Question from '$lib/components/Logs/Question.svelte';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
 	}
 
 	export let data: PageData;
+	const { times } = data;
 
 	const queryClient = useQueryClient();
 
@@ -174,13 +181,36 @@
 	$: modalButtonContainerHeight = 0;
 	$: modalMainContentHeight =
 		modalContainerHeight - modalCheckboxContainerHeight - modalButtonContainerHeight - 20;
+
+	const noteButtons = [
+		{
+			label: 'log',
+			icon: icons.clock,
+			onClick: () => {}
+		},
+		{
+			label: 'todo',
+			icon: icons.todo,
+			onClick: () => {}
+		},
+		{
+			label: 'question',
+			icon: icons.question,
+			onClick: () => {}
+		},
+		{
+			label: 'important',
+			icon: icons.important,
+			onClick: () => {}
+		}
+	];
 </script>
 
 <div class="flex-1 center stack" bind:clientHeight={parentContainerHeight}>
 	<div class="stack gap-2 w-full px-2 max-w-screen-md h-full sm:h-auto justify-center flex-1">
-		<div bind:clientHeight={headerContainer} class="stack gap-2">
-			<div class="hStack gap-1 sm:gap-2 center flex-wrap">
-				<div class="center text-base sm:text-xl hStack gap-1 sm:gap-2">
+		<div bind:clientHeight={headerContainer} class="stack gap-2 flex-1">
+			<div class="hstack gap-1 sm:gap-2 center flex-wrap">
+				<div class="center text-base sm:text-xl hstack gap-1 sm:gap-2">
 					<p class="capitalize text-opacity-40">{$space?.name}</p>
 					<p class="text-opacity-40">-</p>
 					<p class="capitalize">{data.time}</p>
@@ -191,7 +221,16 @@
 					isDisabled={$filteredNotes.length === 0}>Export</Button
 				>
 			</div>
-			<div class="center hStack gap-3">
+			<div class="hstack center capitalize gap-2 sm:gap-4">
+				{#each times as time}
+					{@const timeName = time.name.replace(' ', '-')}
+					<HeaderFooterLink
+						href="/{$space?.name.replace(' ', '-')}/{timeName}"
+						isSelected={$page.params.time === timeName}>{time.name}</HeaderFooterLink
+					>
+				{/each}
+			</div>
+			<div class="center hstack gap-3">
 				{#if $page.params.time === 'history'}
 					<input
 						type="date"
@@ -200,8 +239,22 @@
 					/>
 				{/if}
 			</div>
+			<div class="stack">
+				<Log />
+				<Todo />
+				<Question />
+				<Important />
+			</div>
 		</div>
-		<div class="stack gap-6">
+		<div class="center gap-10">
+			{#each noteButtons as { label, icon, onClick }}
+				<Button {onClick} className="flex-1 uppercase center hstack gap-2">
+					{label}
+					<Icon {icon} class="opacity-20" height="20px" />
+				</Button>
+			{/each}
+		</div>
+		<!-- <div class="stack gap-6">
 			<div
 				class="w-full rounded-md p-1 overflow-y-scroll hide-scrollbar"
 				style="background:{$space?.color}"
@@ -230,7 +283,7 @@
 		</div>
 		<div bind:clientHeight={newNoteContainerHeight}>
 			<NewNote background={$space?.color ?? ''} {onClickAccept} />
-		</div>
+		</div> -->
 	</div>
 </div>
 
@@ -242,7 +295,7 @@
 	<div class="stack justify-end h-full gap-4" bind:clientHeight={modalContainerHeight}>
 		<div class="stack gap-2">
 			<div
-				class="hStack gap-3 justify-end align-center text-xs flex-wrap"
+				class="hstack gap-3 justify-end align-center text-xs flex-wrap"
 				bind:clientHeight={modalCheckboxContainerHeight}
 			>
 				<p>Show:</p>

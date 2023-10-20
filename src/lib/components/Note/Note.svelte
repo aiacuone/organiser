@@ -80,7 +80,7 @@
 			{#if isConfirmingDelete}
 				<div class="gap-3 w-full center stack h-full">
 					<p>Are you sure you want to delete</p>
-					<div class="hStack gap-3">
+					<div class="hstack gap-3">
 						<Button onClick={_onConfirmDelete}>Yes</Button>
 						<Button onClick={() => (isConfirmingDelete = false)}>No</Button>
 					</div>

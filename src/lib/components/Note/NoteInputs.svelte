@@ -102,7 +102,7 @@
 {#if !!timestampData && !isEditing}
 	<div class="flex-1">
 		<div
-			class="hStack gap-2 flex-wrap text-opacity-30 {$darkMode.boolean
+			class="hstack gap-2 flex-wrap text-opacity-30 {$darkMode.boolean
 				? `text-${$darkMode.darkStyles.color}`
 				: `text-${$darkMode.lightStyles.color}`}"
 		>

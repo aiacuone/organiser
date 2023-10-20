@@ -10,5 +10,14 @@ export const icons = {
 	leftArrow: 'bxs:left-arrow',
 	rightArrow: 'bxs:right-arrow',
 	exit: 'iconamoon:exit-thin',
-	darkMode: 'gg:dark-mode'
+	darkMode: 'gg:dark-mode',
+	clock: 'carbon:time',
+	todo: 'icon-park-outline:list',
+	question: 'ph:question-fill',
+	important: 'gridicons:notice-outline',
+	add: 'material-symbols:add',
+	dot: 'icon-park-outline:dot',
+	left: 'icon-park-outline:left',
+	right: 'icon-park-outline:right'
+	// tick: 'teenyicons:tick-small-solid'
 };

@@ -39,12 +39,14 @@
 			? ($darkMode.boolean = true)
 			: ($darkMode.boolean = false);
 	});
+
+	const footerOptions = ['day', 'todo', 'question'];
 </script>
 
 <QueryClientProvider client={queryClient}>
 	<div class="stack h-screen">
 		<header class="center py-2" style="background:{$space?.color}">
-			<div class="hStack gap-2 sm:gap-4">
+			<div class="hstack gap-2 sm:gap-4">
 				{#each spaces as _space}
 					{@const spaceName = _space.name.replace(' ', '-')}
 					<HeaderFooterLink
@@ -74,7 +76,7 @@
 			<slot />
 		</main>
 		<footer class=" py-2" style="background:{$space?.color}">
-			<div class="hStack center capitalize gap-2 sm:gap-4">
+			<div class="hstack center capitalize gap-2 sm:gap-4">
 				{#each times as time}
 					{@const timeName = time.name.replace(' ', '-')}
 					<HeaderFooterLink
