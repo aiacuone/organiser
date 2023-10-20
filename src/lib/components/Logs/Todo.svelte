@@ -4,16 +4,23 @@
 	import BottomOptions from './BottomOptions.svelte';
 
 	export let isChecked = false;
+
+	const onCheckboxClick = () => {
+		isChecked = !isChecked;
+	};
 </script>
 
 <div class="border-dashed border-neutral-200 border px-3 py-4 stack gap-4">
 	<div class="hstack gap-4 items-center">
 		<Icon icon={icons.todo} height="30px" class="opacity-10" />
-		<div class="center border-2 border-gray-400 w-[30px] h-full rounded-md">
+		<button
+			on:click={onCheckboxClick}
+			class="center border-2 border-gray-400 w-[35px] h-full rounded-md"
+		>
 			{#if isChecked}
-				<Icon icon={icons.tick} height="30px" class="opacity-30" />
+				<Icon icon={icons.tickBold} height="20px" color="#32ed65" class="text-green" />
 			{/if}
-		</div>
+		</button>
 		<p class="text-sm">Ask things to do stuff</p>
 	</div>
 	<BottomOptions />

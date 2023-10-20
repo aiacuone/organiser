@@ -55,10 +55,9 @@
 			</li>
 		</ul>
 		<div class="hstack mt-2">
-			<div class="flex-1 hstack gap-4">
+			<div class="flex-1 hstack gap-4 flex-wrap">
 				<LogButton />
 				<TimeIncrement />
-
 				{#if isNew}
 					<Accept />
 				{:else}

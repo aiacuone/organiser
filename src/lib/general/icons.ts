@@ -18,5 +18,6 @@ export const icons = {
 	add: 'material-symbols:add',
 	dot: 'icon-park-outline:dot',
 	left: 'icon-park-outline:left',
-	right: 'icon-park-outline:right'
+	right: 'icon-park-outline:right',
+	tickBold: 'subway:tick'
 };
