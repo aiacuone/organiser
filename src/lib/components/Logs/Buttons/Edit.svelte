@@ -2,10 +2,8 @@
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
 	import CommonLogButton from './CommonLogButton.svelte';
-
-	export let iconClass = '';
 </script>
 
-<CommonLogButton>
-	<Icon icon={icons.delete} height="20px" class="opacity-30 {iconClass}" />
+<CommonLogButton className="w-[60px]">
+	<Icon icon={icons.edit} height="20px" class="opacity-30" />
 </CommonLogButton>

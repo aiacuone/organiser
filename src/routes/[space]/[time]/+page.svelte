@@ -30,6 +30,7 @@
 	import Log from '$lib/components/Logs/Log.svelte';
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Question from '$lib/components/Logs/Question.svelte';
+	import { goto } from '$app/navigation';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -207,7 +208,7 @@
 </script>
 
 <div class="flex-1 center stack" bind:clientHeight={parentContainerHeight}>
-	<div class="stack gap-2 w-full px-2 max-w-screen-md h-full sm:h-auto justify-center flex-1">
+	<div class="stack gap-2 w-full px-2 max-w-screen-lg h-full sm:h-auto justify-center flex-1">
 		<div bind:clientHeight={headerContainer} class="stack gap-2 flex-1">
 			<div class="hstack gap-1 sm:gap-2 center flex-wrap">
 				<div class="center text-base sm:text-xl hstack gap-1 sm:gap-2">
@@ -224,9 +225,9 @@
 			<div class="hstack center capitalize gap-2 sm:gap-4">
 				{#each times as time}
 					{@const timeName = time.name.replace(' ', '-')}
-					<HeaderFooterLink
-						href="/{$space?.name.replace(' ', '-')}/{timeName}"
-						isSelected={$page.params.time === timeName}>{time.name}</HeaderFooterLink
+					<Button
+						onClick={() => goto(`/${$space?.name.replace(' ', '-')}/${timeName}`)}
+						className="capitalize w-[150px]">{time.name}</Button
 					>
 				{/each}
 			</div>
@@ -239,11 +240,12 @@
 					/>
 				{/if}
 			</div>
-			<div class="stack">
-				<Log />
+			<div class="stack gap-6">
+				<Log isNew />
 				<Todo />
-				<Question />
 				<Important />
+				<Log />
+				<Question />
 			</div>
 		</div>
 		<div class="center gap-10">
