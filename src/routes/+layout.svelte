@@ -58,11 +58,11 @@
 			</div>
 		</header>
 		<main
-			class="flex-1 p-2 flex flex-col"
+			class="flex-1 p-2 flex flex-col overflow-hidden"
 			style={$darkMode.boolean ? $darkMode.darkStyles.string : $darkMode.lightStyles.string}
 		>
 			<div class="flex justify-end">
-				<button on:click={onClickDarkMode}>
+				<!-- <button on:click={onClickDarkMode}>
 					<Icon
 						icon={icons.darkMode}
 						height="25px"
@@ -71,7 +71,7 @@
 							? `color-${$darkMode.darkStyles.color}`
 							: `color-${$darkMode.lightStyles.color}`}
 					/>
-				</button>
+				</button> -->
 			</div>
 			<slot />
 		</main>

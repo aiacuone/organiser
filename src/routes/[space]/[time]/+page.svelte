@@ -148,9 +148,12 @@
 
 	$: headerContainer = 0;
 	$: parentContainerHeight = 0;
-	$: newNoteContainerHeight = 0;
+	$: logButtonsContainerHeight = 0;
 
-	$: notesContainerHeight = parentContainerHeight - headerContainer - newNoteContainerHeight - 30;
+	$: notesContainerHeight =
+		parentContainerHeight - headerContainer - logButtonsContainerHeight - 30;
+	$: parentContainerHeight,
+		console.log({ parentContainerHeight, headerContainer, logButtonsContainerHeight });
 
 	let exportedNotesModal: HTMLDialogElement;
 
@@ -207,8 +210,8 @@
 	];
 </script>
 
-<div class="flex-1 center stack" bind:clientHeight={parentContainerHeight}>
-	<div class="stack gap-2 w-full px-2 max-w-screen-lg h-full sm:h-auto justify-center flex-1">
+<div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
+	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full sm:h-auto justify-center flex-1 py-3">
 		<div bind:clientHeight={headerContainer} class="stack gap-2 flex-1">
 			<div class="hstack gap-1 sm:gap-2 center flex-wrap">
 				<div class="center text-base sm:text-xl hstack gap-1 sm:gap-2">
@@ -240,15 +243,18 @@
 					/>
 				{/if}
 			</div>
-			<div class="stack gap-6">
-				<Log isNew />
-				<Todo />
-				<Important />
-				<Log />
-				<Question />
-			</div>
 		</div>
-		<div class="center gap-10">
+		<div
+			class="stack gap-6 overflow-y-scroll hide-scrollbar"
+			style="max-height:{notesContainerHeight}px"
+		>
+			<Log isNew />
+			<Todo />
+			<Important />
+			<Log />
+			<Question />
+		</div>
+		<div class="center gap-10 pb-1" bind:clientHeight={logButtonsContainerHeight}>
 			{#each noteButtons as { label, icon, onClick }}
 				<Button {onClick} className="flex-1 uppercase center hstack gap-2">
 					{label}

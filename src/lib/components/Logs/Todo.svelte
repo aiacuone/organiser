@@ -7,14 +7,14 @@
 </script>
 
 <div class="border-dashed border-neutral-200 border px-3 py-4 stack gap-4">
-	<div class="hstack gap-4">
+	<div class="hstack gap-4 items-center">
 		<Icon icon={icons.todo} height="30px" class="opacity-10" />
-		<div class="center border-2 border-gray-400 w-[30px] rounded-md">
+		<div class="center border-2 border-gray-400 w-[30px] h-full rounded-md">
 			{#if isChecked}
 				<Icon icon={icons.tick} height="30px" class="opacity-30" />
 			{/if}
 		</div>
-		<p>Ask things to do stuff</p>
+		<p class="text-sm">Ask things to do stuff</p>
 	</div>
 	<BottomOptions />
 </div>
