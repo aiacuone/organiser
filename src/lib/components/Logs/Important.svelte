@@ -1,28 +1,42 @@
 <script lang="ts">
 	import { icons } from '$lib/general/icons';
-	import Icon from '@iconify/svelte';
 	import BottomOptions from './BottomOptions.svelte';
 	import IconWithRating from '../IconWithRating.svelte';
+	import LogContainer from './LogContainer.svelte';
 	export let date: Date;
 	export let content: string | string[];
 	export let id: string;
 	export let importance: number;
+	export let isEditing: boolean = false;
 
 	const onEdit = () => {
-		console.log('edit', id);
+		isEditing = true;
 	};
 
 	const onDelete = () => {
 		console.log('delete', id);
+		isEditing = false;
+	};
+
+	const onAccept = () => {
+		isEditing = false;
+		console.log('accept', { id, content, importance });
+	};
+
+	const onResetChange = () => {
+		console.log('reset');
+		isEditing = false;
 	};
 </script>
 
-<div class="bg-neutral-50 px-3 py-3 stack gap-3">
-	<div class="hstack center gap-2">
-		<IconWithRating rating={importance} icon={icons.important} />
-		<p class="text-sm flex-1">
-			{content}
-		</p>
+<LogContainer {isEditing} onConfirmReset={onResetChange}>
+	<div class="bg-neutral-50 px-3 py-3 stack gap-3">
+		<div class="hstack center gap-2">
+			<IconWithRating rating={importance} icon={icons.important} />
+			<p class="text-sm flex-1">
+				{content}
+			</p>
+		</div>
+		<BottomOptions {onEdit} {onDelete} {date} {isEditing} {onAccept} />
 	</div>
-	<BottomOptions {onEdit} {onDelete} {date} />
-</div>
+</LogContainer>

@@ -4,17 +4,20 @@
 	import BottomOptions from './BottomOptions.svelte';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import IconWithRating from '../IconWithRating.svelte';
+	import LogContainer from './LogContainer.svelte';
 	export let date: Date;
 	export let content: string | string[];
 	export let id: string;
 	export let priority: number;
 	export let isChecked: boolean;
+	export let isEditing: boolean = false;
 
 	const onCheckboxClick = () => {
 		isChecked = !isChecked;
 	};
 
 	const onEdit = () => {
+		isEditing = true;
 		console.log('edit', id);
 	};
 
@@ -23,19 +26,34 @@
 	};
 
 	let onOpen: () => void;
+
+	const onAccept = () => {
+		console.log('accept', { id, content });
+		isEditing = false;
+	};
+
+	const onResetChange = () => {
+		console.log('reset');
+		isEditing = false;
+	};
 </script>
 
-<div class="border-dashed border-neutral-200 border px-3 py-4 stack gap-4">
-	<div class="hstack gap-4 items-center">
-		<IconWithRating icon={icons.todo} rating={priority} />
-		<button on:click={onOpen} class="center border-2 border-gray-400 w-[35px] h-full rounded-md">
-			{#if isChecked}
-				<Icon icon={icons.tickBold} height="20px" color="#32ed65" class="text-green" />
-			{/if}
-		</button>
-		<p class="text-sm">{content}</p>
+<LogContainer {isEditing} onConfirmReset={onResetChange}>
+	<div class="border-dashed border-neutral-200 border px-3 py-4 stack gap-4">
+		<div class="hstack gap-4 items-center">
+			<IconWithRating icon={icons.todo} rating={priority} />
+			<button
+				on:click={onOpen}
+				class="center border-2 border-gray-400 w-[35px] h-[35px] rounded-md"
+			>
+				{#if isChecked}
+					<Icon icon={icons.tickBold} height="20px" color="#32ed65" class="text-green" />
+				{/if}
+			</button>
+			<p class="text-sm">{content}</p>
+		</div>
+		<BottomOptions {onEdit} {onDelete} {date} {isEditing} {onAccept} />
 	</div>
-	<BottomOptions {onEdit} {onDelete} {date} />
-</div>
+</LogContainer>
 
 <ConfirmationDialog bind:onOpen onConfirm={onCheckboxClick}>Are you sure?</ConfirmationDialog>

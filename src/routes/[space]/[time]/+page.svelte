@@ -15,7 +15,7 @@
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
 	import Important from '$lib/components/Logs/Important.svelte';
-	import Log from '$lib/components/Logs/Log.svelte';
+	import Time from '$lib/components/Logs/Time.svelte';
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Question from '$lib/components/Logs/Question.svelte';
 	import { goto } from '$app/navigation';
@@ -142,7 +142,7 @@
 				{:else if type === LogType_enum.question}
 					<Question {...rest} importance={log.importance} />
 				{:else if type === LogType_enum.time}
-					<Log {...rest} title={log.title} reference={log.reference} time={log.time} />
+					<Time {...rest} title={log.title} reference={log.reference} time={log.time} />
 				{/if}
 			{/each}
 		</div>
