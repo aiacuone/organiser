@@ -10,37 +10,35 @@
 	import Dialog from '../Dialog.svelte';
 
 	export let isEditing = false;
-	export let date: string | undefined = 'Friday, 12/5/23, 10:23AM';
+
+	export let date: Date;
+	export let content: string | string[];
+	export let id: string;
+	export let title: string;
+	export let reference: string;
+	export let time: number;
+
 	export const onEdit = () => {
 		isEditing = !isEditing;
 	};
 
 	let onOpen: () => void;
 	let onClose: () => void;
-	let header = 'Amazing Header';
-	let reference = 'Amazing Reference';
 
 	const onReset = () => {
-		console.log('reset');
+		console.log('reset', id);
 	};
 
 	const onDelete = (index: number) => {
-		console.log('delete', index);
+		console.log('delete', index, id);
 	};
 
-	const bulletPoints = [
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut feugiat lorem. Quisque ornare dolor sed neque consectetur, a varius augue placerat. Vivamus et lobortis turpis. Fusce sit amet tortor dolor. Fusce efficitur lacus tempor, semper sem et, eleifend felis. Vestibulum eu tincidunt tellus. Vestibulum massa nulla, lacinia id aliquet.',
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut feugiat lorem. Quisque ornare dolor sed neque consectetur, a varius augue placerat. Vivamus et lobortis turpis. Fusce sit amet tortor dolor. Fusce efficitur lacus tempor, semper sem et, eleifend felis. Vestibulum eu tincidunt tellus. Vestibulum massa nulla, lacinia id aliquet.'
-	];
-
 	const onAccept = () => {
-		if (!header && !reference && !bulletPoints.length) {
+		if (!title && !reference && !content.length) {
 			return onOpen();
 		}
 		isEditing = !isEditing;
 	};
-
-	let time = 1.5;
 </script>
 
 <div class="bg-neutral-100 p-2 rounded-sm">
@@ -48,7 +46,7 @@
 		{#if isEditing}
 			<input class="placeholder-black placeholder-opacity-30" type="text" placeholder="Title" />
 		{:else}
-			<p>{header}</p>
+			<p>{title}</p>
 		{/if}
 		{#if isEditing}
 			<input class="placeholder-black placeholder-opacity-30" type="text" placeholder="Reference" />
@@ -57,10 +55,10 @@
 		{/if}
 
 		<ul class="ml-5 stack gap-1">
-			{#each bulletPoints as bulletPoint, index}
+			{#each content as bulletPoint, index}
 				<li>
-					<div class="hstack center">
-						<p>{bulletPoint}</p>
+					<div class="hstack">
+						<p class="flex-1">{bulletPoint}</p>
 						{#if isEditing}
 							<Delete onDelete={() => onDelete(index)} />
 						{/if}

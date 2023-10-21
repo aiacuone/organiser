@@ -1,4 +1,4 @@
-import type { Space_int } from '$lib/types';
+import { LogType_enum, type Space_int } from '$lib/types';
 import { v4 as uuidv4 } from 'uuid';
 
 export const testSpaces: Array<Space_int> = [
@@ -9,11 +9,15 @@ export const testSpaces: Array<Space_int> = [
 		times: [
 			{
 				id: uuidv4(),
-				title: 'test',
-				content: ['test'],
+				title: 'title 1',
+				content: [
+					'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut feugiat lorem. Quisque ornare dolor sed neque consectetur, a varius augue placerat. Vivamus et lobortis turpis. Fusce sit amet tortor dolor. Fusce efficitur lacus tempor, semper sem et, eleifend felis. Vestibulum eu tincidunt tellus. Vestibulum massa nulla, lacinia id aliquet.',
+					'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut feugiat lorem. Quisque ornare dolor sed neque consectetur, a varius augue placerat. Vivamus et lobortis turpis. Fusce sit amet tortor dolor. Fusce efficitur lacus tempor, semper sem et, eleifend felis. Vestibulum eu tincidunt tellus. Vestibulum massa nulla, lacinia id aliquet.'
+				],
 				date: new Date(),
 				time: 1,
-				reference: 'test'
+				reference: 'reference 1',
+				type: LogType_enum.time
 			},
 			{
 				id: uuidv4(),
@@ -21,44 +25,50 @@ export const testSpaces: Array<Space_int> = [
 				content: ['test 2'],
 				date: new Date(),
 				time: 2,
-				reference: 'test 2'
+				reference: 'test 2',
+				type: LogType_enum.time
 			}
 		],
 		todos: [
 			{
 				id: uuidv4(),
-				content: 'test',
+				content: 'Asks things about stuff',
 				date: new Date(),
 				isCompleted: false,
-				priority: 1
+				priority: 1,
+				type: LogType_enum.todo
 			}
 		],
 		importants: [
 			{
 				id: uuidv4(),
-				content: 'test',
+				content: 'A very important thing that you need to remember',
 				date: new Date(),
-				importance: 1
+				importance: 1,
+				type: LogType_enum.important
 			},
 			{
 				id: uuidv4(),
 				content: 'test 2',
 				date: new Date(),
-				importance: 2
+				importance: 3,
+				type: LogType_enum.important
 			}
 		],
 		questions: [
 			{
 				id: uuidv4(),
-				content: 'test',
+				content: 'Why is life',
 				date: new Date(),
-				importance: 1
+				importance: 1,
+				type: LogType_enum.question
 			},
 			{
 				id: uuidv4(),
-				content: 'test 2',
+				content: 'How did we get here',
 				date: new Date(),
-				importance: 2
+				importance: 2,
+				type: LogType_enum.question
 			}
 		]
 	},
@@ -73,7 +83,8 @@ export const testSpaces: Array<Space_int> = [
 				content: ['test'],
 				date: new Date(),
 				time: 1,
-				reference: 'test'
+				reference: 'test',
+				type: LogType_enum.time
 			},
 			{
 				id: uuidv4(),
@@ -81,7 +92,8 @@ export const testSpaces: Array<Space_int> = [
 				content: ['test 2'],
 				date: new Date(),
 				time: 2,
-				reference: 'test 2'
+				reference: 'test 2',
+				type: LogType_enum.time
 			}
 		],
 		todos: [
@@ -90,7 +102,8 @@ export const testSpaces: Array<Space_int> = [
 				content: 'test',
 				date: new Date(),
 				isCompleted: false,
-				priority: 1
+				priority: 1,
+				type: LogType_enum.todo
 			}
 		],
 		importants: [
@@ -98,13 +111,15 @@ export const testSpaces: Array<Space_int> = [
 				id: uuidv4(),
 				content: 'test',
 				date: new Date(),
-				importance: 1
+				importance: 1,
+				type: LogType_enum.important
 			},
 			{
 				id: uuidv4(),
 				content: 'test 2',
 				date: new Date(),
-				importance: 2
+				importance: 2,
+				type: LogType_enum.important
 			}
 		],
 		questions: [
@@ -112,13 +127,15 @@ export const testSpaces: Array<Space_int> = [
 				id: uuidv4(),
 				content: 'test',
 				date: new Date(),
-				importance: 1
+				importance: 1,
+				type: LogType_enum.question
 			},
 			{
 				id: uuidv4(),
 				content: 'test 2',
 				date: new Date(),
-				importance: 2
+				importance: 2,
+				type: LogType_enum.question
 			}
 		]
 	},
@@ -133,7 +150,8 @@ export const testSpaces: Array<Space_int> = [
 				content: ['test'],
 				date: new Date(),
 				time: 1,
-				reference: 'test'
+				reference: 'test',
+				type: LogType_enum.time
 			},
 			{
 				id: uuidv4(),
@@ -141,7 +159,8 @@ export const testSpaces: Array<Space_int> = [
 				content: ['test 2'],
 				date: new Date(),
 				time: 2,
-				reference: 'test 2'
+				reference: 'test 2',
+				type: LogType_enum.time
 			}
 		],
 		todos: [
@@ -150,7 +169,8 @@ export const testSpaces: Array<Space_int> = [
 				content: 'test',
 				date: new Date(),
 				isCompleted: false,
-				priority: 1
+				priority: 1,
+				type: LogType_enum.todo
 			}
 		],
 		importants: [
@@ -158,13 +178,15 @@ export const testSpaces: Array<Space_int> = [
 				id: uuidv4(),
 				content: 'test',
 				date: new Date(),
-				importance: 1
+				importance: 1,
+				type: LogType_enum.important
 			},
 			{
 				id: uuidv4(),
 				content: 'test 2',
 				date: new Date(),
-				importance: 2
+				importance: 2,
+				type: LogType_enum.important
 			}
 		],
 		questions: [
@@ -172,13 +194,15 @@ export const testSpaces: Array<Space_int> = [
 				id: uuidv4(),
 				content: 'test',
 				date: new Date(),
-				importance: 1
+				importance: 1,
+				type: LogType_enum.question
 			},
 			{
 				id: uuidv4(),
 				content: 'test 2',
 				date: new Date(),
-				importance: 2
+				importance: 2,
+				type: LogType_enum.question
 			}
 		]
 	}

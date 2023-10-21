@@ -4,7 +4,7 @@
 
 	export let onDelete: () => void;
 	export let onEdit: () => void;
-	export let date: string;
+	export let date: Date;
 </script>
 
 <div class="hstack items-center gap-4">

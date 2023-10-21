@@ -1,30 +1,27 @@
 <script lang="ts">
 	import { icons } from '$lib/general/icons';
-	import Icon from '@iconify/svelte';
 	import BottomOptions from './BottomOptions.svelte';
+	import IconWithRating from '../IconWithRating.svelte';
+	export let date: Date;
+	export let content: string | string[];
+	export let id: string;
+	export let importance: number;
 
 	const onEdit = () => {
-		console.log('edit');
+		console.log('edit', id);
 	};
 
 	const onDelete = () => {
-		console.log('delete');
+		console.log('delete', id);
 	};
-
-	const date = 'Friday, 12/5/23, 10:23AM';
 </script>
 
 <div class="bg-neutral-100 p-1 rounded-sm">
 	<div class="bg-white px-3 py-3 stack gap-3 rounded-sm">
 		<div class="hstack center gap-2">
-			<div>
-				<Icon icon={icons.question} height="40px" class="opacity-10" />
-			</div>
-			<p class="text-sm">
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut feugiat lorem. Quisque
-				ornare dolor sed neque consectetur, a varius augue placerat. Vivamus et lobortis turpis.
-				Fusce sit amet tortor dolor. Fusce efficitur lacus tempor, semper sem et, eleifend felis.
-				Vestibulum eu tincidunt tellus. Vestibulum massa nulla, lacinia id aliquet.
+			<IconWithRating icon={icons.question} rating={importance} />
+			<p class="text-sm flex-1">
+				{content}
 			</p>
 		</div>
 		<BottomOptions {onEdit} {onDelete} {date} />

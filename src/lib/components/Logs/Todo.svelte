@@ -3,35 +3,37 @@
 	import Icon from '@iconify/svelte';
 	import BottomOptions from './BottomOptions.svelte';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
-
-	export let isChecked = false;
+	import IconWithRating from '../IconWithRating.svelte';
+	export let date: Date;
+	export let content: string | string[];
+	export let id: string;
+	export let priority: number;
+	export let isChecked: boolean;
 
 	const onCheckboxClick = () => {
 		isChecked = !isChecked;
 	};
 
 	const onEdit = () => {
-		console.log('edit');
+		console.log('edit', id);
 	};
 
 	const onDelete = () => {
-		console.log('delete');
+		console.log('delete', id);
 	};
 
 	let onOpen: () => void;
-
-	const date = 'Friday, 12/5/23, 10:23AM';
 </script>
 
 <div class="border-dashed border-neutral-200 border px-3 py-4 stack gap-4">
 	<div class="hstack gap-4 items-center">
-		<Icon icon={icons.todo} height="30px" class="opacity-10" />
+		<IconWithRating icon={icons.todo} rating={priority} />
 		<button on:click={onOpen} class="center border-2 border-gray-400 w-[35px] h-full rounded-md">
 			{#if isChecked}
 				<Icon icon={icons.tickBold} height="20px" color="#32ed65" class="text-green" />
 			{/if}
 		</button>
-		<p class="text-sm">Ask things to do stuff</p>
+		<p class="text-sm">{content}</p>
 	</div>
 	<BottomOptions {onEdit} {onDelete} {date} />
 </div>

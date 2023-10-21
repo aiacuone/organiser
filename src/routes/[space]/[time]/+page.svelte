@@ -1,5 +1,10 @@
 <script lang="ts">
-	import type { Time_enum, SpaceData_int, Space_int } from '$lib/types/general';
+	import {
+		type Time_enum,
+		type SpaceData_int,
+		type Space_int,
+		LogType_enum
+	} from '$lib/types/general';
 	import { getContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
@@ -91,6 +96,8 @@
 			onClick: () => {}
 		}
 	];
+
+	const allLogs = [...space.importants, ...space.times, ...space.questions, ...space.todos];
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -126,11 +133,18 @@
 			class="stack gap-6 overflow-y-scroll hide-scrollbar"
 			style="max-height:{notesContainerHeight}px"
 		>
-			<Log isEditing />
-			<Todo />
-			<Important />
-			<Log />
-			<Question />
+			{#each allLogs as log}
+				{@const { type, ...rest } = log}
+				{#if type === LogType_enum.important}
+					<Important {...rest} importance={log.importance} />
+				{:else if type === LogType_enum.todo}
+					<Todo {...rest} priority={log.priority} isChecked={log.isCompleted} />
+				{:else if type === LogType_enum.question}
+					<Question {...rest} importance={log.importance} />
+				{:else if type === LogType_enum.time}
+					<Log {...rest} title={log.title} reference={log.reference} time={log.time} />
+				{/if}
+			{/each}
 		</div>
 		<div class="center gap-10 pb-1" bind:clientHeight={logButtonsContainerHeight}>
 			{#each noteButtons as { label, icon, onClick }}

@@ -19,5 +19,7 @@ export const icons = {
 	dot: 'icon-park-outline:dot',
 	left: 'icon-park-outline:left',
 	right: 'icon-park-outline:right',
-	tickBold: 'subway:tick'
+	tickBold: 'subway:tick',
+	highPriority: 'octicon:chevron-up-12',
+	lowPriority: 'octicon:chevron-down-12'
 };
