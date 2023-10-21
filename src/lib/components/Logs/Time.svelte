@@ -6,6 +6,7 @@
 	import LogContainer from './LogContainer.svelte';
 	import BottomOptions from './BottomOptions.svelte';
 	import Textarea from '../Textarea.svelte';
+	import { getContext } from 'svelte';
 
 	export let isEditing = false;
 	export let date: Date;
@@ -15,6 +16,7 @@
 	export let reference: string;
 	export let time: number;
 	export let isAddingBullet: boolean = false;
+	export let inputAutoFocus: boolean = false;
 
 	let onOpen: () => void;
 	let onClose: () => void;
@@ -22,6 +24,8 @@
 		isEditing = !isEditing;
 	};
 	let newBulletInput: HTMLInputElement;
+
+	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onReset = () => {
 		console.log('reset', id);
@@ -43,6 +47,7 @@
 		console.log('reset');
 		isEditing = false;
 		isAddingBullet = false;
+		onResetNewLogType();
 	};
 
 	const onAddBullet = () => {
@@ -74,6 +79,7 @@
 					class="placeholder-black placeholder-opacity-30"
 					type="text"
 					placeholder="Title"
+					autofocus={inputAutoFocus}
 				/>
 				<input
 					value={reference}

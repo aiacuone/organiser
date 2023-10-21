@@ -3,6 +3,7 @@
 
 	export let value: string;
 	export let className = '';
+	export let autofocus = false;
 
 	const resize = () => {
 		console.log({ height: textarea.scrollHeight });
@@ -14,6 +15,7 @@
 
 	onMount(() => {
 		resize();
+		autofocus && textarea.focus();
 
 		if (textarea.scrollHeight < 50) {
 			return (textarea.style.height = '20px');

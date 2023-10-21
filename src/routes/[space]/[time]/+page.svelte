@@ -5,7 +5,7 @@
 		type Space_int,
 		LogType_enum
 	} from '$lib/types/general';
-	import { getContext } from 'svelte';
+	import { getContext, setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
 
@@ -19,6 +19,7 @@
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Question from '$lib/components/Logs/Question.svelte';
 	import { goto } from '$app/navigation';
+	import NewLog from '$lib/components/NewLog.svelte';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -73,35 +74,49 @@
 	$: modalMainContentHeight =
 		modalContainerHeight - modalCheckboxContainerHeight - modalButtonContainerHeight - 20;
 
+	let notesContainer: HTMLDivElement;
+	let newLogType: LogType_enum | undefined;
+
+	const onNoteButtonClick = (logType: LogType_enum) => {
+		notesContainer.scrollTo(0, 0);
+		newLogType = logType;
+	};
+
 	const noteButtons = [
 		{
 			label: 'log',
 			icon: icons.clock,
-			onClick: () => {}
+			onClick: () => onNoteButtonClick(LogType_enum.time)
 		},
 		{
 			label: 'todo',
 			icon: icons.todo,
-			onClick: () => {}
+			onClick: () => onNoteButtonClick(LogType_enum.todo)
 		},
 		{
 			label: 'question',
 			icon: icons.question,
-			onClick: () => {}
+			onClick: () => onNoteButtonClick(LogType_enum.question)
 		},
 		{
 			label: 'important',
 			icon: icons.important,
-			onClick: () => {}
+			onClick: () => onNoteButtonClick(LogType_enum.important)
 		}
 	];
+
+	const onResetNewLogType = () => {
+		newLogType = undefined;
+	};
+
+	setContext('onResetNewLogType', onResetNewLogType);
 
 	const allLogs = [...space.importants, ...space.times, ...space.questions, ...space.todos];
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
 	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full sm:h-auto justify-center flex-1 py-3">
-		<div bind:clientHeight={headerContainer} class="stack gap-2 flex-1">
+		<div class="stack gap-2" bind:clientHeight={logButtonsContainerHeight}>
 			<div class="hstack gap-1 sm:gap-2 center flex-wrap">
 				<div class="center text-base sm:text-xl hstack gap-1 sm:gap-2">
 					<p class="capitalize text-opacity-40">{space?.name}</p>
@@ -109,6 +124,37 @@
 					<p class="capitalize">{data.time}</p>
 				</div>
 			</div>
+			<div class="hstack w-full gap-10">
+				{#each noteButtons as { label, icon, onClick }}
+					<Button {onClick} className="flex-1 uppercase center hstack gap-2">
+						{label}
+						<Icon {icon} class="opacity-20" height="20px" />
+					</Button>
+				{/each}
+			</div>
+		</div>
+		<div
+			class="stack gap-6 overflow-y-scroll hide-scrollbar"
+			style="max-height:{notesContainerHeight}px"
+			bind:this={notesContainer}
+		>
+			{#if !!newLogType}
+				<NewLog type={newLogType} />
+			{/if}
+			{#each allLogs as log}
+				{@const { type, ...rest } = log}
+				{#if type === LogType_enum.important}
+					<Important {...rest} importance={log.importance} />
+				{:else if type === LogType_enum.todo}
+					<Todo {...rest} priority={log.priority} isChecked={log.isCompleted} />
+				{:else if type === LogType_enum.question}
+					<Question {...rest} importance={log.importance} />
+				{:else if type === LogType_enum.time}
+					<Time {...rest} title={log.title} reference={log.reference} time={log.time} />
+				{/if}
+			{/each}
+		</div>
+		<div bind:clientHeight={headerContainer} class="stack gap-2 flex-1">
 			<div class="hstack center capitalize gap-2 sm:gap-4">
 				{#each times as time}
 					{@const timeName = time.name.replace(' ', '-')}
@@ -127,31 +173,6 @@
 					/>
 				{/if}
 			</div>
-		</div>
-		<div
-			class="stack gap-6 overflow-y-scroll hide-scrollbar"
-			style="max-height:{notesContainerHeight}px"
-		>
-			{#each allLogs as log}
-				{@const { type, ...rest } = log}
-				{#if type === LogType_enum.important}
-					<Important {...rest} importance={log.importance} />
-				{:else if type === LogType_enum.todo}
-					<Todo {...rest} priority={log.priority} isChecked={log.isCompleted} />
-				{:else if type === LogType_enum.question}
-					<Question {...rest} importance={log.importance} />
-				{:else if type === LogType_enum.time}
-					<Time {...rest} title={log.title} reference={log.reference} time={log.time} />
-				{/if}
-			{/each}
-		</div>
-		<div class="center gap-10 pb-1" bind:clientHeight={logButtonsContainerHeight}>
-			{#each noteButtons as { label, icon, onClick }}
-				<Button {onClick} className="flex-1 uppercase center hstack gap-2">
-					{label}
-					<Icon {icon} class="opacity-20" height="20px" />
-				</Button>
-			{/each}
 		</div>
 	</div>
 </div>

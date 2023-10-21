@@ -4,11 +4,15 @@
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
 	import Textarea from '../Textarea.svelte';
+	import { getContext } from 'svelte';
 	export let date: Date;
 	export let content: string | string[];
 	export let id: string;
 	export let importance: number;
 	export let isEditing: boolean = false;
+	export let inputAutoFocus: boolean = false;
+
+	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onEdit = () => {
 		isEditing = true;
@@ -27,6 +31,7 @@
 	const onResetChange = () => {
 		console.log('reset');
 		isEditing = false;
+		onResetNewLogType();
 	};
 
 	const incrementDecrementProps = {
@@ -44,7 +49,7 @@
 				<IconWithRating icon={icons.question} rating={importance} />
 				<div class="flex flex-1 items-center min-h-[30px]">
 					{#if isEditing}
-						<Textarea value={content} className="" />
+						<Textarea value={content} className="" autofocus={inputAutoFocus} />
 					{:else}
 						<p class="text-sm">
 							{content}
