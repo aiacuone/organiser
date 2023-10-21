@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import Accept from './Buttons/Accept.svelte';
-	import LogButton from './Buttons/AddBullet.svelte';
+	import AddBullet from './Buttons/AddBullet.svelte';
 	import Delete from './Buttons/Delete.svelte';
 	import Reset from './Buttons/Reset.svelte';
 	import TimeIncrement from './Buttons/TimeIncrement.svelte';
@@ -17,13 +17,13 @@
 	export let title: string;
 	export let reference: string;
 	export let time: number;
-
+	export let isAddingBullet: boolean = false;
+	export let onOpen: () => void;
+	export let onClose: () => void;
 	export const onEdit = () => {
 		isEditing = !isEditing;
 	};
-
-	let onOpen: () => void;
-	let onClose: () => void;
+	export let newBulletInput: HTMLInputElement;
 
 	const onReset = () => {
 		console.log('reset', id);
@@ -33,20 +33,33 @@
 		console.log('delete', index, id);
 	};
 
-	const onAccept = () => {
+	const onAcceptEdit = () => {
 		if (!title && !reference && !content.length) {
 			return onOpen();
 		}
-		isEditing = !isEditing;
+		isEditing = false;
 	};
 
 	const onResetChange = () => {
 		console.log('reset');
 		isEditing = false;
+		isAddingBullet = false;
 	};
+
+	const onAddBullet = () => {
+		isAddingBullet = !isAddingBullet;
+	};
+
+	const onAcceptNewBullet = () => {
+		console.log({ value: newBulletInput.value });
+		isAddingBullet = false;
+		newBulletInput.value = '';
+	};
+
+	$: isAddingBullet, newBulletInput && isAddingBullet && newBulletInput.focus();
 </script>
 
-<LogContainer {isEditing} onConfirmReset={onResetChange}>
+<LogContainer isEditing={isEditing || isAddingBullet} onConfirmReset={onResetChange}>
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-4 stack text-sm gap-1">
 			{#if isEditing}
@@ -75,16 +88,26 @@
 						</div>
 					</li>
 				{/each}
+				{#if isAddingBullet}
+					<li>
+						<div class="hstack">
+							<input class="flex-1 p-1 resize-none" bind:this={newBulletInput} />
+							{#if isEditing}
+								<Delete onDelete={() => {}} />
+							{/if}
+						</div>
+					</li>
+				{/if}
 			</ul>
 			<div class="hstack mt-2">
 				<div class="flex-1 hstack gap-4 flex-wrap">
 					{#if date}
 						<p class="text-xs text-opacity-30 text-black">{date}</p>
 					{/if}
-					<LogButton />
+					<AddBullet onClick={onAddBullet} />
 					<TimeIncrement {time} />
-					{#if isEditing}
-						<Accept {onAccept} />
+					{#if isEditing || isAddingBullet}
+						<Accept onClick={isEditing ? onAcceptEdit : onAcceptNewBullet} />
 					{:else}
 						<Edit {onEdit} />
 					{/if}
