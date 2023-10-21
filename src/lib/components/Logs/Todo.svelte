@@ -36,6 +36,13 @@
 		console.log('reset');
 		isEditing = false;
 	};
+
+	const incrementDecrementProps = {
+		min: 0,
+		max: 3,
+		onIncrement: () => (priority = priority + 1),
+		onDecrement: () => (priority = priority - 1)
+	};
 </script>
 
 <LogContainer {isEditing} onConfirmReset={onResetChange}>
@@ -52,7 +59,16 @@
 			</button>
 			<p class="text-sm">{content}</p>
 		</div>
-		<BottomOptions {onEdit} {onDelete} {date} {isEditing} {onAccept} />
+		<BottomOptions
+			{onEdit}
+			{onDelete}
+			{date}
+			{isEditing}
+			{onAccept}
+			{incrementDecrementProps}
+			incrementDecrementValue={priority}
+			showIncrementDecrement={isEditing}
+		/>
 	</div>
 </LogContainer>
 

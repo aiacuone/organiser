@@ -1,14 +1,10 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import Accept from './Buttons/Accept.svelte';
-	import AddBullet from './Buttons/AddBullet.svelte';
 	import Delete from './Buttons/Delete.svelte';
-	import Reset from './Buttons/Reset.svelte';
-	import TimeIncrement from './Buttons/TimeIncrement.svelte';
 	import { icons } from '$lib/general/icons';
-	import Edit from './Buttons/Edit.svelte';
 	import Dialog from '../Dialog.svelte';
 	import LogContainer from './LogContainer.svelte';
+	import BottomOptions from './BottomOptions.svelte';
 
 	export let isEditing = false;
 	export let date: Date;
@@ -18,12 +14,13 @@
 	export let reference: string;
 	export let time: number;
 	export let isAddingBullet: boolean = false;
-	export let onOpen: () => void;
-	export let onClose: () => void;
-	export const onEdit = () => {
+
+	let onOpen: () => void;
+	let onClose: () => void;
+	const onEdit = () => {
 		isEditing = !isEditing;
 	};
-	export let newBulletInput: HTMLInputElement;
+	let newBulletInput: HTMLInputElement;
 
 	const onReset = () => {
 		console.log('reset', id);
@@ -31,6 +28,7 @@
 
 	const onDelete = (index: number) => {
 		console.log('delete', index, id);
+		isEditing = false;
 	};
 
 	const onAcceptEdit = () => {
@@ -57,6 +55,13 @@
 	};
 
 	$: isAddingBullet, newBulletInput && isAddingBullet && newBulletInput.focus();
+
+	const incrementDecrementProps = {
+		min: 0.5,
+		max: 24,
+		onIncrement: () => (time = time + 0.5),
+		onDecrement: () => (time = time - 0.5)
+	};
 </script>
 
 <LogContainer isEditing={isEditing || isAddingBullet} onConfirmReset={onResetChange}>
@@ -76,7 +81,6 @@
 			{:else}
 				<p>{reference}</p>
 			{/if}
-
 			<ul class="ml-5 stack gap-1">
 				{#each content as bulletPoint, index}
 					<li>
@@ -100,21 +104,16 @@
 				{/if}
 			</ul>
 			<div class="hstack mt-2">
-				<div class="flex-1 hstack gap-4 flex-wrap">
-					{#if date}
-						<p class="text-xs text-opacity-30 text-black">{date}</p>
-					{/if}
-					<AddBullet onClick={onAddBullet} />
-					<TimeIncrement {time} />
-					{#if isEditing || isAddingBullet}
-						<Accept onClick={isEditing ? onAcceptEdit : onAcceptNewBullet} />
-					{:else}
-						<Edit {onEdit} />
-					{/if}
-					{#if isEditing}
-						<Reset {onReset} />
-					{/if}
-				</div>
+				<BottomOptions
+					{incrementDecrementProps}
+					incrementDecrementValue={time}
+					{date}
+					isEditing={isEditing || isAddingBullet}
+					onAccept={isEditing ? onAcceptEdit : onAcceptNewBullet}
+					{onAddBullet}
+					{onEdit}
+					{onReset}
+				/>
 				<Icon icon={icons.clock} height="30px" class="opacity-10" />
 			</div>
 		</div>

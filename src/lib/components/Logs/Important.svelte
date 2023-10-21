@@ -27,6 +27,13 @@
 		console.log('reset');
 		isEditing = false;
 	};
+
+	const incrementDecrementProps = {
+		min: 0,
+		max: 3,
+		onIncrement: () => (importance = importance + 1),
+		onDecrement: () => (importance = importance - 1)
+	};
 </script>
 
 <LogContainer {isEditing} onConfirmReset={onResetChange}>
@@ -37,6 +44,15 @@
 				{content}
 			</p>
 		</div>
-		<BottomOptions {onEdit} {onDelete} {date} {isEditing} {onAccept} />
+		<BottomOptions
+			{onEdit}
+			{onDelete}
+			{date}
+			{isEditing}
+			{onAccept}
+			{incrementDecrementProps}
+			incrementDecrementValue={importance}
+			showIncrementDecrement={isEditing}
+		/>
 	</div>
 </LogContainer>

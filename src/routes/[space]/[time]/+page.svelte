@@ -39,7 +39,6 @@
 	$: headerContainer = 0;
 	$: parentContainerHeight = 0;
 	$: logButtonsContainerHeight = 0;
-
 	$: notesContainerHeight =
 		parentContainerHeight - headerContainer - logButtonsContainerHeight - 30;
 
