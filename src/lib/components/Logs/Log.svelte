@@ -7,9 +7,18 @@
 	import TimeIncrement from './Buttons/TimeIncrement.svelte';
 	import { icons } from '$lib/general/icons';
 	import Edit from './Buttons/Edit.svelte';
+	import Dialog from '../Dialog.svelte';
 
 	export let isEditing = false;
 	export let date: string | undefined = 'Friday, 12/5/23, 10:23AM';
+	export const onEdit = () => {
+		isEditing = !isEditing;
+	};
+
+	let onOpen: () => void;
+	let onClose: () => void;
+	let header = 'Amazing Header';
+	let reference = 'Amazing Reference';
 
 	const onReset = () => {
 		console.log('reset');
@@ -19,18 +28,17 @@
 		console.log('delete', index);
 	};
 
-	const onAccept = () => {
-		console.log('accept');
-	};
-
-	const onEdit = () => {
-		console.log('edit');
-	};
-
 	const bulletPoints = [
 		'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut feugiat lorem. Quisque ornare dolor sed neque consectetur, a varius augue placerat. Vivamus et lobortis turpis. Fusce sit amet tortor dolor. Fusce efficitur lacus tempor, semper sem et, eleifend felis. Vestibulum eu tincidunt tellus. Vestibulum massa nulla, lacinia id aliquet.',
 		'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut feugiat lorem. Quisque ornare dolor sed neque consectetur, a varius augue placerat. Vivamus et lobortis turpis. Fusce sit amet tortor dolor. Fusce efficitur lacus tempor, semper sem et, eleifend felis. Vestibulum eu tincidunt tellus. Vestibulum massa nulla, lacinia id aliquet.'
 	];
+
+	const onAccept = () => {
+		if (!header && !reference && !bulletPoints.length) {
+			return onOpen();
+		}
+		isEditing = !isEditing;
+	};
 
 	let time = 1.5;
 </script>
@@ -40,12 +48,12 @@
 		{#if isEditing}
 			<input class="placeholder-black placeholder-opacity-30" type="text" placeholder="Title" />
 		{:else}
-			<p>Amazing Header</p>
+			<p>{header}</p>
 		{/if}
 		{#if isEditing}
 			<input class="placeholder-black placeholder-opacity-30" type="text" placeholder="Reference" />
 		{:else}
-			<p>Brilliant Reference</p>
+			<p>{reference}</p>
 		{/if}
 
 		<ul class="ml-5 stack gap-1">
@@ -80,6 +88,13 @@
 		</div>
 	</div>
 </div>
+
+<Dialog bind:onOpen bind:onClose>
+	<div>
+		<p>You must have a title and reference to save a log.</p>
+		<button on:click={onClose}>Close</button>
+	</div>
+</Dialog>
 
 <style>
 	ul {
