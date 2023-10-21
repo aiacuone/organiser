@@ -10,7 +10,17 @@
 		isChecked = !isChecked;
 	};
 
+	const onEdit = () => {
+		console.log('edit');
+	};
+
+	const onDelete = () => {
+		console.log('delete');
+	};
+
 	let onOpen: () => void;
+
+	const date = 'Friday, 12/5/23, 10:23AM';
 </script>
 
 <div class="border-dashed border-neutral-200 border px-3 py-4 stack gap-4">
@@ -23,7 +33,7 @@
 		</button>
 		<p class="text-sm">Ask things to do stuff</p>
 	</div>
-	<BottomOptions />
+	<BottomOptions {onEdit} {onDelete} {date} />
 </div>
 
 <ConfirmationDialog bind:onOpen onConfirm={onCheckboxClick}>Are you sure?</ConfirmationDialog>

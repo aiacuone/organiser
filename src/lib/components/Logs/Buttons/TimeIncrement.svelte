@@ -3,7 +3,7 @@
 	import Icon from '@iconify/svelte';
 	import CommonLogButton from './CommonLogButton.svelte';
 
-	let time = 1.5;
+	export let time: number;
 
 	const increment = () => {
 		time += 0.5;

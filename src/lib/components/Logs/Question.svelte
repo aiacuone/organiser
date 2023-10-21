@@ -2,6 +2,16 @@
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
 	import BottomOptions from './BottomOptions.svelte';
+
+	const onEdit = () => {
+		console.log('edit');
+	};
+
+	const onDelete = () => {
+		console.log('delete');
+	};
+
+	const date = 'Friday, 12/5/23, 10:23AM';
 </script>
 
 <div class="bg-neutral-100 p-1 rounded-sm">
@@ -17,6 +27,6 @@
 				Vestibulum eu tincidunt tellus. Vestibulum massa nulla, lacinia id aliquet.
 			</p>
 		</div>
-		<BottomOptions />
+		<BottomOptions {onEdit} {onDelete} {date} />
 	</div>
 </div>

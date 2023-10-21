@@ -246,7 +246,7 @@
 			class="stack gap-6 overflow-y-scroll hide-scrollbar"
 			style="max-height:{notesContainerHeight}px"
 		>
-			<Log isNew />
+			<Log isEditing />
 			<Todo />
 			<Important />
 			<Log />
