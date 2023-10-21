@@ -4,13 +4,13 @@
 	import CommonLogButton from './CommonLogButton.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 
+	export let onDelete: () => void;
 	export let iconClass = '';
 	export let onConfirmDelete: () => void = () => {
-		onClose();
+		onDelete();
 	};
 
 	let onOpen: () => void;
-	let onClose: () => void;
 </script>
 
 <CommonLogButton onClick={onOpen}>

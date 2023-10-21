@@ -13,9 +13,11 @@
 </script>
 
 <Dialog bind:onOpen bind:onClose>
-	<div class="hstack gap-3 items-center">
+	<div class="flex flex-col sm:flex-row gap-3 items-center">
 		<slot />
-		<Button onClick={_onConfirm}>Yes</Button>
-		<Button onClick={onClose}>No</Button>
+		<div class="hstack gap-3">
+			<Button onClick={_onConfirm}>Yes</Button>
+			<Button onClick={onClose}>No</Button>
+		</div>
 	</div>
 </Dialog>

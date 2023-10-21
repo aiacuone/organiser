@@ -152,8 +152,6 @@
 
 	$: notesContainerHeight =
 		parentContainerHeight - headerContainer - logButtonsContainerHeight - 30;
-	$: parentContainerHeight,
-		console.log({ parentContainerHeight, headerContainer, logButtonsContainerHeight });
 
 	let exportedNotesModal: HTMLDialogElement;
 
@@ -230,7 +228,7 @@
 					{@const timeName = time.name.replace(' ', '-')}
 					<Button
 						onClick={() => goto(`/${$space?.name.replace(' ', '-')}/${timeName}`)}
-						className="capitalize w-[150px]">{time.name}</Button
+						className="capitalize w-[150px] text-xs sm:text-sm">{time.name}</Button
 					>
 				{/each}
 			</div>

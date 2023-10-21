@@ -9,6 +9,14 @@
 	import Edit from './Buttons/Edit.svelte';
 
 	export let isNew = false;
+
+	const onReset = () => {
+		console.log('reset');
+	};
+
+	const onDelete = () => {
+		console.log('delete');
+	};
 </script>
 
 <div class="bg-neutral-100 p-2 rounded-sm">
@@ -35,7 +43,7 @@
 						aliquet.
 					</p>
 					{#if isNew}
-						<Delete />
+						<Delete {onDelete} />
 					{/if}
 				</div>
 			</li>
@@ -49,7 +57,7 @@
 						aliquet.
 					</p>
 					{#if isNew}
-						<Delete />
+						<Delete {onDelete} />
 					{/if}
 				</div>
 			</li>
@@ -64,7 +72,7 @@
 					<Edit />
 				{/if}
 				{#if isNew}
-					<Reset />
+					<Reset {onReset} />
 				{/if}
 			</div>
 			<Icon icon={icons.clock} height="30px" class="opacity-10" />

@@ -8,7 +8,7 @@
 	};
 </script>
 
-<dialog bind:this={dialog} class="p-4 shadow-md rounded-sm min-w-[500px]">
+<dialog bind:this={dialog} class="p-4 shadow-md rounded-sm w-full max-w-[500px]">
 	<div class="w-full h-full center">
 		<slot />
 	</div>
