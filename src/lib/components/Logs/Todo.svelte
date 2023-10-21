@@ -5,6 +5,7 @@
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
+	import Textarea from '../Textarea.svelte';
 	export let date: Date;
 	export let content: string | string[];
 	export let id: string;
@@ -57,7 +58,13 @@
 					<Icon icon={icons.tickBold} height="20px" color="#32ed65" class="text-green" />
 				{/if}
 			</button>
-			<p class="text-sm">{content}</p>
+			<div class="flex-1">
+				{#if isEditing}
+					<Textarea value={content} />
+				{:else}
+					<p class="text-sm">{content}</p>
+				{/if}
+			</div>
 		</div>
 		<BottomOptions
 			{onEdit}

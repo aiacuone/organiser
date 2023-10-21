@@ -3,6 +3,7 @@
 	import BottomOptions from './BottomOptions.svelte';
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
+	import Textarea from '../Textarea.svelte';
 	export let date: Date;
 	export let content: string | string[];
 	export let id: string;
@@ -41,9 +42,15 @@
 		<div class="bg-white px-3 py-3 stack gap-3 rounded-sm">
 			<div class="hstack center gap-2">
 				<IconWithRating icon={icons.question} rating={importance} />
-				<p class="text-sm flex-1">
-					{content}
-				</p>
+				<div class="flex flex-1 items-center min-h-[30px]">
+					{#if isEditing}
+						<Textarea value={content} className="" />
+					{:else}
+						<p class="text-sm">
+							{content}
+						</p>
+					{/if}
+				</div>
 			</div>
 			<BottomOptions
 				{onEdit}

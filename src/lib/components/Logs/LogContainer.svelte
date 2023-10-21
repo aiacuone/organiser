@@ -11,7 +11,7 @@
 	};
 </script>
 
-<div use:clickOutside on:click_outside={onClickOutside}>
+<div use:clickOutside on:click_outside={onClickOutside} class="shadow-md">
 	<slot />
 </div>
 
