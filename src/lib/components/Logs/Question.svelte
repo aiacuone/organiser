@@ -10,7 +10,7 @@
 	import { LogType_enum } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	export let date: Date;
-	export let content: string | string[];
+	export let content: string;
 	export let id: string;
 	export let importance: number;
 	export let isEditing: boolean = false;

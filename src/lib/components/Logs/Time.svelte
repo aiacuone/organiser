@@ -15,7 +15,7 @@
 
 	export let isEditing = false;
 	export let date: Date;
-	export let content: string[];
+	export let bullets: string[];
 	export let id: string;
 	export let title: string;
 	export let reference: string;
@@ -41,21 +41,21 @@
 	};
 
 	const onDeleteBullet = (index: number) => {
-		content = content.filter((_, i) => i !== index);
+		bullets = bullets.filter((_, i) => i !== index);
 	};
 
 	const onAcceptEdit = () => {
-		if (!title && !reference && !content.length) {
+		if (!title && !reference && !bullets.length) {
 			return onOpen();
 		}
 
-		content = content.filter((c) => c);
+		bullets = bullets.filter((c) => c);
 		isEditing = false;
 		updateLog({
 			id,
 			title,
 			reference,
-			content,
+			bullets,
 			time,
 			date: getDateFromHyphenatedString($page.params.date),
 			type: LogType_enum.time,
@@ -70,7 +70,7 @@
 	};
 
 	const onAddBullet = () => {
-		content = [...content, ''];
+		bullets = [...bullets, ''];
 	};
 
 	const onAcceptNewBullet = () => {
@@ -108,14 +108,14 @@
 				<p>{reference}</p>
 			{/if}
 			<ul class="ml-5 stack gap-1">
-				{#each content as _, index}
+				{#each bullets as _, index}
 					<li>
 						<div class="hstack gap-2 min-h-[30px] items-center">
 							{#if isEditing}
-								<Textarea className="flex-1" bind:value={content[index]} />
+								<Textarea className="flex-1" bind:value={bullets[index]} />
 								<Delete onDelete={() => onDeleteBullet(index)} />
 							{:else}
-								<p class="flex-1">{content[index]}</p>
+								<p class="flex-1">{bullets[index]}</p>
 							{/if}
 						</div>
 					</li>

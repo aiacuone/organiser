@@ -4,29 +4,10 @@ export enum Time_enum {
 	Date = 'date'
 }
 
-// export interface Space_int {
-// 	name: string;
-// 	href: string;
-// 	color: string;
-// 	times: Array<TimeLog_int>;
-// 	todos: Array<Todo_int>;
-// 	importants: Array<Important_int>;
-// 	questions: Array<Question_int>;
-// }
-
 export interface Option_int {
 	name: Time_enum;
 	href: string;
 }
-
-// export interface Note_int {
-// 	id: string;
-// 	title: string;
-// 	content: string;
-// 	date: Date;
-// 	time: number;
-// 	reference: string;
-// }
 
 export interface SpaceData_int {
 	spaces: string[];
@@ -38,15 +19,16 @@ export interface SpaceData_int {
 export interface Log_int {
 	id: string;
 	date: Date;
-	title: string;
-	content: string;
+	title?: string;
+	content?: string;
 	reference?: string;
-	time: number;
+	time?: number;
 	type: LogType_enum;
 	space: string;
 	priority?: number;
 	importance?: number;
 	isCompleted?: boolean;
+	bullets?: string[];
 }
 
 export enum LogType_enum {

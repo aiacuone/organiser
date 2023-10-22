@@ -10,7 +10,7 @@
 	import { page } from '$app/stores';
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	export let date: Date;
-	export let content: string | string[];
+	export let content: string;
 	export let id: string;
 	export let importance: number;
 	export let isEditing: boolean = false;

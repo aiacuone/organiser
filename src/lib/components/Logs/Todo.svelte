@@ -13,7 +13,7 @@
 	import { page } from '$app/stores';
 
 	export let date: Date;
-	export let content: string | string[];
+	export let content: string;
 	export let id: string;
 	export let priority: number;
 	export let isChecked: boolean = false;

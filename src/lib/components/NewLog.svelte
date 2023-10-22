@@ -19,12 +19,13 @@
 		isChecked: false,
 		importance: 2,
 		priority: 2,
-		inputAutoFocus: true
+		inputAutoFocus: true,
+		bullets: ['']
 	};
 </script>
 
 {#if type === LogType_enum.time}
-	<Time {...sharedProps} content={['']} />
+	<Time {...sharedProps} />
 {:else if type === LogType_enum.todo}
 	<Todo {...sharedProps} />
 {:else if type === LogType_enum.question}

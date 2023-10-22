@@ -140,14 +140,25 @@
 			{/if}
 			{#each data.logs as log}
 				{@const { type, ...rest } = log}
-				{#if type === LogType_enum.important && log.importance}
-					<Important {...rest} importance={log.importance} />
-				{:else if type === LogType_enum.todo && log.priority}
-					<Todo {...rest} priority={log.priority} isChecked={log.isCompleted} />
-				{:else if type === LogType_enum.question && log.importance}
-					<Question {...rest} importance={log.importance} />
-				{:else if type === LogType_enum.time && log.reference}
-					<Time {...rest} title={log.title} reference={log.reference} time={log.time} />
+				{#if type === LogType_enum.important && log.importance && log.content}
+					<Important {...rest} importance={log.importance} content={log.content} />
+				{:else if type === LogType_enum.todo && log.priority && log.content}
+					<Todo
+						{...rest}
+						priority={log.priority}
+						isChecked={log.isCompleted}
+						content={log.content}
+					/>
+				{:else if type === LogType_enum.question && log.importance && log.content}
+					<Question {...rest} importance={log.importance} content={log.content} />
+				{:else if type === LogType_enum.time && log.reference && log.bullets && log.time && log.title}
+					<Time
+						{...rest}
+						title={log.title}
+						reference={log.reference}
+						time={log.time}
+						bullets={log.bullets}
+					/>
 				{/if}
 			{/each}
 		</div>
