@@ -17,7 +17,7 @@
 		autofocus && textarea.focus();
 
 		if (textarea.scrollHeight < 50) {
-			return (textarea.style.height = '20px');
+			textarea.style.height = '20px';
 		}
 
 		const preventEnter = (e: KeyboardEvent) => {
