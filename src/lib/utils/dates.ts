@@ -57,15 +57,11 @@ export const getDate2DaysEarlier = () => {
 };
 
 export const getDateFromHyphenatedString = (dateString: string) => {
-	function isValidDateFormat(dateString: string) {
-		const regex = /^\d{4}-\d{1,2}-\d{1,2}$/;
-		return regex.test(dateString);
+	const [day, month, year] = dateString.split('-').map(Number);
+
+	if (isNaN(day) || isNaN(month) || isNaN(year)) {
+		throw new Error('Invalid date format');
 	}
-	if (!isValidDateFormat(dateString)) throw new Error('Invalid date format');
 
-	const dateParts = dateString.split('-');
-	const mappedDateParts = dateParts.map((part) => parseInt(part));
-
-	const date = new Date(mappedDateParts[0], mappedDateParts[1] - 1, mappedDateParts[2]);
-	return date;
+	return new Date(Date.UTC(year, month - 1, day));
 };

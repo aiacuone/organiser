@@ -26,7 +26,6 @@
 	}
 
 	export let data: PageData;
-	const { times } = data;
 
 	const space = getContext('space') as Space_int;
 
@@ -121,7 +120,7 @@
 				<div class="center text-base sm:text-xl hstack gap-1 sm:gap-2">
 					<p class="capitalize text-opacity-40">{space?.name}</p>
 					<p class="text-opacity-40">-</p>
-					<p class="capitalize">{data.time}</p>
+					<p class="capitalize">{data.date}</p>
 				</div>
 			</div>
 			<div class="hstack w-full gap-10">
@@ -141,7 +140,7 @@
 			{#if !!newLogType}
 				<NewLog type={newLogType} />
 			{/if}
-			{#each allLogs as log}
+			{#each data.logs as log}
 				{@const { type, ...rest } = log}
 				{#if type === LogType_enum.important}
 					<Important {...rest} importance={log.importance} />
@@ -155,7 +154,7 @@
 			{/each}
 		</div>
 		<div bind:clientHeight={headerContainer} class="stack gap-2 flex-1">
-			<div class="hstack center capitalize gap-2 sm:gap-4">
+			<!-- <div class="hstack center capitalize gap-2 sm:gap-4">
 				{#each times as time}
 					{@const timeName = time.name.replace(' ', '-')}
 					<Button
@@ -163,7 +162,7 @@
 						className="capitalize w-[150px] text-xs sm:text-sm">{time.name}</Button
 					>
 				{/each}
-			</div>
+			</div> -->
 			<div class="center hstack gap-3">
 				{#if $page.params.time === 'history'}
 					<input

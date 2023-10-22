@@ -4,7 +4,7 @@ import { MongoClient } from 'mongodb';
 
 export const getDatabase = async () => {
 	const client = await MongoClient.connect(MONGO_URL);
-	const database = client.db('time-logger');
+	const database = client.db('organiser');
 	return database;
 };
 
@@ -111,4 +111,34 @@ export const getTimes = async () => {
 	const times = timesDocument?.data;
 
 	return times;
+};
+
+export const getDateLogs = async ({ space, date }: { space: string; date: Date }) => {
+	return await collection
+		.aggregate([
+			{ $match: { space } },
+			{
+				$match: {
+					$or: [
+						{
+							date: date // Format 1: Date object
+						},
+						{
+							date: {
+								$gte: new Date(date.setHours(0, 0, 0, 0)),
+								$lt: new Date(date.setHours(23, 59, 59, 999))
+							} // Format 2: ISODate format (Midnight to 23:59:59.999)
+						},
+						{
+							date: {
+								$gte: new Date(date.setUTCHours(0, 0, 0, 0)),
+								$lt: new Date(date.setUTCHours(23, 59, 59, 999))
+							} // Format 3: UTC Date (Midnight to 23:59:59.999)
+						}
+					]
+				}
+			},
+			{ $project: { _id: 0 } }
+		])
+		.toArray();
 };

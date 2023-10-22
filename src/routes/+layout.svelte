@@ -7,6 +7,7 @@
 	import type { SpaceData_int } from '$lib/types/general';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { derived } from 'svelte/store';
+	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 
 	export let data: SpaceData_int;
 	const { spaces, times } = data;
@@ -16,7 +17,8 @@
 	setContext('space', $space);
 
 	onMount(() => {
-		const goToDefaultSpace = () => goto(`/${spaces[0].name.replace(' ', '-')}/today`);
+		const goToDefaultSpace = () =>
+			goto(`/${spaces[0].name.replace(' ', '-')}/${getHyphenatedStringFromDate(new Date())}`);
 		const isHomePage = $page.url.pathname === '/';
 		if (isHomePage) goToDefaultSpace();
 	});
@@ -31,7 +33,7 @@
 				{#each spaces as { name, href, color }}
 					{@const spaceName = name.replace(' ', '-')}
 					<HeaderFooterLink
-						href="/{spaceName}/today"
+						href="/{spaceName}/{getHyphenatedStringFromDate(new Date())}"
 						isSelected={$space?.name === href}
 						style="background:{color};color:black">{name}</HeaderFooterLink
 					>
@@ -44,11 +46,11 @@
 		</main>
 		<footer class=" py-2" style="background:{$space?.color}">
 			<div class="hstack center capitalize gap-2 sm:gap-4">
-				{#each times as time}
-					{@const timeName = time.name.replace(' ', '-')}
+				{#each times as { name, href }}
+					{@const timeName = name.replace(' ', '-')}
 					<HeaderFooterLink
-						href="/{$space?.name.replace(' ', '-')}/{timeName}"
-						isSelected={$page.params.time === timeName}>{time.name}</HeaderFooterLink
+						href="/{$space?.name.replace(' ', '-')}/{href}"
+						isSelected={$page.params.time === timeName}>{name}</HeaderFooterLink
 					>
 				{/each}
 			</div>
