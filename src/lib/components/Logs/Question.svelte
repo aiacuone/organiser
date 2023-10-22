@@ -16,8 +16,6 @@
 	export let isEditing: boolean = false;
 	export let inputAutoFocus: boolean = false;
 
-	let textarea: HTMLTextAreaElement;
-
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onEdit = () => {
@@ -33,7 +31,7 @@
 		isEditing = false;
 		updateLog({
 			id,
-			content: textarea.value,
+			content,
 			importance,
 			date: new Date(getDateFromHyphenatedString($page.params.date)),
 			type: LogType_enum.question,
@@ -61,7 +59,7 @@
 				<IconWithRating icon={icons.question} rating={importance} />
 				<div class="flex flex-1 items-center min-h-[30px]">
 					{#if isEditing}
-						<Textarea value={content} className="" autofocus={inputAutoFocus} bind:textarea />
+						<Textarea bind:value={content} className="" autofocus={inputAutoFocus} />
 					{:else}
 						<p class="text-sm">
 							{content}

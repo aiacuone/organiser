@@ -7,6 +7,11 @@
 	import LogContainer from './LogContainer.svelte';
 	import Textarea from '../Textarea.svelte';
 	import { getContext } from 'svelte';
+	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
+	import { LogType_enum } from '$lib/types';
+	import { getDateFromHyphenatedString } from '$lib/utils';
+	import { page } from '$app/stores';
+
 	export let date: Date;
 	export let content: string | string[];
 	export let id: string;
@@ -23,22 +28,27 @@
 
 	const onEdit = () => {
 		isEditing = true;
-		console.log('edit', id);
 	};
 
 	const onDelete = () => {
-		console.log('delete', id);
+		deleteLog(id);
 	};
 
 	let onOpen: () => void;
 
 	const onAccept = () => {
-		console.log('accept', { id, content });
 		isEditing = false;
+		updateLog({
+			id,
+			content,
+			priority,
+			date: getDateFromHyphenatedString($page.params.date),
+			type: LogType_enum.todo,
+			space: $page.params.space
+		});
 	};
 
 	const onResetChange = () => {
-		console.log('reset');
 		isEditing = false;
 		onResetNewLogType();
 	};
@@ -65,7 +75,7 @@
 			</button>
 			<div class="flex-1">
 				{#if isEditing}
-					<Textarea value={content} autofocus={inputAutoFocus} />
+					<Textarea bind:value={content} autofocus={inputAutoFocus} />
 				{:else}
 					<p class="text-sm">{content}</p>
 				{/if}

@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-
 	export let value: string | string[];
 	export let className = '';
 	export let autofocus = false;
-	export let textarea: HTMLTextAreaElement;
 
+	let textarea: HTMLTextAreaElement;
 	const resize = () => {
 		if (textarea.scrollHeight > 30) {
 			textarea.style.height = 'auto';
@@ -36,7 +35,7 @@
 </script>
 
 <textarea
-	{value}
+	bind:value
 	class="resize-none {className} w-full text-sm center bg-transparent"
 	bind:this={textarea}
 	on:input={resize}

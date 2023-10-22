@@ -27,7 +27,7 @@
 
 <div class="hstack items-center gap-4 flex-1">
 	<p class="text-xs text-opacity-30 text-black">{date}</p>
-	{#if onAddBullet && !isEditing}
+	{#if onAddBullet}
 		<AddBullet onClick={onAddBullet} />
 	{/if}
 	{#if incrementDecrementProps && showIncrementDecrement && incrementDecrementValue}

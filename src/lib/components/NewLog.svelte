@@ -24,7 +24,7 @@
 </script>
 
 {#if type === LogType_enum.time}
-	<Time {...sharedProps} />
+	<Time {...sharedProps} content={['']} />
 {:else if type === LogType_enum.todo}
 	<Todo {...sharedProps} />
 {:else if type === LogType_enum.question}

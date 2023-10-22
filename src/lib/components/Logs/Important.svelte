@@ -5,6 +5,10 @@
 	import LogContainer from './LogContainer.svelte';
 	import Textarea from '../Textarea.svelte';
 	import { getContext } from 'svelte';
+	import { LogType_enum } from '$lib/types';
+	import { getDateFromHyphenatedString } from '$lib/utils';
+	import { page } from '$app/stores';
+	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	export let date: Date;
 	export let content: string | string[];
 	export let id: string;
@@ -19,13 +23,20 @@
 	};
 
 	const onDelete = () => {
-		console.log('delete', id);
 		isEditing = false;
+		deleteLog(id);
 	};
 
 	const onAccept = () => {
 		isEditing = false;
-		console.log('accept', { id, content, importance });
+		updateLog({
+			id,
+			content,
+			importance,
+			date: new Date(getDateFromHyphenatedString($page.params.date)),
+			type: LogType_enum.important,
+			space: $page.params.space
+		});
 	};
 
 	const onResetChange = () => {
@@ -48,7 +59,7 @@
 			<IconWithRating rating={importance} icon={icons.important} />
 			<div class="flex-1">
 				{#if isEditing}
-					<Textarea value={content} autofocus={inputAutoFocus} />
+					<Textarea bind:value={content} autofocus={inputAutoFocus} />
 				{:else}
 					<p class="text-sm">
 						{content}

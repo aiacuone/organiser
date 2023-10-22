@@ -1,5 +1,5 @@
 import { MONGO_URL } from '$env/static/private';
-import type { Space_int } from '$lib/types';
+import type { LogType_enum, Space_int } from '$lib/types';
 import { MongoClient } from 'mongodb';
 
 export const getDatabase = async () => {
@@ -151,6 +151,8 @@ export const updateLog = async (values: {
 	time?: number;
 	importance?: number;
 	priority?: number;
+	type: LogType_enum;
+	space: string;
 }) => {
 	const { date, ...rest } = values;
 	await collection.updateOne(

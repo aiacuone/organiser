@@ -7,15 +7,20 @@
 	import BottomOptions from './BottomOptions.svelte';
 	import Textarea from '../Textarea.svelte';
 	import { getContext } from 'svelte';
+	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
+
+	import { LogType_enum } from '$lib/types';
+	import { page } from '$app/stores';
+	import { getDateFromHyphenatedString } from '$lib/utils';
+	import { writable } from 'svelte/store';
 
 	export let isEditing = false;
 	export let date: Date;
-	export let content: string | string[];
+	export let content: string[];
 	export let id: string;
 	export let title: string;
 	export let reference: string;
 	export let time: number;
-	export let isAddingBullet: boolean = false;
 	export let inputAutoFocus: boolean = false;
 
 	let onOpen: () => void;
@@ -31,36 +36,48 @@
 		console.log('reset', id);
 	};
 
-	const onDelete = (index: number) => {
-		console.log('delete', index, id);
+	const onDelete = () => {
 		isEditing = false;
+		deleteLog(id);
+	};
+
+	const onDeleteBullet = (index: number) => {
+		content = content.filter((_, i) => i !== index);
 	};
 
 	const onAcceptEdit = () => {
 		if (!title && !reference && !content.length) {
 			return onOpen();
 		}
+
+		content = content.filter((c) => c);
 		isEditing = false;
+		updateLog({
+			id,
+			title,
+			reference,
+			content,
+			time,
+			date: getDateFromHyphenatedString($page.params.date),
+			type: LogType_enum.time,
+			space: $page.params.space
+		});
 	};
 
 	const onResetChange = () => {
 		console.log('reset');
 		isEditing = false;
-		isAddingBullet = false;
 		onResetNewLogType();
 	};
 
 	const onAddBullet = () => {
-		isAddingBullet = !isAddingBullet;
+		content = [...content, ''];
 	};
 
 	const onAcceptNewBullet = () => {
 		console.log({ value: newBulletInput.value });
-		isAddingBullet = false;
 		newBulletInput.value = '';
 	};
-
-	$: isAddingBullet, newBulletInput && isAddingBullet && newBulletInput.focus();
 
 	const incrementDecrementProps = {
 		min: 0.5,
@@ -70,19 +87,19 @@
 	};
 </script>
 
-<LogContainer isEditing={isEditing || isAddingBullet} onConfirmReset={onResetChange}>
+<LogContainer {isEditing} onConfirmReset={onResetChange}>
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-4 stack text-sm gap-1">
 			{#if isEditing}
 				<input
-					value={title}
+					bind:value={title}
 					class="placeholder-black placeholder-opacity-30"
 					type="text"
 					placeholder="Title"
 					autofocus={inputAutoFocus}
 				/>
 				<input
-					value={reference}
+					bind:value={reference}
 					class="placeholder-black placeholder-opacity-30"
 					type="text"
 					placeholder="Reference"
@@ -92,39 +109,30 @@
 				<p>{reference}</p>
 			{/if}
 			<ul class="ml-5 stack gap-1">
-				{#each content as bulletPoint, index}
+				{#each content as _, index}
 					<li>
 						<div class="hstack gap-2 min-h-[30px] items-center">
 							{#if isEditing}
-								<Textarea value={bulletPoint} className="flex-1" />
-								<Delete onDelete={() => onDelete(index)} />
+								<Textarea className="flex-1" bind:value={content[index]} />
+								<Delete onDelete={() => onDeleteBullet(index)} />
 							{:else}
-								<p class="flex-1">{bulletPoint}</p>
+								<p class="flex-1">{content[index]}</p>
 							{/if}
 						</div>
 					</li>
 				{/each}
-				{#if isAddingBullet}
-					<li>
-						<div class="hstack">
-							<input class="flex-1 p-1 resize-none" bind:this={newBulletInput} />
-							{#if isEditing}
-								<Delete onDelete={() => {}} />
-							{/if}
-						</div>
-					</li>
-				{/if}
 			</ul>
 			<div class="hstack mt-2">
 				<BottomOptions
 					{incrementDecrementProps}
 					incrementDecrementValue={time}
 					{date}
-					isEditing={isEditing || isAddingBullet}
+					{isEditing}
 					onAccept={isEditing ? onAcceptEdit : onAcceptNewBullet}
 					{onAddBullet}
 					{onEdit}
 					{onReset}
+					{onDelete}
 				/>
 				<Icon icon={icons.clock} height="30px" class="opacity-10" />
 			</div>
