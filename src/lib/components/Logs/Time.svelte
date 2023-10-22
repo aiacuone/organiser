@@ -12,7 +12,6 @@
 	import { LogType_enum } from '$lib/types';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString } from '$lib/utils';
-	import { writable } from 'svelte/store';
 
 	export let isEditing = false;
 	export let date: Date;

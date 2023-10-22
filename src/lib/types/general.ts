@@ -1,37 +1,52 @@
 export enum Time_enum {
 	Today = 'today',
 	Yesterday = 'yesterday',
-	History = 'history'
+	Date = 'date'
 }
 
-export interface Space_int {
-	name: string;
-	href: string;
-	color: string;
-	times: Array<TimeLog_int>;
-	todos: Array<Todo_int>;
-	importants: Array<Important_int>;
-	questions: Array<Question_int>;
-}
+// export interface Space_int {
+// 	name: string;
+// 	href: string;
+// 	color: string;
+// 	times: Array<TimeLog_int>;
+// 	todos: Array<Todo_int>;
+// 	importants: Array<Important_int>;
+// 	questions: Array<Question_int>;
+// }
 
 export interface Option_int {
 	name: Time_enum;
+	href: string;
 }
 
-export interface Note_int {
-	id: string;
-	title: string;
-	content: string;
-	date: Date;
-	time: number;
-	reference: string;
-}
+// export interface Note_int {
+// 	id: string;
+// 	title: string;
+// 	content: string;
+// 	date: Date;
+// 	time: number;
+// 	reference: string;
+// }
 
 export interface SpaceData_int {
 	spaces: string[];
 	times: Array<Option_int>;
 	space: string;
 	date: string;
+}
+
+export interface Log_int {
+	id: string;
+	date: Date;
+	title: string;
+	content: string;
+	reference?: string;
+	time: number;
+	type: LogType_enum;
+	space: string;
+	priority?: number;
+	importance?: number;
+	isCompleted?: boolean;
 }
 
 export enum LogType_enum {

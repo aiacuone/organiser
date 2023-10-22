@@ -13,7 +13,7 @@
 
 	onMount(() => {
 		const goToDefaultSpace = () =>
-			goto(`/${spaces[0].name.replace(' ', '-')}/${getHyphenatedStringFromDate(new Date())}`);
+			goto(`/${spaces[0].replace(' ', '-')}/${getHyphenatedStringFromDate(new Date())}`);
 		const isHomePage = $page.url.pathname === '/';
 		if (isHomePage) goToDefaultSpace();
 	});

@@ -16,7 +16,7 @@
 	export let content: string | string[];
 	export let id: string;
 	export let priority: number;
-	export let isChecked: boolean;
+	export let isChecked: boolean = false;
 	export let isEditing: boolean = false;
 	export let inputAutoFocus: boolean = false;
 
