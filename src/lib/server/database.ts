@@ -99,13 +99,6 @@ export const deleteNote = async ({
 	return { spaces };
 };
 
-// export const getSpaces = async () => {
-// 	const spacesDocument = await collection.findOne({ name: 'spaces' });
-// 	const spaces = spacesDocument?.data;
-
-// 	return spaces;
-// };
-
 export const getTimes = async () => {
 	const timesDocument = await collection.findOne({ name: 'times' });
 	const times = timesDocument?.data;
@@ -121,7 +114,7 @@ export const getDateLogs = async ({ space, date }: { space: string; date: Date }
 				$match: {
 					$or: [
 						{
-							date: date // Format 1: Date object
+							date: new Date(date) // Format 1: Date object
 						},
 						{
 							date: {
@@ -147,4 +140,28 @@ export const getSpaces = async () => {
 	const spaces = await collection.distinct('space');
 
 	return spaces;
+};
+
+export const updateLog = async (values: {
+	id: string;
+	date: Date;
+	title?: string;
+	content: string | string[];
+	reference?: string;
+	time?: number;
+	importance?: number;
+	priority?: number;
+}) => {
+	const { date, ...rest } = values;
+	await collection.updateOne(
+		{ id: values.id },
+		{
+			$set: { date: new Date(date), ...rest }
+		},
+		{ upsert: true }
+	);
+};
+
+export const deleteLog = async (id: string) => {
+	await collection.deleteOne({ id });
 };

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	export let value: string;
+	export let value: string | string[];
 	export let className = '';
 	export let autofocus = false;
+	export let textarea: HTMLTextAreaElement;
 
 	const resize = () => {
-		console.log({ height: textarea.scrollHeight });
 		if (textarea.scrollHeight > 30) {
 			textarea.style.height = 'auto';
 			textarea.style.height = textarea.scrollHeight + 'px';
@@ -21,7 +21,7 @@
 			return (textarea.style.height = '20px');
 		}
 
-		const preventEnter = (e) => {
+		const preventEnter = (e: KeyboardEvent) => {
 			if (e.key === 'Enter') {
 				e.preventDefault();
 			}
@@ -33,8 +33,6 @@
 			textarea.removeEventListener('keydown', preventEnter);
 		};
 	});
-
-	let textarea: HTMLTextAreaElement;
 </script>
 
 <textarea

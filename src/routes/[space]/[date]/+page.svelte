@@ -13,7 +13,6 @@
 	import Time from '$lib/components/Logs/Time.svelte';
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Question from '$lib/components/Logs/Question.svelte';
-	import { goto } from '$app/navigation';
 	import NewLog from '$lib/components/NewLog.svelte';
 
 	interface PageData extends SpaceData_int {

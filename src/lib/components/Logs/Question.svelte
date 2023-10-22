@@ -5,12 +5,18 @@
 	import LogContainer from './LogContainer.svelte';
 	import Textarea from '../Textarea.svelte';
 	import { getContext } from 'svelte';
+	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
+	import { page } from '$app/stores';
+	import { LogType_enum } from '$lib/types';
+	import { getDateFromHyphenatedString } from '$lib/utils';
 	export let date: Date;
 	export let content: string | string[];
 	export let id: string;
 	export let importance: number;
 	export let isEditing: boolean = false;
 	export let inputAutoFocus: boolean = false;
+
+	let textarea: HTMLTextAreaElement;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
@@ -19,17 +25,23 @@
 	};
 
 	const onDelete = () => {
-		console.log('delete', id);
 		isEditing = false;
+		deleteLog(id);
 	};
 
 	const onAccept = () => {
-		console.log('accept', { id, content, importance });
 		isEditing = false;
+		updateLog({
+			id,
+			content: textarea.value,
+			importance,
+			date: new Date(getDateFromHyphenatedString($page.params.date)),
+			type: LogType_enum.question,
+			space: $page.params.space
+		});
 	};
 
 	const onResetChange = () => {
-		console.log('reset');
 		isEditing = false;
 		onResetNewLogType();
 	};
@@ -49,7 +61,7 @@
 				<IconWithRating icon={icons.question} rating={importance} />
 				<div class="flex flex-1 items-center min-h-[30px]">
 					{#if isEditing}
-						<Textarea value={content} className="" autofocus={inputAutoFocus} />
+						<Textarea value={content} className="" autofocus={inputAutoFocus} bind:textarea />
 					{:else}
 						<p class="text-sm">
 							{content}
