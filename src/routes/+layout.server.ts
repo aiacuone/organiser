@@ -1,5 +1,4 @@
-import { getDate2DaysEarlier, getDayMonthYearFromDate, getYesterdaysDate } from '$lib';
-import { testSpaces } from '../testData';
+import { getDate2DaysEarlier, getDayMonthYearFromDate, getSpaces, getYesterdaysDate } from '$lib';
 
 export const load = async (req: Request, res: Response) => {
 	const todaysDate = new Date();
@@ -11,18 +10,18 @@ export const load = async (req: Request, res: Response) => {
 		return string;
 	};
 
+	const spaces = await getSpaces();
 	const times = [
 		{ name: 'today', href: getDateString(todaysDate) },
 		{ name: 'yesterday', href: getDateString(yesterdaysDate) },
 		{ name: 'date', href: getDateString(date2DaysEarlier) }
 	];
 
+	const space = req.url.pathname.split('/')[1];
+
 	return {
-		spaces: testSpaces,
-		times
+		spaces,
+		times,
+		space
 	};
-	// return {
-	// 	spaces,
-	// 	times
-	// };
 };

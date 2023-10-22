@@ -28,8 +28,10 @@ export interface Note_int {
 }
 
 export interface SpaceData_int {
-	spaces: Array<Space_int>;
+	spaces: string[];
 	times: Array<Option_int>;
+	space: string;
+	date: string;
 }
 
 export enum LogType_enum {

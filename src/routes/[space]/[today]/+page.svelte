@@ -1,11 +1,6 @@
 <script lang="ts">
-	import {
-		type Time_enum,
-		type SpaceData_int,
-		type Space_int,
-		LogType_enum
-	} from '$lib/types/general';
-	import { getContext, setContext } from 'svelte';
+	import { type Time_enum, type SpaceData_int, LogType_enum } from '$lib/types/general';
+	import { setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
 
@@ -26,8 +21,6 @@
 	}
 
 	export let data: PageData;
-
-	const space = getContext('space') as Space_int;
 
 	const getInitialDatePickerValue = () => {
 		const { day, month, year } = getDayMonthYearFromDate(getDate2DaysEarlier());
@@ -109,8 +102,6 @@
 	};
 
 	setContext('onResetNewLogType', onResetNewLogType);
-
-	const allLogs = [...space.importants, ...space.times, ...space.questions, ...space.todos];
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -118,7 +109,7 @@
 		<div class="stack gap-2" bind:clientHeight={logButtonsContainerHeight}>
 			<div class="hstack gap-1 sm:gap-2 center flex-wrap">
 				<div class="center text-base sm:text-xl hstack gap-1 sm:gap-2">
-					<p class="capitalize text-opacity-40">{space?.name}</p>
+					<p class="capitalize text-opacity-40">{data.space}</p>
 					<p class="text-opacity-40">-</p>
 					<p class="capitalize">{data.date}</p>
 				</div>

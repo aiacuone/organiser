@@ -26,7 +26,7 @@
 	export let time: number;
 	export let onDeleteNote: () => void;
 
-	const space: Readable<Space_int> = getContext('space');
+	// const space: Readable<Space_int> = getContext('space');
 
 	const queryClient = useQueryClient();
 
@@ -64,20 +64,20 @@
 		const content = contentInput.value;
 		const reference = referenceInput.value;
 
-		onClickAccept({
-			title,
-			content,
-			reference
-		});
-		$updateNoteMutation.mutate({
-			title,
-			content,
-			reference,
-			id,
-			space: $space.name,
-			time,
-			date
-		});
+		// onClickAccept({
+		// 	title,
+		// 	content,
+		// 	reference
+		// });
+		// $updateNoteMutation.mutate({
+		// 	title,
+		// 	content,
+		// 	reference,
+		// 	id,
+		// 	space: $space.name,
+		// 	time,
+		// 	date
+		// });
 	};
 
 	const onChangeTime = (increaseOrDecrease: 'increase' | 'decrease') => {

@@ -99,12 +99,12 @@ export const deleteNote = async ({
 	return { spaces };
 };
 
-export const getSpaces = async () => {
-	const spacesDocument = await collection.findOne({ name: 'spaces' });
-	const spaces = spacesDocument?.data;
+// export const getSpaces = async () => {
+// 	const spacesDocument = await collection.findOne({ name: 'spaces' });
+// 	const spaces = spacesDocument?.data;
 
-	return spaces;
-};
+// 	return spaces;
+// };
 
 export const getTimes = async () => {
 	const timesDocument = await collection.findOne({ name: 'times' });
@@ -141,4 +141,10 @@ export const getDateLogs = async ({ space, date }: { space: string; date: Date }
 			{ $project: { _id: 0 } }
 		])
 		.toArray();
+};
+
+export const getSpaces = async () => {
+	const spaces = await collection.distinct('space');
+
+	return spaces;
 };

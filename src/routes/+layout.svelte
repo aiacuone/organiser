@@ -1,20 +1,15 @@
 <script lang="ts">
 	import '../app.css';
 	import { page } from '$app/stores';
-	import { onMount, setContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import HeaderFooterLink from '../lib/components/HeaderFooterLink.svelte';
 	import type { SpaceData_int } from '$lib/types/general';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
-	import { derived } from 'svelte/store';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 
 	export let data: SpaceData_int;
-	const { spaces, times } = data;
-
-	const space = derived(page, ($page) => spaces.find((space) => space.href === $page.params.space));
-
-	setContext('space', $space);
+	const { spaces, times, space } = data;
 
 	onMount(() => {
 		const goToDefaultSpace = () =>
@@ -28,14 +23,11 @@
 
 <QueryClientProvider client={queryClient}>
 	<div class="stack h-screen">
-		<header class="center py-2" style="background:{$space?.color}">
+		<header class="center py-2 bg-gray-200">
 			<div class="hstack gap-2 sm:gap-4">
-				{#each spaces as { name, href, color }}
-					{@const spaceName = name.replace(' ', '-')}
-					<HeaderFooterLink
-						href="/{spaceName}/{getHyphenatedStringFromDate(new Date())}"
-						isSelected={$space?.name === href}
-						style="background:{color};color:black">{name}</HeaderFooterLink
+				{#each spaces as space}
+					<HeaderFooterLink href="/{space}/{getHyphenatedStringFromDate(new Date())}"
+						>{space}</HeaderFooterLink
 					>
 				{/each}
 			</div>
@@ -44,13 +36,12 @@
 			<div class="flex justify-end" />
 			<slot />
 		</main>
-		<footer class=" py-2" style="background:{$space?.color}">
+		<footer class="py-2 bg-gray-300">
 			<div class="hstack center capitalize gap-2 sm:gap-4">
 				{#each times as { name, href }}
 					{@const timeName = name.replace(' ', '-')}
-					<HeaderFooterLink
-						href="/{$space?.name.replace(' ', '-')}/{href}"
-						isSelected={$page.params.time === timeName}>{name}</HeaderFooterLink
+					<HeaderFooterLink href="/{space}/{href}" isSelected={$page.params.time === timeName}
+						>{name}</HeaderFooterLink
 					>
 				{/each}
 			</div>

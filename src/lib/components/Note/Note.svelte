@@ -15,7 +15,7 @@
 	export let time: number;
 	export let reference: string;
 
-	const space: Readable<Space_int> = getContext('space');
+	// const space: Readable<Space_int> = getContext('space');
 
 	let isEditing = false;
 	let isConfirmingDelete = false;
@@ -97,7 +97,6 @@
 			<div class="z-10 w-full center mt-2">
 				<button
 					on:click={() => (isEditing = true)}
-					style="background:{$space.color}"
 					class="px-1 rounded-sm bottom-0 absolute h-[15px] w-[35px]"
 				/>
 			</div>
