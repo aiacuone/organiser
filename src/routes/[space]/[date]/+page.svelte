@@ -1,10 +1,5 @@
 <script lang="ts">
-	import {
-		type Time_enum,
-		LogType_enum,
-		type Log_int,
-		type SpaceData_int
-	} from '$lib/types/general';
+	import { type Time_enum, LogType_enum, type SpaceData_int } from '$lib/types/general';
 	import { setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
@@ -19,15 +14,27 @@
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Question from '$lib/components/Logs/Question.svelte';
 	import NewLog from '$lib/components/NewLog.svelte';
+	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
+	import { getDateLogs } from '$lib/api/logsLocalApi';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
 		date: string;
 		space: string;
-		logs: Log_int[];
 	}
 
 	export let data: PageData;
+
+	const queryClient = useQueryClient();
+
+	const logs = useQuery('logs', () =>
+		getDateLogs({
+			space: data.space,
+			date: data.date
+		})
+	);
+
+	$: $page, queryClient.invalidateQueries('logs');
 
 	const getInitialDatePickerValue = () => {
 		const { day, month, year } = getDayMonthYearFromDate(getDate2DaysEarlier());
@@ -138,29 +145,35 @@
 			{#if !!newLogType}
 				<NewLog type={newLogType} />
 			{/if}
-			{#each data.logs as log}
-				{@const { type, ...rest } = log}
-				{#if type === LogType_enum.important && log.importance && log.content}
-					<Important {...rest} importance={log.importance} content={log.content} />
-				{:else if type === LogType_enum.todo && log.priority && log.content}
-					<Todo
-						{...rest}
-						priority={log.priority}
-						isChecked={log.isCompleted}
-						content={log.content}
-					/>
-				{:else if type === LogType_enum.question && log.importance && log.content}
-					<Question {...rest} importance={log.importance} content={log.content} />
-				{:else if type === LogType_enum.time && log.reference && log.bullets && log.time && log.title}
-					<Time
-						{...rest}
-						title={log.title}
-						reference={log.reference}
-						time={log.time}
-						bullets={log.bullets}
-					/>
-				{/if}
-			{/each}
+			{#if $logs.isLoading}
+				<span>Loading...</span>
+			{:else if $logs.isError}
+				Error
+			{:else}
+				{#each $logs.data as log}
+					{@const { type, ...rest } = log}
+					{#if type === LogType_enum.important && log.importance && log.content}
+						<Important {...rest} importance={log.importance} content={log.content} />
+					{:else if type === LogType_enum.todo && log.priority && log.content}
+						<Todo
+							{...rest}
+							priority={log.priority}
+							isChecked={log.isCompleted}
+							content={log.content}
+						/>
+					{:else if type === LogType_enum.question && log.importance && log.content}
+						<Question {...rest} importance={log.importance} content={log.content} />
+					{:else if type === LogType_enum.time && log.reference && log.bullets && log.time && log.title}
+						<Time
+							{...rest}
+							title={log.title}
+							reference={log.reference}
+							time={log.time}
+							bullets={log.bullets}
+						/>
+					{/if}
+				{/each}
+			{/if}
 		</div>
 		<div bind:clientHeight={headerContainer} class="stack gap-2 flex-1">
 			<!-- <div class="hstack center capitalize gap-2 sm:gap-4">

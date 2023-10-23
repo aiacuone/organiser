@@ -58,10 +58,10 @@ export const getDate2DaysEarlier = () => {
 
 export const getDateFromHyphenatedString = (dateString: string) => {
 	const [day, month, year] = dateString.split('-').map(Number);
-
-	if (isNaN(day) || isNaN(month) || isNaN(year)) {
-		throw new Error('Invalid date format');
-	}
+	// console.log({ day, month, year });
+	// if (isNaN(day) || isNaN(month) || isNaN(year)) {
+	// 	throw new Error('Invalid date format');
+	// }
 
 	return new Date(Date.UTC(year, month - 1, day));
 };

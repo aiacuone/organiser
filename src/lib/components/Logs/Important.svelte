@@ -4,11 +4,13 @@
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
 	import Textarea from '../Textarea.svelte';
-	import { getContext } from 'svelte';
+	import { getContext, setContext } from 'svelte';
 	import { LogType_enum } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { page } from '$app/stores';
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
+	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
+
 	export let date: Date;
 	export let content: string;
 	export let id: string;
@@ -22,14 +24,31 @@
 		isEditing = true;
 	};
 
+	const queryClient = useQueryClient();
+
+	export const deleteMutation = useMutation(deleteLog, {
+		onSuccess: () => {
+			queryClient.invalidateQueries('logs');
+		}
+	});
+
+	export const updateMutation = useMutation(updateLog, {
+		onSuccess: () => {
+			queryClient.invalidateQueries('logs');
+		}
+	});
+
+	setContext('deleteMutation', deleteMutation);
+	setContext('updateMutation', updateMutation);
+
 	const onDelete = () => {
 		isEditing = false;
-		deleteLog(id);
+		$deleteMutation.mutate(id);
 	};
 
 	const onAccept = () => {
 		isEditing = false;
-		updateLog({
+		$updateMutation.mutate({
 			id,
 			content,
 			importance,
@@ -37,6 +56,7 @@
 			type: LogType_enum.important,
 			space: $page.params.space
 		});
+		onResetNewLogType();
 	};
 
 	const onResetChange = () => {

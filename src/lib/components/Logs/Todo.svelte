@@ -11,6 +11,7 @@
 	import { LogType_enum } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { page } from '$app/stores';
+	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 
 	export let date: Date;
 	export let content: string;
@@ -22,6 +23,20 @@
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
+	const queryClient = useQueryClient();
+
+	export const deleteMutation = useMutation(deleteLog, {
+		onSuccess: () => {
+			queryClient.invalidateQueries('logs');
+		}
+	});
+
+	export const updateMutation = useMutation(updateLog, {
+		onSuccess: () => {
+			queryClient.invalidateQueries('logs');
+		}
+	});
+
 	const onCheckboxClick = () => {
 		isChecked = !isChecked;
 	};
@@ -31,14 +46,14 @@
 	};
 
 	const onDelete = () => {
-		deleteLog(id);
+		$deleteMutation.mutate(id);
 	};
 
 	let onOpen: () => void;
 
 	const onAccept = () => {
 		isEditing = false;
-		updateLog({
+		$updateMutation.mutate({
 			id,
 			content,
 			priority,
@@ -46,6 +61,7 @@
 			type: LogType_enum.todo,
 			space: $page.params.space
 		});
+		onResetNewLogType();
 	};
 
 	const onResetChange = () => {

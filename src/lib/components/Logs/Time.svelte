@@ -12,6 +12,7 @@
 	import { LogType_enum } from '$lib/types';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString } from '$lib/utils';
+	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 
 	export let isEditing = false;
 	export let date: Date;
@@ -29,6 +30,20 @@
 	};
 	let newBulletInput: HTMLInputElement;
 
+	const queryClient = useQueryClient();
+
+	export const deleteMutation = useMutation(deleteLog, {
+		onSuccess: () => {
+			queryClient.invalidateQueries('logs');
+		}
+	});
+
+	export const updateMutation = useMutation(updateLog, {
+		onSuccess: () => {
+			queryClient.invalidateQueries('logs');
+		}
+	});
+
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onReset = () => {
@@ -37,7 +52,7 @@
 
 	const onDelete = () => {
 		isEditing = false;
-		deleteLog(id);
+		$deleteMutation.mutate(id);
 	};
 
 	const onDeleteBullet = (index: number) => {
@@ -51,7 +66,7 @@
 
 		bullets = bullets.filter((c) => c);
 		isEditing = false;
-		updateLog({
+		$updateMutation.mutate({
 			id,
 			title,
 			reference,
@@ -61,6 +76,7 @@
 			type: LogType_enum.time,
 			space: $page.params.space
 		});
+		onResetNewLogType();
 	};
 
 	const onResetChange = () => {
@@ -74,7 +90,6 @@
 	};
 
 	const onAcceptNewBullet = () => {
-		console.log({ value: newBulletInput.value });
 		newBulletInput.value = '';
 	};
 
@@ -107,7 +122,7 @@
 				<p>{title}</p>
 				<p>{reference}</p>
 			{/if}
-			<ul class="ml-5 stack gap-1">
+			<ul class="ml-5 stack">
 				{#each bullets as _, index}
 					<li>
 						<div class="hstack gap-2 min-h-[30px] items-center">
