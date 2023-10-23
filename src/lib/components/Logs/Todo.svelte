@@ -54,7 +54,8 @@
 	const onAccept = () => {
 		const currentDate = new Date();
 		const date = new Date(getDateFromHyphenatedString($page.params.date));
-		date.setTime(currentDate.getTime());
+		date.setHours(currentDate.getHours());
+		date.setMinutes(currentDate.getMinutes());
 
 		isEditing = false;
 		$updateMutation.mutate({

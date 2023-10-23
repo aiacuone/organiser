@@ -16,6 +16,7 @@
 	import NewLog from '$lib/components/NewLog.svelte';
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import { getDateLogs } from '$lib/api/logsLocalApi';
+	import { goto } from '$app/navigation';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -116,6 +117,12 @@
 	};
 
 	setContext('onResetNewLogType', onResetNewLogType);
+
+	const onDateChange = (e) => {
+		const value = e.target.value;
+		const reversedValue = value.split('-').reverse().join('-');
+		goto(`/${data.space}/${reversedValue}`);
+	};
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -127,6 +134,7 @@
 					<p class="text-opacity-40">-</p>
 					<p class="capitalize">{data.date}</p>
 				</div>
+				<input type="date" on:change={onDateChange} class="w-[20px]" />
 			</div>
 			<div class="hstack w-full gap-10">
 				{#each noteButtons as { label, icon, onClick }}

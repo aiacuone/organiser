@@ -8,7 +8,7 @@
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import { page } from '$app/stores';
 	import { LogType_enum } from '$lib/types';
-	import { getDateFromHyphenatedString, getDayMonthYearFromDate } from '$lib/utils';
+	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	export let date: Date;
 	export let content: string;
@@ -45,7 +45,8 @@
 	const onAccept = () => {
 		const currentDate = new Date();
 		const date = new Date(getDateFromHyphenatedString($page.params.date));
-		date.setTime(currentDate.getTime());
+		date.setHours(currentDate.getHours());
+		date.setMinutes(currentDate.getMinutes());
 
 		isEditing = false;
 		$updateMutation.mutate({
