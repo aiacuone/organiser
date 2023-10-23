@@ -98,11 +98,38 @@
 		newBulletInput.value = '';
 	};
 
+	const onIncrement = () => {
+		time = time + 0.5;
+		$updateMutation.mutate({
+			id,
+			title,
+			reference,
+			bullets,
+			time,
+			date,
+			type: LogType_enum.time,
+			space: $page.params.space
+		});
+	};
+	const onDecrement = () => {
+		time = time - 0.5;
+		$updateMutation.mutate({
+			id,
+			title,
+			reference,
+			bullets,
+			time,
+			date,
+			type: LogType_enum.time,
+			space: $page.params.space
+		});
+	};
+
 	const incrementDecrementProps = {
 		min: 0.5,
 		max: 24,
-		onIncrement: () => (time = time + 0.5),
-		onDecrement: () => (time = time - 0.5)
+		onIncrement,
+		onDecrement
 	};
 </script>
 

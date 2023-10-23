@@ -17,7 +17,7 @@
 	export let content: string;
 	export let id: string;
 	export let priority: number;
-	export let isChecked: boolean = false;
+	export let isCompleted: boolean = false;
 	export let isEditing: boolean = false;
 	export let inputAutoFocus: boolean = false;
 
@@ -38,7 +38,16 @@
 	});
 
 	const onCheckboxClick = () => {
-		isChecked = !isChecked;
+		isCompleted = !isCompleted;
+		$updateMutation.mutate({
+			id,
+			content,
+			priority,
+			date,
+			type: LogType_enum.todo,
+			space: $page.params.space,
+			isCompleted
+		});
 	};
 
 	const onEdit = () => {
@@ -64,7 +73,8 @@
 			priority,
 			date,
 			type: LogType_enum.todo,
-			space: $page.params.space
+			space: $page.params.space,
+			isCompleted
 		});
 		onResetNewLogType();
 	};
@@ -90,7 +100,7 @@
 				on:click={onOpen}
 				class="center border-2 border-gray-400 w-[35px] h-[35px] rounded-md"
 			>
-				{#if isChecked}
+				{#if isCompleted}
 					<Icon icon={icons.tickBold} height="20px" color="#32ed65" class="text-green" />
 				{/if}
 			</button>

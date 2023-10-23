@@ -16,7 +16,7 @@
 		reference: '',
 		time: 0.5,
 		isEditing: true,
-		isChecked: false,
+		isCompleted: false,
 		importance: 2,
 		priority: 2,
 		inputAutoFocus: true,

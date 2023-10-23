@@ -166,7 +166,7 @@
 						<Todo
 							{...rest}
 							priority={log.priority}
-							isChecked={log.isCompleted}
+							isCompleted={log.isCompleted}
 							content={log.content}
 						/>
 					{:else if type === LogType_enum.question && log.importance && log.content}
