@@ -47,12 +47,16 @@
 	};
 
 	const onAccept = () => {
+		const currentDate = new Date();
+		const date = new Date(getDateFromHyphenatedString($page.params.date));
+		date.setTime(currentDate.getTime());
+
 		isEditing = false;
 		$updateMutation.mutate({
 			id,
 			content,
 			importance,
-			date: new Date(getDateFromHyphenatedString($page.params.date)),
+			date,
 			type: LogType_enum.important,
 			space: $page.params.space
 		});

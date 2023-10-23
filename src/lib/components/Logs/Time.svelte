@@ -64,6 +64,10 @@
 			return onOpen();
 		}
 
+		const currentDate = new Date();
+		const date = new Date(getDateFromHyphenatedString($page.params.date));
+		date.setTime(currentDate.getTime());
+
 		bullets = bullets.filter((c) => c);
 		isEditing = false;
 		$updateMutation.mutate({
@@ -72,7 +76,7 @@
 			reference,
 			bullets,
 			time,
-			date: getDateFromHyphenatedString($page.params.date),
+			date,
 			type: LogType_enum.time,
 			space: $page.params.space
 		});

@@ -42,7 +42,8 @@ export const getDateLogs = async ({ space, date }: { space: string; date: Date }
 					]
 				}
 			},
-			{ $project: { _id: 0 } }
+			{ $project: { _id: 0 } },
+			{ $sort: { date: -1 } }
 		])
 		.toArray();
 };

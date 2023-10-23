@@ -52,12 +52,16 @@
 	let onOpen: () => void;
 
 	const onAccept = () => {
+		const currentDate = new Date();
+		const date = new Date(getDateFromHyphenatedString($page.params.date));
+		date.setTime(currentDate.getTime());
+
 		isEditing = false;
 		$updateMutation.mutate({
 			id,
 			content,
 			priority,
-			date: getDateFromHyphenatedString($page.params.date),
+			date,
 			type: LogType_enum.todo,
 			space: $page.params.space
 		});
