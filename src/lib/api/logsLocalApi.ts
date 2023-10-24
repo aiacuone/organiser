@@ -1,5 +1,5 @@
+import { axios } from '$lib/general/axios';
 import type { Log_int } from '$lib/types';
-import axios from 'axios';
 
 const resource = 'log';
 
