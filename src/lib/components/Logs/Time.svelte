@@ -31,6 +31,7 @@
 	let newBulletInput: HTMLInputElement;
 
 	const queryClient = useQueryClient();
+	const originalBullets = [...bullets];
 
 	export const deleteMutation = useMutation(deleteLog, {
 		onSuccess: () => {
@@ -85,9 +86,9 @@
 	};
 
 	const onResetChange = () => {
-		console.log('reset');
 		isEditing = false;
 		onResetNewLogType();
+		bullets = originalBullets;
 	};
 
 	const onAddBullet = () => {
@@ -158,13 +159,13 @@
 			<ul class="ml-5 stack">
 				{#each bullets as _, index}
 					<li>
-						<div class="hstack gap-2 min-h-[30px] items-center">
-							{#if isEditing}
-								<Textarea className="flex-1" bind:value={bullets[index]} />
-								<Delete onDelete={() => onDeleteBullet(index)} />
-							{:else}
-								<p class="flex-1">{bullets[index]}</p>
-							{/if}
+						<div class="hstack gap-2 min-h-[40px] items-center">
+							<Textarea className="flex-1" bind:value={bullets[index]} isDisabled={!isEditing} />
+							<div class="min-w-[40px]">
+								{#if isEditing}
+									<Delete onDelete={() => onDeleteBullet(index)} />
+								{/if}
+							</div>
 						</div>
 					</li>
 				{/each}

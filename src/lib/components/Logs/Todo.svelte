@@ -22,6 +22,7 @@
 	export let inputAutoFocus: boolean = false;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
+	const originalContent = content;
 
 	const queryClient = useQueryClient();
 
@@ -82,6 +83,7 @@
 	const onResetChange = () => {
 		isEditing = false;
 		onResetNewLogType();
+		content = originalContent;
 	};
 
 	const incrementDecrementProps = {

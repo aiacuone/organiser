@@ -19,7 +19,7 @@
 	export let inputAutoFocus: boolean = false;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
-
+	const originalContent = content;
 	const onEdit = () => {
 		isEditing = true;
 	};
@@ -65,9 +65,9 @@
 	};
 
 	const onResetChange = () => {
-		console.log('reset');
 		isEditing = false;
 		onResetNewLogType();
+		content = originalContent;
 	};
 
 	const incrementDecrementProps = {

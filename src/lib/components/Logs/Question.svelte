@@ -18,6 +18,7 @@
 	export let inputAutoFocus: boolean = false;
 
 	const queryClient = useQueryClient();
+	const originalContent = content;
 
 	export const deleteMutation = useMutation(deleteLog, {
 		onSuccess: () => {
@@ -63,6 +64,7 @@
 	const onResetChange = () => {
 		isEditing = false;
 		onResetNewLogType();
+		content = originalContent;
 	};
 
 	const incrementDecrementProps = {
