@@ -129,7 +129,7 @@
 	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full sm:h-auto justify-center flex-1 py-3">
 		<div class="stack gap-2" bind:clientHeight={logButtonsContainerHeight}>
 			<div class="hstack gap-1 sm:gap-2 center flex-wrap">
-				<div class="center text-base sm:text-xl hstack gap-1 sm:gap-2">
+				<div class="center text-base sm:text-lg hstack gap-1 sm:gap-2">
 					<p class="capitalize text-opacity-40">{data.space}</p>
 					<p class="text-opacity-40">-</p>
 					<p class="capitalize">{data.date}</p>

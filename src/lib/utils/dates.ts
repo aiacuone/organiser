@@ -65,3 +65,14 @@ export const getDateFromHyphenatedString = (dateString: string) => {
 
 	return new Date(Date.UTC(year, month - 1, day));
 };
+
+export const getLastFridayDate = () => {
+	const today = new Date();
+	const dayOfWeek = today.getDay(); // Get the current day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+	const daysUntilFriday = (dayOfWeek + 7 - 5) % 7; // Calculate how many days to subtract to get to the last Friday
+
+	const lastFriday = new Date(today);
+	lastFriday.setDate(today.getDate() - daysUntilFriday);
+
+	return lastFriday;
+};

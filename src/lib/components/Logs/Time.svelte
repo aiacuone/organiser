@@ -91,6 +91,7 @@
 	};
 
 	const onAddBullet = () => {
+		isEditing = true;
 		bullets = [...bullets, ''];
 	};
 
