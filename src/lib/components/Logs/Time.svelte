@@ -181,8 +181,8 @@
 					{onEdit}
 					{onReset}
 					{onDelete}
+					icon={icons.clock}
 				/>
-				<Icon icon={icons.clock} height="30px" class="opacity-10" />
 			</div>
 		</div>
 	</div>

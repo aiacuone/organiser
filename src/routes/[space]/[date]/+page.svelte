@@ -143,10 +143,12 @@
 				</div>
 				<input type="date" on:change={onDateChange} class="w-[20px]" />
 			</div>
-			<div class="hstack w-full gap-10">
+			<div class="grid grid-cols-2 sm:grid-cols-4 w-full gap-y-3 gap-x-3 sm:gap-x-10">
 				{#each noteButtons as { label, icon, onClick }}
 					<Button {onClick} className="flex-1 uppercase center hstack gap-2">
-						{label}
+						<div class="hidden sm:block">
+							{label}
+						</div>
 						<Icon {icon} class="opacity-20" height="20px" />
 					</Button>
 				{/each}
