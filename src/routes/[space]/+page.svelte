@@ -7,6 +7,6 @@
 	export let data: SpaceData_int;
 
 	onMount(() => {
-		goto(`/${data.space}/${getHyphenatedStringFromDate(new Date())}`);
+		goto(`/${data.space.replace(' ', '-')}/${getHyphenatedStringFromDate(new Date())}`);
 	});
 </script>
