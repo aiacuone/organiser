@@ -54,6 +54,12 @@ export const getSpaces = async () => {
 	return spaces;
 };
 
+export const getReferences = async (space: string) => {
+	const spaces = await collection.distinct('reference', { space });
+
+	return spaces;
+};
+
 export const updateLog = async (values: {
 	id: string;
 	date: Date;

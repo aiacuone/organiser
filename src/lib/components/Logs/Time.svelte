@@ -13,6 +13,7 @@
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
+	import Input from '../Input.svelte';
 
 	export let isEditing = false;
 	export let date: Date;
@@ -32,6 +33,10 @@
 
 	const queryClient = useQueryClient();
 	const originalBullets = [...bullets];
+	const originalTitle = title;
+	const originalReference = reference;
+
+	const references: string[] = getContext('references');
 
 	export const deleteMutation = useMutation(deleteLog, {
 		onSuccess: () => {
@@ -89,6 +94,9 @@
 		isEditing = false;
 		onResetNewLogType();
 		bullets = originalBullets;
+		title = originalTitle;
+		reference = originalReference;
+		console.log('onResetChange');
 	};
 
 	const onAddBullet = () => {
@@ -138,24 +146,19 @@
 <LogContainer {isEditing} onConfirmReset={onResetChange}>
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-4 stack text-sm gap-1">
-			{#if isEditing}
-				<input
-					bind:value={title}
-					class="placeholder-black placeholder-opacity-30"
-					type="text"
-					placeholder="Title"
-					autofocus={inputAutoFocus}
-				/>
-				<input
-					bind:value={reference}
-					class="placeholder-black placeholder-opacity-30"
-					type="text"
-					placeholder="Reference"
-				/>
-			{:else}
-				<p>{title}</p>
-				<p>{reference}</p>
-			{/if}
+			<Input
+				bind:value={title}
+				autofocus={inputAutoFocus}
+				placeholder="Title"
+				isDisabled={!isEditing}
+			/>
+			<Input
+				bind:value={reference}
+				placeholder="Reference"
+				autofillValues={references}
+				isDisabled={!isEditing}
+			/>
+
 			<ul class="ml-5 stack">
 				{#each bullets as _, index}
 					<li>

@@ -9,7 +9,7 @@
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 
 	export let data: SpaceData_int;
-	const { spaces, times, space } = data;
+	const { spaces, times } = data;
 
 	onMount(() => {
 		const goToDefaultSpace = () =>
@@ -22,7 +22,7 @@
 </script>
 
 <QueryClientProvider client={queryClient}>
-	<div class="stack h-screen">
+	<div class="stack" style={'height:100dvh'}>
 		<header class="center py-2 bg-gray-200">
 			<div class="hstack gap-2 sm:gap-4">
 				{#each spaces as space}
@@ -40,7 +40,7 @@
 			<div class="hstack center capitalize gap-2 sm:gap-4">
 				{#each times as { name, href }}
 					{@const timeName = name.replace(' ', '-')}
-					<HeaderFooterLink href="/{space}/{href}" isSelected={$page.params.time === timeName}
+					<HeaderFooterLink href="/{data.space}/{href}" isSelected={$page.params.time === timeName}
 						>{name}</HeaderFooterLink
 					>
 				{/each}

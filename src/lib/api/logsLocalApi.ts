@@ -15,3 +15,8 @@ export const getDateLogs = async ({ space, date }: { space: string; date: string
 	const { data } = await axios.get(`/${resource}/${space}/${date}`);
 	return data;
 };
+
+export const getReferences = async (space: string) => {
+	const { data } = await axios.get(`/${resource}/${space}/references`);
+	return data;
+};
