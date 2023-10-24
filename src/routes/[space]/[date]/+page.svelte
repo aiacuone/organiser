@@ -4,7 +4,11 @@
 	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
 
-	import { getDate2DaysEarlier, getDayMonthYearFromDate } from '$lib/utils';
+	import {
+		getDate2DaysEarlier,
+		getDateFromHyphenatedString,
+		getDayMonthYearFromDate
+	} from '$lib/utils';
 	import Button from '$lib/components/Button.svelte';
 	import { darkMode } from '$lib/stores';
 	import { icons } from '$lib/general/icons';
@@ -123,6 +127,8 @@
 		const reversedValue = value.split('-').reverse().join('-');
 		goto(`/${data.space}/${reversedValue}`);
 	};
+
+	$: dayString = getDayMonthYearFromDate(getDateFromHyphenatedString(data.date)).dayString;
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -131,7 +137,8 @@
 			<div class="hstack gap-1 sm:gap-2 center flex-wrap">
 				<div class="center text-base sm:text-lg hstack gap-1 sm:gap-2">
 					<p class="capitalize text-opacity-40">{data.space}</p>
-					<p class="text-opacity-40">-</p>
+					<p>-</p>
+					<p>{dayString?.slice(0, 2)}</p>
 					<p class="capitalize">{data.date}</p>
 				</div>
 				<input type="date" on:change={onDateChange} class="w-[20px]" />
