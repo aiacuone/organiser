@@ -175,7 +175,7 @@
 
 <LogContainer {isEditing} onConfirmReset={onResetChange}>
 	<div class="bg-neutral-100 p-2 rounded-sm">
-		<div class="bg-white rounded-sm p-4 stack text-sm gap-1">
+		<div class="bg-white rounded-sm p-2 sm:p-4 stack text-sm gap-1">
 			<Input
 				bind:value={title}
 				autofocus={inputAutoFocus}

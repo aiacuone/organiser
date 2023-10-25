@@ -101,7 +101,7 @@
 
 <LogContainer {isEditing} onConfirmReset={onResetChange}>
 	<div class="bg-neutral-100 p-1 rounded-sm">
-		<div class="bg-white px-3 py-3 stack gap-3 rounded-sm">
+		<div class="bg-white p-2 sm:p-3 stack gap-3 rounded-sm">
 			<div class="hstack center gap-2">
 				<IconWithRating icon={icons.question} rating={importance} />
 				<div class="flex flex-1 items-center min-h-[30px]">

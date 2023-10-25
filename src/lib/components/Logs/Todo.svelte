@@ -125,7 +125,7 @@
 </script>
 
 <LogContainer {isEditing} onConfirmReset={onResetChange}>
-	<div class="border-dashed border-neutral-200 border px-3 py-4 stack gap-4">
+	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-4">
 		<div class="hstack gap-4 items-center">
 			<IconWithRating icon={icons.todo} rating={priority} />
 			<button

@@ -104,7 +104,7 @@
 </script>
 
 <LogContainer {isEditing} onConfirmReset={onResetChange}>
-	<div class="bg-neutral-50 px-3 py-3 stack gap-3">
+	<div class="bg-neutral-50 p-2 sm:p-3 stack gap-3">
 		<div class="hstack center gap-2">
 			<IconWithRating rating={importance} icon={icons.important} />
 			<div class="flex-1">

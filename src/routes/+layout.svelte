@@ -33,7 +33,7 @@
 				{/each}
 			</div>
 		</header>
-		<main class="flex-1 p-2 flex flex-col overflow-hidden">
+		<main class="flex-1 p-1 sm:p-2 flex flex-col overflow-hidden">
 			<div class="flex justify-end" />
 			<slot />
 		</main>
