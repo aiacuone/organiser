@@ -26,7 +26,8 @@
 		<header class="center py-2 bg-gray-200">
 			<div class="hstack gap-2 sm:gap-4">
 				{#each spaces as space}
-					<HeaderFooterLink href="/{space}/{getHyphenatedStringFromDate(new Date())}"
+					<HeaderFooterLink
+						href="/{space.replace(' ', '-')}/{getHyphenatedStringFromDate(new Date())}"
 						>{space}</HeaderFooterLink
 					>
 				{/each}

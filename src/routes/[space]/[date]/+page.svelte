@@ -37,7 +37,7 @@
 
 	const logs = useQuery('logs', () =>
 		getDateLogs({
-			space: data.space,
+			space: data.space.replace(' ', '-'),
 			date: data.date
 		})
 	);
