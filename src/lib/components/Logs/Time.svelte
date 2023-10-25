@@ -191,7 +191,7 @@
 
 			<ul class="ml-5 stack">
 				{#each bullets as _, index}
-					<li class="flex flex-col gap-1">
+					<li>
 						<div class="flex gap-2 min-h-[40px] items-center">
 							<Textarea className="flex-1" bind:value={bullets[index]} isDisabled={!isEditing} />
 							<div class="min-w-[40px] hidden sm:flex">
@@ -200,7 +200,7 @@
 								{/if}
 							</div>
 						</div>
-						<div class="flex sm:hidden">
+						<div class="mt-1">
 							{#if isEditing}
 								<Delete onDelete={() => onDeleteBullet(index)} />
 							{/if}
