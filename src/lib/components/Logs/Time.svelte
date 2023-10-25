@@ -17,10 +17,10 @@
 
 	export let isEditing = false;
 	export let date: Date;
-	export let bullets: string[];
+	export let bullets: string[] = [];
 	export let id: string;
 	export let title: string;
-	export let reference: string;
+	export let reference: string = '';
 	export let time: number;
 	export let inputAutoFocus: boolean = false;
 

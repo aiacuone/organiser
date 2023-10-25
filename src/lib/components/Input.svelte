@@ -27,12 +27,12 @@
 	};
 </script>
 
-<div class="relative" use:clickOutside on:click_outside={onClickOutside}>
+<div class="relative w-full" use:clickOutside on:click_outside={onClickOutside}>
 	<input
 		type="text"
 		bind:value
-		class="placeholder-black placeholder-opacity-30 bg-transparent"
-		{placeholder}
+		class="placeholder-black placeholder-opacity-30 w-full bg-transparent"
+		placeholder={isDisabled ? '' : placeholder}
 		bind:this={input}
 		on:focus={() => (isInputFocused = true)}
 		disabled={isDisabled}

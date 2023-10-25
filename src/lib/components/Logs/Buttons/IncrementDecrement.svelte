@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
-	import CommonLogButton from './CommonLogButton.svelte';
 
 	export let value: number;
 	export let min: number;
@@ -14,6 +13,7 @@
 			onIncrement();
 		}
 	};
+
 	const _onDecrement = () => {
 		if (value > min) {
 			onDecrement();
@@ -21,14 +21,20 @@
 	};
 </script>
 
-<CommonLogButton className="flex px-0">
-	<button on:click={_onDecrement}>
-		<Icon icon={icons.left} height="20px" class="opacity-40" />
+<div class="hstack h-[30px]">
+	<button
+		on:click={_onDecrement}
+		class="center h-full border-l-2 border-t-2 border-b-2 rounded-l-lg border-gray-100 px-[1px]"
+	>
+		<Icon icon={icons.left} height="15px" class="opacity-40" />
 	</button>
-	<p class="flex-1 px-2 border-l-2 border-r-2 border-gray-200 text-gray-400 min-w-[45px]">
+	<p class="flex-1 min-w-[30px] border-2 border-gray-100 text-gray-400 center text-xs">
 		{value}
 	</p>
-	<button on:click={_onIncrement}>
-		<Icon icon={icons.right} height="20px" class="opacity-40" />
+	<button
+		on:click={_onIncrement}
+		class="center h-full border-r-2 border-t-2 border-b-2 rounded-r-lg border-gray-100 px-[1px]"
+	>
+		<Icon icon={icons.right} height="15px" class="opacity-40" />
 	</button>
-</CommonLogButton>
+</div>
