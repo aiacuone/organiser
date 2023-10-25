@@ -10,15 +10,20 @@
 	import { LogType_enum } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
+	import { getHaveValuesChanged } from '$lib/utils/logs';
 	export let date: Date;
 	export let content: string;
 	export let id: string;
 	export let importance: number;
 	export let isEditing: boolean = false;
 	export let inputAutoFocus: boolean = false;
+	export let lastUpdated: Date | undefined = undefined;
+
+	let originalContent = content;
+	let originalImportance = importance;
+	let originalDate = date;
 
 	const queryClient = useQueryClient();
-	const originalContent = content;
 
 	export const deleteMutation = useMutation(deleteLog, {
 		onSuccess: () => {
@@ -49,15 +54,34 @@
 		date.setHours(currentDate.getHours());
 		date.setMinutes(currentDate.getMinutes());
 
+		const haveValuesChanged = getHaveValuesChanged({
+			values: {
+				content,
+				importance
+			},
+			originalValues: {
+				content: originalContent,
+				importance: originalImportance
+			}
+		});
+
 		isEditing = false;
+
+		if (!haveValuesChanged) return;
+
 		$updateMutation.mutate({
 			id,
 			content,
 			importance,
 			date,
 			type: LogType_enum.question,
-			space: $page.params.space
+			space: $page.params.space,
+			lastUpdated: date
 		});
+		originalContent = content;
+		originalImportance = importance;
+		originalDate = date;
+
 		onResetNewLogType();
 	};
 
@@ -99,6 +123,7 @@
 				{incrementDecrementProps}
 				incrementDecrementValue={importance}
 				showIncrementDecrement={isEditing}
+				{lastUpdated}
 			/>
 		</div>
 	</div>

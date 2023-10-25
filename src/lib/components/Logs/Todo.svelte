@@ -12,6 +12,7 @@
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { page } from '$app/stores';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
+	import { getHaveValuesChanged } from '$lib/utils/logs';
 
 	export let date: Date;
 	export let content: string;
@@ -20,9 +21,14 @@
 	export let isCompleted: boolean = false;
 	export let isEditing: boolean = false;
 	export let inputAutoFocus: boolean = false;
+	export let lastUpdated: Date | undefined = undefined;
+
+	let originalContent = content;
+	let originalPriority = priority;
+	let originalDate = date;
+	let originalIsCompleted = isCompleted;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
-	const originalContent = content;
 
 	const queryClient = useQueryClient();
 
@@ -61,23 +67,47 @@
 
 	let onOpen: () => void;
 
-	const onAccept = () => {
+	const onAccept = async () => {
 		const currentDate = new Date();
 		const date = new Date(getDateFromHyphenatedString($page.params.date));
 		date.setHours(currentDate.getHours());
 		date.setMinutes(currentDate.getMinutes());
 
-		isEditing = false;
-		$updateMutation.mutate({
-			id,
-			content,
-			priority,
-			date,
-			type: LogType_enum.todo,
-			space: $page.params.space,
-			isCompleted
+		const haveValuesChanged = getHaveValuesChanged({
+			values: {
+				content,
+				priority,
+				isCompleted
+			},
+			originalValues: {
+				content: originalContent,
+				priority: originalPriority,
+				isCompleted: originalIsCompleted
+			}
 		});
-		onResetNewLogType();
+
+		if (!haveValuesChanged) return (isEditing = false);
+
+		try {
+			await $updateMutation.mutate({
+				id,
+				content,
+				priority,
+				date,
+				type: LogType_enum.todo,
+				space: $page.params.space,
+				isCompleted,
+				lastUpdated: date
+			});
+			onResetNewLogType();
+			originalContent = content;
+			originalPriority = priority;
+			originalDate = date;
+			originalIsCompleted = isCompleted;
+
+			console.log('updateMutation');
+		} catch (error) {}
+		isEditing = false;
 	};
 
 	const onResetChange = () => {
@@ -123,6 +153,7 @@
 			{incrementDecrementProps}
 			incrementDecrementValue={priority}
 			showIncrementDecrement={isEditing}
+			{lastUpdated}
 		/>
 	</div>
 </LogContainer>

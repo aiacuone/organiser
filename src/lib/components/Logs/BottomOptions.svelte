@@ -26,8 +26,10 @@
 	export let incrementDecrementValue: number | undefined = undefined;
 	export let showIncrementDecrement: boolean = true;
 	export let icon: string | undefined = undefined;
+	export let lastUpdated: Date | undefined = undefined;
 
-	const { string: dateString, minutes, hour } = getDayMonthYearFromDate(date);
+	$: dateValues = getDayMonthYearFromDate(date);
+	$: lastUpdatedDateValues = lastUpdated && getDayMonthYearFromDate(lastUpdated);
 </script>
 
 <div class="w-full hstack">
@@ -51,9 +53,16 @@
 		{:else if onEdit}
 			<Edit {onEdit} />
 		{/if}
-		<p class="text-xs text-opacity-30 text-black">
-			{hour}:{minutes}/{dateString}
-		</p>
+		<div class="stack">
+			<p class="text-xs text-opacity-30 text-black">
+				{dateValues.hour}:{dateValues.minutes}/{dateValues.string}
+			</p>
+			{#if lastUpdatedDateValues}
+				<p class="text-xs text-opacity-10 text-black">
+					{lastUpdatedDateValues?.hour}:{lastUpdatedDateValues?.minutes}/{lastUpdatedDateValues?.string}
+				</p>
+			{/if}
+		</div>
 	</div>
 	<div class="flex-1 flex justify-end items-end">
 		{#if icon}

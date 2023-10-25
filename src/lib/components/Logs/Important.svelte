@@ -10,6 +10,7 @@
 	import { page } from '$app/stores';
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
+	import { getHaveValuesChanged } from '$lib/utils/logs';
 
 	export let date: Date;
 	export let content: string;
@@ -17,9 +18,14 @@
 	export let importance: number;
 	export let isEditing: boolean = false;
 	export let inputAutoFocus: boolean = false;
+	export let lastUpdated: Date | undefined = undefined;
+
+	let originalContent = content;
+	let originalImportance = importance;
+	let originalDate = date;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
-	const originalContent = content;
+
 	const onEdit = () => {
 		isEditing = true;
 	};
@@ -52,15 +58,34 @@
 		date.setHours(currentDate.getHours());
 		date.setMinutes(currentDate.getMinutes());
 
+		const haveValuesChanged = getHaveValuesChanged({
+			values: {
+				content,
+				importance
+			},
+			originalValues: {
+				content: originalContent,
+				importance: originalImportance
+			}
+		});
+
 		isEditing = false;
+
+		if (!haveValuesChanged) return;
+
 		$updateMutation.mutate({
 			id,
 			content,
 			importance,
 			date,
 			type: LogType_enum.important,
-			space: $page.params.space
+			space: $page.params.space,
+			lastUpdated: date
 		});
+		originalContent = content;
+		originalImportance = importance;
+		originalDate = date;
+
 		onResetNewLogType();
 	};
 
@@ -101,6 +126,7 @@
 			{incrementDecrementProps}
 			incrementDecrementValue={importance}
 			showIncrementDecrement={isEditing}
+			{lastUpdated}
 		/>
 	</div>
 </LogContainer>

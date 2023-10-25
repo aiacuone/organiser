@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Icon from '@iconify/svelte';
 	import Delete from './Buttons/Delete.svelte';
 	import { icons } from '$lib/general/icons';
 	import Dialog from '../Dialog.svelte';
@@ -14,6 +13,7 @@
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import Input from '../Input.svelte';
+	import { getHaveValuesChanged } from '$lib/utils/logs';
 
 	export let isEditing = false;
 	export let date: Date;
@@ -23,6 +23,7 @@
 	export let reference: string = '';
 	export let time: number;
 	export let inputAutoFocus: boolean = false;
+	export let lastUpdated: Date | undefined = undefined;
 
 	let onOpen: () => void;
 	let onClose: () => void;
@@ -32,11 +33,12 @@
 	let newBulletInput: HTMLInputElement;
 
 	const queryClient = useQueryClient();
-	const originalBullets = [...bullets];
-	const originalTitle = title;
-	const originalReference = reference;
-
-	const references: string[] = getContext('references');
+	const originalDate = date;
+	let originalBullets = [...bullets];
+	let originalTitle = title;
+	let originalReference = reference;
+	let originalTime = time;
+	let references: string[] = getContext('references');
 
 	export const deleteMutation = useMutation(deleteLog, {
 		onSuccess: () => {
@@ -65,10 +67,27 @@
 		bullets = bullets.filter((_, i) => i !== index);
 	};
 
-	const onAcceptEdit = () => {
+	const onAcceptEdit = async () => {
 		if (!title && !reference && !bullets.length) {
 			return onOpen();
 		}
+
+		const haveValuesChanged = getHaveValuesChanged({
+			values: {
+				title,
+				reference,
+				bullets,
+				time
+			},
+			originalValues: {
+				title: originalTitle,
+				reference: originalReference,
+				bullets: originalBullets,
+				time: originalTime
+			}
+		});
+
+		if (!haveValuesChanged) return (isEditing = false);
 
 		const currentDate = new Date();
 		const date = new Date(getDateFromHyphenatedString($page.params.date));
@@ -77,16 +96,27 @@
 
 		bullets = bullets.filter((c) => c);
 		isEditing = false;
-		$updateMutation.mutate({
-			id,
-			title,
-			reference,
-			bullets,
-			time,
-			date,
-			type: LogType_enum.time,
-			space: $page.params.space
-		});
+		try {
+			await $updateMutation.mutate({
+				id,
+				title,
+				reference,
+				bullets,
+				time,
+				date: originalDate,
+				type: LogType_enum.time,
+				space: $page.params.space,
+				lastUpdated: date
+			});
+			originalTitle = title;
+			originalReference = reference;
+			originalBullets = bullets;
+			originalTime = time;
+			lastUpdated = date;
+		} catch (error) {
+			console.log({ error });
+		}
+
 		onResetNewLogType();
 	};
 
@@ -185,6 +215,7 @@
 					{onReset}
 					{onDelete}
 					icon={icons.clock}
+					{lastUpdated}
 				/>
 			</div>
 		</div>

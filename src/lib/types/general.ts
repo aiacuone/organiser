@@ -29,6 +29,7 @@ export interface Log_int {
 	importance?: number;
 	isCompleted?: boolean;
 	bullets?: string[];
+	lastUpdated?: Date;
 }
 
 export enum LogType_enum {
