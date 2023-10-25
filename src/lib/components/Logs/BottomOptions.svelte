@@ -31,10 +31,7 @@
 </script>
 
 <div class="w-full hstack">
-	<div class="grid grid-cols-3 sm:grid-cols-6 place-items-center justify-center gap-2 sm:gap-3">
-		<p class="text-xs text-opacity-30 text-black">
-			{hour}:{minutes}/{dateString}
-		</p>
+	<div class="flex flex-wrap place-items-center gap-2 sm:gap-3">
 		{#if onAddBullet}
 			<AddBullet onClick={onAddBullet} />
 		{/if}
@@ -54,6 +51,9 @@
 		{:else if onEdit}
 			<Edit {onEdit} />
 		{/if}
+		<p class="text-xs text-opacity-30 text-black">
+			{hour}:{minutes}/{dateString}
+		</p>
 	</div>
 	<div class="flex-1 flex justify-end items-end">
 		{#if icon}

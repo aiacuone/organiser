@@ -24,7 +24,7 @@
 <div class="hstack h-[30px]">
 	<button
 		on:click={_onDecrement}
-		class="center h-full border-l-2 border-t-2 border-b-2 rounded-l-lg border-gray-100 px-[1px]"
+		class="center h-full border-l-2 border-t-2 border-b-2 rounded-l-lg border-gray-100 px-1"
 	>
 		<Icon icon={icons.left} height="15px" class="opacity-40" />
 	</button>
@@ -33,7 +33,7 @@
 	</p>
 	<button
 		on:click={_onIncrement}
-		class="center h-full border-r-2 border-t-2 border-b-2 rounded-r-lg border-gray-100 px-[1px]"
+		class="center h-full border-r-2 border-t-2 border-b-2 rounded-r-lg border-gray-100 px-1"
 	>
 		<Icon icon={icons.right} height="15px" class="opacity-40" />
 	</button>
