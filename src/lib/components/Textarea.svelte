@@ -7,16 +7,13 @@
 
 	let textarea: HTMLTextAreaElement;
 	const resize = () => {
-		if (textarea.scrollHeight > 30) {
-			textarea.style.height = 'auto';
-			textarea.style.height = textarea.scrollHeight + 'px';
-		}
+		if (!textarea) return;
+		textarea.style.height = '20px';
+		if (textarea.scrollHeight > 20) textarea.style.height = textarea.scrollHeight + 'px';
 	};
 
 	afterUpdate(() => {
-		if (!textarea) return;
-		textarea.style.height = '20px';
-		if (textarea.scrollHeight === 40) textarea.style.height = textarea.scrollHeight + 'px';
+		resize();
 	});
 
 	onMount(() => {
