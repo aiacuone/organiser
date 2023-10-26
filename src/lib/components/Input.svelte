@@ -37,6 +37,8 @@
 		on:focus={() => (isInputFocused = true)}
 		disabled={isDisabled}
 	/>
+</div>
+<div class="relative">
 	<div class="absolute stack bg-white">
 		{#if isInputFocused}
 			{#each autofillValues as autofillValue}

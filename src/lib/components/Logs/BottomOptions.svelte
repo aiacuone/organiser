@@ -54,7 +54,7 @@
 			<Edit {onEdit} />
 		{/if}
 		<div class="stack">
-			<p class="text-xs text-gray-300 text-black">
+			<p class="text-xs text-gray-200 text-black">
 				{dateValues.hour}:{dateValues.minutes}/{dateValues.string}
 			</p>
 			{#if lastUpdatedDateValues}
