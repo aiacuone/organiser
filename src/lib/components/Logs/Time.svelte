@@ -200,7 +200,7 @@
 								{/if}
 							</div>
 						</div>
-						<div class="mt-1">
+						<div class="mt-1 flex sm:hidden">
 							{#if isEditing}
 								<Delete onDelete={() => onDeleteBullet(index)} />
 							{/if}
