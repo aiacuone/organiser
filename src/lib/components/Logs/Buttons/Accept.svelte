@@ -7,5 +7,5 @@
 </script>
 
 <CommonLogButton className="w-[60px]" onClick={onAccept}>
-	<Icon icon={icons.tick} height="20px" class="opacity-30" />
+	<Icon icon={icons.tick} height="20px" class="text-gray-300" />
 </CommonLogButton>

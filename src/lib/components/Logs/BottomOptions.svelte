@@ -54,11 +54,11 @@
 			<Edit {onEdit} />
 		{/if}
 		<div class="stack">
-			<p class="text-xs text-opacity-30 text-black">
+			<p class="text-xs text-gray-300 text-black">
 				{dateValues.hour}:{dateValues.minutes}/{dateValues.string}
 			</p>
 			{#if lastUpdatedDateValues}
-				<p class="text-xs text-opacity-10 text-black">
+				<p class="text-xs text-gray-300 text-black">
 					{lastUpdatedDateValues?.hour}:{lastUpdatedDateValues?.minutes}/{lastUpdatedDateValues?.string}
 				</p>
 			{/if}
@@ -66,7 +66,7 @@
 	</div>
 	<div class="flex-1 flex justify-end items-end">
 		{#if icon}
-			<Icon {icon} height="30px" class="opacity-10" />
+			<Icon {icon} height="30px" class="text-gray-300" />
 		{/if}
 	</div>
 </div>

@@ -7,5 +7,5 @@
 </script>
 
 <CommonLogButton className="w-[60px]" onClick={onEdit}>
-	<Icon icon={icons.edit} height="20px" class="opacity-30" />
+	<Icon icon={icons.edit} height="20px" class="text-gray-300" />
 </CommonLogButton>

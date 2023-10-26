@@ -16,7 +16,7 @@
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 
 	export let isEditing = false;
-	export let date: Date;
+	export let date: Date = new Date();
 	export let bullets: string[] = [];
 	export let id: string;
 	export let title: string;
@@ -190,7 +190,6 @@
 				autofillValues={references}
 				isDisabled={!isEditing}
 			/>
-
 			<ul class="ml-5 stack">
 				{#each bullets as _, index}
 					<li>

@@ -14,7 +14,7 @@
 </script>
 
 <CommonLogButton className="w-[60px]" onClick={onOpen}>
-	<Icon icon={icons.reset} height="20px" class="opacity-30" />
+	<Icon icon={icons.reset} height="20px" class="text-gray-300" />
 </CommonLogButton>
 
 <ConfirmationDialog {onConfirm} bind:onOpen>Are you sure you want to reset?</ConfirmationDialog>

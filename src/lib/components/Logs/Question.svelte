@@ -11,7 +11,7 @@
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
-	export let date: Date;
+	export let date: Date = new Date();
 	export let content: string;
 	export let id: string;
 	export let importance: number;

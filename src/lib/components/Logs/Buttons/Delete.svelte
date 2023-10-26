@@ -14,7 +14,7 @@
 </script>
 
 <CommonLogButton onClick={onOpen}>
-	<Icon icon={icons.delete} height="20px" class="opacity-30 {iconClass}" />
+	<Icon icon={icons.delete} height="20px" class="text-gray-300 {iconClass}" />
 </CommonLogButton>
 
 <ConfirmationDialog bind:onOpen onConfirm={onConfirmDelete}

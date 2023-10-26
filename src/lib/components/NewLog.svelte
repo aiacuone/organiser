@@ -10,7 +10,6 @@
 
 	const sharedProps = {
 		id: uuidv4(),
-		date: new Date(),
 		title: '',
 		content: '',
 		reference: '',

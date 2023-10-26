@@ -27,21 +27,21 @@
 	};
 </script>
 
-<div class="relative w-full" use:clickOutside on:click_outside={onClickOutside}>
+<div class="w-full" use:clickOutside on:click_outside={onClickOutside}>
 	<input
 		type="text"
 		bind:value
-		class="placeholder-black placeholder-opacity-30 w-full bg-transparent"
+		class=" placeholder-gray-300 w-full bg-transparent"
 		placeholder={isDisabled ? '' : placeholder}
 		bind:this={input}
 		on:focus={() => (isInputFocused = true)}
 		disabled={isDisabled}
 	/>
-	<div class="absolute stack top-7">
+	<div class="absolute stack bg-white">
 		{#if isInputFocused}
 			{#each autofillValues as autofillValue}
 				<button
-					class="text-xs text-neutral-400 cursor-pointer hover:bg-gray-100 px-2 py-2 bg-white z-99"
+					class="text-xs text-neutral-400 cursor-pointer hover:bg-gray-100 px-4 py-2 z-99"
 					on:click={() => onClickAutofill(autofillValue)}
 				>
 					{autofillValue}

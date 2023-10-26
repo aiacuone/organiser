@@ -7,6 +7,6 @@
 </script>
 
 <CommonLogButton {onClick}>
-	<Icon icon={icons.add} height="20px" class="opacity-30" />
-	<Icon icon={icons.dot} height="20px" class="opacity-30" />
+	<Icon icon={icons.add} height="20px" class="text-gray-300" />
+	<Icon icon={icons.dot} height="20px" class="text-gray-300" />
 </CommonLogButton>
