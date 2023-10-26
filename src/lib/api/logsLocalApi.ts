@@ -20,3 +20,8 @@ export const getReferences = async (space: string) => {
 	const { data } = await axios.get(`/${resource}/${space}/references`);
 	return data;
 };
+
+export const getTitles = async (space: string) => {
+	const { data } = await axios.get(`/${resource}/${space}/titles`);
+	return data;
+};

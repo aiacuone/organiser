@@ -26,12 +26,14 @@
 		time: Time_enum;
 		date: string;
 		space: string;
+		titles: string[];
 		references: string[];
 	}
 
 	export let data: PageData;
 
 	setContext('references', data.references);
+	setContext('titles', data.titles);
 
 	const queryClient = useQueryClient();
 

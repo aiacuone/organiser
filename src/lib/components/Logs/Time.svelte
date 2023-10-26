@@ -39,6 +39,7 @@
 	let originalReference = reference;
 	let originalTime = time;
 	let references: string[] = getContext('references');
+	let titles: string[] = getContext('titles');
 
 	export const deleteMutation = useMutation(deleteLog, {
 		onSuccess: () => {
@@ -180,6 +181,7 @@
 				bind:value={title}
 				autofocus={inputAutoFocus}
 				placeholder="Title"
+				autofillValues={titles}
 				isDisabled={!isEditing}
 			/>
 			<Input
