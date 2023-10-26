@@ -185,12 +185,14 @@
 				autofillValues={titles}
 				isDisabled={!isEditing}
 			/>
-			<Input
-				bind:value={reference}
-				placeholder="Reference"
-				autofillValues={references}
-				isDisabled={!isEditing}
-			/>
+			{#if !isEditing && !reference}{''}{:else}
+				<Input
+					bind:value={reference}
+					placeholder="Reference"
+					autofillValues={references}
+					isDisabled={!isEditing}
+				/>
+			{/if}
 			<ul class="ml-5 stack">
 				{#each bullets as _, index}
 					<li>
