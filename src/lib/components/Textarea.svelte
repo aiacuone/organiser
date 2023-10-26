@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
 	export let value: string | string[];
 	export let className = '';
 	export let autofocus = false;
@@ -7,17 +7,19 @@
 
 	let textarea: HTMLTextAreaElement;
 	const resize = () => {
-		if (textarea.scrollHeight === 40) {
-			textarea.style.height = '20px';
-		}
 		if (textarea.scrollHeight > 30) {
 			textarea.style.height = 'auto';
 			textarea.style.height = textarea.scrollHeight + 'px';
 		}
 	};
 
+	afterUpdate(() => {
+		if (!textarea) return;
+		textarea.style.height = '20px';
+		if (textarea.scrollHeight === 40) textarea.style.height = textarea.scrollHeight + 'px';
+	});
+
 	onMount(() => {
-		resize();
 		autofocus && textarea.focus();
 
 		const preventEnter = (e: KeyboardEvent) => {
@@ -36,7 +38,7 @@
 
 <textarea
 	bind:value
-	class="resize-none {className} w-full text-sm center bg-transparent"
+	class="resize-none {className} w-full text-sm center bg-transparent h-[20px]"
 	bind:this={textarea}
 	on:input={resize}
 	disabled={isDisabled}
