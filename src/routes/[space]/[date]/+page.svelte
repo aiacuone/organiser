@@ -170,7 +170,7 @@
 			</div>
 		</div>
 		<div
-			class="stack gap-6 overflow-y-scroll hide-scrollbar"
+			class="stack gap-6 overflow-y-scroll hide-scrollbar flex-1"
 			style="max-height:{notesContainerHeight}px"
 			bind:this={notesContainer}
 		>
@@ -178,7 +178,11 @@
 				<NewLog type={newLogType} />
 			{/if}
 			{#if $logs.isLoading}
-				<span>Loading...</span>
+				<div style="max-height:{notesContainerHeight}px">
+					{#each Array(5) as _}
+						<div class="bg-neutral-100 rounded-sm h-[120px] w-full" />
+					{/each}
+				</div>
 			{:else if $logs.isError}
 				Error
 			{:else}
@@ -207,16 +211,7 @@
 				{/each}
 			{/if}
 		</div>
-		<div bind:clientHeight={headerContainer} class="stack gap-2 flex-1">
-			<!-- <div class="hstack center capitalize gap-2 sm:gap-4">
-				{#each times as time}
-					{@const timeName = time.name.replace(' ', '-')}
-					<Button
-						onClick={() => goto(`/${space?.name.replace(' ', '-')}/${timeName}`)}
-						className="capitalize w-[150px] text-xs sm:text-sm">{time.name}</Button
-					>
-				{/each}
-			</div> -->
+		<div bind:clientHeight={headerContainer} class="stack gap-2">
 			<div class="center hstack gap-3">
 				{#if $page.params.time === 'history'}
 					<input
