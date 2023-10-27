@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { type Time_enum, LogType_enum, type SpaceData_int } from '$lib/types/general';
+	import {
+		type Time_enum,
+		LogType_enum,
+		type SpaceData_int,
+		type titlesAndReferences_int
+	} from '$lib/types/general';
 	import { setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
@@ -19,8 +24,9 @@
 	import Question from '$lib/components/Logs/Question.svelte';
 	import NewLog from '$lib/components/NewLog.svelte';
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
-	import { getDateLogs } from '$lib/api/logsLocalApi';
+	import { getDateLogs, getTitlesAndReferences } from '$lib/api/logsLocalApi';
 	import { goto } from '$app/navigation';
+	import { titlesAndReferences } from '$lib/stores';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -32,9 +38,6 @@
 
 	export let data: PageData;
 
-	setContext('references', data.references);
-	setContext('titles', data.titles);
-
 	const queryClient = useQueryClient();
 
 	const logs = useQuery('logs', () =>
@@ -44,7 +47,14 @@
 		})
 	);
 
+	const titlesAndReferencesQuery = useQuery('titlesAndReferences', () =>
+		getTitlesAndReferences(data.space.replace(' ', '-'))
+	);
+
 	$: $page, queryClient.invalidateQueries('logs');
+	$: $page, queryClient.invalidateQueries('titlesAndReferences');
+
+	$: $titlesAndReferencesQuery, ($titlesAndReferences = $titlesAndReferencesQuery.data);
 
 	const getInitialDatePickerValue = () => {
 		const { day, month, year } = getDayMonthYearFromDate(getDate2DaysEarlier());

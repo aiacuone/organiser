@@ -65,3 +65,9 @@ export interface Question_int extends LogBase_int {
 	importance: 1 | 2 | 3;
 	type: LogType_enum.question;
 }
+
+export interface titlesAndReferences_int {
+	title?: string;
+	reference?: string;
+	date: Date;
+}

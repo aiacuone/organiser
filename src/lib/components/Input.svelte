@@ -5,8 +5,13 @@
 	export let value: string;
 	export let placeholder: string | undefined = undefined;
 	export let autofocus: boolean = false;
-	export let autofillValues: string[] = [];
+	export let autofillValues: (string | undefined)[] = [];
 	export let isDisabled: boolean = false;
+	export const changeInputValue = (_value: string | undefined) => {
+		if (!_value) return;
+		value = _value;
+	};
+	export let onAutoFill: ((value: string) => void) | undefined = undefined;
 
 	let input: HTMLInputElement;
 	let isInputFocused: boolean = false;
@@ -20,6 +25,7 @@
 	const onClickAutofill = (_value: string) => {
 		value = _value;
 		isInputFocused = false;
+		onAutoFill && onAutoFill(_value);
 	};
 
 	const onClickOutside = () => {
@@ -39,11 +45,11 @@
 	/>
 	<div class="relative">
 		<div class="absolute stack bg-white">
-			{#if isInputFocused}
+			{#if isInputFocused && !value}
 				{#each autofillValues as autofillValue}
 					<button
 						class="text-xs text-neutral-400 cursor-pointer hover:bg-gray-100 px-4 py-2 z-99"
-						on:click={() => onClickAutofill(autofillValue)}
+						on:click={() => autofillValue && onClickAutofill(autofillValue)}
 					>
 						{autofillValue}
 					</button>

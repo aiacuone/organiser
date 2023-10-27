@@ -16,12 +16,17 @@ export const getDateLogs = async ({ space, date }: { space: string; date: string
 	return data;
 };
 
-export const getReferences = async (space: string) => {
-	const { data } = await axios.get(`/${resource}/${space}/references`);
-	return data;
-};
+// export const getReferences = async (space: string) => {
+// 	const { data } = await axios.get(`/${resource}/${space}/references`);
+// 	return data;
+// };
 
-export const getTitles = async (space: string) => {
-	const { data } = await axios.get(`/${resource}/${space}/titles`);
+// export const getTitles = async (space: string) => {
+// 	const { data } = await axios.get(`/${resource}/${space}/titles`);
+// 	return data;
+// };
+
+export const getTitlesAndReferences = async (space: string) => {
+	const { data } = await axios.get(`/${resource}/${space}/titlesAndReferences`);
 	return data;
 };

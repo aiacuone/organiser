@@ -54,17 +54,6 @@ export const getSpaces = async () => {
 	return spaces;
 };
 
-export const getReferences = async (space: string) => {
-	const spaces = await collection.distinct('reference', { space });
-
-	return spaces;
-};
-
-export const getTitles = async (space: string) => {
-	const spaces = await collection.distinct('title', { space });
-	return spaces;
-};
-
 export const updateLog = async (values: {
 	id: string;
 	date: Date;
@@ -90,3 +79,34 @@ export const updateLog = async (values: {
 export const deleteLog = async (id: string) => {
 	await collection.deleteOne({ id });
 };
+
+export const getTitlesAndReferences = async (space: string) => {
+	const result = await collection
+		.aggregate([
+			{ $match: { space } },
+			{
+				$project: {
+					_id: 0,
+					reference: 1,
+					title: 1,
+					date: 1
+				}
+			},
+			{ $sort: { date: -1 } },
+			{ $limit: 10 }
+		])
+		.toArray();
+
+	return result;
+};
+
+// export const getReferences = async (space: string) => {
+// 	const spaces = await collection.distinct('reference', { space });
+
+// 	return spaces;
+// };
+
+// export const getTitles = async (space: string) => {
+// 	const spaces = await collection.distinct('title', { space });
+// 	return spaces;
+// };

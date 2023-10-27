@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Delete from './Buttons/Delete.svelte';
 	import { icons } from '$lib/general/icons';
 	import Dialog from '../Dialog.svelte';
 	import LogContainer from './LogContainer.svelte';
@@ -8,13 +7,14 @@
 	import { getContext } from 'svelte';
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 
-	import { LogType_enum } from '$lib/types';
+	import { LogType_enum, type titlesAndReferences_int } from '$lib/types';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import Input from '../Input.svelte';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import Icon from '@iconify/svelte';
+	import { titles, titlesAndReferences } from '$lib/stores';
 
 	export let isEditing = false;
 	export let date: Date = new Date();
@@ -39,8 +39,6 @@
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalTime = time;
-	let references: string[] = getContext('references');
-	let titles: string[] = getContext('titles');
 
 	export const deleteMutation = useMutation(deleteLog, {
 		onSuccess: () => {
@@ -173,6 +171,13 @@
 		onIncrement,
 		onDecrement
 	};
+
+	let changeReferenceInputValue: (value: string | undefined) => void;
+
+	let onTitleAutoFill = (_title: string) => {
+		const correspondingReference = $titlesAndReferences.find((t) => t.title === _title)?.reference;
+		changeReferenceInputValue(correspondingReference ?? undefined);
+	};
 </script>
 
 <LogContainer {isEditing} onConfirmReset={onResetChange}>
@@ -182,15 +187,16 @@
 				bind:value={title}
 				autofocus={inputAutoFocus}
 				placeholder="Title"
-				autofillValues={titles}
+				autofillValues={$titles}
 				isDisabled={!isEditing}
+				bind:onAutoFill={onTitleAutoFill}
 			/>
 			{#if !isEditing && !reference}{''}{:else}
 				<Input
 					bind:value={reference}
 					placeholder="Reference"
-					autofillValues={references}
 					isDisabled={!isEditing}
+					bind:changeInputValue={changeReferenceInputValue}
 				/>
 			{/if}
 			<ul class="ml-5 stack">
