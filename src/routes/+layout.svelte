@@ -95,7 +95,7 @@
 			<slot />
 		</main>
 		<footer class="py-2 bg-gray-300">
-			<div class="hstack center capitalize sm:gap-5">
+			<div class="hstack center capitalize gap-5">
 				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickPreviousDay}>
 					<Icon icon={icons.left} height="20px" />
 				</Button>
