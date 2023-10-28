@@ -11,7 +11,7 @@
 	import Input from '../Input.svelte';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import Icon from '@iconify/svelte';
-	import { titles, titlesAndReferences } from '$lib/stores';
+	import { titles } from '$lib/stores';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 
 	export let isEditing: boolean;
@@ -29,6 +29,8 @@
 	let onEdit: () => void;
 	let newBulletInput: HTMLInputElement;
 	let onDelete: () => void;
+	let changeReferenceInputValue: (value: string | undefined) => void;
+	let onTitleAutoFill: (title: string) => void;
 
 	const originalDate = date;
 	let originalBullets = [...bullets];
@@ -40,10 +42,6 @@
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
-
-	const onReset = () => {
-		console.log('reset', id);
-	};
 
 	const onDeleteBullet = (index: number) => {
 		bullets = bullets.filter((_, i) => i !== index);
@@ -108,7 +106,6 @@
 		bullets = originalBullets;
 		title = originalTitle;
 		reference = originalReference;
-		console.log('onResetChange');
 	};
 
 	const onAddBullet = () => {
@@ -153,13 +150,6 @@
 		onIncrement,
 		onDecrement
 	};
-
-	let changeReferenceInputValue: (value: string | undefined) => void;
-
-	let onTitleAutoFill = (_title: string) => {
-		const correspondingReference = $titlesAndReferences.find((t) => t.title === _title)?.reference;
-		changeReferenceInputValue(correspondingReference ?? undefined);
-	};
 </script>
 
 <LogContainer
@@ -170,6 +160,8 @@
 	bind:deleteLogMutation={deleteMutation}
 	bind:onDelete
 	{id}
+	bind:onTitleAutoFill
+	{changeReferenceInputValue}
 >
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-2 sm:p-4 stack text-sm gap-1">
@@ -179,7 +171,7 @@
 				placeholder="Title"
 				autofillValues={$titles}
 				isDisabled={!isEditing}
-				bind:onAutoFill={onTitleAutoFill}
+				onAutoFill={onTitleAutoFill}
 			/>
 			{#if !isEditing && !reference}{''}{:else}
 				<Input
@@ -221,7 +213,6 @@
 					onAccept={isEditing ? onAcceptEdit : onAcceptNewBullet}
 					{onAddBullet}
 					{onEdit}
-					{onReset}
 					{onDelete}
 					icon={icons.clock}
 					{lastUpdated}

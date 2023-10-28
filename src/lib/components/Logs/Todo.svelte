@@ -86,8 +86,6 @@
 			originalPriority = priority;
 			originalDate = date;
 			originalIsCompleted = isCompleted;
-
-			console.log('updateMutation');
 		} catch (error) {}
 		isEditing = false;
 	};
