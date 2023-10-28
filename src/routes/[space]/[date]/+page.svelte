@@ -67,7 +67,7 @@
 	$: parentContainerHeight = 0;
 	$: logButtonsContainerHeight = 0;
 	$: notesContainerHeight =
-		parentContainerHeight - headerContainer - logButtonsContainerHeight - 30;
+		parentContainerHeight - headerContainer - logButtonsContainerHeight - 55;
 
 	let exportedNotesModal: HTMLDialogElement;
 
