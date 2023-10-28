@@ -14,7 +14,7 @@
 	import { titles, titlesAndReferences } from '$lib/stores';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 
-	export let isEditing = false;
+	export let isEditing: boolean;
 	export let date: Date = new Date();
 	export let bullets: string[] = [];
 	export let id: string;
@@ -26,9 +26,7 @@
 
 	let onOpen: () => void;
 	let onClose: () => void;
-	const onEdit = () => {
-		isEditing = !isEditing;
-	};
+	let onEdit: () => void;
 	let newBulletInput: HTMLInputElement;
 
 	const originalDate = date;
@@ -169,7 +167,8 @@
 </script>
 
 <LogContainer
-	{isEditing}
+	bind:isEditing
+	bind:onEdit
 	onConfirmReset={onResetChange}
 	bind:updateLogMutation={updateMutation}
 	bind:deleteLogMutation={deleteMutation}

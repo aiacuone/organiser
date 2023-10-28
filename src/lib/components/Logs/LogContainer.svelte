@@ -15,6 +15,9 @@
 			queryClient.invalidateQueries('logs');
 		}
 	});
+	export const onEdit = () => {
+		isEditing = true;
+	};
 
 	let onOpen: () => void;
 

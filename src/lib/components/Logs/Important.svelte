@@ -24,12 +24,9 @@
 	let originalDate = date;
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
+	let onEdit: () => void;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
-
-	const onEdit = () => {
-		isEditing = true;
-	};
 
 	const onDelete = () => {
 		isEditing = false;
@@ -88,7 +85,8 @@
 </script>
 
 <LogContainer
-	{isEditing}
+	bind:isEditing
+	bind:onEdit
 	onConfirmReset={onResetChange}
 	bind:updateLogMutation={updateMutation}
 	bind:deleteLogMutation={deleteMutation}

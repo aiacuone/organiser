@@ -15,22 +15,18 @@
 	export let content: string;
 	export let id: string;
 	export let importance: number;
-	export let isEditing: boolean = false;
+	export let isEditing: boolean;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
 
 	let originalContent = content;
 	let originalImportance = importance;
 	let originalDate = date;
-
+	let onEdit: () => void;
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
-
-	const onEdit = () => {
-		isEditing = true;
-	};
 
 	const onDelete = () => {
 		isEditing = false;
@@ -89,7 +85,8 @@
 </script>
 
 <LogContainer
-	{isEditing}
+	bind:isEditing
+	bind:onEdit
 	onConfirmReset={onResetChange}
 	bind:updateLogMutation={updateMutation}
 	bind:deleteLogMutation={deleteMutation}

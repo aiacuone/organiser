@@ -18,9 +18,10 @@
 	export let id: string;
 	export let priority: number;
 	export let isCompleted: boolean = false;
-	export let isEditing: boolean = false;
+	export let isEditing: boolean;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
+	let onEdit: () => void;
 
 	let originalContent = content;
 	let originalPriority = priority;
@@ -43,10 +44,6 @@
 			space: $page.params.space,
 			isCompleted
 		});
-	};
-
-	const onEdit = () => {
-		isEditing = true;
 	};
 
 	const onDelete = () => {
@@ -113,7 +110,8 @@
 </script>
 
 <LogContainer
-	{isEditing}
+	bind:isEditing
+	bind:onEdit
 	onConfirmReset={onResetChange}
 	bind:updateLogMutation={updateMutation}
 	bind:deleteLogMutation={deleteMutation}
