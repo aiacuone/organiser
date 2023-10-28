@@ -178,7 +178,7 @@
 				<NewLog type={newLogType} />
 			{/if}
 			{#if $logs.isLoading}
-				<div style="max-height:{notesContainerHeight}px">
+				<div style="max-height:{notesContainerHeight}px" class="stack gap-6">
 					{#each Array(5) as _}
 						<div class="bg-neutral-100 rounded-sm h-[120px] w-full" />
 					{/each}
