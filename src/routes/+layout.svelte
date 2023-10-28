@@ -3,7 +3,6 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import HeaderFooterLink from '../lib/components/HeaderFooterLink.svelte';
 	import type { SpaceData_int } from '$lib/types/general';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
@@ -39,9 +38,12 @@
 		<footer class="py-2 bg-gray-300">
 			<div class="hstack center capitalize gap-2 sm:gap-4">
 				{#each times as { name, href }}
-					{@const timeName = name.replace(' ', '-')}
-					<HeaderFooterLink href="/{data.space}/{href}" isSelected={$page.params.time === timeName}
-						>{name}</HeaderFooterLink
+					{@const onClick = () => goto(`/${data.space}/${href}`)}
+					<Button
+						{onClick}
+						_class="capitalize bg-white {$page.params.date === href
+							? 'bg-opacity-90'
+							: 'bg-opacity-60'}">{name}</Button
 					>
 				{/each}
 			</div>
