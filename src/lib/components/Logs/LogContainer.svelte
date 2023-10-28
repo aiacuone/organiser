@@ -42,7 +42,7 @@
 	const queryClient = useQueryClient();
 </script>
 
-<div use:clickOutside on:click_outside={onClickOutside} class="shadow-md">
+<div use:clickOutside on:click_outside={onClickOutside} class="">
 	<slot />
 </div>
 

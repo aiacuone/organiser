@@ -8,9 +8,11 @@
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import Button from '$lib/components/Button.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
+	import Icon from '@iconify/svelte';
+	import { icons } from '$lib/general/icons';
 
 	export let data: SpaceData_int;
-	const { spaces, times } = data;
+	const { spaces } = data;
 
 	onMount(() => {
 		const goToDefaultSpace = () =>
@@ -22,6 +24,81 @@
 	const queryClient = new QueryClient();
 	let onOpen: () => void;
 	let onClose: () => void;
+
+	export const getDateFromHyphenatedString = (dateString: string) => {
+		const [day, month, year] = dateString.split('-').map(Number);
+
+		return new Date(Date.UTC(year, month - 1, day));
+	};
+
+	export const getDayFromNumber = (day: number) => {
+		switch (day) {
+			case 0:
+				return 'Sunday';
+			case 1:
+				return 'Monday';
+			case 2:
+				return 'Tuesday';
+			case 3:
+				return 'Wednesday';
+			case 4:
+				return 'Thursday';
+			case 5:
+				return 'Friday';
+			case 6:
+				return 'Saturday';
+		}
+	};
+
+	export const getDayMonthYearFromDate = (date: Date) => {
+		const _date = new Date(date);
+		const day = _date.getDate();
+		const month = _date.getMonth() + 1;
+		const year = _date.getFullYear();
+		const hour = _date.getHours();
+		const minutes = _date.getMinutes();
+
+		return {
+			day,
+			month,
+			year,
+			string: `${day}-${month}-${year}`,
+			dayString: getDayFromNumber(_date.getDay()),
+			hour,
+			minutes
+		};
+	};
+
+	const onClickPreviousDay = () => {
+		const getPreviousDay = (date: Date) => {
+			const _date = new Date(date);
+			_date.setDate(_date.getDate() - 1);
+			return _date;
+		};
+		const selectedDate = getDateFromHyphenatedString($page.params.date);
+		goto(`/${data.space}/${getHyphenatedStringFromDate(getPreviousDay(selectedDate))}`);
+	};
+	const onClickNextDay = () => {
+		const getPreviousDay = (date: Date) => {
+			const _date = new Date(date);
+			_date.setDate(_date.getDate() + 1);
+			return _date;
+		};
+		const selectedDate = getDateFromHyphenatedString($page.params.date);
+		goto(`/${data.space}/${getHyphenatedStringFromDate(getPreviousDay(selectedDate))}`);
+	};
+
+	export const getNextDay = (date: Date) => {
+		const _date = new Date(date);
+		_date.setDate(_date.getDate() + 1);
+		return _date;
+	};
+
+	const getDateString = (date: Date) => {
+		const { string } = getDayMonthYearFromDate(date);
+		return string;
+	};
+	const todaysDate = new Date();
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -36,16 +113,17 @@
 			<slot />
 		</main>
 		<footer class="py-2 bg-gray-300">
-			<div class="hstack center capitalize gap-2 sm:gap-4">
-				{#each times as { name, href }}
-					{@const onClick = () => goto(`/${data.space}/${href}`)}
-					<Button
-						{onClick}
-						_class="capitalize bg-white {$page.params.date === href
-							? 'bg-opacity-90'
-							: 'bg-opacity-60'}">{name}</Button
-					>
-				{/each}
+			<div class="hstack center capitalize gap-2 sm:gap-3">
+				<Button _class="bg-white bg-opacity-80" onClick={onClickPreviousDay}>
+					<Icon icon={icons.left} />
+				</Button>
+				<Button
+					_class="bg-white bg-opacity-80"
+					onClick={() => goto(`/${data.space}/${getDateString(todaysDate)}`)}>Today</Button
+				>
+				<Button _class="bg-white bg-opacity-80" onClick={onClickNextDay}>
+					<Icon icon={icons.right} />
+				</Button>
 			</div>
 		</footer>
 	</div>
