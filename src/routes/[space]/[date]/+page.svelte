@@ -3,7 +3,6 @@
 	import { setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
-
 	import {
 		getDate2DaysEarlier,
 		getDateFromHyphenatedString,
@@ -23,6 +22,8 @@
 	import { goto } from '$app/navigation';
 	import { titlesAndReferences } from '$lib/stores';
 	import { debounce } from '$lib/utils/general';
+	import { selectedDate, selectedDayString, selectedHyphenatedDateString } from '$lib/stores/dates';
+	import { replaceAllSpacesWithHyphens } from '$lib/utils/strings';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -36,15 +37,23 @@
 
 	const queryClient = useQueryClient();
 
-	const logs = useQuery('logs', () =>
-		getDateLogs({
-			space: data.space.replace(' ', '-'),
-			date: data.date
-		})
+	const logs = useQuery(
+		'logs',
+		() =>
+			$selectedHyphenatedDateString &&
+			getDateLogs({
+				space: replaceAllSpacesWithHyphens(data.space),
+				date: $selectedHyphenatedDateString
+			}),
+		{
+			onSuccess: () => {
+				goto(`/${replaceAllSpacesWithHyphens(data.space)}/${$selectedHyphenatedDateString}`);
+			}
+		}
 	);
 
 	const titlesAndReferencesQuery = useQuery('titlesAndReferences', () =>
-		getTitlesAndReferences(data.space.replace(' ', '-'))
+		getTitlesAndReferences(replaceAllSpacesWithHyphens(data.space))
 	);
 
 	const invalidateLogsAndTitlesAndReferences = () => {
@@ -52,8 +61,8 @@
 		queryClient.invalidateQueries('titlesAndReferences');
 	};
 
-	$: $page, debounce(invalidateLogsAndTitlesAndReferences);
-
+	$: $selectedDate, debounce(invalidateLogsAndTitlesAndReferences);
+	$: $page.params.space, invalidateLogsAndTitlesAndReferences();
 	$: $titlesAndReferencesQuery, ($titlesAndReferences = $titlesAndReferencesQuery.data);
 
 	const getInitialDatePickerValue = () => {
@@ -139,12 +148,8 @@
 	setContext('onResetNewLogType', onResetNewLogType);
 
 	const onDateChange = (e) => {
-		const value = e.target.value;
-		const reversedValue = value.split('-').reverse().join('-');
-		goto(`/${data.space}/${reversedValue}`);
+		$selectedDate = getDateFromHyphenatedString(e.target.value.split('-').reverse().join('-'));
 	};
-
-	$: dayString = getDayMonthYearFromDate(getDateFromHyphenatedString(data.date)).dayString;
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -154,8 +159,8 @@
 				<div class="center text-base sm:text-lg hstack gap-1 sm:gap-2">
 					<p class="capitalize text-opacity-40">{data.space}</p>
 					<p>-</p>
-					<p>{dayString?.slice(0, 2)}</p>
-					<p class="capitalize">{data.date}</p>
+					<p>{$selectedDayString?.sliced}</p>
+					<p class="capitalize">{$selectedHyphenatedDateString}</p>
 				</div>
 				<input type="date" on:change={onDateChange} class="w-[20px]" />
 			</div>
@@ -186,7 +191,7 @@
 				</div>
 			{:else if $logs.isError}
 				Error
-			{:else}
+			{:else if $logs.data}
 				{#each $logs.data as log}
 					{@const { type, ...rest } = log}
 					{#if type === LogType_enum.important && log.importance && log.content}

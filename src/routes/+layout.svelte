@@ -5,89 +5,54 @@
 	import { goto } from '$app/navigation';
 	import type { SpaceData_int } from '$lib/types/general';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
-	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
+	import {
+		getHyphenatedStringFromDate,
+		replaceAllHyphensWithSpaces,
+		replaceAllSpacesWithHyphens
+	} from '$lib/utils/strings';
 	import Button from '$lib/components/Button.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
+	import { selectedDate, selectedHyphenatedDateString } from '$lib/stores/dates';
+	import Input from '$lib/components/Input.svelte';
 
 	export let data: SpaceData_int;
 	const { spaces } = data;
 
+	const getDateFromHyphenatedString = (dateString: string) => {
+		const [day, month, year] = dateString.split('-').map(Number);
+
+		return new Date(Date.UTC(year, month - 1, day));
+	};
+
 	onMount(() => {
-		const goToDefaultSpace = () =>
-			goto(`/${spaces[0].replace(' ', '-')}/${getHyphenatedStringFromDate(new Date())}`);
-		const isHomePage = $page.url.pathname === '/';
-		if (isHomePage) goToDefaultSpace();
+		if ($page.params.date) {
+			return ($selectedDate = new Date(getDateFromHyphenatedString($page.params.date)));
+		}
+		$selectedDate = new Date();
 	});
 
 	const queryClient = new QueryClient();
 	let onOpen: () => void;
 	let onClose: () => void;
 
-	//NOTE: These methods are duplicated because using these in +layout is causing issues with SSR
-	export const getDateFromHyphenatedString = (dateString: string) => {
-		const [day, month, year] = dateString.split('-').map(Number);
-
-		return new Date(Date.UTC(year, month - 1, day));
-	};
-
-	export const getDayFromNumber = (day: number) => {
-		switch (day) {
-			case 0:
-				return 'Sunday';
-			case 1:
-				return 'Monday';
-			case 2:
-				return 'Tuesday';
-			case 3:
-				return 'Wednesday';
-			case 4:
-				return 'Thursday';
-			case 5:
-				return 'Friday';
-			case 6:
-				return 'Saturday';
-		}
-	};
-
-	export const getDayMonthYearFromDate = (date: Date) => {
-		const _date = new Date(date);
-		const day = _date.getDate();
-		const month = _date.getMonth() + 1;
-		const year = _date.getFullYear();
-		const hour = _date.getHours();
-		const minutes = _date.getMinutes();
-
-		return {
-			day,
-			month,
-			year,
-			string: `${day}-${month}-${year}`,
-			dayString: getDayFromNumber(_date.getDay()),
-			hour,
-			minutes
-		};
-	};
-
 	const onClickPreviousDay = () => {
-		const getPreviousDay = (date: Date) => {
+		const getPreviousDate = (date: Date) => {
 			const _date = new Date(date);
 			_date.setDate(_date.getDate() - 1);
 			return _date;
 		};
-		const selectedDate = getDateFromHyphenatedString($page.params.date);
-		goto(`/${data.space}/${getHyphenatedStringFromDate(getPreviousDay(selectedDate))}`);
+		$selectedDate = getPreviousDate($selectedDate);
 	};
 
 	const onClickNextDay = () => {
-		const getPreviousDay = (date: Date) => {
+		const getPreviousDate = (date: Date) => {
 			const _date = new Date(date);
 			_date.setDate(_date.getDate() + 1);
 			return _date;
 		};
-		const selectedDate = getDateFromHyphenatedString($page.params.date);
-		goto(`/${data.space}/${getHyphenatedStringFromDate(getPreviousDay(selectedDate))}`);
+		$selectedDate = getPreviousDate($selectedDate);
 	};
 
 	export const getNextDay = (date: Date) => {
@@ -95,19 +60,34 @@
 		_date.setDate(_date.getDate() + 1);
 		return _date;
 	};
+	let isAddingNewSpace: boolean = false;
+	let dialog: HTMLDialogElement;
+	let addInputValue: string;
 
-	const getDateString = (date: Date) => {
-		const { string } = getDayMonthYearFromDate(date);
-		return string;
+	const onDialogClose = () => {
+		isAddingNewSpace = false;
+		dialog.close();
 	};
-	const todaysDate = new Date();
+
+	const onAddSpace = () => {
+		console.log({ value: replaceAllSpacesWithHyphens(addInputValue) });
+		goto(
+			`/${replaceAllSpacesWithHyphens(addInputValue)}/${getHyphenatedStringFromDate(new Date())}`
+		);
+
+		addInputValue = '';
+		onDialogClose();
+		$selectedDate = new Date();
+	};
 </script>
 
 <QueryClientProvider client={queryClient}>
 	<div class="stack" style={'height:100dvh'}>
 		<header class="center py-2 bg-gray-200">
 			<div class="hstack gap-2 sm:gap-4">
-				<Button _class="bg-white bg-opacity-80 capitalize" onClick={onOpen}>{data.space}</Button>
+				<Button _class="bg-white bg-opacity-80 capitalize" onClick={onOpen}
+					>{replaceAllHyphensWithSpaces(data.space)}</Button
+				>
 			</div>
 		</header>
 		<main class="flex-1 p-1 sm:p-2 flex flex-col overflow-hidden">
@@ -120,10 +100,11 @@
 					<Icon icon={icons.left} />
 				</Button>
 				<Button
-					_class="bg-white {getHyphenatedStringFromDate(new Date()) === $page.params.date
+					_class="bg-white {getHyphenatedStringFromDate(new Date()) ===
+					$selectedHyphenatedDateString
 						? 'bg-opacity-80'
 						: 'bg-opacity-40'}"
-					onClick={() => goto(`/${data.space}/${getDateString(todaysDate)}`)}>Today</Button
+					onClick={() => ($selectedDate = new Date())}>Today</Button
 				>
 				<Button _class="bg-white bg-opacity-80" onClick={onClickNextDay}>
 					<Icon icon={icons.right} />
@@ -133,14 +114,28 @@
 	</div>
 </QueryClientProvider>
 
-<Dialog bind:onOpen bind:onClose>
-	<div class="stack gap-4">
-		{#each spaces as space}
-			{@const onClick = () => {
-				goto(`/${space.replace(' ', '-')}/${getHyphenatedStringFromDate(new Date())}`);
-				onClose();
-			}}
-			<Button {onClick} _class="capitalize">{space}</Button>
-		{/each}
+<Dialog bind:onOpen onClose={onDialogClose} bind:dialog>
+	<div class="stack gap-3">
+		<div class="stack gap-4 self-center">
+			{#each spaces as space}
+				{@const onClick = () => {
+					goto(`/${replaceAllSpacesWithHyphens(space)}/${getHyphenatedStringFromDate(new Date())}`);
+					onDialogClose();
+				}}
+				<Button {onClick} _class="capitalize">{replaceAllHyphensWithSpaces(space)}</Button>
+			{/each}
+		</div>
+		<div class="min-h-[50px] center">
+			{#if isAddingNewSpace}
+				<div class="hstack gap-2">
+					<Input _class="border border-gray-100 px-2" autofocus bind:value={addInputValue} />
+					<button class="bg-gray-50 px-2 py-1" on:click={(e) => onAddSpace(e)}>
+						<Icon icon={icons.enter} />
+					</button>
+				</div>
+			{:else}
+				<Button onClick={() => (isAddingNewSpace = true)}>Add</Button>
+			{/if}
+		</div>
 	</div>
 </Dialog>

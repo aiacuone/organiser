@@ -65,12 +65,13 @@ export const updateLog = async (values: {
 	priority?: number;
 	type: LogType_enum;
 	space: string;
+	lastUpdated: Date;
 }) => {
-	const { date, ...rest } = values;
+	const { date, lastUpdated, ...rest } = values;
 	await collection.updateOne(
 		{ id: values.id },
 		{
-			$set: { date: new Date(date), ...rest }
+			$set: { date: new Date(date), lastUpdated: new Date(lastUpdated), ...rest }
 		},
 		{ upsert: true }
 	);

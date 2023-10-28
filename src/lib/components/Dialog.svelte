@@ -6,7 +6,7 @@
 	export const onOpen = () => {
 		dialog?.showModal();
 	};
-	export const onClose = () => {
+	export let onClose = () => {
 		if (dialog && dialog.open && overlayClickClose) {
 			dialog?.close();
 		}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let onClick: () => void = () => {};
+	export let onClick: (e: any) => void = () => {};
 	export let isDisabled: boolean = false;
 	export let className: string = '';
 	export let _class: string = '';

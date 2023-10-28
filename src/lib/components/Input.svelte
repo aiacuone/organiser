@@ -2,7 +2,7 @@
 	import { clickOutside } from '$lib/utils/clickAway';
 	import { onMount } from 'svelte';
 
-	export let value: string;
+	export let value: string = '';
 	export let placeholder: string | undefined = undefined;
 	export let autofocus: boolean = false;
 	export let autofillValues: (string | undefined)[] = [];
@@ -12,13 +12,14 @@
 		value = _value;
 	};
 	export let onAutoFill: ((value: string) => void) | undefined = undefined;
+	export let _class: string | undefined = undefined;
 
 	let input: HTMLInputElement;
 	let isInputFocused: boolean = false;
 
 	onMount(() => {
 		if (autofocus) {
-			isInputFocused = true;
+			input.focus();
 		}
 	});
 
@@ -37,7 +38,7 @@
 	<input
 		type="text"
 		bind:value
-		class=" placeholder-gray-300 w-full bg-transparent"
+		class="placeholder-gray-300 w-full bg-transparent {_class}"
 		placeholder={isDisabled ? '' : placeholder}
 		bind:this={input}
 		on:focus={() => (isInputFocused = true)}
