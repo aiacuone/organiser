@@ -1,10 +1,5 @@
 <script lang="ts">
-	import {
-		type Time_enum,
-		LogType_enum,
-		type SpaceData_int,
-		type titlesAndReferences_int
-	} from '$lib/types/general';
+	import { type Time_enum, LogType_enum, type SpaceData_int } from '$lib/types/general';
 	import { setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
@@ -27,6 +22,7 @@
 	import { getDateLogs, getTitlesAndReferences } from '$lib/api/logsLocalApi';
 	import { goto } from '$app/navigation';
 	import { titlesAndReferences } from '$lib/stores';
+	import { debounce } from '$lib/utils/general';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -51,8 +47,12 @@
 		getTitlesAndReferences(data.space.replace(' ', '-'))
 	);
 
-	$: $page, queryClient.invalidateQueries('logs');
-	$: $page, queryClient.invalidateQueries('titlesAndReferences');
+	const invalidateLogsAndTitlesAndReferences = () => {
+		queryClient.invalidateQueries('logs');
+		queryClient.invalidateQueries('titlesAndReferences');
+	};
+
+	$: $page, debounce(invalidateLogsAndTitlesAndReferences);
 
 	$: $titlesAndReferencesQuery, ($titlesAndReferences = $titlesAndReferencesQuery.data);
 
@@ -94,6 +94,7 @@
 		});
 		navigator.clipboard.write([clipboardItem]);
 	};
+
 	$: modalContainerHeight = 0;
 	$: modalCheckboxContainerHeight = 0;
 	$: modalButtonContainerHeight = 0;
