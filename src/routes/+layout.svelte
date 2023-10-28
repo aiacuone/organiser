@@ -95,9 +95,9 @@
 			<slot />
 		</main>
 		<footer class="py-2 bg-gray-300">
-			<div class="hstack center capitalize gap-2 sm:gap-3">
+			<div class="hstack center capitalize sm:gap-5">
 				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickPreviousDay}>
-					<Icon icon={icons.left} />
+					<Icon icon={icons.left} height="20px" />
 				</Button>
 				<Button
 					_class="bg-white {getHyphenatedStringFromDate(new Date()) ===
@@ -107,7 +107,7 @@
 					onClick={() => ($selectedDate = new Date())}>Today</Button
 				>
 				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickNextDay}>
-					<Icon icon={icons.right} />
+					<Icon icon={icons.right} height="20px" />
 				</Button>
 			</div>
 		</footer>
