@@ -36,20 +36,20 @@ export const getDayMonthYearFromDate = (date: Date) => {
 	};
 };
 
-export const getTodaysDayMonthYear = () => {
-	const date = new Date();
-	return getDayMonthYearFromDate(new Date(date));
-};
+// export const getTodaysDayMonthYear = () => {
+// 	const date = new Date();
+// 	return getDayMonthYearFromDate(new Date(date));
+// };
 
-export const getYesterdaysDayMonthYear = () => {
-	const date = getYesterdaysDate();
-	return getDayMonthYearFromDate(new Date(date));
-};
+// export const getYesterdaysDayMonthYear = () => {
+// 	const date = getYesterdaysDate();
+// 	return getDayMonthYearFromDate(new Date(date));
+// };
 
-export const getYesterdaysDate = () => {
-	const date = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
-	return new Date(date);
-};
+// export const getYesterdaysDate = () => {
+// 	const date = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+// 	return new Date(date);
+// };
 
 export const getDate2DaysEarlier = () => {
 	const date = new Date(new Date().getTime() - 48 * 60 * 60 * 1000);
@@ -66,13 +66,13 @@ export const getDateFromHyphenatedString = (dateString: string) => {
 	return new Date(Date.UTC(year, month - 1, day));
 };
 
-export const getLastFridayDate = () => {
-	const today = new Date();
-	const dayOfWeek = today.getDay(); // Get the current day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-	const daysUntilFriday = (dayOfWeek + 7 - 5) % 7; // Calculate how many days to subtract to get to the last Friday
+// export const getLastFridayDate = () => {
+// 	const today = new Date();
+// 	const dayOfWeek = today.getDay(); // Get the current day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+// 	const daysUntilFriday = (dayOfWeek + 7 - 5) % 7; // Calculate how many days to subtract to get to the last Friday
 
-	const lastFriday = new Date(today);
-	lastFriday.setDate(today.getDate() - daysUntilFriday);
+// 	const lastFriday = new Date(today);
+// 	lastFriday.setDate(today.getDate() - daysUntilFriday);
 
-	return lastFriday;
-};
+// 	return lastFriday;
+// };

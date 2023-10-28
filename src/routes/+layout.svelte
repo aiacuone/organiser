@@ -25,6 +25,7 @@
 	let onOpen: () => void;
 	let onClose: () => void;
 
+	//NOTE: These methods are duplicated because using these in +layout is causing issues with SSR
 	export const getDateFromHyphenatedString = (dateString: string) => {
 		const [day, month, year] = dateString.split('-').map(Number);
 
@@ -78,6 +79,7 @@
 		const selectedDate = getDateFromHyphenatedString($page.params.date);
 		goto(`/${data.space}/${getHyphenatedStringFromDate(getPreviousDay(selectedDate))}`);
 	};
+
 	const onClickNextDay = () => {
 		const getPreviousDay = (date: Date) => {
 			const _date = new Date(date);
@@ -118,7 +120,9 @@
 					<Icon icon={icons.left} />
 				</Button>
 				<Button
-					_class="bg-white bg-opacity-80"
+					_class="bg-white {getHyphenatedStringFromDate(new Date()) === $page.params.date
+						? 'bg-opacity-80'
+						: 'bg-opacity-40'}"
 					onClick={() => goto(`/${data.space}/${getDateString(todaysDate)}`)}>Today</Button
 				>
 				<Button _class="bg-white bg-opacity-80" onClick={onClickNextDay}>
