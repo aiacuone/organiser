@@ -7,6 +7,8 @@
 	import type { SpaceData_int } from '$lib/types/general';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
+	import Button from '$lib/components/Button.svelte';
+	import Dialog from '$lib/components/Dialog.svelte';
 
 	export let data: SpaceData_int;
 	const { spaces, times } = data;
@@ -19,18 +21,15 @@
 	});
 
 	const queryClient = new QueryClient();
+	let onOpen: () => void;
+	let onClose: () => void;
 </script>
 
 <QueryClientProvider client={queryClient}>
 	<div class="stack" style={'height:100dvh'}>
 		<header class="center py-2 bg-gray-200">
 			<div class="hstack gap-2 sm:gap-4">
-				{#each spaces as space}
-					<HeaderFooterLink
-						href="/{space.replace(' ', '-')}/{getHyphenatedStringFromDate(new Date())}"
-						>{space}</HeaderFooterLink
-					>
-				{/each}
+				<Button _class="bg-white bg-opacity-80 capitalize" onClick={onOpen}>{data.space}</Button>
 			</div>
 		</header>
 		<main class="flex-1 p-1 sm:p-2 flex flex-col overflow-hidden">
@@ -49,3 +48,15 @@
 		</footer>
 	</div>
 </QueryClientProvider>
+
+<Dialog bind:onOpen bind:onClose>
+	<div class="stack gap-4">
+		{#each spaces as space}
+			{@const onClick = () => {
+				goto(`/${space.replace(' ', '-')}/${getHyphenatedStringFromDate(new Date())}`);
+				onClose();
+			}}
+			<Button {onClick} _class="capitalize">{space}</Button>
+		{/each}
+	</div>
+</Dialog>
