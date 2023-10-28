@@ -96,7 +96,7 @@
 		</main>
 		<footer class="py-2 bg-gray-300">
 			<div class="hstack center capitalize gap-2 sm:gap-3">
-				<Button _class="bg-white bg-opacity-80" onClick={onClickPreviousDay}>
+				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickPreviousDay}>
 					<Icon icon={icons.left} />
 				</Button>
 				<Button
@@ -106,7 +106,7 @@
 						: 'bg-opacity-40'}"
 					onClick={() => ($selectedDate = new Date())}>Today</Button
 				>
-				<Button _class="bg-white bg-opacity-80" onClick={onClickNextDay}>
+				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickNextDay}>
 					<Icon icon={icons.right} />
 				</Button>
 			</div>
