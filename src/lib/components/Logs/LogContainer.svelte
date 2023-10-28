@@ -1,14 +1,28 @@
 <script lang="ts">
+	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import { clickOutside } from '$lib/utils/clickAway';
+	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	export let isEditing = false;
 	export let onConfirmReset: () => void;
+	export const updateLogMutation = useMutation(updateLog, {
+		onSuccess: () => {
+			queryClient.invalidateQueries('logs');
+		}
+	});
+	export const deleteLogMutation = useMutation(deleteLog, {
+		onSuccess: () => {
+			queryClient.invalidateQueries('logs');
+		}
+	});
 
 	let onOpen: () => void;
 
 	const onClickOutside = () => {
 		isEditing && onOpen();
 	};
+
+	const queryClient = useQueryClient();
 </script>
 
 <div use:clickOutside on:click_outside={onClickOutside} class="shadow-md">

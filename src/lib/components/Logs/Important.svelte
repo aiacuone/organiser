@@ -4,13 +4,12 @@
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
 	import Textarea from '../Textarea.svelte';
-	import { getContext, setContext } from 'svelte';
-	import { LogType_enum } from '$lib/types';
+	import { getContext } from 'svelte';
+	import { LogType_enum, type Log_int } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { page } from '$app/stores';
-	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
-	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
+	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 
 	export let date: Date = new Date();
 	export let content: string;
@@ -23,29 +22,14 @@
 	let originalContent = content;
 	let originalImportance = importance;
 	let originalDate = date;
+	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
+	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onEdit = () => {
 		isEditing = true;
 	};
-
-	const queryClient = useQueryClient();
-
-	export const deleteMutation = useMutation(deleteLog, {
-		onSuccess: () => {
-			queryClient.invalidateQueries('logs');
-		}
-	});
-
-	export const updateMutation = useMutation(updateLog, {
-		onSuccess: () => {
-			queryClient.invalidateQueries('logs');
-		}
-	});
-
-	setContext('deleteMutation', deleteMutation);
-	setContext('updateMutation', updateMutation);
 
 	const onDelete = () => {
 		isEditing = false;
@@ -103,7 +87,12 @@
 	};
 </script>
 
-<LogContainer {isEditing} onConfirmReset={onResetChange}>
+<LogContainer
+	{isEditing}
+	onConfirmReset={onResetChange}
+	bind:updateLogMutation={updateMutation}
+	bind:deleteLogMutation={deleteMutation}
+>
 	<div class="bg-neutral-50 p-2 sm:p-3 stack gap-3">
 		<div class="hstack center gap-2">
 			<IconWithRating rating={importance} icon={icons.important} />

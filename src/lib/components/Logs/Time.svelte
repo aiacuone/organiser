@@ -5,16 +5,14 @@
 	import BottomOptions from './BottomOptions.svelte';
 	import Textarea from '../Textarea.svelte';
 	import { getContext } from 'svelte';
-	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
-
-	import { LogType_enum, type titlesAndReferences_int } from '$lib/types';
+	import { LogType_enum, type Log_int } from '$lib/types';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString } from '$lib/utils';
-	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import Input from '../Input.svelte';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import Icon from '@iconify/svelte';
 	import { titles, titlesAndReferences } from '$lib/stores';
+	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 
 	export let isEditing = false;
 	export let date: Date = new Date();
@@ -33,24 +31,14 @@
 	};
 	let newBulletInput: HTMLInputElement;
 
-	const queryClient = useQueryClient();
 	const originalDate = date;
 	let originalBullets = [...bullets];
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalTime = time;
 
-	export const deleteMutation = useMutation(deleteLog, {
-		onSuccess: () => {
-			queryClient.invalidateQueries('logs');
-		}
-	});
-
-	export const updateMutation = useMutation(updateLog, {
-		onSuccess: () => {
-			queryClient.invalidateQueries('logs');
-		}
-	});
+	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
+	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
@@ -180,7 +168,12 @@
 	};
 </script>
 
-<LogContainer {isEditing} onConfirmReset={onResetChange}>
+<LogContainer
+	{isEditing}
+	onConfirmReset={onResetChange}
+	bind:updateLogMutation={updateMutation}
+	bind:deleteLogMutation={deleteMutation}
+>
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-2 sm:p-4 stack text-sm gap-1">
 			<Input

@@ -7,12 +7,11 @@
 	import LogContainer from './LogContainer.svelte';
 	import Textarea from '../Textarea.svelte';
 	import { getContext } from 'svelte';
-	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
-	import { LogType_enum } from '$lib/types';
+	import { LogType_enum, type Log_int } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { page } from '$app/stores';
-	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
+	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 
 	export let date: Date = new Date();
 	export let content: string;
@@ -30,19 +29,8 @@
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
-	const queryClient = useQueryClient();
-
-	export const deleteMutation = useMutation(deleteLog, {
-		onSuccess: () => {
-			queryClient.invalidateQueries('logs');
-		}
-	});
-
-	export const updateMutation = useMutation(updateLog, {
-		onSuccess: () => {
-			queryClient.invalidateQueries('logs');
-		}
-	});
+	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
+	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
 
 	const onCheckboxClick = () => {
 		isCompleted = !isCompleted;
@@ -124,7 +112,12 @@
 	};
 </script>
 
-<LogContainer {isEditing} onConfirmReset={onResetChange}>
+<LogContainer
+	{isEditing}
+	onConfirmReset={onResetChange}
+	bind:updateLogMutation={updateMutation}
+	bind:deleteLogMutation={deleteMutation}
+>
 	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-4">
 		<div class="hstack gap-4 items-center">
 			<IconWithRating icon={icons.todo} rating={priority} />
