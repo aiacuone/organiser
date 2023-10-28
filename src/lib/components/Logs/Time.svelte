@@ -28,6 +28,7 @@
 	let onClose: () => void;
 	let onEdit: () => void;
 	let newBulletInput: HTMLInputElement;
+	let onDelete: () => void;
 
 	const originalDate = date;
 	let originalBullets = [...bullets];
@@ -42,11 +43,6 @@
 
 	const onReset = () => {
 		console.log('reset', id);
-	};
-
-	const onDelete = () => {
-		isEditing = false;
-		$deleteMutation.mutate(id);
 	};
 
 	const onDeleteBullet = (index: number) => {
@@ -172,6 +168,8 @@
 	onConfirmReset={onResetChange}
 	bind:updateLogMutation={updateMutation}
 	bind:deleteLogMutation={deleteMutation}
+	bind:onDelete
+	{id}
 >
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-2 sm:p-4 stack text-sm gap-1">

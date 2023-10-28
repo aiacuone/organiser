@@ -5,6 +5,7 @@
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	export let isEditing = false;
 	export let onConfirmReset: () => void;
+	export let id: string;
 	export const updateLogMutation = useMutation(updateLog, {
 		onSuccess: () => {
 			queryClient.invalidateQueries('logs');
@@ -17,6 +18,10 @@
 	});
 	export const onEdit = () => {
 		isEditing = true;
+	};
+	export const onDelete = () => {
+		isEditing = false;
+		$deleteLogMutation.mutate(id);
 	};
 
 	let onOpen: () => void;

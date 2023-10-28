@@ -27,6 +27,7 @@
 	let originalPriority = priority;
 	let originalDate = date;
 	let originalIsCompleted = isCompleted;
+	let onDelete: () => void;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
@@ -44,10 +45,6 @@
 			space: $page.params.space,
 			isCompleted
 		});
-	};
-
-	const onDelete = () => {
-		$deleteMutation.mutate(id);
 	};
 
 	let onOpen: () => void;
@@ -115,6 +112,8 @@
 	onConfirmReset={onResetChange}
 	bind:updateLogMutation={updateMutation}
 	bind:deleteLogMutation={deleteMutation}
+	bind:onDelete
+	{id}
 >
 	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-4">
 		<div class="hstack gap-4 items-center">

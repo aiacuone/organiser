@@ -25,13 +25,9 @@
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
 	let onEdit: () => void;
+	let onDelete: () => void;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
-
-	const onDelete = () => {
-		isEditing = false;
-		$deleteMutation.mutate(id);
-	};
 
 	const onAccept = () => {
 		const currentDate = new Date();
@@ -90,6 +86,8 @@
 	onConfirmReset={onResetChange}
 	bind:updateLogMutation={updateMutation}
 	bind:deleteLogMutation={deleteMutation}
+	bind:onDelete
+	{id}
 >
 	<div class="bg-neutral-50 p-2 sm:p-3 stack gap-3">
 		<div class="hstack center gap-2">
