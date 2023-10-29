@@ -23,7 +23,7 @@
 	import { titlesAndReferences } from '$lib/stores';
 	import { debounce } from '$lib/utils/general';
 	import { selectedDate, selectedDayString, selectedHyphenatedDateString } from '$lib/stores/dates';
-	import { replaceAllSpacesWithHyphens } from '$lib/utils/strings';
+	import { getCapitalizedWords, replaceAllSpacesWithHyphens } from '$lib/utils/strings';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -264,3 +264,7 @@
 		</div>
 	</div>
 </dialog>
+
+<svelte:head>
+	<title>{getCapitalizedWords(data.space)} - Organiser</title>
+</svelte:head>
