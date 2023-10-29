@@ -13,7 +13,7 @@
 		title: '',
 		content: '',
 		reference: '',
-		time: 0.5,
+		time: 0,
 		isEditing: true,
 		isCompleted: false,
 		importance: 2,

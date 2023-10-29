@@ -18,7 +18,7 @@ export const getCollection = async (collectionName: string) => {
 const collection = await getCollection('aiacuone');
 
 export const getDateLogs = async ({ space, date }: { space: string; date: Date }) => {
-	return await collection
+	const result = await collection
 		.aggregate([
 			{ $match: { space } },
 			{
@@ -46,6 +46,8 @@ export const getDateLogs = async ({ space, date }: { space: string; date: Date }
 			{ $sort: { date: -1 } }
 		])
 		.toArray();
+
+	return result;
 };
 
 export const getSpaces = async () => {

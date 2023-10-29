@@ -37,7 +37,7 @@
 		{#if onAddBullet}
 			<AddBullet onClick={onAddBullet} />
 		{/if}
-		{#if incrementDecrementProps && showIncrementDecrement && incrementDecrementValue}
+		{#if isEditing || (incrementDecrementProps && showIncrementDecrement && incrementDecrementValue)}
 			<IncrementDecrement {...incrementDecrementProps} value={incrementDecrementValue} />
 		{/if}
 		{#if isEditing}

@@ -20,7 +20,7 @@
 	export let id: string;
 	export let title: string;
 	export let reference: string = '';
-	export let time: number;
+	export let time: number = 0;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
 
@@ -145,7 +145,7 @@
 	};
 
 	const incrementDecrementProps = {
-		min: 0.5,
+		min: 0,
 		max: 24,
 		onIncrement,
 		onDecrement
