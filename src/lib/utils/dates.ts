@@ -76,3 +76,9 @@ export const getDateFromHyphenatedString = (dateString: string) => {
 
 // 	return lastFriday;
 // };
+
+export const getDayFromHyphenatedString = (dateString: string) => {
+	const date = getDateFromHyphenatedString(dateString);
+	const day = getDayFromNumber(date.getDay());
+	return day;
+};

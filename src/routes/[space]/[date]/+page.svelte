@@ -6,6 +6,7 @@
 	import {
 		getDate2DaysEarlier,
 		getDateFromHyphenatedString,
+		getDayFromHyphenatedString,
 		getDayMonthYearFromDate
 	} from '$lib/utils';
 	import Button from '$lib/components/Button.svelte';
@@ -159,8 +160,8 @@
 				<div class="center text-base sm:text-lg hstack gap-1 sm:gap-2">
 					<p class="capitalize text-opacity-40">{data.space}</p>
 					<p>-</p>
-					<p>{$selectedDayString?.sliced}</p>
-					<p class="capitalize">{$selectedHyphenatedDateString}</p>
+					<p>{$selectedDayString?.sliced ?? getDayFromHyphenatedString(data.date)?.slice(0, 3)}</p>
+					<p class="capitalize">{$selectedHyphenatedDateString ?? data.date}</p>
 				</div>
 				<input type="date" on:change={onDateChange} class="w-[20px]" />
 			</div>

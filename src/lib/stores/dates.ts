@@ -2,7 +2,7 @@ import { getDayMonthYearFromDate } from '$lib/utils';
 import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 import { derived, writable, type Writable } from 'svelte/store';
 
-export const selectedDate: Writable<Date> = writable(new Date());
+export const selectedDate: Writable<Date> = writable();
 
 export const selectedDateString = derived(selectedDate, ($selectedDate) => {
 	if (!$selectedDate) return;
