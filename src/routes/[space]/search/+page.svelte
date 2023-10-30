@@ -19,8 +19,12 @@
 	const onChange = (e) => {
 		debounce(() => goto(`/${$page.params.space}/search/${e.target.value}`));
 	};
+
+	const onSearch = () => {
+		goto(`/${$page.params.space}/search/${searchValue}`);
+	};
 </script>
 
 <div class="center">
-	<Search bind:value={searchValue} {onChange} />
+	<Search bind:value={searchValue} {onChange} onClickEnter={onSearch} />
 </div>

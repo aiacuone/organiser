@@ -123,9 +123,9 @@ export const getFilteredLogs = async ({ space, value }: { space: string; value: 
 			{
 				$match: {
 					$or: [
-						{ title: { $regex: value } },
-						{ reference: { $regex: value } },
-						{ content: { $regex: value } }
+						{ title: { $regex: value, $options: 'i' } },
+						{ reference: { $regex: value, $options: 'i' } },
+						{ content: { $regex: value, $options: 'i' } }
 					]
 				}
 			},

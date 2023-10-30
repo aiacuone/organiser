@@ -18,7 +18,6 @@
 	const filteredLogsQuery = useQuery(
 		'filteredLogs',
 		() => {
-			console.log({ space: replaceAllSpacesWithHyphens($page.params.space), searchValue });
 			return getFilteredLogs({
 				space: replaceAllSpacesWithHyphens($page.params.space),
 				value: searchValue
