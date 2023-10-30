@@ -10,7 +10,11 @@
 	import { page } from '$app/stores';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
+	import Input from '../Input.svelte';
+	import { titles } from '$lib/stores';
 
+	export let title: string;
+	export let reference: string = '';
 	export let date: Date = new Date();
 	export let content: string;
 	export let id: string;
@@ -19,13 +23,18 @@
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
 
+	let originalTitle = title;
+	let originalReference = reference;
 	let originalContent = content;
 	let originalImportance = importance;
 	let originalDate = date;
+
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
 	let onEdit: () => void;
 	let onDelete: () => void;
+	let changeReferenceInputValue: (value: string | undefined) => void;
+	let onTitleAutoFill: (title: string) => void;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
@@ -37,10 +46,14 @@
 
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
+				title,
+				reference,
 				content,
 				importance
 			},
 			originalValues: {
+				title: originalTitle,
+				reference: originalReference,
 				content: originalContent,
 				importance: originalImportance
 			}
@@ -52,6 +65,8 @@
 
 		$updateMutation.mutate({
 			id,
+			title,
+			reference,
 			content,
 			importance,
 			date,
@@ -59,6 +74,8 @@
 			space: $page.params.space,
 			lastUpdated: date
 		});
+		originalTitle = title;
+		originalReference = reference;
 		originalContent = content;
 		originalImportance = importance;
 		originalDate = date;
@@ -90,6 +107,24 @@
 	{id}
 >
 	<div class="bg-neutral-50 p-2 sm:p-3 stack gap-3">
+		<div class="stack">
+			<Input
+				bind:value={title}
+				autofocus={inputAutoFocus}
+				placeholder="Title"
+				autofillValues={$titles}
+				isDisabled={!isEditing}
+				onAutoFill={onTitleAutoFill}
+			/>
+			{#if !isEditing && !reference}{''}{:else}
+				<Input
+					bind:value={reference}
+					placeholder="Reference"
+					isDisabled={!isEditing}
+					bind:changeInputValue={changeReferenceInputValue}
+				/>
+			{/if}
+		</div>
 		<div class="hstack center gap-2">
 			<IconWithRating rating={importance} icon={icons.important} />
 			<div class="flex-1">
