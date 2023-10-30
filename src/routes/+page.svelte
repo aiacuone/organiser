@@ -9,6 +9,6 @@
 	onMount(() => {
 		const space = data.space || data.spaces[0];
 		const date = getHyphenatedStringFromDate(new Date());
-		goto(`/${replaceAllSpacesWithHyphens(space)}/${date}`);
+		goto(`/${replaceAllSpacesWithHyphens(space)}/date/${date}`);
 	});
 </script>

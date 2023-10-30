@@ -22,5 +22,8 @@ export const icons = {
 	tickBold: 'subway:tick',
 	highPriority: 'octicon:chevron-up-12',
 	lowPriority: 'octicon:chevron-down-12',
-	enter: 'ant-design:enter-outlined'
+	enter: 'ant-design:enter-outlined',
+	search: 'iconoir:search',
+	close: 'material-symbols:close',
+	home: 'ic:sharp-home'
 };

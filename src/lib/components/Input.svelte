@@ -13,6 +13,7 @@
 	};
 	export let onAutoFill: ((value: string) => void) | undefined = undefined;
 	export let _class: string | undefined = undefined;
+	export let onChange: (event: Event) => void = () => {};
 
 	let input: HTMLInputElement;
 	let isInputFocused: boolean = false;
@@ -47,6 +48,7 @@
 		bind:this={input}
 		on:focus={onFocus}
 		disabled={isDisabled}
+		on:input={onChange}
 	/>
 	<div class="relative">
 		<div class="absolute stack bg-white">

@@ -10,6 +10,6 @@
 
 	onMount(() => {
 		const space = data.space ?? data.spaces[0];
-		goto(`/${replaceAllSpacesWithHyphens(space)}/${selectedHyphenatedDateString}`);
+		goto(`/${replaceAllSpacesWithHyphens(space)}/date/${selectedHyphenatedDateString}`);
 	});
 </script>

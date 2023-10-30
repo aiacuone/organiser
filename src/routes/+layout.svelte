@@ -119,7 +119,9 @@
 		<div class="stack gap-4 self-center">
 			{#each spaces as space}
 				{@const onClick = () => {
-					goto(`/${replaceAllSpacesWithHyphens(space)}/${getHyphenatedStringFromDate(new Date())}`);
+					goto(
+						`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(new Date())}`
+					);
 					onDialogClose();
 				}}
 				<Button {onClick} _class="capitalize">{replaceAllHyphensWithSpaces(space)}</Button>

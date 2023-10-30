@@ -1,7 +1,13 @@
 <script lang="ts">
-	import { type Time_enum, LogType_enum, type SpaceData_int } from '$lib/types/general';
+	import {
+		type Time_enum,
+		LogType_enum,
+		type SpaceData_int,
+		type LogBase_int,
+		type Log_int
+	} from '$lib/types/general';
 	import { setContext } from 'svelte';
-	import { writable, type Writable } from 'svelte/store';
+	import { derived, writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
 	import {
 		getDate2DaysEarlier,
@@ -22,9 +28,10 @@
 	import { getDateLogs, getTitlesAndReferences } from '$lib/api/logsLocalApi';
 	import { goto } from '$app/navigation';
 	import { titlesAndReferences } from '$lib/stores';
-	import { debounce } from '$lib/utils/general';
 	import { selectedDate, selectedDayString, selectedHyphenatedDateString } from '$lib/stores/dates';
 	import { getCapitalizedWords, replaceAllSpacesWithHyphens } from '$lib/utils/strings';
+	// import Input from '$lib/components/Input.svelte';
+	import Search from '$lib/components/Search.svelte';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -38,6 +45,17 @@
 
 	const queryClient = useQueryClient();
 
+	let timer: any;
+	const debounce = (fn: () => any, delay = 500) => {
+		const timeout = () => {
+			clearTimeout(timer);
+			timer = setTimeout(() => {
+				fn();
+			}, delay);
+		};
+		timeout();
+	};
+
 	const logs = useQuery(
 		'logs',
 		() =>
@@ -48,7 +66,7 @@
 			}),
 		{
 			onSuccess: () => {
-				goto(`/${replaceAllSpacesWithHyphens(data.space)}/${$selectedHyphenatedDateString}`);
+				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
 			}
 		}
 	);
@@ -151,20 +169,31 @@
 	const onDateChange = (e) => {
 		$selectedDate = getDateFromHyphenatedString(e.target.value.split('-').reverse().join('-'));
 	};
+
+	let searchValue: string;
+	const onSearch = () => {
+		goto(`/${$page.params.space}/search/${searchValue}`);
+	};
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
 	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full sm:h-auto justify-center flex-1 py-3">
 		<div class="stack gap-2" bind:clientHeight={logButtonsContainerHeight}>
-			<div class="hstack gap-1 sm:gap-2 center flex-wrap">
-				<div class="center text-base sm:text-lg hstack gap-1 sm:gap-2">
-					<p class="capitalize text-opacity-40">{data.space}</p>
-					<p>-</p>
-					<p>{$selectedDayString?.sliced ?? getDayFromHyphenatedString(data.date)?.slice(0, 3)}</p>
-					<p class="capitalize">{$selectedHyphenatedDateString ?? data.date}</p>
+			<div class="hstack center gap-2 flex-wrap">
+				<div class="hstack gap-2 sm:gap-2 center">
+					<div class="center text-base sm:text-lg hstack gap-1 sm:gap-2 flex-wrap">
+						<p class="capitalize text-opacity-40">{data.space}</p>
+						<p>-</p>
+						<p>
+							{$selectedDayString?.sliced ?? getDayFromHyphenatedString(data.date)?.slice(0, 3)}
+						</p>
+						<p class="capitalize">{$selectedHyphenatedDateString ?? data.date}</p>
+					</div>
+					<input type="date" on:change={onDateChange} class="w-[20px]" />
 				</div>
-				<input type="date" on:change={onDateChange} class="w-[20px]" />
+				<Search bind:value={searchValue} onClickEnter={onSearch} />
 			</div>
+
 			<div class="grid grid-cols-2 sm:grid-cols-4 w-full gap-y-3 gap-x-3 sm:gap-x-10">
 				{#each noteButtons as { label, icon, onClick }}
 					<Button {onClick} className="flex-1 uppercase center hstack gap-2">

@@ -115,3 +115,23 @@ export const getTitlesAndReferences = async (space: string) => {
 // 	const spaces = await collection.distinct('title', { space });
 // 	return spaces;
 // };
+
+export const getFilteredLogs = async ({ space, value }: { space: string; value: string }) => {
+	const result = await collection
+		.aggregate([
+			{ $match: { space } },
+			{
+				$match: {
+					$or: [
+						{ title: { $regex: value } },
+						{ reference: { $regex: value } },
+						{ content: { $regex: value } }
+					]
+				}
+			},
+			{ $project: { _id: 0 } }
+		])
+		.toArray();
+
+	return result;
+};
