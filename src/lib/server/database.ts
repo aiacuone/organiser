@@ -68,6 +68,8 @@ export const updateLog = async (values: {
 	type: LogType_enum;
 	space: string;
 	lastUpdated: Date;
+	question?: string;
+	answer?: string;
 }) => {
 	const { date, lastUpdated, ...rest } = values;
 	await collection.updateOne(

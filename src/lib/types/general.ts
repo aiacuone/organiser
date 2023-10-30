@@ -30,6 +30,8 @@ export interface Log_int {
 	isCompleted?: boolean;
 	bullets?: string[];
 	lastUpdated?: Date;
+	question?: string;
+	answer?: string;
 }
 
 export enum LogType_enum {

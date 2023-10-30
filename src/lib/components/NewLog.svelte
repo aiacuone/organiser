@@ -19,7 +19,8 @@
 		importance: 2,
 		priority: 2,
 		inputAutoFocus: true,
-		bullets: ['']
+		bullets: [''],
+		question: ''
 	};
 </script>
 

@@ -4,8 +4,12 @@
 	export let className = '';
 	export let autofocus = false;
 	export let isDisabled = false;
+	export let _class = '';
 
 	let textarea: HTMLTextAreaElement;
+	export const onFocus = () => {
+		textarea.focus();
+	};
 	const resize = () => {
 		if (!textarea) return;
 		textarea.style.height = '20px';
@@ -35,7 +39,7 @@
 
 <textarea
 	bind:value
-	class="resize-none {className} w-full text-sm center bg-transparent h-[20px]"
+	class="resize-none {className} w-full text-sm center bg-transparent h-[20px] px-2 {_class}"
 	bind:this={textarea}
 	on:input={resize}
 	disabled={isDisabled}

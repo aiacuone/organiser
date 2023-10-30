@@ -8,7 +8,7 @@
 </script>
 
 <div class="relative">
-	<Icon {icon} height={iconSize} class="opacity-10" />
+	<Icon {icon} height={iconSize} class="text-gray-200" />
 	{#if rating > 2}
 		<div class="absolute top-0 left-6">
 			<div class="w-[{ratingSize}] h-[{ratingSize}]">

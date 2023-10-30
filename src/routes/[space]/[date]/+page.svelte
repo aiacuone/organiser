@@ -204,7 +204,7 @@
 							isCompleted={log.isCompleted}
 							content={log.content}
 						/>
-					{:else if type === LogType_enum.question && log.importance && log.content}
+					{:else if type === LogType_enum.question && log.importance && log.question}
 						<Question {...rest} importance={log.importance} content={log.content} />
 					{:else if type === LogType_enum.time && log.title}
 						<Time

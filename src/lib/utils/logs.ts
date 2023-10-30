@@ -7,6 +7,8 @@ interface values_int {
 	priority?: number;
 	importance?: number;
 	isCompleted?: boolean;
+	question?: string;
+	answer?: string;
 }
 
 export const getHaveValuesChanged = ({
@@ -26,7 +28,9 @@ export const getHaveValuesChanged = ({
 		values.content !== originalValues.content ||
 		values.priority !== originalValues.priority ||
 		values.importance !== originalValues.importance ||
-		values.isCompleted !== originalValues.isCompleted
+		values.isCompleted !== originalValues.isCompleted ||
+		values.question !== originalValues.question ||
+		values.answer !== originalValues.answer
 	);
 };
 
