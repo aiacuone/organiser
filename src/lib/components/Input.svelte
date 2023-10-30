@@ -32,6 +32,10 @@
 	const onClickOutside = () => {
 		isInputFocused = false;
 	};
+
+	const onFocus = () => {
+		isInputFocused = true;
+	};
 </script>
 
 <div use:clickOutside on:click_outside={onClickOutside}>
@@ -41,7 +45,7 @@
 		class="placeholder-gray-300 w-full bg-transparent text-sm {_class}"
 		placeholder={isDisabled ? '' : placeholder}
 		bind:this={input}
-		on:focus={() => (isInputFocused = true)}
+		on:focus={onFocus}
 		disabled={isDisabled}
 	/>
 	<div class="relative">

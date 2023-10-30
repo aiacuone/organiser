@@ -12,6 +12,8 @@
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import Input from '../Input.svelte';
 	import { titles } from '$lib/stores';
+	import Dialog from '../Dialog.svelte';
+	import Button from '../Button.svelte';
 
 	export let title: string;
 	export let reference: string = '';
@@ -36,9 +38,14 @@
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let onTitleAutoFill: (title: string) => void;
 
+	let onOpen: () => void;
+
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onAccept = () => {
+		if (!content) {
+			return onOpen();
+		}
 		const currentDate = new Date();
 		const date = new Date(getDateFromHyphenatedString($page.params.date));
 		date.setHours(currentDate.getHours());
@@ -95,6 +102,9 @@
 		onIncrement: () => (importance = importance + 1),
 		onDecrement: () => (importance = importance - 1)
 	};
+
+	let isOpen: boolean;
+	let onClose: () => void;
 </script>
 
 <LogContainer
@@ -105,6 +115,7 @@
 	bind:deleteLogMutation={deleteMutation}
 	bind:onDelete
 	{id}
+	showDialog={!isOpen}
 >
 	<div class="bg-neutral-50 p-2 sm:p-3 stack gap-3">
 		<div class="stack">
@@ -150,3 +161,10 @@
 		/>
 	</div>
 </LogContainer>
+
+<Dialog bind:onOpen bind:isOpen bind:onClose>
+	<div class="stack center gap-1">
+		Please add some content to your log.
+		<Button onClick={onClose}>OK</Button>
+	</div>
+</Dialog>

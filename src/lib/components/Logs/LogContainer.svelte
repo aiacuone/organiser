@@ -7,6 +7,7 @@
 	export let isEditing = false;
 	export let onConfirmReset: () => void;
 	export let id: string;
+	export let showDialog = true;
 	export const updateLogMutation = useMutation(updateLog, {
 		onSuccess: () => {
 			queryClient.invalidateQueries('logs');
@@ -36,7 +37,7 @@
 	let onOpen: () => void;
 
 	const onClickOutside = () => {
-		isEditing && onOpen();
+		isEditing && showDialog && onOpen();
 	};
 
 	const queryClient = useQueryClient();
