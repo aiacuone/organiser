@@ -12,7 +12,11 @@
 	import { page } from '$app/stores';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
+	import Input from '../Input.svelte';
+	import { titles } from '$lib/stores';
 
+	export let title: string;
+	export let reference: string = '';
 	export let date: Date = new Date();
 	export let content: string;
 	export let id: string;
@@ -21,13 +25,18 @@
 	export let isEditing: boolean;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
-	let onEdit: () => void;
 
+	let originalTitle = title;
+	let originalReference = reference;
 	let originalContent = content;
 	let originalPriority = priority;
 	let originalDate = date;
 	let originalIsCompleted = isCompleted;
+
 	let onDelete: () => void;
+	let onTitleAutoFill: (title: string) => void;
+	let changeReferenceInputValue: (value: string | undefined) => void;
+	let onEdit: () => void;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
@@ -59,12 +68,16 @@
 			values: {
 				content,
 				priority,
-				isCompleted
+				isCompleted,
+				title,
+				reference
 			},
 			originalValues: {
 				content: originalContent,
 				priority: originalPriority,
-				isCompleted: originalIsCompleted
+				isCompleted: originalIsCompleted,
+				title: originalTitle,
+				reference: originalReference
 			}
 		});
 
@@ -79,9 +92,13 @@
 				type: LogType_enum.todo,
 				space: $page.params.space,
 				isCompleted,
-				lastUpdated: date
+				lastUpdated: date,
+				title,
+				reference
 			});
 			onResetNewLogType();
+			originalTitle = title;
+			originalReference = reference;
 			originalContent = content;
 			originalPriority = priority;
 			originalDate = date;
@@ -93,6 +110,8 @@
 	const onResetChange = () => {
 		isEditing = false;
 		onResetNewLogType();
+		title = originalTitle;
+		reference = originalReference;
 		content = originalContent;
 	};
 
@@ -112,8 +131,28 @@
 	bind:deleteLogMutation={deleteMutation}
 	bind:onDelete
 	{id}
+	bind:onTitleAutoFill
+	{changeReferenceInputValue}
 >
 	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-4">
+		<div class="stack gap-1">
+			<Input
+				bind:value={title}
+				autofocus={inputAutoFocus}
+				placeholder="Title"
+				autofillValues={$titles}
+				isDisabled={!isEditing}
+				onAutoFill={onTitleAutoFill}
+			/>
+			{#if !isEditing && !reference}{''}{:else}
+				<Input
+					bind:value={reference}
+					placeholder="Reference"
+					isDisabled={!isEditing}
+					bind:changeInputValue={changeReferenceInputValue}
+				/>
+			{/if}
+		</div>
 		<div class="hstack gap-4 items-center">
 			<IconWithRating icon={icons.todo} rating={priority} />
 			<button
