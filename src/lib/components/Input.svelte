@@ -14,6 +14,7 @@
 	export let onAutoFill: ((value: string) => void) | undefined = undefined;
 	export let _class: string | undefined = undefined;
 	export let onChange: (event: Event) => void = () => {};
+	export let onEnterKeydown: () => void = () => {};
 
 	let input: HTMLInputElement;
 	let isInputFocused: boolean = false;
@@ -37,6 +38,11 @@
 	const onFocus = () => {
 		isInputFocused = true;
 	};
+	const onKeydown = (e) => {
+		if (e.key === 'Enter') {
+			onEnterKeydown();
+		}
+	};
 </script>
 
 <div use:clickOutside on:click_outside={onClickOutside}>
@@ -49,6 +55,7 @@
 		on:focus={onFocus}
 		disabled={isDisabled}
 		on:input={onChange}
+		on:keydown={onKeydown}
 	/>
 	{#if isInputFocused && !value}
 		<div class="relative">

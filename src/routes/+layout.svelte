@@ -35,7 +35,6 @@
 
 	const queryClient = new QueryClient();
 	let onOpen: () => void;
-	let onClose: () => void;
 
 	const onClickPreviousDay = () => {
 		const getPreviousDate = (date: Date) => {

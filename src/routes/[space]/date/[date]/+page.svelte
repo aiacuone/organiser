@@ -191,7 +191,7 @@
 					</div>
 					<input type="date" on:change={onDateChange} class="w-[20px]" />
 				</div>
-				<Search bind:value={searchValue} onClickEnter={onSearch} />
+				<Search bind:value={searchValue} onClickEnter={onSearch} onEnterKeydown={onSearch} />
 			</div>
 
 			<div class="grid grid-cols-2 sm:grid-cols-4 w-full gap-y-3 gap-x-3 sm:gap-x-10">
