@@ -129,7 +129,8 @@ export const getFilteredLogs = async ({ space, value }: { space: string; value: 
 					]
 				}
 			},
-			{ $project: { _id: 0 } }
+			{ $project: { _id: 0 } },
+			{ $sort: { date: -1 } }
 		])
 		.toArray();
 
