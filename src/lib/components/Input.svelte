@@ -43,25 +43,25 @@
 	<input
 		type="text"
 		bind:value
-		class="placeholder-gray-300 w-full bg-transparent text-sm {_class}"
+		class="placeholder-gray-300 w-full bg-transparent text-sm outline-none {_class}"
 		placeholder={isDisabled ? '' : placeholder}
 		bind:this={input}
 		on:focus={onFocus}
 		disabled={isDisabled}
 		on:input={onChange}
 	/>
-	<div class="relative">
-		<div class="absolute stack bg-white">
-			{#if isInputFocused && !value}
+	{#if isInputFocused && !value}
+		<div class="relative">
+			<div class="absolute stack bg-white border-l border-r border-b rounded-b-md">
 				{#each autofillValues as autofillValue}
 					<button
-						class="text-xs text-neutral-400 cursor-pointer hover:bg-gray-100 px-4 py-2 z-99"
+						class="text-xs text-neutral-400 cursor-pointer hover:bg-gray-100 px-4 py-2 z-99 flex justify-start"
 						on:click={() => autofillValue && onClickAutofill(autofillValue)}
 					>
 						{autofillValue}
 					</button>
 				{/each}
-			{/if}
+			</div>
 		</div>
-	</div>
+	{/if}
 </div>
