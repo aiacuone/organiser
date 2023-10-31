@@ -70,9 +70,10 @@
 	};
 
 	const onAddSpace = () => {
-		console.log({ value: replaceAllSpacesWithHyphens(addInputValue) });
 		goto(
-			`/${replaceAllSpacesWithHyphens(addInputValue)}/${getHyphenatedStringFromDate(new Date())}`
+			`/${replaceAllSpacesWithHyphens(addInputValue)}/date/${getHyphenatedStringFromDate(
+				new Date()
+			)}`
 		);
 
 		addInputValue = '';
