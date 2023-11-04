@@ -1,29 +1,75 @@
 export enum Time_enum {
 	Today = 'today',
 	Yesterday = 'yesterday',
-	History = 'history'
-}
-
-export interface Space_int {
-	name: string;
-	color: string;
-	notes: Array<Note_int>;
+	Date = 'date'
 }
 
 export interface Option_int {
 	name: Time_enum;
-}
-
-export interface Note_int {
-	id: string;
-	title: string;
-	content: string;
-	date: Date;
-	time: number;
-	reference: string;
+	href: string;
 }
 
 export interface SpaceData_int {
-	spaces: Array<Space_int>;
+	spaces: string[];
 	times: Array<Option_int>;
+	space: string;
+	date: string;
+}
+
+export interface Log_int {
+	id: string;
+	date: Date;
+	title?: string;
+	content?: string;
+	reference?: string;
+	time?: number;
+	type: LogType_enum;
+	space: string;
+	priority?: number;
+	importance?: number;
+	isCompleted?: boolean;
+	bullets?: string[];
+	lastUpdated?: Date;
+	question?: string;
+	answer?: string;
+}
+
+export enum LogType_enum {
+	time = 'time',
+	todo = 'todo',
+	important = 'important',
+	question = 'question'
+}
+
+export interface LogBase_int<T = string> {
+	id: string;
+	date: Date;
+	content: T;
+}
+export interface TimeLog_int extends LogBase_int<string[]> {
+	title: string;
+	reference: string;
+	time: number;
+	type: LogType_enum.time;
+}
+
+export interface Todo_int extends LogBase_int {
+	isCompleted: boolean;
+	priority: 1 | 2 | 3;
+	type: LogType_enum.todo;
+}
+
+export interface Important_int extends LogBase_int {
+	importance: 1 | 2 | 3;
+	type: LogType_enum.important;
+}
+export interface Question_int extends LogBase_int {
+	importance: 1 | 2 | 3;
+	type: LogType_enum.question;
+}
+
+export interface titlesAndReferences_int {
+	title?: string;
+	reference?: string;
+	date: Date;
 }

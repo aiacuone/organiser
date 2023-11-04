@@ -36,20 +36,20 @@ export const getDayMonthYearFromDate = (date: Date) => {
 	};
 };
 
-export const getTodaysDayMonthYear = () => {
-	const date = new Date();
-	return getDayMonthYearFromDate(new Date(date));
-};
+// export const getTodaysDayMonthYear = () => {
+// 	const date = new Date();
+// 	return getDayMonthYearFromDate(new Date(date));
+// };
 
-export const getYesterdaysDayMonthYear = () => {
-	const date = getYesterdaysDate();
-	return getDayMonthYearFromDate(new Date(date));
-};
+// export const getYesterdaysDayMonthYear = () => {
+// 	const date = getYesterdaysDate();
+// 	return getDayMonthYearFromDate(new Date(date));
+// };
 
-export const getYesterdaysDate = () => {
-	const date = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
-	return new Date(date);
-};
+// export const getYesterdaysDate = () => {
+// 	const date = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+// 	return new Date(date);
+// };
 
 export const getDate2DaysEarlier = () => {
 	const date = new Date(new Date().getTime() - 48 * 60 * 60 * 1000);
@@ -57,15 +57,28 @@ export const getDate2DaysEarlier = () => {
 };
 
 export const getDateFromHyphenatedString = (dateString: string) => {
-	function isValidDateFormat(dateString: string) {
-		const regex = /^\d{4}-\d{1,2}-\d{1,2}$/;
-		return regex.test(dateString);
-	}
-	if (!isValidDateFormat(dateString)) throw new Error('Invalid date format');
+	const [day, month, year] = dateString.split('-').map(Number);
+	// console.log({ day, month, year });
+	// if (isNaN(day) || isNaN(month) || isNaN(year)) {
+	// 	throw new Error('Invalid date format');
+	// }
 
-	const dateParts = dateString.split('-');
-	const mappedDateParts = dateParts.map((part) => parseInt(part));
+	return new Date(Date.UTC(year, month - 1, day));
+};
 
-	const date = new Date(mappedDateParts[0], mappedDateParts[1] - 1, mappedDateParts[2]);
-	return date;
+// export const getLastFridayDate = () => {
+// 	const today = new Date();
+// 	const dayOfWeek = today.getDay(); // Get the current day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+// 	const daysUntilFriday = (dayOfWeek + 7 - 5) % 7; // Calculate how many days to subtract to get to the last Friday
+
+// 	const lastFriday = new Date(today);
+// 	lastFriday.setDate(today.getDate() - daysUntilFriday);
+
+// 	return lastFriday;
+// };
+
+export const getDayFromHyphenatedString = (dateString: string) => {
+	const date = getDateFromHyphenatedString(dateString);
+	const day = getDayFromNumber(date.getDay());
+	return day;
 };

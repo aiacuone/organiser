@@ -1,15 +1,13 @@
-import { getSpaces, getTimes } from '$lib/server';
-// import { testData } from '../testData';
+import { getSpaces } from '$lib';
 
 export const load = async (req: Request, res: Response) => {
-	const spaces = getSpaces();
-	const times = getTimes();
+	const spaces = await getSpaces();
 
-	// return {
-	// 	...testData
-	// };
+	const space = req.url.pathname.split('/')[1];
+
 	return {
 		spaces,
-		times
+		// times,
+		space
 	};
 };

@@ -1,92 +1,209 @@
+import { LogType_enum, type Space_int } from '$lib/types';
 import { v4 as uuidv4 } from 'uuid';
 
-export const testData = {
-	spaces: [
-		{
-			name: 'aventus',
-			color: '#B6D0E2',
-			notes: [
-				{
-					id: uuidv4(),
-					title: 'test 1',
-					content:
-						'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vitae enim ut milobortis commodo vitae ut justo. Etiam rutrum ligula justo, sit amet elementum sapienultrices eu. Praesent sit amet nisl volutpat quam fermentum suscipit. Aenean sodales antesed enim porta, sit amet viverra nulla porta. Curabitur sodales pharetra. asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf',
-					date: new Date()
-				},
-				{
-					id: uuidv4(),
-					title: 'test 2',
-					content: 'test content for note test 2 aventus',
-					date: new Date()
-				},
-				{
-					id: uuidv4(),
-					title: 'test 3',
-					content: 'test content for note test 3 aventus',
-					date: new Date()
-				},
-				{
-					id: uuidv4(),
-					title: 'test 4',
-					content: 'test content for note test 4 aventus',
-					date: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-				},
-				{
-					id: uuidv4(),
-					title: 'test 5',
-					content: 'test content for note test 5 aventus',
-					date: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-				},
-				{
-					id: uuidv4(),
-					title: 'test 6',
-					content: 'test content for note test 6 aventus',
-					date: 'Thu Aug 03 2023 20:00:47 GMT+0100 (British Summer Time)'
-				}
-			]
-		},
-		{
-			name: 'eth lizards',
-			color: '#C1E1C1',
-			notes: [
-				{
-					id: uuidv4(),
-					title: 'test 3',
-					content: 'test content for note test 3 eth lizards',
-					date: new Date()
-				},
-				{
-					id: uuidv4(),
-					title: 'test 4',
-					content: 'test content for note test 4 eth lizards',
-					date: new Date()
-				}
-			]
-		},
-		{
-			name: 'personal',
-			color: '#E5E4E2',
-			notes: [
-				{
-					id: uuidv4(),
-					title: 'test 5',
-					content: 'test content for note test 5 personal',
-					date: new Date()
-				},
-				{
-					id: uuidv4(),
-					title: 'test 6',
-					content: 'test content for note test 6 personal',
-					date: new Date()
-				},
-				{
-					id: uuidv4(),
-					title: 'test 7',
-					content: 'test content for note test 7 personal',
-					date: new Date()
-				}
-			]
-		}
-	],
-	times: [{ name: 'today' }, { name: 'yesterday' }, { name: 'history' }]
-};
+export const testSpaces: Array<Space_int> = [
+	{
+		name: 'aventus',
+		href: 'aventus',
+		color: 'blue',
+		times: [
+			{
+				id: uuidv4(),
+				title: 'title 1',
+				content: [
+					'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut feugiat lorem. Quisque ornare dolor sed neque consectetur, a varius augue placerat. Vivamus et lobortis turpis. Fusce sit amet tortor dolor. Fusce efficitur lacus tempor, semper sem et, eleifend felis. Vestibulum eu tincidunt tellus. Vestibulum massa nulla, lacinia id aliquet.',
+					'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut feugiat lorem. Quisque ornare dolor sed neque consectetur, a varius augue placerat. Vivamus et lobortis turpis. Fusce sit amet tortor dolor. Fusce efficitur lacus tempor, semper sem et, eleifend felis. Vestibulum eu tincidunt tellus. Vestibulum massa nulla, lacinia id aliquet.'
+				],
+				date: new Date(),
+				time: 1,
+				reference: 'reference 1',
+				type: LogType_enum.time
+			},
+			{
+				id: uuidv4(),
+				title: 'test 2',
+				content: ['test 2'],
+				date: new Date(),
+				time: 2,
+				reference: 'test 2',
+				type: LogType_enum.time
+			}
+		],
+		todos: [
+			{
+				id: uuidv4(),
+				content: 'Asks things about stuff',
+				date: new Date(),
+				isCompleted: false,
+				priority: 1,
+				type: LogType_enum.todo
+			}
+		],
+		importants: [
+			{
+				id: uuidv4(),
+				content: 'A very important thing that you need to remember',
+				date: new Date(),
+				importance: 1,
+				type: LogType_enum.important
+			},
+			{
+				id: uuidv4(),
+				content: 'test 2',
+				date: new Date(),
+				importance: 3,
+				type: LogType_enum.important
+			}
+		],
+		questions: [
+			{
+				id: uuidv4(),
+				content: 'Why is life',
+				date: new Date(),
+				importance: 1,
+				type: LogType_enum.question
+			},
+			{
+				id: uuidv4(),
+				content: 'How did we get here',
+				date: new Date(),
+				importance: 2,
+				type: LogType_enum.question
+			}
+		]
+	},
+	{
+		name: 'eth lizards',
+		href: 'eth-lizards',
+		color: 'green',
+		times: [
+			{
+				id: uuidv4(),
+				title: 'test',
+				content: ['test'],
+				date: new Date(),
+				time: 1,
+				reference: 'test',
+				type: LogType_enum.time
+			},
+			{
+				id: uuidv4(),
+				title: 'test 2',
+				content: ['test 2'],
+				date: new Date(),
+				time: 2,
+				reference: 'test 2',
+				type: LogType_enum.time
+			}
+		],
+		todos: [
+			{
+				id: uuidv4(),
+				content: 'test',
+				date: new Date(),
+				isCompleted: false,
+				priority: 1,
+				type: LogType_enum.todo
+			}
+		],
+		importants: [
+			{
+				id: uuidv4(),
+				content: 'test',
+				date: new Date(),
+				importance: 1,
+				type: LogType_enum.important
+			},
+			{
+				id: uuidv4(),
+				content: 'test 2',
+				date: new Date(),
+				importance: 2,
+				type: LogType_enum.important
+			}
+		],
+		questions: [
+			{
+				id: uuidv4(),
+				content: 'test',
+				date: new Date(),
+				importance: 1,
+				type: LogType_enum.question
+			},
+			{
+				id: uuidv4(),
+				content: 'test 2',
+				date: new Date(),
+				importance: 2,
+				type: LogType_enum.question
+			}
+		]
+	},
+	{
+		name: 'daid',
+		href: 'daid',
+		color: 'gray',
+		times: [
+			{
+				id: uuidv4(),
+				title: 'test',
+				content: ['test'],
+				date: new Date(),
+				time: 1,
+				reference: 'test',
+				type: LogType_enum.time
+			},
+			{
+				id: uuidv4(),
+				title: 'test 2',
+				content: ['test 2'],
+				date: new Date(),
+				time: 2,
+				reference: 'test 2',
+				type: LogType_enum.time
+			}
+		],
+		todos: [
+			{
+				id: uuidv4(),
+				content: 'test',
+				date: new Date(),
+				isCompleted: false,
+				priority: 1,
+				type: LogType_enum.todo
+			}
+		],
+		importants: [
+			{
+				id: uuidv4(),
+				content: 'test',
+				date: new Date(),
+				importance: 1,
+				type: LogType_enum.important
+			},
+			{
+				id: uuidv4(),
+				content: 'test 2',
+				date: new Date(),
+				importance: 2,
+				type: LogType_enum.important
+			}
+		],
+		questions: [
+			{
+				id: uuidv4(),
+				content: 'test',
+				date: new Date(),
+				importance: 1,
+				type: LogType_enum.question
+			},
+			{
+				id: uuidv4(),
+				content: 'test 2',
+				date: new Date(),
+				importance: 2,
+				type: LogType_enum.question
+			}
+		]
+	}
+];

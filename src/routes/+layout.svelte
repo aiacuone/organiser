@@ -1,88 +1,180 @@
 <script lang="ts">
-	import { derived, type Readable } from 'svelte/store';
 	import '../app.css';
 	import { page } from '$app/stores';
-	import { onMount, setContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import HeaderFooterLink from '../lib/components/HeaderFooterLink.svelte';
-	import type { Space_int, SpaceData_int } from '$lib/types/general';
+	import type { SpaceData_int } from '$lib/types/general';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
-	import { darkMode } from '$lib/stores';
+	import {
+		getHyphenatedStringFromDate,
+		replaceAllHyphensWithSpaces,
+		replaceAllSpacesWithHyphens
+	} from '$lib/utils/strings';
+	import Button from '$lib/components/Button.svelte';
+	import Dialog from '$lib/components/Dialog.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
+	import { selectedDate, selectedHyphenatedDateString } from '$lib/stores/dates';
+	import Input from '$lib/components/Input.svelte';
 
 	export let data: SpaceData_int;
-	const { spaces, times } = data;
+	const { spaces } = data;
 
-	const space: Readable<Space_int | undefined> = derived(page, ($page) =>
-		$page.params.space
-			? data.spaces.find((space) => space.name === $page.params.space.replace('-', ' '))
-			: spaces[0]
-	);
-	setContext('space', space);
+	const getDateFromHyphenatedString = (dateString: string) => {
+		const [day, month, year] = dateString.split('-').map(Number);
 
-	onMount(() => {
-		const goToDefaultSpace = () => goto(`/${spaces[0].name.replace(' ', '-')}/today`);
-		const isHomePage = $page.url.pathname === '/';
-		if (isHomePage) goToDefaultSpace();
-	});
-
-	const queryClient = new QueryClient();
-
-	const onClickDarkMode = () => {
-		localStorage.setItem('isDarkMode', new Boolean(!$darkMode.boolean).toString());
-		$darkMode.boolean = !$darkMode.boolean;
+		return new Date(Date.UTC(year, month - 1, day));
 	};
 
 	onMount(() => {
-		localStorage.getItem('isDarkMode') === 'true'
-			? ($darkMode.boolean = true)
-			: ($darkMode.boolean = false);
+		if ($page.params.date) {
+			return ($selectedDate = new Date(getDateFromHyphenatedString($page.params.date)));
+		}
+		$selectedDate = new Date();
 	});
+
+	onMount(() => {
+		const onKeydown = (e) => {
+			switch (true) {
+				case e.ctrlKey && e.shiftKey && e.key === 'T':
+					onGotoTodaysDate();
+					break;
+
+				case e.key === 'ArrowLeft':
+					onClickPreviousDay();
+					break;
+
+				case e.key === 'ArrowRight':
+					onClickNextDay();
+					break;
+
+				case e.key === 'ArrowUp':
+					console.log('up');
+					break;
+
+				case e.key === 'ArrowDown':
+					console.log('down');
+					break;
+
+				default:
+			}
+		};
+
+		document.addEventListener('keydown', onKeydown);
+		return () => {
+			document.removeEventListener('keydown', onKeydown);
+		};
+	});
+
+	const queryClient = new QueryClient();
+	let onOpen: () => void;
+
+	const onClickPreviousDay = () => {
+		const getPreviousDate = (date: Date) => {
+			const _date = new Date(date);
+			_date.setDate(_date.getDate() - 1);
+			return _date;
+		};
+		$selectedDate = getPreviousDate($selectedDate);
+	};
+
+	const onClickNextDay = () => {
+		const getPreviousDate = (date: Date) => {
+			const _date = new Date(date);
+			_date.setDate(_date.getDate() + 1);
+			return _date;
+		};
+		$selectedDate = getPreviousDate($selectedDate);
+	};
+
+	const onGotoTodaysDate = () => {
+		$selectedDate = new Date();
+	};
+
+	export const getNextDay = (date: Date) => {
+		const _date = new Date(date);
+		_date.setDate(_date.getDate() + 1);
+		return _date;
+	};
+	let isAddingNewSpace: boolean = false;
+	let dialog: HTMLDialogElement;
+	let addInputValue: string;
+
+	const onDialogClose = () => {
+		isAddingNewSpace = false;
+		dialog.close();
+	};
+
+	const onAddSpace = () => {
+		goto(
+			`/${replaceAllSpacesWithHyphens(addInputValue)}/date/${getHyphenatedStringFromDate(
+				new Date()
+			)}`
+		);
+
+		addInputValue = '';
+		onDialogClose();
+		$selectedDate = new Date();
+	};
 </script>
 
 <QueryClientProvider client={queryClient}>
-	<div class="stack h-screen">
-		<header class="center py-2" style="background:{$space?.color}">
-			<div class="hStack gap-2 sm:gap-4">
-				{#each spaces as _space}
-					{@const spaceName = _space.name.replace(' ', '-')}
-					<HeaderFooterLink
-						href="/{spaceName}/today"
-						isSelected={$space?.name === _space.name}
-						style="background:{_space.color};color:black">{_space.name}</HeaderFooterLink
-					>
-				{/each}
+	<div class="stack" style={'height:100dvh'}>
+		<header class="center py-2 bg-gray-200">
+			<div class="hstack gap-2 sm:gap-4">
+				<Button _class="bg-white bg-opacity-80 capitalize" onClick={onOpen}
+					>{replaceAllHyphensWithSpaces(data.space)}</Button
+				>
 			</div>
 		</header>
-		<main
-			class="flex-1 p-2 flex flex-col"
-			style={$darkMode.boolean ? $darkMode.darkStyles.string : $darkMode.lightStyles.string}
-		>
-			<div class="flex justify-end">
-				<button on:click={onClickDarkMode}>
-					<Icon
-						icon={icons.darkMode}
-						height="25px"
-						width="25px"
-						class={$darkMode.boolean
-							? `color-${$darkMode.darkStyles.color}`
-							: `color-${$darkMode.lightStyles.color}`}
-					/>
-				</button>
-			</div>
+		<main class="flex-1 p-1 sm:p-2 flex flex-col overflow-hidden">
+			<div class="flex justify-end" />
 			<slot />
 		</main>
-		<footer class=" py-2" style="background:{$space?.color}">
-			<div class="hStack center capitalize gap-2 sm:gap-4">
-				{#each times as time}
-					{@const timeName = time.name.replace(' ', '-')}
-					<HeaderFooterLink
-						href="/{$space?.name.replace(' ', '-')}/{timeName}"
-						isSelected={$page.params.time === timeName}>{time.name}</HeaderFooterLink
-					>
-				{/each}
+		<footer class="py-2 bg-gray-300">
+			<div class="hstack center capitalize gap-5">
+				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickPreviousDay}>
+					<Icon icon={icons.left} height="20px" />
+				</Button>
+				<Button
+					_class="bg-white {getHyphenatedStringFromDate(new Date()) ===
+					$selectedHyphenatedDateString
+						? 'bg-opacity-80'
+						: 'bg-opacity-40'}"
+					onClick={onGotoTodaysDate}>Today</Button
+				>
+				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickNextDay}>
+					<Icon icon={icons.right} height="20px" />
+				</Button>
 			</div>
 		</footer>
 	</div>
 </QueryClientProvider>
+
+<Dialog bind:onOpen onClose={onDialogClose} bind:dialog>
+	<div class="stack gap-3">
+		<div class="stack gap-4 self-center">
+			{#each spaces as space}
+				{@const onClick = () => {
+					goto(
+						`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(new Date())}`
+					);
+					onDialogClose();
+				}}
+				<Button {onClick} _class="capitalize">{replaceAllHyphensWithSpaces(space)}</Button>
+			{/each}
+		</div>
+		<div class="min-h-[50px] center">
+			{#if isAddingNewSpace}
+				<div class="hstack gap-2">
+					<Input _class="border border-gray-100 px-2" autofocus bind:value={addInputValue} />
+					<button class="bg-gray-50 px-2 py-1" on:click={(e) => onAddSpace(e)}>
+						<Icon icon={icons.enter} />
+					</button>
+				</div>
+			{:else}
+				<Button onClick={() => (isAddingNewSpace = true)}>Add</Button>
+			{/if}
+		</div>
+	</div>
+</Dialog>
