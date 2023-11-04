@@ -32,7 +32,7 @@
 	let originalQuestion = question;
 	let originalAnswer = answer;
 	let originalImportance = importance;
-	let originalDate = date;
+	const originalDate = date;
 	let onEdit: () => void;
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
@@ -80,7 +80,6 @@
 		originalQuestion = question;
 		originalAnswer = answer;
 		originalImportance = importance;
-		originalDate = date;
 
 		onResetNewLogType();
 	};

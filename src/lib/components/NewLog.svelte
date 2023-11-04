@@ -5,8 +5,15 @@
 	import Todo from './Logs/Todo.svelte';
 	import Question from './Logs/Question.svelte';
 	import Important from './Logs/Important.svelte';
+	import { page } from '$app/stores';
 
 	export let type: LogType_enum;
+
+	const [day, month] = $page.params.date.split('-');
+
+	const date = new Date();
+	date.setMonth(parseInt(month) - 1);
+	date.setDate(parseInt(day));
 
 	const sharedProps = {
 		id: uuidv4(),
@@ -20,7 +27,8 @@
 		priority: 2,
 		inputAutoFocus: true,
 		bullets: [''],
-		question: ''
+		question: '',
+		date
 	};
 </script>
 

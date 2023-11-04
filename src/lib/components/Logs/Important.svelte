@@ -29,7 +29,7 @@
 	let originalReference = reference;
 	let originalContent = content;
 	let originalImportance = importance;
-	let originalDate = date;
+	const originalDate = date;
 
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
@@ -85,7 +85,6 @@
 		originalReference = reference;
 		originalContent = content;
 		originalImportance = importance;
-		originalDate = date;
 
 		onResetNewLogType();
 	};

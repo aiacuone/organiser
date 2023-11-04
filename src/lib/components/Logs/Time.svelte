@@ -92,6 +92,7 @@
 			originalReference = reference;
 			originalBullets = bullets;
 			originalTime = time;
+
 			lastUpdated = date;
 		} catch (error) {
 			console.log({ error });
