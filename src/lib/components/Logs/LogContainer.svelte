@@ -4,6 +4,7 @@
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import { titlesAndReferences } from '$lib/stores';
+	import { onMount } from 'svelte';
 	export let isEditing = false;
 	export let onConfirmReset: () => void;
 	export let id: string;
@@ -27,12 +28,12 @@
 	};
 	export let changeReferenceInputValue: ((value: string | undefined) => void) | undefined =
 		undefined;
-
 	export const onTitleAutoFill = (_title: string) => {
 		const correspondingReference = $titlesAndReferences.find((t) => t.title === _title)?.reference;
 
 		changeReferenceInputValue && changeReferenceInputValue(correspondingReference ?? undefined);
 	};
+	export let onMetaAndEnterKeydown: () => void = () => {};
 
 	let onOpen: () => void;
 
@@ -41,9 +42,25 @@
 	};
 
 	const queryClient = useQueryClient();
+
+	let container: HTMLDivElement;
+
+	onMount(() => {
+		const keydown = (e: KeyboardEvent) => {
+			if (e.metaKey && e.key === 'Enter') {
+				onMetaAndEnterKeydown();
+			}
+		};
+
+		container.addEventListener('keydown', keydown);
+
+		return () => {
+			container.removeEventListener('keydown', keydown);
+		};
+	});
 </script>
 
-<div use:clickOutside on:click_outside={onClickOutside} class="">
+<div bind:this={container} use:clickOutside on:click_outside={onClickOutside} class="">
 	<slot />
 </div>
 

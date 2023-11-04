@@ -150,6 +150,12 @@
 		onIncrement,
 		onDecrement
 	};
+	const onTextareaEnterKeydown: () => void = () => {
+		onAddBullet();
+	};
+	const onMetaAndEnterKeydown = () => {
+		onAcceptEdit();
+	};
 </script>
 
 <LogContainer
@@ -162,6 +168,7 @@
 	{id}
 	bind:onTitleAutoFill
 	{changeReferenceInputValue}
+	{onMetaAndEnterKeydown}
 >
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-2 sm:p-4 stack text-sm gap-1">
@@ -185,7 +192,13 @@
 				{#each bullets as _, index}
 					<li>
 						<div class="flex gap-2 min-h-[20px]">
-							<Textarea className="flex-1" bind:value={bullets[index]} isDisabled={!isEditing} />
+							<Textarea
+								className="flex-1"
+								bind:value={bullets[index]}
+								isDisabled={!isEditing}
+								onEnterKeydown={onTextareaEnterKeydown}
+								autofocus={index > 0}
+							/>
 							<div class="min-w-[40px] hidden sm:flex align-center relative">
 								{#if isEditing}
 									<button class=" absolute top-0" on:click={() => onDeleteBullet(index)}>

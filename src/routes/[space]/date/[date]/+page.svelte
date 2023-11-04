@@ -1,13 +1,7 @@
 <script lang="ts">
-	import {
-		type Time_enum,
-		LogType_enum,
-		type SpaceData_int,
-		type LogBase_int,
-		type Log_int
-	} from '$lib/types/general';
+	import { type Time_enum, LogType_enum, type SpaceData_int } from '$lib/types/general';
 	import { setContext } from 'svelte';
-	import { derived, writable, type Writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
 	import {
 		getDate2DaysEarlier,
@@ -30,7 +24,6 @@
 	import { titlesAndReferences } from '$lib/stores';
 	import { selectedDate, selectedDayString, selectedHyphenatedDateString } from '$lib/stores/dates';
 	import { getCapitalizedWords, replaceAllSpacesWithHyphens } from '$lib/utils/strings';
-	// import Input from '$lib/components/Input.svelte';
 	import Search from '$lib/components/Search.svelte';
 
 	interface PageData extends SpaceData_int {

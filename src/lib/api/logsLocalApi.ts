@@ -15,6 +15,7 @@ export const getDateLogs = async ({ space, date }: { space: string; date: string
 	const { data } = await axios.get(`/${resource}/${space}/${date}`);
 	return data;
 };
+
 export const getFilteredLogs = async ({ space, value }: { space: string; value: string }) => {
 	const { data } = await axios.get(`/${resource}/${space}/search/${value}`);
 	return data;

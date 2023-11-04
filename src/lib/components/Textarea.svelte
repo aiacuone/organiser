@@ -5,6 +5,7 @@
 	export let autofocus = false;
 	export let isDisabled = false;
 	export let _class = '';
+	export let onEnterKeydown: () => void = () => {};
 
 	let textarea: HTMLTextAreaElement;
 	export const onFocus = () => {
@@ -23,16 +24,18 @@
 	onMount(() => {
 		autofocus && textarea.focus();
 
-		const preventEnter = (e: KeyboardEvent) => {
+		const keydown = (e: KeyboardEvent) => {
 			if (e.key === 'Enter') {
+				if (e.metaKey || e.ctrlKey || e.altKey) return;
 				e.preventDefault();
+				onEnterKeydown();
 			}
 		};
 
-		textarea.addEventListener('keydown', preventEnter);
+		textarea.addEventListener('keydown', keydown);
 
 		return () => {
-			textarea.removeEventListener('keydown', preventEnter);
+			textarea.removeEventListener('keydown', keydown);
 		};
 	});
 </script>
