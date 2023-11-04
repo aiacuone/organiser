@@ -15,6 +15,9 @@
 	export let _class: string | undefined = undefined;
 	export let onChange: (event: Event) => void = () => {};
 	export let onEnterKeydown: () => void = () => {};
+	export const onFocus: () => void = () => {
+		input && input.focus();
+	};
 
 	let input: HTMLInputElement;
 	let isInputFocused: boolean = false;
@@ -35,7 +38,7 @@
 		isInputFocused = false;
 	};
 
-	const onFocus = () => {
+	const _onFocus = () => {
 		isInputFocused = true;
 	};
 	const onKeydown = (e) => {
@@ -52,7 +55,7 @@
 		class="placeholder-gray-300 w-full bg-transparent text-sm outline-none {_class}"
 		placeholder={isDisabled ? '' : placeholder}
 		bind:this={input}
-		on:focus={onFocus}
+		on:focus={_onFocus}
 		disabled={isDisabled}
 		on:input={onChange}
 		on:keydown={onKeydown}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { getFilteredLogs } from '$lib/api/logsLocalApi';
 	import Important from '$lib/components/Logs/Important.svelte';
@@ -10,6 +11,7 @@
 	import { debounce } from '$lib/utils/general';
 	import { replaceAllSpacesWithHyphens } from '$lib/utils/strings';
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
+	import { onMount } from 'svelte';
 
 	const queryClient = useQueryClient();
 
@@ -43,6 +45,18 @@
 	let headerContainerHeight: number;
 	let parentContainerHeight: number;
 	$: logContainerHeight = parentContainerHeight - headerContainerHeight - 20;
+
+	onMount(() => {
+		const onKeydown = (e) => {
+			if (e.key === 'Escape') {
+				window.history.back();
+			}
+		};
+		document.addEventListener('keydown', onKeydown);
+		return () => {
+			document.removeEventListener('keydown', onKeydown);
+		};
+	});
 </script>
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>

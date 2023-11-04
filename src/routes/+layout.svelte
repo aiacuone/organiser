@@ -33,6 +33,39 @@
 		$selectedDate = new Date();
 	});
 
+	onMount(() => {
+		const onKeydown = (e) => {
+			switch (true) {
+				case e.ctrlKey && e.shiftKey && e.key === 'T':
+					onGotoTodaysDate();
+					break;
+
+				case e.key === 'ArrowLeft':
+					onClickPreviousDay();
+					break;
+
+				case e.key === 'ArrowRight':
+					onClickNextDay();
+					break;
+
+				case e.key === 'ArrowUp':
+					console.log('up');
+					break;
+
+				case e.key === 'ArrowDown':
+					console.log('down');
+					break;
+
+				default:
+			}
+		};
+
+		document.addEventListener('keydown', onKeydown);
+		return () => {
+			document.removeEventListener('keydown', onKeydown);
+		};
+	});
+
 	const queryClient = new QueryClient();
 	let onOpen: () => void;
 
@@ -52,6 +85,10 @@
 			return _date;
 		};
 		$selectedDate = getPreviousDate($selectedDate);
+	};
+
+	const onGotoTodaysDate = () => {
+		$selectedDate = new Date();
 	};
 
 	export const getNextDay = (date: Date) => {
@@ -104,7 +141,7 @@
 					$selectedHyphenatedDateString
 						? 'bg-opacity-80'
 						: 'bg-opacity-40'}"
-					onClick={() => ($selectedDate = new Date())}>Today</Button
+					onClick={onGotoTodaysDate}>Today</Button
 				>
 				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickNextDay}>
 					<Icon icon={icons.right} height="20px" />

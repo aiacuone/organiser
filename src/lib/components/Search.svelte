@@ -9,12 +9,13 @@
 	export let onClickEnter: () => void = () => {};
 	export let showEnter: boolean = true;
 	export let onEnterKeydown: () => void = () => {};
+	export let onFocus: (() => void) | undefined = undefined;
 </script>
 
 <div class="hstack">
 	<div class="hstack center gap-1 px-1 border border-gray-100 rounded-sm">
 		<Icon icon={icons.search} class="text-gray-500" />
-		<Input _class="outline-none" bind:value {onChange} bind:onEnterKeydown />
+		<Input bind:onFocus _class="outline-none" bind:value {onChange} bind:onEnterKeydown />
 	</div>
 	{#if showEnter}
 		<button class="w-[30px] center" on:click={onClickEnter}>

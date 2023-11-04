@@ -47,7 +47,7 @@
 
 	onMount(() => {
 		const keydown = (e: KeyboardEvent) => {
-			if (e.metaKey && e.key === 'Enter') {
+			if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
 				onMetaAndEnterKeydown();
 			}
 		};

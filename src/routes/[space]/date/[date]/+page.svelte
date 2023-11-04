@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { type Time_enum, LogType_enum, type SpaceData_int } from '$lib/types/general';
-	import { setContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
 	import {
@@ -164,9 +164,24 @@
 	};
 
 	let searchValue: string;
+	let onSearchFocus: () => void;
+
 	const onSearch = () => {
 		goto(`/${$page.params.space}/search/${searchValue}`);
 	};
+
+	onMount(() => {
+		const keydown = (e: KeyboardEvent) => {
+			if (e.shiftKey && e.ctrlKey && e.key === 'S') {
+				e.preventDefault();
+				onSearchFocus();
+			}
+		};
+		document.addEventListener('keydown', keydown);
+		return () => {
+			document.removeEventListener('keydown', keydown);
+		};
+	});
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -184,7 +199,12 @@
 					</div>
 					<input type="date" on:change={onDateChange} class="w-[20px]" />
 				</div>
-				<Search bind:value={searchValue} onClickEnter={onSearch} onEnterKeydown={onSearch} />
+				<Search
+					bind:onFocus={onSearchFocus}
+					bind:value={searchValue}
+					onClickEnter={onSearch}
+					onEnterKeydown={onSearch}
+				/>
 			</div>
 
 			<div class="grid grid-cols-2 sm:grid-cols-4 w-full gap-y-3 gap-x-3 sm:gap-x-10">
