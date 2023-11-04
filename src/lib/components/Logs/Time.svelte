@@ -15,7 +15,7 @@
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 
 	export let isEditing: boolean;
-	export let date: Date = new Date();
+	export let date: Date;
 	export let bullets: string[] = [];
 	export let id: string;
 	export let title: string;
@@ -32,7 +32,6 @@
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let onTitleAutoFill: (title: string) => void;
 
-	const originalDate = date;
 	let originalBullets = [...bullets];
 	let originalTitle = title;
 	let originalReference = reference;
@@ -83,7 +82,7 @@
 				reference,
 				bullets,
 				time,
-				date: originalDate,
+				date,
 				type: LogType_enum.time,
 				space: $page.params.space,
 				lastUpdated: date

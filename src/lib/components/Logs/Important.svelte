@@ -29,7 +29,6 @@
 	let originalReference = reference;
 	let originalContent = content;
 	let originalImportance = importance;
-	const originalDate = date;
 
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;

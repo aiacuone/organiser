@@ -32,7 +32,6 @@
 	let originalQuestion = question;
 	let originalAnswer = answer;
 	let originalImportance = importance;
-	const originalDate = date;
 	let onEdit: () => void;
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;

@@ -30,7 +30,6 @@
 	let originalReference = reference;
 	let originalContent = content;
 	let originalPriority = priority;
-	const originalDate = date;
 	let originalIsCompleted = isCompleted;
 
 	let onDelete: () => void;
