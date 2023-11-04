@@ -19,7 +19,7 @@
 	import Question from '$lib/components/Logs/Question.svelte';
 	import NewLog from '$lib/components/NewLog.svelte';
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
-	import { getDateLogs, getTitlesAndReferences } from '$lib/api/logsLocalApi';
+	import { getLogs, getTitlesAndReferences } from '$lib/api/logsLocalApi';
 	import { goto } from '$app/navigation';
 	import { titlesAndReferences } from '$lib/stores';
 	import { selectedDate, selectedDayString, selectedHyphenatedDateString } from '$lib/stores/dates';
@@ -53,9 +53,9 @@
 		'logs',
 		() =>
 			$selectedHyphenatedDateString &&
-			getDateLogs({
+			getLogs({
 				space: replaceAllSpacesWithHyphens(data.space),
-				date: $selectedHyphenatedDateString
+				date: $selectedDate
 			}),
 		{
 			onSuccess: () => {

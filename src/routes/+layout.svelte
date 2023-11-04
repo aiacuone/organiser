@@ -36,7 +36,7 @@
 	onMount(() => {
 		const onKeydown = (e) => {
 			switch (true) {
-				case e.ctrlKey && e.shiftKey && e.key === 'T':
+				case e.ctrlKey && e.shiftKey && e.code === 'Space':
 					onGotoTodaysDate();
 					break;
 

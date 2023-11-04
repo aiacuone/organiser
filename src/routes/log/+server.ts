@@ -1,4 +1,4 @@
-import { deleteLog, updateLog } from '$lib';
+import { deleteLog, getLogs, updateLog } from '$lib';
 
 export async function PATCH({ request }) {
 	const data = await request.json();
@@ -12,4 +12,12 @@ export const DELETE = async ({ request }) => {
 	await deleteLog(id);
 
 	return new Response(JSON.stringify(''), { status: 200 });
+};
+
+export const GET = async ({ url: { searchParams } }) => {
+	const result = new URLSearchParams(searchParams).entries();
+	const params = Object.fromEntries(result);
+	const logs = await getLogs(params);
+
+	return new Response(JSON.stringify(logs), { status: 200 });
 };

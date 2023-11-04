@@ -17,35 +17,53 @@ export const getCollection = async (collectionName: string) => {
 
 const collection = await getCollection('aiacuone');
 
-export const getDateLogs = async ({ space, date }: { space: string; date: Date }) => {
-	const result = await collection
-		.aggregate([
-			{ $match: { space } },
-			{
-				$match: {
-					$or: [
-						{
-							date: new Date(date) // Format 1: Date object
-						},
-						{
-							date: {
-								$gte: new Date(date.setHours(0, 0, 0, 0)),
-								$lt: new Date(date.setHours(23, 59, 59, 999))
-							} // Format 2: ISODate format (Midnight to 23:59:59.999)
-						},
-						{
-							date: {
-								$gte: new Date(date.setUTCHours(0, 0, 0, 0)),
-								$lt: new Date(date.setUTCHours(23, 59, 59, 999))
-							} // Format 3: UTC Date (Midnight to 23:59:59.999)
-						}
-					]
-				}
-			},
-			{ $project: { _id: 0 } },
-			{ $sort: { date: -1 } }
-		])
-		.toArray();
+export const getLogs = async ({ space, search, date: _date }: Record<string, any>) => {
+	const query: Array<Record<string | number, Record<string, any>>> = [
+		{ $project: { _id: 0 } },
+		{ $sort: { date: -1 } }
+	];
+
+	if (space) {
+		query.push({ $match: { space } });
+	}
+
+	if (_date) {
+		const date = new Date(_date);
+		query.push({
+			$match: {
+				$or: [
+					{
+						date: new Date(date) // Format 1: Date object
+					},
+					{
+						date: {
+							$gte: new Date(date.setHours(0, 0, 0, 0)),
+							$lt: new Date(date.setHours(23, 59, 59, 999))
+						} // Format 2: ISODate format (Midnight to 23:59:59.999)
+					},
+					{
+						date: {
+							$gte: new Date(date.setUTCHours(0, 0, 0, 0)),
+							$lt: new Date(date.setUTCHours(23, 59, 59, 999))
+						} // Format 3: UTC Date (Midnight to 23:59:59.999)
+					}
+				]
+			}
+		});
+	}
+
+	if (search) {
+		const options = ['title', 'reference', 'content', 'question', 'answer'];
+		query.push({
+			$match: {
+				$or: options.map((option) => ({
+					[option]: { $regex: search, $options: 'i' }
+				}))
+			}
+		});
+	}
+
+	const result = await collection.aggregate(query).toArray();
 
 	return result;
 };
@@ -115,24 +133,3 @@ export const getTitlesAndReferences = async (space: string) => {
 // 	const spaces = await collection.distinct('title', { space });
 // 	return spaces;
 // };
-
-export const getFilteredLogs = async ({ space, value }: { space: string; value: string }) => {
-	const result = await collection
-		.aggregate([
-			{ $match: { space } },
-			{
-				$match: {
-					$or: [
-						{ title: { $regex: value, $options: 'i' } },
-						{ reference: { $regex: value, $options: 'i' } },
-						{ content: { $regex: value, $options: 'i' } }
-					]
-				}
-			},
-			{ $project: { _id: 0 } },
-			{ $sort: { date: -1 } }
-		])
-		.toArray();
-
-	return result;
-};

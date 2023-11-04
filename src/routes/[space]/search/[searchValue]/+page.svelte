@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { getFilteredLogs } from '$lib/api/logsLocalApi';
+	import { getLogs } from '$lib/api/logsLocalApi';
 	import Important from '$lib/components/Logs/Important.svelte';
 	import Question from '$lib/components/Logs/Question.svelte';
 	import Time from '$lib/components/Logs/Time.svelte';
@@ -20,9 +19,9 @@
 	const filteredLogsQuery = useQuery(
 		'filteredLogs',
 		() => {
-			return getFilteredLogs({
+			return getLogs({
 				space: replaceAllSpacesWithHyphens($page.params.space),
-				value: searchValue
+				search: searchValue
 			});
 		},
 		{

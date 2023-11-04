@@ -11,25 +11,23 @@ export const deleteLog = async (id: string) => {
 	await axios.delete(`/${resource}`, { data: { id } });
 };
 
-export const getDateLogs = async ({ space, date }: { space: string; date: string }) => {
-	const { data } = await axios.get(`/${resource}/${space}/${date}`);
+export const getDateLogs = async ({
+	space,
+	date,
+	params
+}: {
+	space: string;
+	date: string;
+	params?: Record<'search', string>;
+}) => {
+	const { data } = await axios.get(`/${resource}/${space}/${date}`, { params });
 	return data;
 };
 
-export const getFilteredLogs = async ({ space, value }: { space: string; value: string }) => {
-	const { data } = await axios.get(`/${resource}/${space}/search/${value}`);
+export const getLogs = async (params: { space?: string; search?: string; date?: Date }) => {
+	const { data } = await axios.get(`/${resource}`, { params });
 	return data;
 };
-
-// export const getReferences = async (space: string) => {
-// 	const { data } = await axios.get(`/${resource}/${space}/references`);
-// 	return data;
-// };
-
-// export const getTitles = async (space: string) => {
-// 	const { data } = await axios.get(`/${resource}/${space}/titles`);
-// 	return data;
-// };
 
 export const getTitlesAndReferences = async (space: string) => {
 	const { data } = await axios.get(`/${resource}/${space}/titlesAndReferences`);
