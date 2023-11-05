@@ -19,9 +19,11 @@
 	const filters: Writable<Record<string, string>> = writable(defaultFilters);
 
 	let hasPageLoaded = false;
+	let onSearchInputFocus: () => void;
 
 	onMount(() => {
 		hasPageLoaded = true;
+		defaultFilters.search && onSearchInputFocus();
 	});
 
 	const objectToQueryString = (obj: Record<string, string>) => {
@@ -97,7 +99,12 @@
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
 	<div class="center" bind:clientHeight={headerContainerHeight}>
-		<Search bind:value={$filters.search} {onClickClear} showEnter={false} />
+		<Search
+			bind:value={$filters.search}
+			{onClickClear}
+			showEnter={false}
+			bind:onFocus={onSearchInputFocus}
+		/>
 	</div>
 	<div class="center">
 		<div
