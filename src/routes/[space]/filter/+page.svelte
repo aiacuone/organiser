@@ -9,7 +9,7 @@
 	import Search from '$lib/components/Search.svelte';
 	import { LogType_enum } from '$lib/types';
 
-	import { replaceAllSpacesWithHyphens } from '$lib/utils/strings';
+	import { objectToQueryString, replaceAllSpacesWithHyphens } from '$lib/utils/strings';
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import { onMount } from 'svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
@@ -25,15 +25,6 @@
 		hasPageLoaded = true;
 		defaultFilters.search && onSearchInputFocus();
 	});
-
-	const objectToQueryString = (obj: Record<string, string>) => {
-		return Object.entries(obj)
-			.map(([key, value]) => {
-				if (value) return encodeURIComponent(key) + '=' + encodeURIComponent(value);
-			})
-			.filter(Boolean)
-			.join('&');
-	};
 
 	const searchParams = derived(filters, ($filters) => {
 		return objectToQueryString($filters);

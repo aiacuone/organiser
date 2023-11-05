@@ -66,7 +66,7 @@
 	</div>
 	<div class="flex-1 flex justify-end items-end">
 		{#if icon}
-			<Icon {icon} height="30px" class="text-gray-300" />
+			<Icon {icon} height="20px" class="text-gray-300" />
 		{/if}
 	</div>
 </div>

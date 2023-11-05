@@ -1,5 +1,5 @@
 import { MONGO_URL } from '$env/static/private';
-import type { LogType_enum } from '$lib/types';
+import { LogType_enum } from '$lib/types';
 import { MongoClient } from 'mongodb';
 
 export const getDatabase = async () => {
@@ -132,13 +132,69 @@ export const getTitlesAndReferences = async (space: string) => {
 	return result;
 };
 
-// export const getReferences = async (space: string) => {
-// 	const spaces = await collection.distinct('reference', { space });
+export const getLogNotifications = async (space: string, types: Array<LogType_enum>) => {
+	const facet: any = {};
 
-// 	return spaces;
-// };
+	if (types.includes(LogType_enum.todo)) {
+		facet[LogType_enum.todo] = [
+			{
+				$match: {
+					type: 'todo'
+				}
+			},
+			{
+				$match: {
+					isCompleted: false
+				}
+			},
+			{
+				$count: 'count'
+			}
+		];
+	}
 
-// export const getTitles = async (space: string) => {
-// 	const spaces = await collection.distinct('title', { space });
-// 	return spaces;
-// };
+	if (types.includes(LogType_enum.question)) {
+		facet[LogType_enum.question] = [
+			{
+				$match: {
+					type: 'question'
+				}
+			},
+			{
+				$match: {
+					answer: {
+						$not: {
+							$exists: true
+						}
+					}
+				}
+			},
+			{
+				$count: 'count'
+			}
+		];
+	}
+
+	const counts = await collection
+		.aggregate([
+			{
+				$match: {
+					space
+				}
+			},
+			{
+				$facet: facet
+			}
+		])
+		.toArray();
+
+	const mappedCounts = Object.entries(counts[0]).map(([key, countArray]) => {
+		const count = countArray[0]?.count ?? 0;
+		return {
+			type: key,
+			count
+		};
+	});
+
+	return mappedCounts;
+};

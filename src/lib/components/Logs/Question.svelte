@@ -18,7 +18,7 @@
 	export let reference: string = '';
 	export let date: Date = new Date();
 	export let question: string;
-	export let answer: string = '';
+	export let answer: string | undefined = undefined;
 	export let id: string;
 	export let importance: number;
 	export let isEditing: boolean;

@@ -1,14 +1,8 @@
 <script lang="ts">
 	import { Time_enum, LogType_enum, type SpaceData_int } from '$lib/types/general';
 	import { onMount, setContext } from 'svelte';
-	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
-	import {
-		getDate2DaysEarlier,
-		getDateFromHyphenatedString,
-		getDayFromHyphenatedString,
-		getDayMonthYearFromDate
-	} from '$lib/utils';
+	import { getDateFromHyphenatedString, getDayFromHyphenatedString } from '$lib/utils';
 	import Button from '$lib/components/Button.svelte';
 	import { darkMode } from '$lib/stores';
 	import { icons } from '$lib/general/icons';
@@ -80,13 +74,6 @@
 	$: $selectedDate, debounce(invalidateLogsAndTitlesAndReferences);
 	$: $page.params.space, invalidateLogsAndTitlesAndReferences();
 	$: $titlesAndReferencesQuery, ($titlesAndReferences = $titlesAndReferencesQuery.data);
-
-	const getInitialDatePickerValue = () => {
-		const { day, month, year } = getDayMonthYearFromDate(getDate2DaysEarlier());
-		return `${year}-${month}-${day}`;
-	};
-
-	const datePickerValue: Writable<string> = writable(getInitialDatePickerValue());
 
 	$: headerContainer = 0;
 	$: parentContainerHeight = 0;

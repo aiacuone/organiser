@@ -155,10 +155,10 @@
 			<IconWithRating icon={icons.todo} rating={priority} />
 			<button
 				on:click={onOpen}
-				class="center border-2 border-gray-400 w-[35px] h-[35px] rounded-md"
+				class="center border-2 border-gray-300 w-[30px] h-[30px] rounded-md"
 			>
 				{#if isCompleted}
-					<Icon icon={icons.tickBold} height="20px" color="#32ed65" class="text-green" />
+					<Icon icon={icons.tickBold} height="15px" class="text-green-500" />
 				{/if}
 			</button>
 			<div class="flex-1">

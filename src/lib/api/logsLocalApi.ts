@@ -1,5 +1,5 @@
 import { axios } from '$lib/general/axios';
-import type { Log_int } from '$lib/types';
+import type { LogType_enum, Log_int } from '$lib/types';
 
 const resource = 'log';
 
@@ -31,5 +31,13 @@ export const getLogs = async (params: { space?: string; search?: string; date?: 
 
 export const getTitlesAndReferences = async (space: string) => {
 	const { data } = await axios.get(`/${resource}/${space}/titlesAndReferences`);
+	return data;
+};
+
+export const getLogNotifications = async (space: string, params: { types: LogType_enum[] }) => {
+	const mappedTypes = params.types.map((type) => ['type', type]);
+	const queryString = new URLSearchParams(mappedTypes).toString();
+
+	const { data } = await axios.get(`/${resource}/${space}/notifications?${queryString}`);
 	return data;
 };

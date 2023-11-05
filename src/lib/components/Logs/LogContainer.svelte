@@ -12,11 +12,13 @@
 	export const updateLogMutation = useMutation(updateLog, {
 		onSuccess: () => {
 			queryClient.invalidateQueries('logs');
+			queryClient.invalidateQueries('logNotifications');
 		}
 	});
 	export const deleteLogMutation = useMutation(deleteLog, {
 		onSuccess: () => {
 			queryClient.invalidateQueries('logs');
+			queryClient.invalidateQueries('logNotifications');
 		}
 	});
 	export const onEdit = () => {

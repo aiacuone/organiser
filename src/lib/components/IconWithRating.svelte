@@ -4,7 +4,7 @@
 	export let rating: number;
 	export let icon: string;
 	export let ratingSize: number | string = 5;
-	export let iconSize: string = '40px';
+	export let iconSize: string = '30px';
 </script>
 
 <div class="relative">
