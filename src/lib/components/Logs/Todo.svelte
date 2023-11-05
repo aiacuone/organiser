@@ -14,10 +14,11 @@
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import Input from '../Input.svelte';
 	import { titles } from '$lib/stores';
+	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 
 	export let title: string;
 	export let reference: string = '';
-	export let date: Date = new Date();
+	export let date: Date;
 	export let content: string;
 	export let id: string;
 	export let priority: number;
@@ -58,11 +59,6 @@
 	let onOpen: () => void;
 
 	const onAccept = async () => {
-		const currentDate = new Date();
-		const date = new Date(getDateFromHyphenatedString($page.params.date));
-		date.setHours(currentDate.getHours());
-		date.setMinutes(currentDate.getMinutes());
-
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
 				content,
@@ -82,20 +78,30 @@
 
 		if (!haveValuesChanged) return (isEditing = false);
 
+		let logDate: Date = date;
+
+		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate(date)) {
+			const currentDate = new Date();
+			const _date = new Date(getDateFromHyphenatedString($page.params.date));
+			_date.setHours(currentDate.getHours());
+			_date.setMinutes(currentDate.getMinutes());
+			logDate = _date;
+		}
+
 		try {
 			await $updateMutation.mutate({
 				id,
 				content,
 				priority,
-				date,
+				date: logDate,
 				type: LogType_enum.todo,
 				space: $page.params.space,
 				isCompleted,
-				lastUpdated: date,
+				lastUpdated: new Date(),
 				title,
 				reference
 			});
-			onResetNewLogType();
+			onResetNewLogType && onResetNewLogType();
 			originalTitle = title;
 			originalReference = reference;
 			originalContent = content;
@@ -107,7 +113,7 @@
 
 	const onResetChange = () => {
 		isEditing = false;
-		onResetNewLogType();
+		onResetNewLogType && onResetNewLogType();
 		title = originalTitle;
 		reference = originalReference;
 		content = originalContent;

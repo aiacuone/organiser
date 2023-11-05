@@ -1,5 +1,7 @@
-export const getHyphenatedStringFromDate = (date: Date) =>
-	date.toISOString().split('T')[0].replace(/-/g, '-').split('-').reverse().join('-');
+export const getHyphenatedStringFromDate = (date: Date) => {
+	const _date = new Date(date);
+	return _date.toISOString().split('T')[0].replace(/-/g, '-').split('-').reverse().join('-');
+};
 
 export const replaceAllHyphensWithSpaces = (string: string) => string.replaceAll('-', ' ');
 

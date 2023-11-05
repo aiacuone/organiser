@@ -13,10 +13,11 @@
 	import { titles } from '$lib/stores';
 	import Input from '../Input.svelte';
 	import Button from '../Button.svelte';
+	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 
 	export let title: string;
 	export let reference: string = '';
-	export let date: Date = new Date();
+	export let date: Date;
 	export let question: string;
 	export let answer: string | undefined = undefined;
 	export let id: string;
@@ -40,11 +41,6 @@
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onAccept = () => {
-		const currentDate = new Date();
-		const date = new Date(getDateFromHyphenatedString($page.params.date));
-		date.setHours(currentDate.getHours());
-		date.setMinutes(currentDate.getMinutes());
-
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
 				question,
@@ -62,6 +58,15 @@
 
 		if (!haveValuesChanged) return;
 
+		let logDate: Date = date;
+		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate(date)) {
+			const currentDate = new Date();
+			const _date = new Date(getDateFromHyphenatedString($page.params.date));
+			_date.setHours(currentDate.getHours());
+			_date.setMinutes(currentDate.getMinutes());
+			logDate = _date;
+		}
+
 		$updateMutation.mutate({
 			title,
 			reference,
@@ -69,10 +74,10 @@
 			question,
 			answer,
 			importance,
-			date,
+			date: logDate,
 			type: LogType_enum.question,
 			space: $page.params.space,
-			lastUpdated: date
+			lastUpdated: new Date()
 		});
 		originalTitle = title;
 		originalReference = reference;
@@ -80,12 +85,12 @@
 		originalAnswer = answer;
 		originalImportance = importance;
 
-		onResetNewLogType();
+		onResetNewLogType && onResetNewLogType();
 	};
 
 	const onResetChange = () => {
 		isEditing = false;
-		onResetNewLogType();
+		onResetNewLogType && onResetNewLogType();
 		question = originalQuestion;
 		answer = originalAnswer;
 	};

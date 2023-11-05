@@ -13,6 +13,7 @@
 	import Icon from '@iconify/svelte';
 	import { titles } from '$lib/stores';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
+	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 
 	export let isEditing: boolean;
 	export let date: Date;
@@ -68,10 +69,14 @@
 
 		if (!haveValuesChanged) return (isEditing = false);
 
-		const currentDate = new Date();
-		const date = new Date(getDateFromHyphenatedString($page.params.date));
-		date.setHours(currentDate.getHours());
-		date.setMinutes(currentDate.getMinutes());
+		let logDate: Date = date;
+		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate(date)) {
+			const currentDate = new Date();
+			const _date = new Date(getDateFromHyphenatedString($page.params.date));
+			_date.setHours(currentDate.getHours());
+			_date.setMinutes(currentDate.getMinutes());
+			logDate = _date;
+		}
 
 		bullets = bullets.filter((c) => c);
 		isEditing = false;
@@ -82,27 +87,26 @@
 				reference,
 				bullets,
 				time,
-				date,
+				date: logDate,
 				type: LogType_enum.time,
 				space: $page.params.space,
-				lastUpdated: date
+				lastUpdated: new Date()
 			});
 			originalTitle = title;
 			originalReference = reference;
 			originalBullets = bullets;
 			originalTime = time;
-
-			lastUpdated = date;
+			lastUpdated = new Date();
 		} catch (error) {
 			console.log({ error });
 		}
 
-		onResetNewLogType();
+		onResetNewLogType && onResetNewLogType();
 	};
 
 	const onResetChange = () => {
 		isEditing = false;
-		onResetNewLogType();
+		onResetNewLogType && onResetNewLogType();
 		bullets = originalBullets;
 		title = originalTitle;
 		reference = originalReference;
