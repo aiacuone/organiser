@@ -12,12 +12,14 @@
 	import Button from './Button.svelte';
 	import Dialog from './Dialog.svelte';
 	import Input from './Input.svelte';
-	import { useQuery } from '@sveltestack/svelte-query';
+	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import { getLogNotifications } from '$lib/api/logsLocalApi';
 	import { selectedDate } from '$lib/stores/dates';
 
 	export let space: string;
 	export let spaces: string[];
+
+	const queryClient = useQueryClient();
 
 	let isAddingNewSpace: boolean = false;
 	let onOpen: () => void;
@@ -39,7 +41,8 @@
 			onSuccess: () => {}
 		}
 	);
-	$: $logNotificationsQuery, console.log($logNotificationsQuery.data);
+
+	$: $page, queryClient.invalidateQueries('logNotifications');
 
 	const headerButtons = [
 		{
