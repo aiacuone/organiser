@@ -19,6 +19,7 @@
 		onSuccess: () => {
 			queryClient.invalidateQueries('logs');
 			queryClient.invalidateQueries('logNotifications');
+			queryClient.invalidateQueries('filteredLogs');
 		}
 	});
 	export const onEdit = () => {
