@@ -17,7 +17,12 @@ export const getCollection = async (collectionName: string) => {
 
 const collection = await getCollection('aiacuone');
 
-export const getLogs = async ({ space, search, date: _date }: Record<string, any>) => {
+export const getLogs = async ({
+	space,
+	search,
+	date,
+	type
+}: Record<'space' | 'search' | 'date' | 'type', string | number>) => {
 	const query: Array<Record<string | number, Record<string, any>>> = [
 		{ $project: { _id: 0 } },
 		{ $sort: { date: -1 } }
@@ -27,24 +32,24 @@ export const getLogs = async ({ space, search, date: _date }: Record<string, any
 		query.push({ $match: { space } });
 	}
 
-	if (_date) {
-		const date = new Date(_date);
+	if (date) {
+		const _date = new Date(date);
 		query.push({
 			$match: {
 				$or: [
 					{
-						date: new Date(date) // Format 1: Date object
+						date: new Date(_date) // Format 1: Date object
 					},
 					{
 						date: {
-							$gte: new Date(date.setHours(0, 0, 0, 0)),
-							$lt: new Date(date.setHours(23, 59, 59, 999))
+							$gte: new Date(_date.setHours(0, 0, 0, 0)),
+							$lt: new Date(_date.setHours(23, 59, 59, 999))
 						} // Format 2: ISODate format (Midnight to 23:59:59.999)
 					},
 					{
 						date: {
-							$gte: new Date(date.setUTCHours(0, 0, 0, 0)),
-							$lt: new Date(date.setUTCHours(23, 59, 59, 999))
+							$gte: new Date(_date.setUTCHours(0, 0, 0, 0)),
+							$lt: new Date(_date.setUTCHours(23, 59, 59, 999))
 						} // Format 3: UTC Date (Midnight to 23:59:59.999)
 					}
 				]
@@ -61,6 +66,10 @@ export const getLogs = async ({ space, search, date: _date }: Record<string, any
 				}))
 			}
 		});
+	}
+
+	if (type) {
+		query.push({ $match: { type } });
 	}
 
 	const result = await collection.aggregate(query).toArray();

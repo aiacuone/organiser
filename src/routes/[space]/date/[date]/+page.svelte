@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type Time_enum, LogType_enum, type SpaceData_int } from '$lib/types/general';
+	import { Time_enum, LogType_enum, type SpaceData_int } from '$lib/types/general';
 	import { onMount, setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { page } from '$app/stores';
@@ -211,7 +211,7 @@
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
-	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full sm:h-auto justify-center flex-1">
+	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full sm:h-auto justify-center flex-1 py-1">
 		<div class="stack gap-2 center" bind:clientHeight={logButtonsContainerHeight}>
 			<div class="hstack center gap-2 flex-wrap">
 				<div class="hstack gap-2 sm:gap-2 center">
@@ -233,7 +233,7 @@
 				/>
 			</div>
 
-			<div class="grid grid-cols-2 sm:grid-cols-4 w-full gap-y-3 gap-x-3 sm:gap-x-5 max-w-[500px]">
+			<div class="grid grid-cols-4 w-full gap-y-3 gap-x-3 sm:gap-x-5 max-w-[500px] min-w-[300px]">
 				{#each noteButtons as { icon, onClick }}
 					<Button {onClick} className="flex-1 uppercase center hstack gap-2">
 						<Icon {icon} class="opacity-20" height="20px" />
@@ -283,30 +283,22 @@
 				{/each}
 			{/if}
 		</div>
-		<div class="hstack center capitalize gap-5">
-			<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickPreviousDay}>
-				<Icon icon={icons.left} height="20px" />
-			</Button>
-			<Button
-				_class="bg-white {getHyphenatedStringFromDate(new Date()) === $selectedHyphenatedDateString
-					? 'bg-opacity-80'
-					: 'bg-opacity-40'}"
-				onClick={onGotoTodaysDate}
-				><div class=" rounded-md border-2 w-[18px] h-[18px] border-gray-500" /></Button
-			>
-			<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickNextDay}>
-				<Icon icon={icons.right} height="20px" />
-			</Button>
-		</div>
-		<div bind:clientHeight={headerContainer} class="stack gap-2">
-			<div class="center hstack gap-3">
-				{#if $page.params.time === 'history'}
-					<input
-						type="date"
-						class="border border-gray-300 px-5 py-[1px] rounded text-black"
-						bind:value={$datePickerValue}
-					/>
-				{/if}
+		<div class="stack gap-2">
+			<div class="hstack center capitalize gap-5">
+				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickPreviousDay}>
+					<Icon icon={icons.left} height="20px" class="text-gray-400" />
+				</Button>
+				<Button
+					_class="bg-white {getHyphenatedStringFromDate(new Date()) ===
+					$selectedHyphenatedDateString
+						? 'bg-opacity-80'
+						: 'bg-opacity-40'}"
+					onClick={onGotoTodaysDate}
+					><div class=" rounded-md border-2 w-[18px] h-[18px] border-gray-400" /></Button
+				>
+				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickNextDay}>
+					<Icon icon={icons.right} height="20px" class="text-gray-400" />
+				</Button>
 			</div>
 		</div>
 	</div>

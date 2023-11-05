@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import type { SpaceData_int } from '$lib/types/general';
+	import { LogType_enum, type SpaceData_int } from '$lib/types/general';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import {
 		getHyphenatedStringFromDate,
@@ -127,15 +127,41 @@
 			onClick: () => goto(`/${$page.params.space}/filter`)
 		}
 	];
+
+	const headerButtons = [
+		{
+			label: 'todo',
+			icon: icons.todo,
+			onClick: () => {
+				goto(`/${$page.params.space}/filter?type=${LogType_enum.todo}`);
+			}
+		},
+		{
+			label: 'question',
+			icon: icons.question,
+			onClick: () => {
+				goto(`/${$page.params.space}/filter?type=${LogType_enum.question}`);
+			}
+		}
+	];
 </script>
 
 <QueryClientProvider client={queryClient}>
 	<div class="stack" style={'height:100dvh'}>
-		<header class="center py-2 bg-gray-200">
-			<div class="hstack gap-2 sm:gap-4">
-				<Button _class="bg-white bg-opacity-80 capitalize" onClick={onOpen}
-					>{replaceAllHyphensWithSpaces(data.space)}</Button
-				>
+		<header class="center py-2 px-2 bg-gray-200">
+			<div class="flex-1 max-w-screen-lg hstack">
+				<div class="flex-1">
+					<Button _class="bg-white bg-opacity-80 capitalize" onClick={onOpen}
+						>{replaceAllHyphensWithSpaces(data.space)}</Button
+					>
+				</div>
+				<div class="flex-1 hstack justify-end gap-5">
+					{#each headerButtons as { icon, onClick }}
+						<button on:click={onClick}>
+							<Icon {icon} class="text-gray-500" height="20px" />
+						</button>
+					{/each}
+				</div>
 			</div>
 		</header>
 		<main class="flex-1 p-1 sm:p-2 flex flex-col overflow-hidden">

@@ -27,12 +27,12 @@
 	});
 
 	const objectToQueryString = (obj: Record<string, string>) => {
-		const keys = Object.keys(obj);
-		const keyValuePairs = keys.map((key) => {
-			if (!obj[key]) return;
-			return encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]);
-		});
-		return keyValuePairs.join('&');
+		return Object.entries(obj)
+			.map(([key, value]) => {
+				if (value) return encodeURIComponent(key) + '=' + encodeURIComponent(value);
+			})
+			.filter(Boolean)
+			.join('&');
 	};
 
 	const searchParams = derived(filters, ($filters) => {
@@ -78,7 +78,11 @@
 		queryClient.invalidateQueries('filteredLogs');
 	};
 
-	$: $page.url, queryClient.invalidateQueries('filteredLogs');
+	const updatedStateAndInvalidate = () => {
+		$filters = Object.fromEntries(new URLSearchParams($page.url.searchParams).entries());
+		queryClient.invalidateQueries('filteredLogs');
+	};
+	$: $page.url, updatedStateAndInvalidate();
 
 	let headerContainerHeight: number;
 	let parentContainerHeight: number;
