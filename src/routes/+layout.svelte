@@ -104,7 +104,7 @@
 <QueryClientProvider client={queryClient}>
 	<div class="stack" style={'height:100dvh'}>
 		<Header space={data.space} spaces={data.spaces} />
-		<main class="flex-1 p-1 sm:p-2 flex flex-col overflow-hidden">
+		<main class="flex-1 p-1 flex flex-col overflow-hidden">
 			<div class="flex justify-end" />
 			<slot />
 		</main>
