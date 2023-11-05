@@ -50,7 +50,7 @@
 			type: LogType_enum.todo,
 			icon: icons.todo,
 			onClick: () => {
-				goto(`/${$page.params.space}/filter?type=${LogType_enum.todo}`);
+				goto(`/${$page.params.space}/filter?type=${LogType_enum.todo}&isCompleted=false`);
 			}
 		},
 		{
@@ -58,7 +58,7 @@
 			type: LogType_enum.question,
 			icon: icons.question,
 			onClick: () => {
-				goto(`/${$page.params.space}/filter?type=${LogType_enum.question}`);
+				goto(`/${$page.params.space}/filter?type=${LogType_enum.question}&hasAnswer=false`);
 			}
 		}
 	];
@@ -76,7 +76,7 @@
 	};
 </script>
 
-<header class="center py-2 px-2 bg-gray-200">
+<header class="center py-2 px-3 bg-gray-200">
 	<div class="flex-1 max-w-screen-lg hstack">
 		<div class="flex-1">
 			<Button _class="bg-white bg-opacity-80 capitalize" onClick={onOpen}

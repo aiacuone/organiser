@@ -118,7 +118,7 @@
 	{changeReferenceInputValue}
 >
 	<div class="bg-neutral-100 p-1 rounded-sm">
-		<div class="bg-white p-2 sm:p-3 stack gap-3 rounded-sm">
+		<div class="bg-white p-2 stack gap-3 rounded-sm">
 			<div class="stack">
 				<Input
 					bind:value={title}

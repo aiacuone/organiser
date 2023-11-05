@@ -7,7 +7,7 @@
 
 <button
 	on:click={onClick}
-	class=" text-sm shadow-md h-[30px] px-3 rounded {className} {_class} {isDisabled
+	class=" text-sm shadow-md h-[28px] px-3 rounded {className} {_class} {isDisabled
 		? 'opacity-40'
 		: ''} {isDisabled ? 'cursor-not-allowed' : ''}"
 	disabled={isDisabled}

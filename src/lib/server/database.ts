@@ -21,8 +21,10 @@ export const getLogs = async ({
 	space,
 	search,
 	date,
-	type
-}: Record<'space' | 'search' | 'date' | 'type', string | number>) => {
+	type,
+	isCompleted,
+	hasAnswer
+}: Record<'space' | 'search' | 'date' | 'type' | 'isCompleted' | 'hasAnswer', string>) => {
 	const query: Array<Record<string | number, Record<string, any>>> = [
 		{ $project: { _id: 0 } },
 		{ $sort: { date: -1 } }
@@ -70,6 +72,16 @@ export const getLogs = async ({
 
 	if (type) {
 		query.push({ $match: { type } });
+	}
+
+	if (isCompleted) {
+		const _isCompleted = JSON.parse(isCompleted);
+		query.push({ $match: { isCompleted: _isCompleted } });
+	}
+
+	if (hasAnswer) {
+		const _hasAnswer = JSON.parse(hasAnswer);
+		query.push({ $match: { answer: { $exists: _hasAnswer } } });
 	}
 
 	const result = await collection.aggregate(query).toArray();
