@@ -23,7 +23,11 @@
 	import { goto } from '$app/navigation';
 	import { titlesAndReferences } from '$lib/stores';
 	import { selectedDate, selectedDayString, selectedHyphenatedDateString } from '$lib/stores/dates';
-	import { getCapitalizedWords, replaceAllSpacesWithHyphens } from '$lib/utils/strings';
+	import {
+		getCapitalizedWords,
+		getHyphenatedStringFromDate,
+		replaceAllSpacesWithHyphens
+	} from '$lib/utils/strings';
 	import Search from '$lib/components/Search.svelte';
 
 	interface PageData extends SpaceData_int {
@@ -167,7 +171,7 @@
 	let onSearchFocus: () => void;
 
 	const onSearch = () => {
-		goto(`/${$page.params.space}/filter?search=${searchValue}`, { replaceState: false });
+		goto(`/${$page.params.space}/filter?search=${searchValue}`);
 	};
 
 	onMount(() => {
@@ -182,10 +186,32 @@
 			document.removeEventListener('keydown', keydown);
 		};
 	});
+
+	const onClickPreviousDay = () => {
+		const getPreviousDate = (date: Date) => {
+			const _date = new Date(date);
+			_date.setDate(_date.getDate() - 1);
+			return _date;
+		};
+		$selectedDate = getPreviousDate($selectedDate);
+	};
+
+	const onClickNextDay = () => {
+		const getPreviousDate = (date: Date) => {
+			const _date = new Date(date);
+			_date.setDate(_date.getDate() + 1);
+			return _date;
+		};
+		$selectedDate = getPreviousDate($selectedDate);
+	};
+
+	const onGotoTodaysDate = () => {
+		$selectedDate = new Date();
+	};
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
-	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full sm:h-auto justify-center flex-1 py-3">
+	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full sm:h-auto justify-center flex-1">
 		<div class="stack gap-2" bind:clientHeight={logButtonsContainerHeight}>
 			<div class="hstack center gap-2 flex-wrap">
 				<div class="hstack gap-2 sm:gap-2 center">
@@ -259,6 +285,21 @@
 					{/if}
 				{/each}
 			{/if}
+		</div>
+		<div class="hstack center capitalize gap-5">
+			<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickPreviousDay}>
+				<Icon icon={icons.left} height="20px" />
+			</Button>
+			<Button
+				_class="bg-white {getHyphenatedStringFromDate(new Date()) === $selectedHyphenatedDateString
+					? 'bg-opacity-80'
+					: 'bg-opacity-40'}"
+				onClick={onGotoTodaysDate}
+				><div class=" rounded-md border-2 w-[18px] h-[18px] border-gray-500" /></Button
+			>
+			<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickNextDay}>
+				<Icon icon={icons.right} height="20px" />
+			</Button>
 		</div>
 		<div bind:clientHeight={headerContainer} class="stack gap-2">
 			<div class="center hstack gap-3">

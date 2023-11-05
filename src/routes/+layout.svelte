@@ -116,6 +116,17 @@
 		onDialogClose();
 		$selectedDate = new Date();
 	};
+
+	const footerButtons = [
+		{
+			icon: icons.date,
+			onClick: () => goto(`/${$page.params.space}`)
+		},
+		{
+			icon: icons.search,
+			onClick: () => goto(`/${$page.params.space}/filter`)
+		}
+	];
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -133,19 +144,11 @@
 		</main>
 		<footer class="py-2 bg-gray-300">
 			<div class="hstack center capitalize gap-5">
-				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickPreviousDay}>
-					<Icon icon={icons.left} height="20px" />
-				</Button>
-				<Button
-					_class="bg-white {getHyphenatedStringFromDate(new Date()) ===
-					$selectedHyphenatedDateString
-						? 'bg-opacity-80'
-						: 'bg-opacity-40'}"
-					onClick={onGotoTodaysDate}>Today</Button
-				>
-				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickNextDay}>
-					<Icon icon={icons.right} height="20px" />
-				</Button>
+				{#each footerButtons as footerButton}
+					<Button _class="bg-white bg-opacity-80" onClick={footerButton.onClick}>
+						<Icon icon={footerButton.icon} />
+					</Button>
+				{/each}
 			</div>
 		</footer>
 	</div>

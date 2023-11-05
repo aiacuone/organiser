@@ -25,5 +25,6 @@ export const icons = {
 	enter: 'ant-design:enter-outlined',
 	search: 'iconoir:search',
 	close: 'material-symbols:close',
-	home: 'ic:sharp-home'
+	home: 'ic:sharp-home',
+	date: 'uiw:date'
 };
