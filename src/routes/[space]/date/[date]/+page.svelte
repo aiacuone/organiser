@@ -167,7 +167,7 @@
 	let onSearchFocus: () => void;
 
 	const onSearch = () => {
-		goto(`/${$page.params.space}/search/${searchValue}`);
+		goto(`/${$page.params.space}/filter?search=${searchValue}`, { replaceState: false });
 	};
 
 	onMount(() => {

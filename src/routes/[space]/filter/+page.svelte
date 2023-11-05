@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { getLogs } from '$lib/api/logsLocalApi';
 	import Important from '$lib/components/Logs/Important.svelte';
@@ -7,21 +8,62 @@
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import { LogType_enum } from '$lib/types';
-	import { debounce } from '$lib/utils/general';
+
 	import { replaceAllSpacesWithHyphens } from '$lib/utils/strings';
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import { onMount } from 'svelte';
+	import { derived, writable, type Writable } from 'svelte/store';
 
 	const queryClient = useQueryClient();
+	const defaultFilters = Object.fromEntries(new URLSearchParams($page.url.searchParams).entries());
+	const filters: Writable<Record<string, string>> = writable(defaultFilters);
 
-	let searchValue: string = $page.params.searchValue;
+	let hasPageLoaded = false;
+
+	onMount(() => {
+		hasPageLoaded = true;
+	});
+
+	const objectToQueryString = (obj: Record<string, string>) => {
+		const keys = Object.keys(obj);
+		const keyValuePairs = keys.map((key) => {
+			if (!obj[key]) return;
+			return encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]);
+		});
+		return keyValuePairs.join('&');
+	};
+
+	const searchParams = derived(filters, ($filters) => {
+		return objectToQueryString($filters);
+	});
+
+	let timer;
+
+	const debounce = (fn: () => any, delay = 500) => {
+		const timeout = () => {
+			clearTimeout(timer);
+			timer = setTimeout(() => {
+				fn();
+			}, delay);
+		};
+		timeout();
+	};
+
+	$: $filters,
+		hasPageLoaded &&
+			debounce(() => {
+				const url = $searchParams
+					? `${$page.url.pathname}?${$searchParams}`
+					: `${$page.url.pathname}`;
+				goto(url, { keepFocus: true });
+			});
 
 	const filteredLogsQuery = useQuery(
 		'filteredLogs',
 		() => {
 			return getLogs({
 				space: replaceAllSpacesWithHyphens($page.params.space),
-				search: searchValue
+				...$filters
 			});
 		},
 		{
@@ -30,16 +72,11 @@
 	);
 
 	const onClickClear = () => {
-		searchValue = '';
+		$filters = {};
 		queryClient.invalidateQueries('filteredLogs');
 	};
 
-	const onChange = (e) => {
-		searchValue = e.target.value;
-		debounce(() => {
-			queryClient.invalidateQueries('filteredLogs');
-		}, 500);
-	};
+	$: $page.url, queryClient.invalidateQueries('filteredLogs');
 
 	let headerContainerHeight: number;
 	let parentContainerHeight: number;
@@ -48,7 +85,7 @@
 	onMount(() => {
 		const onKeydown = (e) => {
 			if (e.key === 'Escape') {
-				window.history.back();
+				goto(`/${$page.params.space}`);
 			}
 		};
 		document.addEventListener('keydown', onKeydown);
@@ -60,7 +97,7 @@
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
 	<div class="center" bind:clientHeight={headerContainerHeight}>
-		<Search bind:value={searchValue} {onClickClear} {onChange} showEnter={false} />
+		<Search bind:value={$filters.search} {onClickClear} showEnter={false} />
 	</div>
 	<div class="center">
 		<div
