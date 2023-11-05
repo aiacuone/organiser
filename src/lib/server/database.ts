@@ -81,7 +81,18 @@ export const getLogs = async ({
 
 	if (hasAnswer) {
 		const _hasAnswer = JSON.parse(hasAnswer);
-		query.push({ $match: { answer: { $exists: _hasAnswer } } });
+		if (!_hasAnswer) {
+			query.push({
+				$match: {
+					$or: [
+						{ answer: { $exists: _hasAnswer } },
+						{
+							answer: { $eq: '' }
+						}
+					]
+				}
+			});
+		}
 	}
 
 	const result = await collection.aggregate(query).toArray();
@@ -174,11 +185,20 @@ export const getLogNotifications = async (space: string, types: Array<LogType_en
 			},
 			{
 				$match: {
-					answer: {
-						$not: {
-							$exists: true
+					$or: [
+						{
+							answer: {
+								$not: {
+									$exists: true
+								}
+							}
+						},
+						{
+							answer: {
+								$eq: ''
+							}
 						}
-					}
+					]
 				}
 			},
 			{
