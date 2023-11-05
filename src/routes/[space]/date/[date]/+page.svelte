@@ -212,7 +212,7 @@
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
 	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full sm:h-auto justify-center flex-1">
-		<div class="stack gap-2" bind:clientHeight={logButtonsContainerHeight}>
+		<div class="stack gap-2 center" bind:clientHeight={logButtonsContainerHeight}>
 			<div class="hstack center gap-2 flex-wrap">
 				<div class="hstack gap-2 sm:gap-2 center">
 					<div class="center text-base sm:text-lg hstack gap-1 sm:gap-2 flex-wrap">
@@ -233,12 +233,9 @@
 				/>
 			</div>
 
-			<div class="grid grid-cols-2 sm:grid-cols-4 w-full gap-y-3 gap-x-3 sm:gap-x-10">
-				{#each noteButtons as { label, icon, onClick }}
+			<div class="grid grid-cols-2 sm:grid-cols-4 w-full gap-y-3 gap-x-3 sm:gap-x-5 max-w-[500px]">
+				{#each noteButtons as { icon, onClick }}
 					<Button {onClick} className="flex-1 uppercase center hstack gap-2">
-						<div class="hidden sm:block">
-							{label}
-						</div>
 						<Icon {icon} class="opacity-20" height="20px" />
 					</Button>
 				{/each}
