@@ -46,19 +46,41 @@
 
 	const headerButtons = [
 		{
+			label: 'important',
+			type: LogType_enum.important,
+			icon: icons.important,
+			onClick: () => {
+				goto(`/${$page.params.space}/filter?type=${LogType_enum.important}`);
+			}
+		},
+		{
+			label: 'time',
+			type: LogType_enum.time,
+			icon: icons.clock,
+			onClick: () => {
+				goto(`/${$page.params.space}/filter?type=${LogType_enum.time}`);
+			}
+		},
+		{
 			label: 'todo',
 			type: LogType_enum.todo,
 			icon: icons.todo,
-			onClick: () => {
-				goto(`/${$page.params.space}/filter?type=${LogType_enum.todo}&isCompleted=false`);
+			onClick: (hasNotification: boolean) => {
+				const url = hasNotification
+					? `/${$page.params.space}/filter?type=${LogType_enum.todo}&isCompleted=false`
+					: `/${$page.params.space}/filter?type=${LogType_enum.todo}`;
+				goto(url);
 			}
 		},
 		{
 			label: 'question',
 			type: LogType_enum.question,
 			icon: icons.question,
-			onClick: () => {
-				goto(`/${$page.params.space}/filter?type=${LogType_enum.question}&hasAnswer=false`);
+			onClick: (hasNotification: boolean) => {
+				const url = hasNotification
+					? `/${$page.params.space}/filter?type=${LogType_enum.question}&hasAnswer=false`
+					: `/${$page.params.space}/filter?type=${LogType_enum.question}`;
+				goto(url);
 			}
 		}
 	];
@@ -88,7 +110,7 @@
 				{@const notificationsCount =
 					$logNotificationsQuery.data &&
 					$logNotificationsQuery.data.find(({ type: _type }) => _type === type)?.count}
-				<button on:click={onClick} class="relative">
+				<button on:click={() => onClick(!!notificationsCount)} class="relative">
 					<Icon {icon} class="text-gray-500" height="20px" />
 					{#if notificationsCount}
 						<div
