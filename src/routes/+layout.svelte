@@ -33,19 +33,19 @@
 					onGotoTodaysDate();
 					break;
 
-				case e.key === 'ArrowLeft':
+				case e.ctrlKey && e.shiftKey && e.key === 'ArrowLeft':
 					onClickPreviousDay();
 					break;
 
-				case e.key === 'ArrowRight':
+				case e.ctrlKey && e.shiftKey && e.key === 'ArrowRight':
 					onClickNextDay();
 					break;
 
-				case e.key === 'ArrowUp':
+				case e.ctrlKey && e.shiftKey && e.key === 'ArrowUp':
 					console.log('up');
 					break;
 
-				case e.key === 'ArrowDown':
+				case e.ctrlKey && e.shiftKey && e.key === 'ArrowDown':
 					console.log('down');
 					break;
 
