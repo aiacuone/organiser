@@ -122,24 +122,28 @@
 	showDialog={!isOpen}
 >
 	<div class="bg-neutral-50 p-2 sm:p-3 stack gap-3">
-		<div class="stack">
-			<Input
-				bind:value={title}
-				autofocus={inputAutoFocus}
-				placeholder="Title"
-				autofillValues={$titles}
-				isDisabled={!isEditing}
-				onAutoFill={onTitleAutoFill}
-			/>
-			{#if !isEditing && !reference}{''}{:else}
-				<Input
-					bind:value={reference}
-					placeholder="Reference"
-					isDisabled={!isEditing}
-					bind:changeInputValue={changeReferenceInputValue}
-				/>
-			{/if}
-		</div>
+		{#if title || reference}
+			<div class="stack">
+				{#if !isEditing && !title}{''}{:else}
+					<Input
+						bind:value={title}
+						autofocus={inputAutoFocus}
+						placeholder="Title"
+						autofillValues={$titles}
+						isDisabled={!isEditing}
+						onAutoFill={onTitleAutoFill}
+					/>
+				{/if}
+				{#if !isEditing && !reference}{''}{:else}
+					<Input
+						bind:value={reference}
+						placeholder="Reference"
+						isDisabled={!isEditing}
+						bind:changeInputValue={changeReferenceInputValue}
+					/>
+				{/if}
+			</div>
+		{/if}
 		<div class="hstack center gap-2">
 			<IconWithRating rating={importance} icon={icons.important} />
 			<div class="flex-1">

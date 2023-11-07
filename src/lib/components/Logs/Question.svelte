@@ -124,24 +124,28 @@
 >
 	<div class="bg-neutral-100 p-1 rounded-sm">
 		<div class="bg-white p-2 stack gap-3 rounded-sm">
-			<div class="stack">
-				<Input
-					bind:value={title}
-					autofocus={inputAutoFocus}
-					placeholder="Title"
-					autofillValues={$titles}
-					isDisabled={!isEditing}
-					onAutoFill={onTitleAutoFill}
-				/>
-				{#if !isEditing && !reference}{''}{:else}
-					<Input
-						bind:value={reference}
-						placeholder="Reference"
-						isDisabled={!isEditing}
-						bind:changeInputValue={changeReferenceInputValue}
-					/>
-				{/if}
-			</div>
+			{#if title || reference}
+				<div class="stack">
+					{#if !isEditing && !title}{''}{:else}
+						<Input
+							bind:value={title}
+							autofocus={inputAutoFocus}
+							placeholder="Title"
+							autofillValues={$titles}
+							isDisabled={!isEditing}
+							onAutoFill={onTitleAutoFill}
+						/>
+					{/if}
+					{#if !isEditing && !reference}{''}{:else}
+						<Input
+							bind:value={reference}
+							placeholder="Reference"
+							isDisabled={!isEditing}
+							bind:changeInputValue={changeReferenceInputValue}
+						/>
+					{/if}
+				</div>
+			{/if}
 			<div class="hstack center gap-2">
 				<IconWithRating icon={icons.question} rating={importance} />
 				<div class="stack gap-1 w-full min-h-[60px]">

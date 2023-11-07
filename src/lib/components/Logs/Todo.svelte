@@ -139,24 +139,28 @@
 	{changeReferenceInputValue}
 >
 	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-4">
-		<div class="stack gap-1">
-			<Input
-				bind:value={title}
-				autofocus={inputAutoFocus}
-				placeholder="Title"
-				autofillValues={$titles}
-				isDisabled={!isEditing}
-				onAutoFill={onTitleAutoFill}
-			/>
-			{#if !isEditing && !reference}{''}{:else}
-				<Input
-					bind:value={reference}
-					placeholder="Reference"
-					isDisabled={!isEditing}
-					bind:changeInputValue={changeReferenceInputValue}
-				/>
-			{/if}
-		</div>
+		{#if title || reference}
+			<div class="stack gap-1">
+				{#if !isEditing && !title}{''}{:else}
+					<Input
+						bind:value={title}
+						autofocus={inputAutoFocus}
+						placeholder="Title"
+						autofillValues={$titles}
+						isDisabled={!isEditing}
+						onAutoFill={onTitleAutoFill}
+					/>
+				{/if}
+				{#if !isEditing && !reference}{''}{:else}
+					<Input
+						bind:value={reference}
+						placeholder="Reference"
+						isDisabled={!isEditing}
+						bind:changeInputValue={changeReferenceInputValue}
+					/>
+				{/if}
+			</div>
+		{/if}
 		<div class="hstack gap-4 items-center">
 			<IconWithRating icon={icons.todo} rating={priority} />
 			<button
