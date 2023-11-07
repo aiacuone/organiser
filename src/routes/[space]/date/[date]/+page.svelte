@@ -23,6 +23,7 @@
 		replaceAllSpacesWithHyphens
 	} from '$lib/utils/strings';
 	import Search from '$lib/components/Search.svelte';
+	import { derived, writable, type Writable } from 'svelte/store';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -121,26 +122,33 @@
 		newLogType = logType;
 	};
 
+	const filters: Writable<Array<LogType_enum>> = writable([]);
+
+	const filteredLogs = derived([logs, filters], ([$logs, $filters]) => {
+		if ($filters.length === 0) return $logs.data;
+		return $logs.data?.filter((log) => $filters.includes(log.type));
+	});
+
 	const noteButtons = [
 		{
 			label: 'log',
 			icon: icons.clock,
-			onClick: () => onNoteButtonClick(LogType_enum.time)
+			type: LogType_enum.time
 		},
 		{
 			label: 'todo',
 			icon: icons.todo,
-			onClick: () => onNoteButtonClick(LogType_enum.todo)
+			type: LogType_enum.todo
 		},
 		{
 			label: 'question',
 			icon: icons.question,
-			onClick: () => onNoteButtonClick(LogType_enum.question)
+			type: LogType_enum.question
 		},
 		{
 			label: 'important',
 			icon: icons.important,
-			onClick: () => onNoteButtonClick(LogType_enum.important)
+			type: LogType_enum.important
 		}
 	];
 
@@ -195,6 +203,10 @@
 	const onGotoTodaysDate = () => {
 		$selectedDate = new Date();
 	};
+
+	const onClickClear = () => {
+		$filters = [];
+	};
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -217,14 +229,31 @@
 					bind:value={searchValue}
 					onClickEnter={onSearch}
 					onEnterKeydown={onSearch}
+					{onClickClear}
 				/>
 			</div>
 
 			<div class="grid grid-cols-4 w-full gap-y-3 gap-x-3 max-w-[500px] min-w-[300px]">
-				{#each noteButtons as { icon, onClick }}
-					<Button {onClick} className="flex-1 uppercase center hstack gap-2">
-						<Icon {icon} class="opacity-20" height="20px" />
-					</Button>
+				{#each noteButtons as { icon, type }}
+					<div class="flex-1 hstack shadow-md min-h-[30px] rounded-r-md rounded-l-md">
+						<button
+							class=" w-4/6 h-full center rounded-l-md"
+							on:click={() => onNoteButtonClick(type)}
+						>
+							<Icon {icon} class="text-gray-300" height="20px" />
+						</button>
+						<button
+							class="rounded-r-md w-2/6 h-full border-l-[2px] border-gray-50 {$filters.includes(
+								type
+							)
+								? 'bg-gray-50'
+								: 'bg-white'}"
+							on:click={() =>
+								$filters.includes(type)
+									? ($filters = $filters.filter((filter) => filter !== type))
+									: ($filters = [...$filters, type])}
+						/>
+					</div>
 				{/each}
 			</div>
 		</div>
@@ -244,8 +273,8 @@
 				</div>
 			{:else if $logs.isError}
 				Error
-			{:else if $logs.data}
-				{#each $logs.data as log}
+			{:else if $filteredLogs}
+				{#each $filteredLogs as log}
 					{@const { type, ...rest } = log}
 					{#if type === LogType_enum.important && log.importance && log.content}
 						<Important {...rest} importance={log.importance} content={log.content} />
