@@ -46,14 +46,6 @@
 
 	const headerButtons = [
 		{
-			label: 'important',
-			type: LogType_enum.important,
-			icon: icons.important,
-			onClick: () => {
-				goto(`/${$page.params.space}/filter?type=${LogType_enum.important}`);
-			}
-		},
-		{
 			label: 'time',
 			type: LogType_enum.time,
 			icon: icons.clock,
@@ -70,6 +62,14 @@
 					? `/${$page.params.space}/filter?type=${LogType_enum.todo}&isCompleted=false`
 					: `/${$page.params.space}/filter?type=${LogType_enum.todo}`;
 				goto(url);
+			}
+		},
+		{
+			label: 'important',
+			type: LogType_enum.important,
+			icon: icons.important,
+			onClick: () => {
+				goto(`/${$page.params.space}/filter?type=${LogType_enum.important}`);
 			}
 		},
 		{

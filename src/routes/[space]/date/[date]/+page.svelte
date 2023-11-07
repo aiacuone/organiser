@@ -1,5 +1,11 @@
 <script lang="ts">
-	import { Time_enum, LogType_enum, type SpaceData_int } from '$lib/types/general';
+	import {
+		Time_enum,
+		LogType_enum,
+		type SpaceData_int,
+		type LogBase_int,
+		type Log_int
+	} from '$lib/types/general';
 	import { onMount, setContext } from 'svelte';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString, getDayFromHyphenatedString } from '$lib/utils';
@@ -126,7 +132,7 @@
 
 	const filteredLogs = derived([logs, filters], ([$logs, $filters]) => {
 		if ($filters.length === 0) return $logs.data;
-		return $logs.data?.filter((log) => $filters.includes(log.type));
+		return $logs.data?.filter((log: Log_int) => $filters.includes(log.type));
 	});
 
 	const noteButtons = [
@@ -141,14 +147,14 @@
 			type: LogType_enum.todo
 		},
 		{
-			label: 'question',
-			icon: icons.question,
-			type: LogType_enum.question
-		},
-		{
 			label: 'important',
 			icon: icons.important,
 			type: LogType_enum.important
+		},
+		{
+			label: 'question',
+			icon: icons.question,
+			type: LogType_enum.question
 		}
 	];
 
