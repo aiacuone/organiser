@@ -108,13 +108,20 @@
 			<div class="flex justify-end" />
 			<slot />
 		</main>
-		<footer class="py-2 bg-gray-300">
-			<div class="hstack center capitalize gap-5">
-				{#each footerButtons as footerButton}
-					<Button _class="bg-white bg-opacity-80" onClick={footerButton.onClick}>
-						<Icon icon={footerButton.icon} />
-					</Button>
-				{/each}
+		<footer class="py-2 bg-gray-300 px-3 center">
+			<div class="hstack max-w-screen-lg flex-1">
+				<div class="hstack center capitalize gap-5">
+					{#each footerButtons as footerButton}
+						<Button _class="bg-white bg-opacity-80" onClick={footerButton.onClick}>
+							<Icon icon={footerButton.icon} />
+						</Button>
+					{/each}
+				</div>
+				<div class="flex justify-end flex-1">
+					<div class="rounded-full bg-neutral-500 h-[30px] w-[30px] center">
+						<p class="text-white">AI</p>
+					</div>
+				</div>
 			</div>
 		</footer>
 	</div>
