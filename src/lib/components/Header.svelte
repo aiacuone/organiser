@@ -6,20 +6,19 @@
 	import {
 		getHyphenatedStringFromDate,
 		replaceAllHyphensWithSpaces,
-		replaceAllSpacesWithHyphens
+		replaceAllSpacesWithHyphens,
+		stringArrayToQueryString
 	} from '$lib/utils/strings';
 	import Icon from '@iconify/svelte';
 	import Button from './Button.svelte';
 	import Dialog from './Dialog.svelte';
 	import Input from './Input.svelte';
-	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
-	import { getLogNotifications } from '$lib/api/logsLocalApi';
+	import { useQuery } from '@sveltestack/svelte-query';
 	import { selectedDate } from '$lib/stores/dates';
+	import axios from 'axios';
 
 	export let space: string;
 	export let spaces: string[];
-
-	const queryClient = useQueryClient();
 
 	let isAddingNewSpace: boolean = false;
 	let onOpen: () => void;
@@ -31,18 +30,17 @@
 		dialog.close();
 	};
 
-	const logNotificationsQuery = useQuery(
-		'logNotifications',
-		() =>
-			getLogNotifications(replaceAllSpacesWithHyphens(space), {
-				types: [LogType_enum.todo, LogType_enum.question]
-			}),
+	const allLogsNotificationsQuery = useQuery(
+		`allLogNotifications`,
+		() => {
+			const queryString = stringArrayToQueryString(spaces);
+
+			return axios.get(`/log/notifications?${queryString}`);
+		},
 		{
 			onSuccess: () => {}
 		}
 	);
-
-	$: $page, queryClient.invalidateQueries('logNotifications');
 
 	const headerButtons = [
 		{
@@ -107,14 +105,15 @@
 		</div>
 		<div class="flex-1 hstack justify-end gap-5">
 			{#each headerButtons as { icon, onClick, type }}
-				{@const notificationsCount =
-					$logNotificationsQuery.data &&
-					$logNotificationsQuery.data.find(({ type: _type }) => _type === type)?.count}
+				{@const spaceNotifications = $allLogsNotificationsQuery.data?.data.find(
+					({ space: _space }) => _space === space
+				)}
+				{@const notificationsCount = spaceNotifications?.[type]}
 				<button on:click={() => onClick(!!notificationsCount)} class="relative">
 					<Icon {icon} class="text-gray-500" height="20px" />
 					{#if notificationsCount}
 						<div
-							class="absolute top-0 -right-2 rounded-full bg-red-500 text-[10px] w-[15px] h-[15px] text-white"
+							class="absolute top-0 -right-2 rounded-full bg-blue-400 text-[10px] w-[15px] h-[15px] text-white"
 						>
 							{notificationsCount}
 						</div>
@@ -128,15 +127,51 @@
 <Dialog bind:onOpen onClose={onDialogClose} bind:dialog>
 	<div class="stack gap-3">
 		<div class="stack gap-4 self-center">
-			{#each spaces as space}
-				{@const onClick = () => {
-					goto(
-						`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(new Date())}`
-					);
-					onDialogClose();
-				}}
-				<Button {onClick} _class="capitalize">{replaceAllHyphensWithSpaces(space)}</Button>
-			{/each}
+			{#if $allLogsNotificationsQuery.data?.data}
+				{#each $allLogsNotificationsQuery.data?.data as { space, todo, question }}
+					{@const onClick = () => {
+						goto(
+							`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(
+								new Date()
+							)}`
+						);
+						onDialogClose();
+					}}
+					<div class="hstack gap-2 items-center">
+						<Button {onClick} _class="capitalize">{replaceAllHyphensWithSpaces(space)}</Button>
+						<div class="hstack gap-4">
+							{#if todo}
+								<a
+									class="relative"
+									href={`/${space}/filter?type=todo&isCompleted=false`}
+									on:click={onDialogClose}
+								>
+									<Icon icon={icons.todo} class="text-neutral-400" height="20px" />
+									<p
+										class="absolute -top-2 -right-[8px] text-[10px] rounded-full bg-blue-400 w-[15px] center text-white"
+									>
+										{todo}
+									</p>
+								</a>
+							{/if}
+							{#if question}
+								<a
+									class="relative"
+									href={`/${space}/filter?type=question&isAnswered=false`}
+									on:click={onDialogClose}
+								>
+									<Icon icon={icons.question} class="text-neutral-400" height="20px" />
+									<p
+										class="absolute -top-2 -right-[8px] text-[10px] rounded-full bg-blue-400 w-[15px] center text-white"
+									>
+										{question}
+									</p>
+								</a>
+							{/if}
+						</div>
+					</div>
+				{/each}
+			{/if}
 		</div>
 		<div class="min-h-[50px] center">
 			{#if isAddingNewSpace}

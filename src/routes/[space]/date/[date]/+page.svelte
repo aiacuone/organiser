@@ -1,11 +1,5 @@
 <script lang="ts">
-	import {
-		Time_enum,
-		LogType_enum,
-		type SpaceData_int,
-		type LogBase_int,
-		type Log_int
-	} from '$lib/types/general';
+	import { Time_enum, LogType_enum, type SpaceData_int, type Log_int } from '$lib/types/general';
 	import { onMount, setContext } from 'svelte';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString, getDayFromHyphenatedString } from '$lib/utils';
@@ -208,6 +202,7 @@
 
 	const onGotoTodaysDate = () => {
 		$selectedDate = new Date();
+		$filters = [];
 	};
 
 	const onClickClear = () => {
@@ -249,10 +244,10 @@
 							<Icon {icon} class="text-gray-300" height="20px" />
 						</button>
 						<button
-							class="rounded-r-md w-2/6 h-full border-l-[2px] border-gray-50 {$filters.includes(
+							class="rounded-r-md w-2/6 h-full border-l-[2px] border-neutral-100 {$filters.includes(
 								type
 							)
-								? 'bg-gray-50'
+								? 'bg-neutral-100'
 								: 'bg-white'}"
 							on:click={() =>
 								$filters.includes(type)

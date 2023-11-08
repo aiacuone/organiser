@@ -18,3 +18,13 @@ export const objectToQueryString = (obj: Record<string, string>) => {
 		.filter(Boolean)
 		.join('&');
 };
+
+export const stringArrayToQueryString = (arr: string[]) => {
+	return arr
+		.map((query, index) => {
+			return `query${index}=${query}`;
+			// return 'query=' + index+query;
+		})
+		.filter(Boolean)
+		.join('&');
+};

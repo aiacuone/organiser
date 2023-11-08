@@ -41,6 +41,8 @@ export enum LogType_enum {
 	question = 'question'
 }
 
+export const allLogs = Object.entries(LogType_enum).map(([key, value]) => ({ key, value }));
+
 export interface LogBase_int<T = string> {
 	id: string;
 	date: Date;

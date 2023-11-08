@@ -155,78 +155,91 @@ export const getTitlesAndReferences = async (space: string) => {
 	return result;
 };
 
-export const getLogNotifications = async (space: string, types: Array<LogType_enum>) => {
-	const facet: any = {};
-
-	if (types.includes(LogType_enum.todo)) {
-		facet[LogType_enum.todo] = [
-			{
-				$match: {
-					type: 'todo'
+export const getAllLogNotifications = async (spaces: string[]) => {
+	const facet = spaces.reduce(
+		(acc, space) => ({
+			...acc,
+			[`${space}/${LogType_enum.todo}`]: [
+				{
+					$match: {
+						type: 'todo'
+					}
+				},
+				{
+					$match: {
+						space
+					}
+				},
+				{
+					$match: {
+						isCompleted: false
+					}
+				},
+				{
+					$count: 'count'
 				}
-			},
-			{
-				$match: {
-					isCompleted: false
-				}
-			},
-			{
-				$count: 'count'
-			}
-		];
-	}
-
-	if (types.includes(LogType_enum.question)) {
-		facet[LogType_enum.question] = [
-			{
-				$match: {
-					type: 'question'
-				}
-			},
-			{
-				$match: {
-					$or: [
-						{
-							answer: {
-								$not: {
-									$exists: true
+			],
+			[`${space}/${LogType_enum.question}`]: [
+				{
+					$match: {
+						type: 'question'
+					}
+				},
+				{
+					$match: {
+						space
+					}
+				},
+				{
+					$match: {
+						$or: [
+							{
+								answer: {
+									$not: {
+										$exists: true
+									}
+								}
+							},
+							{
+								answer: {
+									$eq: ''
 								}
 							}
-						},
-						{
-							answer: {
-								$eq: ''
-							}
-						}
-					]
+						]
+					}
+				},
+				{
+					$count: 'count'
 				}
-			},
-			{
-				$count: 'count'
-			}
-		];
-	}
+			]
+		}),
+		{}
+	);
 
 	const counts = await collection
 		.aggregate([
-			{
-				$match: {
-					space
-				}
-			},
 			{
 				$facet: facet
 			}
 		])
 		.toArray();
 
-	const mappedCounts = Object.entries(counts[0]).map(([key, countArray]) => {
-		const count = countArray[0]?.count ?? 0;
-		return {
-			type: key,
-			count
-		};
-	});
+	const mappedCounts = Object.entries(counts[0])
+		.map(([key, countArray]) => {
+			const count = countArray[0]?.count ?? 0;
+			const [space, type] = key.split('/');
+			return {
+				space,
+				type,
+				count
+			};
+		})
+		.reduce((result, { space, type, count }) => {
+			const indexOfExistingSpace = result.findIndex((group) => group.space === space);
+			result[indexOfExistingSpace] = { ...result[indexOfExistingSpace], [type]: count ?? 0 };
+
+			return result;
+		}, spaces.map((space) => ({ space })) as Array<{ space: string; type: string; count: number }>);
 
 	return mappedCounts;
 };
