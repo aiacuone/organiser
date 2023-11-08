@@ -293,7 +293,7 @@
 						/>
 					{:else if type === LogType_enum.question && log.importance && log.question}
 						<Question {...rest} importance={log.importance} content={log.content} />
-					{:else if type === LogType_enum.time && log.title}
+					{:else if type === LogType_enum.time}
 						<Time
 							{...rest}
 							title={log.title}

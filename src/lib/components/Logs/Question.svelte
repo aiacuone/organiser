@@ -124,7 +124,7 @@
 >
 	<div class="bg-neutral-100 p-1 rounded-sm">
 		<div class="bg-white p-2 stack gap-3 rounded-sm">
-			{#if title || reference}
+			{#if title || reference || isEditing}
 				<div class="stack">
 					{#if !isEditing && !title}{''}{:else}
 						<Input

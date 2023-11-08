@@ -139,7 +139,7 @@
 	{changeReferenceInputValue}
 >
 	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-4">
-		{#if title || reference}
+		{#if title || reference || isEditing}
 			<div class="stack gap-1">
 				{#if !isEditing && !title}{''}{:else}
 					<Input

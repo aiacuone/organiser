@@ -122,7 +122,7 @@
 	showDialog={!isOpen}
 >
 	<div class="bg-neutral-50 p-2 sm:p-3 stack gap-3">
-		{#if title || reference}
+		{#if title || reference || isEditing}
 			<div class="stack">
 				{#if !isEditing && !title}{''}{:else}
 					<Input

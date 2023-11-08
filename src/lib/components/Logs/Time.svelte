@@ -19,7 +19,7 @@
 	export let date: Date;
 	export let bullets: string[] = [];
 	export let id: string;
-	export let title: string;
+	export let title: string = '';
 	export let reference: string = '';
 	export let time: number = 0;
 	export let inputAutoFocus: boolean = false;
@@ -176,7 +176,7 @@
 >
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-2 stack text-sm gap-1">
-			{#if title || reference}
+			{#if title || reference || isEditing}
 				<div class="stack gap-1">
 					{#if !isEditing && !title}{''}{:else}
 						<Input
