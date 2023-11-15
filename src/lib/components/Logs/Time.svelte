@@ -14,6 +14,7 @@
 	import { titles } from '$lib/stores';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
+	import { debounce } from '$lib/utils/general';
 
 	export let isEditing: boolean;
 	export let date: Date;
@@ -123,29 +124,34 @@
 
 	const onIncrement = () => {
 		time = time + 0.5;
-		$updateMutation.mutate({
-			id,
-			title,
-			reference,
-			bullets,
-			time,
-			date,
-			type: LogType_enum.time,
-			space: $page.params.space
-		});
+		debounce(() =>
+			$updateMutation.mutate({
+				id,
+				title,
+				reference,
+				bullets,
+				time,
+				date,
+				type: LogType_enum.time,
+				space: $page.params.space
+			})
+		);
 	};
+
 	const onDecrement = () => {
 		time = time - 0.5;
-		$updateMutation.mutate({
-			id,
-			title,
-			reference,
-			bullets,
-			time,
-			date,
-			type: LogType_enum.time,
-			space: $page.params.space
-		});
+		debounce(() =>
+			$updateMutation.mutate({
+				id,
+				title,
+				reference,
+				bullets,
+				time,
+				date,
+				type: LogType_enum.time,
+				space: $page.params.space
+			})
+		);
 	};
 
 	const incrementDecrementProps = {
