@@ -2,7 +2,6 @@
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
 	import BottomOptions from './BottomOptions.svelte';
-	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
 	import Textarea from '../Textarea.svelte';
@@ -15,6 +14,7 @@
 	import Input from '../Input.svelte';
 	import { titles } from '$lib/stores';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
+	import { debounce } from '$lib/utils/general';
 
 	export let title: string;
 	export let reference: string = '';
@@ -45,18 +45,18 @@
 
 	const onCheckboxClick = () => {
 		isCompleted = !isCompleted;
-		$updateMutation.mutate({
-			id,
-			content,
-			priority,
-			date,
-			type: LogType_enum.todo,
-			space: $page.params.space,
-			isCompleted
-		});
+		debounce(() =>
+			$updateMutation.mutate({
+				id,
+				content,
+				priority,
+				date,
+				type: LogType_enum.todo,
+				space: $page.params.space,
+				isCompleted
+			})
+		);
 	};
-
-	let onOpen: () => void;
 
 	const onAccept = async () => {
 		const haveValuesChanged = getHaveValuesChanged({
@@ -164,7 +164,7 @@
 		<div class="hstack gap-4 items-center">
 			<IconWithRating icon={icons.todo} rating={priority} />
 			<button
-				on:click={onOpen}
+				on:click={onCheckboxClick}
 				class="center border-2 border-gray-300 w-[30px] h-[30px] rounded-md"
 			>
 				{#if isCompleted}
@@ -192,5 +192,3 @@
 		/>
 	</div>
 </LogContainer>
-
-<ConfirmationDialog bind:onOpen onConfirm={onCheckboxClick}>Are you sure?</ConfirmationDialog>
