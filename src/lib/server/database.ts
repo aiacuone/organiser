@@ -101,11 +101,11 @@ export const getLogs = async ({
 		});
 	}
 
-	if (isCompleted) {
+	if (typeof isCompleted === 'boolean') {
 		query.push({ $match: { isCompleted } });
 	}
 
-	if (hasAnswer) {
+	if (typeof hasAnswer === 'boolean') {
 		query.push({
 			$match: {
 				$or: [
