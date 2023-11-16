@@ -7,7 +7,7 @@
 	import Time from '$lib/components/Logs/Time.svelte';
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Search from '$lib/components/Search.svelte';
-	import { LogType_enum } from '$lib/types';
+	import { LogType_enum, allLogs } from '$lib/types';
 
 	import { objectToQueryString, replaceAllSpacesWithHyphens } from '$lib/utils/strings';
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
@@ -16,6 +16,7 @@
 
 	const queryClient = useQueryClient();
 	const defaultFilters = Object.fromEntries(new URLSearchParams($page.url.searchParams).entries());
+
 	const filters: Writable<Record<string, string>> = writable(defaultFilters);
 
 	let hasPageLoaded = false;
@@ -93,13 +94,27 @@
 </script>
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
-	<div class="center" bind:clientHeight={headerContainerHeight}>
+	<div class="center flex flex-col sm:flex-row" bind:clientHeight={headerContainerHeight}>
 		<Search
 			bind:value={$filters.search}
 			{onClickClear}
 			showEnter={false}
 			bind:onFocus={onSearchInputFocus}
 		/>
+		<div class="hstack gap-4 flex-wrap center">
+			{#each allLogs as logKey, i}
+				<label class="capitalize text-xs center gap-1">
+					{logKey}
+					<input
+						type="checkbox"
+						bind:checked={$filters[logKey]}
+						on:change={() => {
+							$filters = { ...$filters, [logKey]: $filters[logKey] };
+						}}
+					/>
+				</label>
+			{/each}
+		</div>
 	</div>
 	<div class="center">
 		<div

@@ -21,10 +21,23 @@ export const getLogs = async ({
 	space,
 	search,
 	date,
-	type,
 	isCompleted,
-	hasAnswer
-}: Record<'space' | 'search' | 'date' | 'type' | 'isCompleted' | 'hasAnswer', string>) => {
+	hasAnswer,
+	important,
+	todo,
+	time,
+	question
+}: {
+	space?: string;
+	search?: string;
+	date?: string;
+	isCompleted?: boolean;
+	hasAnswer?: boolean;
+	important?: boolean;
+	todo?: boolean;
+	time?: boolean;
+	question?: boolean;
+}) => {
 	const query: Array<Record<string | number, Record<string, any>>> = [
 		{ $project: { _id: 0 } },
 		{ $sort: { date: -1 } }
@@ -70,29 +83,39 @@ export const getLogs = async ({
 		});
 	}
 
-	if (type) {
-		query.push({ $match: { type } });
+	const logTypes = Object.entries({ todo, question, important, time })
+		.map(([type, boolean]) => ({ type, boolean }))
+		.filter(({ boolean }) => boolean);
+
+	if (logTypes.length) {
+		query.push({
+			$match: {
+				$or: logTypes.map(({ type }) => {
+					return {
+						type: {
+							$eq: type
+						}
+					};
+				})
+			}
+		});
 	}
 
 	if (isCompleted) {
-		const _isCompleted = JSON.parse(isCompleted);
-		query.push({ $match: { isCompleted: _isCompleted } });
+		query.push({ $match: { isCompleted } });
 	}
 
 	if (hasAnswer) {
-		const _hasAnswer = JSON.parse(hasAnswer);
-		if (!_hasAnswer) {
-			query.push({
-				$match: {
-					$or: [
-						{ answer: { $exists: _hasAnswer } },
-						{
-							answer: { $eq: '' }
-						}
-					]
-				}
-			});
-		}
+		query.push({
+			$match: {
+				$or: [
+					{ answer: { $exists: hasAnswer } },
+					{
+						answer: { $eq: '' }
+					}
+				]
+			}
+		});
 	}
 
 	const result = await collection.aggregate(query).toArray();
