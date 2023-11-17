@@ -94,7 +94,7 @@
 </script>
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
-	<div class="center flex flex-col sm:flex-row" bind:clientHeight={headerContainerHeight}>
+	<div class="center flex flex-col sm:flex-row gap-2" bind:clientHeight={headerContainerHeight}>
 		<Search
 			bind:value={$filters.search}
 			{onClickClear}
