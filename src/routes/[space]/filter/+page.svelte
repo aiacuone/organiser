@@ -171,7 +171,7 @@
 					{#if $filteredLogsQuery.isFetching}
 						Loading more...
 					{:else if $filteredLogsQuery.hasNextPage}
-						<div use:viewport on:enterViewport={onGetNextPage} />
+						<div use:viewport on:enterViewport={onGetNextPage} class="h-10 w-full" />
 					{:else}
 						{$filteredLogsQuery.data.pages[0].data.total} Results
 					{/if}
