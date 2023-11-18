@@ -1,23 +1,24 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { getLogs } from '$lib/api/logsLocalApi';
 	import Important from '$lib/components/Logs/Important.svelte';
 	import Question from '$lib/components/Logs/Question.svelte';
 	import Time from '$lib/components/Logs/Time.svelte';
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Search from '$lib/components/Search.svelte';
+	import { viewport } from '$lib/hooks';
 	import { LogType_enum, allLogs } from '$lib/types';
 
 	import { objectToQueryString, replaceAllSpacesWithHyphens } from '$lib/utils/strings';
-	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
+	import { useInfiniteQuery, useQueryClient } from '@sveltestack/svelte-query';
+	import axios from 'axios';
 	import { onMount } from 'svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
 
 	const queryClient = useQueryClient();
 	const defaultFilters = Object.fromEntries(new URLSearchParams($page.url.searchParams).entries());
 
-	const filters: Writable<Record<string, string>> = writable(defaultFilters);
+	const filters: Writable<Record<string, string | number>> = writable(defaultFilters);
 
 	let hasPageLoaded = false;
 	let onSearchInputFocus: () => void;
@@ -52,18 +53,25 @@
 				goto(url, { keepFocus: true });
 			});
 
-	const filteredLogsQuery = useQuery(
-		'filteredLogs',
-		() => {
-			return getLogs({
+	const fetchFilteredLogs = async ({ pageParam: skip = 0 }) => {
+		return await axios.get(`/log`, {
+			params: {
 				space: replaceAllSpacesWithHyphens($page.params.space),
-				...$filters
-			});
-		},
-		{
-			onSuccess: () => {}
+				...$filters,
+				skip
+			}
+		});
+	};
+
+	const filteredLogsQuery = useInfiniteQuery('filteredLogs', fetchFilteredLogs, {
+		getNextPageParam: (lastGroup) => {
+			const skip = 10;
+			const total = lastGroup.data.total;
+			const nextSkip = lastGroup.config.params.skip + skip;
+			const hasNextPage = nextSkip < total;
+			return hasNextPage ? nextSkip : undefined;
 		}
-	);
+	});
 
 	const onClickClear = () => {
 		$filters = {};
@@ -91,6 +99,12 @@
 			document.removeEventListener('keydown', onKeydown);
 		};
 	});
+
+	const onGetNextPage = () => {
+		if (!$filteredLogsQuery.isFetching) {
+			$filteredLogsQuery.fetchNextPage();
+		}
+	};
 </script>
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
@@ -128,29 +142,40 @@
 			{:else if $filteredLogsQuery.isError}
 				Error
 			{:else if $filteredLogsQuery.data}
-				{#each $filteredLogsQuery.data as log}
-					{@const { type, ...rest } = log}
-					{#if type === LogType_enum.important && log.importance && log.content}
-						<Important {...rest} importance={log.importance} content={log.content} />
-					{:else if type === LogType_enum.todo && log.priority && log.content}
-						<Todo
-							{...rest}
-							priority={log.priority}
-							isCompleted={log.isCompleted}
-							content={log.content}
-						/>
-					{:else if type === LogType_enum.question && log.importance && log.question}
-						<Question {...rest} importance={log.importance} content={log.content} />
-					{:else if type === LogType_enum.time && log.title}
-						<Time
-							{...rest}
-							title={log.title}
-							reference={log.reference}
-							time={log.time}
-							bullets={log.bullets}
-						/>
-					{/if}
+				{#each $filteredLogsQuery.data.pages as page}
+					{#each page.data.logs as log}
+						{@const { type, ...rest } = log}
+						{#if type === LogType_enum.important && log.importance && log.content}
+							<Important {...rest} importance={log.importance} content={log.content} />
+						{:else if type === LogType_enum.todo && log.priority && log.content}
+							<Todo
+								{...rest}
+								priority={log.priority}
+								isCompleted={log.isCompleted}
+								content={log.content}
+							/>
+						{:else if type === LogType_enum.question && log.importance && log.question}
+							<Question {...rest} importance={log.importance} content={log.content} />
+						{:else if type === LogType_enum.time && log.title}
+							<Time
+								{...rest}
+								title={log.title}
+								reference={log.reference}
+								time={log.time}
+								bullets={log.bullets}
+							/>
+						{/if}
+					{/each}
 				{/each}
+				<div class="center text-gray-300">
+					{#if $filteredLogsQuery.isFetching}
+						Loading more...
+					{:else if $filteredLogsQuery.hasNextPage}
+						<div use:viewport on:enterViewport={onGetNextPage} />
+					{:else}
+						{$filteredLogsQuery.data.pages[0].data.total} Results
+					{/if}
+				</div>
 			{/if}
 		</div>
 	</div>

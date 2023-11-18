@@ -50,12 +50,15 @@
 
 	const logs = useQuery(
 		'logs',
-		() =>
-			$selectedHyphenatedDateString &&
-			getLogs({
-				space: replaceAllSpacesWithHyphens(data.space),
-				date: $selectedDate
-			}),
+		() => {
+			return (
+				selectedHyphenatedDateString &&
+				getLogs({
+					space: replaceAllSpacesWithHyphens(data.space),
+					date: $selectedDate
+				})
+			);
+		},
 		{
 			onSuccess: () => {
 				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
@@ -125,8 +128,8 @@
 	const filters: Writable<Array<LogType_enum>> = writable([]);
 
 	const filteredLogs = derived([logs, filters], ([$logs, $filters]) => {
-		if ($filters.length === 0) return $logs.data;
-		return $logs.data?.filter((log: Log_int) => $filters.includes(log.type));
+		if ($filters.length === 0) return $logs.data?.logs;
+		return $logs.data?.logs.filter((log: Log_int) => $filters.includes(log.type));
 	});
 
 	const noteButtons = [

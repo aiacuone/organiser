@@ -18,13 +18,18 @@ export const getDateLogs = async ({
 }: {
 	space: string;
 	date: string;
-	params?: Record<'search', string>;
+	params?: Record<'search' | 'skip', string>;
 }) => {
 	const { data } = await axios.get(`/${resource}/${space}/${date}`, { params });
 	return data;
 };
 
-export const getLogs = async (params: { space?: string; search?: string; date?: Date }) => {
+export const getLogs = async (params: {
+	space?: string;
+	search?: string;
+	date?: Date;
+	skip?: number;
+}) => {
 	const { data } = await axios.get(`/${resource}`, { params });
 	return data;
 };

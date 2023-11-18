@@ -1,5 +1,6 @@
 import { MONGO_URL } from '$env/static/private';
 import { LogType_enum } from '$lib/types';
+import type { Query } from '@sveltestack/svelte-query';
 import { MongoClient } from 'mongodb';
 
 export const getDatabase = async () => {
@@ -26,7 +27,9 @@ export const getLogs = async ({
 	important,
 	todo,
 	time,
-	question
+	question,
+	limit = '10',
+	skip
 }: {
 	space?: string;
 	search?: string;
@@ -37,19 +40,18 @@ export const getLogs = async ({
 	todo?: boolean;
 	time?: boolean;
 	question?: boolean;
+	limit?: string;
+	skip?: string;
 }) => {
-	const query: Array<Record<string | number, Record<string, any>>> = [
-		{ $project: { _id: 0 } },
-		{ $sort: { date: -1 } }
-	];
+	const baseQuery: Array<any> = [{ $project: { _id: 0 } }, { $sort: { date: -1 } }];
 
 	if (space) {
-		query.push({ $match: { space } });
+		baseQuery.push({ $match: { space } });
 	}
 
 	if (date) {
 		const _date = new Date(date);
-		query.push({
+		baseQuery.push({
 			$match: {
 				$or: [
 					{
@@ -74,7 +76,7 @@ export const getLogs = async ({
 
 	if (search) {
 		const options = ['title', 'reference', 'content', 'question', 'answer'];
-		query.push({
+		baseQuery.push({
 			$match: {
 				$or: options.map((option) => ({
 					[option]: { $regex: search, $options: 'i' }
@@ -88,7 +90,7 @@ export const getLogs = async ({
 		.filter(({ boolean }) => boolean);
 
 	if (logTypes.length) {
-		query.push({
+		baseQuery.push({
 			$match: {
 				$or: logTypes.map(({ type }) => {
 					return {
@@ -102,11 +104,11 @@ export const getLogs = async ({
 	}
 
 	if (typeof isCompleted === 'boolean') {
-		query.push({ $match: { isCompleted } });
+		baseQuery.push({ $match: { isCompleted } });
 	}
 
 	if (typeof hasAnswer === 'boolean') {
-		query.push({
+		baseQuery.push({
 			$match: {
 				$or: [
 					{ answer: { $exists: hasAnswer } },
@@ -118,9 +120,37 @@ export const getLogs = async ({
 		});
 	}
 
-	const result = await collection.aggregate(query).toArray();
+	const logQuery = [...baseQuery];
 
-	return result;
+	if (skip) {
+		logQuery.push({ $skip: parseInt(skip) });
+	}
+
+	if (limit) {
+		logQuery.push({ $limit: parseInt(limit) });
+	}
+
+	const countQuery = [
+		...baseQuery,
+		{
+			$count: 'total'
+		}
+	];
+
+	const queryWithTotal: Array<any> = [
+		{
+			$facet: {
+				logs: logQuery,
+				total: countQuery
+			}
+		}
+	];
+
+	const result = await collection.aggregate(queryWithTotal).toArray();
+	const logs = result[0].logs;
+	const total = result[0].total[0]?.total ?? 0;
+
+	return { logs, total };
 };
 
 export const getSpaces = async () => {

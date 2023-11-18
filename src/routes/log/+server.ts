@@ -24,7 +24,7 @@ export const GET = async ({ url: { searchParams } }) => {
 
 	const parsedParams = getObjectWithParsedValues(params);
 
-	const logs = await getLogs(parsedParams);
+	const { logs, total } = await getLogs(parsedParams);
 
-	return new Response(JSON.stringify(logs), { status: 200 });
+	return new Response(JSON.stringify({ logs, total }), { status: 200 });
 };
