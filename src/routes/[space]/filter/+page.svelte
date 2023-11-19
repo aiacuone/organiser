@@ -1,19 +1,16 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-
 	import Important from '$lib/components/Logs/Important.svelte';
 	import Question from '$lib/components/Logs/Question.svelte';
 	import Time from '$lib/components/Logs/Time.svelte';
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import { viewport } from '$lib/hooks';
-	import { LogType_enum, allLogInputs, allLogs, searchableInputs } from '$lib/types';
+	import { LogType_enum, allLogs, searchableInputs } from '$lib/types';
 	import { arraysAreEqual } from '$lib/utils/arrays';
-
 	import {
 		arrayToSearchParamsString,
-		capitalizeWords,
 		searchParamsStringToArray,
 		replaceAllSpacesWithHyphens,
 		camelCaseToLower
@@ -23,12 +20,15 @@
 	import { onMount } from 'svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
 
+	const searchValue = writable('');
+
 	const queryClient = useQueryClient();
 
 	const searchParams = derived(page, ($page) => {
 		const searchParams = new URLSearchParams($page.url.searchParams);
 
 		const string = searchParams.toString();
+
 		const array = searchParamsStringToArray(searchParams);
 
 		return { string, array };
@@ -36,10 +36,15 @@
 
 	const filters: Writable<Array<Array<string>>> = writable($searchParams.array);
 
+	const filtersValues = derived(filters, ($filters) => {
+		const string = arrayToSearchParamsString($filters);
+		return { string };
+	});
+
 	const onClickClear = () => {
 		$filters = [];
 		queryClient.invalidateQueries('filteredLogs');
-		searchValue = '';
+		$searchValue = '';
 	};
 
 	let hasPageLoaded = false;
@@ -48,13 +53,11 @@
 	onMount(() => {
 		hasPageLoaded = true;
 		const hasSearchQuery = $page.url.searchParams.has('search');
+
 		if (hasSearchQuery) {
 			onSearchInputFocus();
+			$searchValue = $page.url.searchParams.get('search') ?? '';
 		}
-	});
-
-	const filtersSearchParamsString = derived(filters, ($filters) => {
-		return arrayToSearchParamsString($filters);
 	});
 
 	let timer;
@@ -69,11 +72,11 @@
 		timeout();
 	};
 
-	$: $filtersSearchParamsString,
+	$: $filters,
 		hasPageLoaded &&
 			debounce(() => {
-				const url = $filtersSearchParamsString
-					? `${$page.url.pathname}?${$filtersSearchParamsString}`
+				const url = $filtersValues.string
+					? `${$page.url.pathname}?${$filtersValues.string}`
 					: `${$page.url.pathname}`;
 
 				goto(url, { keepFocus: true });
@@ -129,8 +132,6 @@
 		}
 	};
 
-	let searchValue: string;
-
 	const onFilterChange = (filterValue: string[]) => {
 		const hasExistingValue = $filters.some((filter) => arraysAreEqual(filter, filterValue));
 
@@ -141,15 +142,13 @@
 		}
 	};
 
-	const onSearch = (e) => {
+	const onSearch = () => {
 		if ($filters.some((filter) => filter[0] === 'searchType')) {
 			$filters = $filters.filter((filter) => filter[0] !== 'searchType');
 		}
 
-		const searchValue = e.target.value;
-
-		if (searchValue) {
-			$filters = [...$filters, ['search', searchValue]];
+		if ($searchValue) {
+			$filters = [...$filters, ['search', $searchValue]];
 		} else {
 			$filters = $filters.filter((filter) => filter[0] !== 'search');
 		}
@@ -161,13 +160,13 @@
 		<div class="hstack gap-3 flex-wrap center">
 			<div class="hstack gap-3 border border-gray-100 py-1 px-2 rounded-md flex-wrap center">
 				<Search
-					bind:value={searchValue}
-					onChange={(e) => debounce(() => onSearch(e))}
+					bind:value={$searchValue}
+					onChange={(e) => debounce(() => onSearch())}
 					{onClickClear}
 					showEnter={false}
 					bind:onFocus={onSearchInputFocus}
 				/>
-				<div class="hstack gap-2 {searchValue ? 'opacity-100' : 'opacity-20'}">
+				<div class="hstack gap-2 {$searchValue ? 'opacity-100' : 'opacity-20'}">
 					{#each searchableInputs as key}
 						<label class="capitalize text-xs center gap-1 hstack gap-[2px]">
 							{camelCaseToLower(key)}
@@ -177,7 +176,7 @@
 								checked={$filters.some((filterArray) =>
 									arraysAreEqual(filterArray, ['searchType', key])
 								)}
-								disabled={!searchValue}
+								disabled={!$searchValue}
 							/>
 						</label>
 					{/each}
