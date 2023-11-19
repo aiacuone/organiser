@@ -24,3 +24,5 @@ export const references = derived(titlesAndReferences, ($titlesAndReferences) =>
 		.filter(({ reference }) => reference)
 		.map(({ reference }) => reference);
 });
+
+export const searchValue = writable('');

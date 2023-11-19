@@ -7,6 +7,7 @@
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import { viewport } from '$lib/hooks';
+	import { searchValue } from '$lib/stores';
 	import { LogType_enum, allLogs, searchableInputs } from '$lib/types';
 	import { arraysAreEqual } from '$lib/utils/arrays';
 	import {
@@ -19,8 +20,6 @@
 	import axios from 'axios';
 	import { onMount } from 'svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
-
-	const searchValue = writable('');
 
 	const queryClient = useQueryClient();
 

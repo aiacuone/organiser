@@ -10,6 +10,7 @@
 	import { icons } from '$lib/general/icons';
 	import { selectedDate } from '$lib/stores/dates';
 	import Header from '$lib/components/Header.svelte';
+	import { searchValue } from '$lib/stores';
 
 	export let data: SpaceData_int;
 
@@ -96,7 +97,10 @@
 		},
 		{
 			icon: icons.search,
-			onClick: () => goto(`/${$page.params.space}/filter`)
+			onClick: () => {
+				goto(`/${$page.params.space}/filter`);
+				$searchValue = '';
+			}
 		}
 	];
 </script>
