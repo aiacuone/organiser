@@ -13,7 +13,7 @@
 </script>
 
 <div class="hstack">
-	<div class="hstack center gap-1 px-1 border border-gray-100 rounded-sm">
+	<div class="hstack center gap-1 px-2 border border-gray-100 rounded-md">
 		<Icon icon={icons.search} class="text-gray-500" />
 		<Input bind:onFocus _class="outline-none" bind:value {onChange} bind:onEnterKeydown />
 	</div>

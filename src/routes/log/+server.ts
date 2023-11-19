@@ -1,5 +1,4 @@
 import { deleteLog, getLogs, updateLog } from '$lib';
-import { getObjectWithParsedValues } from '$lib/utils/parse.js';
 
 export async function PATCH({ request }) {
 	const data = await request.json();
@@ -18,13 +17,41 @@ export const DELETE = async ({ request }) => {
 };
 
 export const GET = async ({ url: { searchParams } }) => {
-	const result = new URLSearchParams(searchParams).entries();
+	const objectSearchParams = Object.fromEntries(searchParams.entries());
+	const json = objectSearchParams['json'];
 
-	const params = Object.fromEntries(result);
+	let logs;
+	let total;
 
-	const parsedParams = getObjectWithParsedValues(params);
+	if (json) {
+		const jsonArray = JSON.parse(objectSearchParams['json']);
 
-	const { logs, total } = await getLogs(parsedParams);
+		objectSearchParams['json'] = JSON.parse(objectSearchParams['json']);
+
+		const reducedJsonParams = jsonArray.reduce((object, [key, value]) => {
+			const isMultiplesKey = ['type', 'searchType'].includes(key);
+
+			if (isMultiplesKey) {
+				if (object[key]) {
+					object[key] = [...object[key], value];
+				} else {
+					object[key] = [value];
+				}
+			} else {
+				object[key] = value;
+			}
+
+			return object;
+		}, {} as Record<string, string[] | string>);
+
+		delete objectSearchParams['json'];
+
+		const params = { ...objectSearchParams, ...reducedJsonParams };
+
+		({ logs, total } = await getLogs(params));
+	} else {
+		({ logs, total } = await getLogs(objectSearchParams));
+	}
 
 	return new Response(JSON.stringify({ logs, total }), { status: 200 });
 };

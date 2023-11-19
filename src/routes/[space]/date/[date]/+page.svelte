@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Time_enum, LogType_enum, type SpaceData_int, type Log_int } from '$lib/types/general';
+	import { Time_enum, LogType_enum, type SpaceData_int, type Log_int } from '$lib/types/logs';
 	import { onMount, setContext } from 'svelte';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString, getDayFromHyphenatedString } from '$lib/utils';
