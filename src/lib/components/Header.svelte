@@ -48,7 +48,7 @@
 			type: LogType_enum.time,
 			icon: icons.clock,
 			onClick: () => {
-				goto(`/${$page.params.space}/filter?${LogType_enum.time}=true`);
+				goto(`/${$page.params.space}/filter?type=${LogType_enum.time}`);
 			}
 		},
 		{
@@ -57,8 +57,8 @@
 			icon: icons.todo,
 			onClick: (hasNotification: boolean) => {
 				const url = hasNotification
-					? `/${$page.params.space}/filter?${LogType_enum.todo}=true&isCompleted=false`
-					: `/${$page.params.space}/filter?${LogType_enum.todo}=true`;
+					? `/${$page.params.space}/filter?type=${LogType_enum.todo}&isCompleted=false`
+					: `/${$page.params.space}/filter?type=${LogType_enum.todo}`;
 				goto(url);
 			}
 		},
@@ -67,7 +67,7 @@
 			type: LogType_enum.important,
 			icon: icons.important,
 			onClick: () => {
-				goto(`/${$page.params.space}/filter?${LogType_enum.important}=true`);
+				goto(`/${$page.params.space}/filter?type=${LogType_enum.important}`);
 			}
 		},
 		{
@@ -76,8 +76,8 @@
 			icon: icons.question,
 			onClick: (hasNotification: boolean) => {
 				const url = hasNotification
-					? `/${$page.params.space}/filter?${LogType_enum.question}=true&hasAnswer=false`
-					: `/${$page.params.space}/filter?${LogType_enum.question}=true`;
+					? `/${$page.params.space}/filter?type=${LogType_enum.question}&hasAnswer=false`
+					: `/${$page.params.space}/filter?type=${LogType_enum.question}`;
 				goto(url);
 			}
 		}

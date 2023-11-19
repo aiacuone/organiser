@@ -30,8 +30,8 @@ export const getLogs = async ({
 }: {
 	space?: string;
 	date?: string;
-	isCompleted?: boolean;
-	hasAnswer?: boolean;
+	isCompleted?: 'true' | 'false';
+	hasAnswer?: 'true' | 'false';
 	limit?: string;
 	skip?: string;
 	search?: string;
@@ -101,15 +101,17 @@ export const getLogs = async ({
 		});
 	}
 
-	if (typeof isCompleted === 'boolean') {
-		baseQuery.push({ $match: { isCompleted } });
+	if (isCompleted) {
+		const parsedBoolean = JSON.parse(isCompleted);
+		baseQuery.push({ $match: { isCompleted: parsedBoolean } });
 	}
 
-	if (typeof hasAnswer === 'boolean') {
+	if (hasAnswer) {
+		const parsedBoolean = JSON.parse(hasAnswer);
 		baseQuery.push({
 			$match: {
 				$or: [
-					{ answer: { $exists: hasAnswer } },
+					{ answer: { $exists: parsedBoolean } },
 					{
 						answer: { $eq: '' }
 					}
