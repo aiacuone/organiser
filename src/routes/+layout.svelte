@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import type { SpaceData_int } from '$lib/types/general';
+	import type { SpaceData_int } from '$lib/types/logs';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '@iconify/svelte';

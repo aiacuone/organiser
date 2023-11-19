@@ -7,29 +7,57 @@
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import { viewport } from '$lib/hooks';
-	import { LogType_enum, allLogs } from '$lib/types';
-
-	import { objectToQueryString, replaceAllSpacesWithHyphens } from '$lib/utils/strings';
+	import { LogType_enum, allLogs, searchableInputs } from '$lib/types';
+	import { arraysAreEqual } from '$lib/utils/arrays';
+	import {
+		arrayToSearchParamsString,
+		searchParamsStringToArray,
+		replaceAllSpacesWithHyphens,
+		camelCaseToLower
+	} from '$lib/utils/strings';
 	import { useInfiniteQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import axios from 'axios';
 	import { onMount } from 'svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
 
-	const queryClient = useQueryClient();
-	const defaultFilters = Object.fromEntries(new URLSearchParams($page.url.searchParams).entries());
+	const searchValue = writable('');
 
-	const filters: Writable<Record<string, string | number>> = writable(defaultFilters);
+	const queryClient = useQueryClient();
+
+	const searchParams = derived(page, ($page) => {
+		const searchParams = new URLSearchParams($page.url.searchParams);
+
+		const string = searchParams.toString();
+
+		const array = searchParamsStringToArray(searchParams);
+
+		return { string, array };
+	});
+
+	const filters: Writable<Array<Array<string>>> = writable($searchParams.array);
+
+	const filtersValues = derived(filters, ($filters) => {
+		const string = arrayToSearchParamsString($filters);
+		return { string };
+	});
+
+	const onClickClear = () => {
+		$filters = [];
+		queryClient.invalidateQueries('filteredLogs');
+		$searchValue = '';
+	};
 
 	let hasPageLoaded = false;
 	let onSearchInputFocus: () => void;
 
 	onMount(() => {
 		hasPageLoaded = true;
-		defaultFilters.search && onSearchInputFocus();
-	});
+		const hasSearchQuery = $page.url.searchParams.has('search');
 
-	const searchParams = derived(filters, ($filters) => {
-		return objectToQueryString($filters);
+		if (hasSearchQuery) {
+			onSearchInputFocus();
+			$searchValue = $page.url.searchParams.get('search') ?? '';
+		}
 	});
 
 	let timer;
@@ -47,20 +75,23 @@
 	$: $filters,
 		hasPageLoaded &&
 			debounce(() => {
-				const url = $searchParams
-					? `${$page.url.pathname}?${$searchParams}`
+				const url = $filtersValues.string
+					? `${$page.url.pathname}?${$filtersValues.string}`
 					: `${$page.url.pathname}`;
+
 				goto(url, { keepFocus: true });
 			});
 
 	const fetchFilteredLogs = async ({ pageParam: skip = 0 }) => {
-		return await axios.get(`/log`, {
+		const result = await axios.get(`/log`, {
 			params: {
 				space: replaceAllSpacesWithHyphens($page.params.space),
-				...$filters,
-				skip
+				skip,
+				json: JSON.stringify($searchParams.array)
 			}
 		});
+
+		return result;
 	};
 
 	const filteredLogsQuery = useInfiniteQuery('filteredLogs', fetchFilteredLogs, {
@@ -73,13 +104,8 @@
 		}
 	});
 
-	const onClickClear = () => {
-		$filters = {};
-		queryClient.invalidateQueries('filteredLogs');
-	};
-
 	const updatedStateAndInvalidate = () => {
-		$filters = Object.fromEntries(new URLSearchParams($page.url.searchParams).entries());
+		$filters = searchParamsStringToArray($page.url.searchParams);
 		queryClient.invalidateQueries('filteredLogs');
 	};
 	$: $page.url, updatedStateAndInvalidate();
@@ -105,29 +131,69 @@
 			$filteredLogsQuery.fetchNextPage();
 		}
 	};
+
+	const onFilterChange = (filterValue: string[]) => {
+		const hasExistingValue = $filters.some((filter) => arraysAreEqual(filter, filterValue));
+
+		if (hasExistingValue) {
+			$filters = $filters.filter((filter) => !arraysAreEqual(filter, filterValue));
+		} else {
+			$filters = [...$filters, filterValue];
+		}
+	};
+
+	const onSearch = () => {
+		if ($filters.some((filter) => filter[0] === 'searchType')) {
+			$filters = $filters.filter((filter) => filter[0] !== 'searchType');
+		}
+
+		if ($searchValue) {
+			$filters = [...$filters, ['search', $searchValue]];
+		} else {
+			$filters = $filters.filter((filter) => filter[0] !== 'search');
+		}
+	};
 </script>
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
-	<div class="center flex flex-col sm:flex-row gap-2" bind:clientHeight={headerContainerHeight}>
-		<Search
-			bind:value={$filters.search}
-			{onClickClear}
-			showEnter={false}
-			bind:onFocus={onSearchInputFocus}
-		/>
-		<div class="hstack gap-4 flex-wrap center">
-			{#each allLogs as logKey, i}
-				<label class="capitalize text-xs center gap-1">
-					{logKey}
-					<input
-						type="checkbox"
-						bind:checked={$filters[logKey]}
-						on:change={() => {
-							$filters = { ...$filters, [logKey]: $filters[logKey] };
-						}}
-					/>
-				</label>
-			{/each}
+	<div class="center stack gap-2" bind:clientHeight={headerContainerHeight}>
+		<div class="hstack gap-3 flex-wrap center">
+			<div class="hstack gap-3 border border-gray-100 py-1 px-2 rounded-md flex-wrap center">
+				<Search
+					bind:value={$searchValue}
+					onChange={(e) => debounce(() => onSearch())}
+					{onClickClear}
+					showEnter={false}
+					bind:onFocus={onSearchInputFocus}
+				/>
+				<div class="hstack gap-2 {$searchValue ? 'opacity-100' : 'opacity-20'}">
+					{#each searchableInputs as key}
+						<label class="capitalize text-xs center gap-1 hstack gap-[2px]">
+							{camelCaseToLower(key)}
+							<input
+								type="checkbox"
+								on:change={() => onFilterChange(['searchType', key])}
+								checked={$filters.some((filterArray) =>
+									arraysAreEqual(filterArray, ['searchType', key])
+								)}
+								disabled={!$searchValue}
+							/>
+						</label>
+					{/each}
+				</div>
+			</div>
+			<div class="hstack gap-2 flex-wrap center">
+				{#each allLogs as key, i}
+					<label class="capitalize text-xs center gap-1">
+						{camelCaseToLower(key)}
+						<input
+							type="checkbox"
+							on:change={() => onFilterChange(['type', key])}
+							checked={$filters.some((filterArray) => arraysAreEqual(filterArray, ['type', key]))}
+						/>
+					</label>
+				{/each}
+			</div>
 		</div>
 	</div>
 	<div class="center">

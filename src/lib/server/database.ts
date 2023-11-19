@@ -1,6 +1,5 @@
 import { MONGO_URL } from '$env/static/private';
-import { LogType_enum } from '$lib/types';
-import type { Query } from '@sveltestack/svelte-query';
+import { LogInput_enum, LogType_enum, searchableInputs } from '$lib/types';
 import { MongoClient } from 'mongodb';
 
 export const getDatabase = async () => {
@@ -20,28 +19,24 @@ const collection = await getCollection('aiacuone');
 
 export const getLogs = async ({
 	space,
-	search,
 	date,
 	isCompleted,
 	hasAnswer,
-	important,
-	todo,
-	time,
-	question,
 	limit = '10',
-	skip
+	skip,
+	type,
+	search,
+	searchType
 }: {
 	space?: string;
-	search?: string;
 	date?: string;
 	isCompleted?: boolean;
 	hasAnswer?: boolean;
-	important?: boolean;
-	todo?: boolean;
-	time?: boolean;
-	question?: boolean;
 	limit?: string;
 	skip?: string;
+	search?: string;
+	searchType?: string[];
+	type?: string[];
 }) => {
 	const baseQuery: Array<any> = [{ $project: { _id: 0 } }, { $sort: { date: -1 } }];
 
@@ -74,28 +69,31 @@ export const getLogs = async ({
 		});
 	}
 
-	if (search) {
-		const options = ['title', 'reference', 'content', 'question', 'answer'];
+	if (search && searchType && searchType.length) {
 		baseQuery.push({
 			$match: {
-				$or: options.map((option) => ({
+				$or: searchType.map((s) => ({
+					[s]: { $regex: search, $options: 'i' }
+				}))
+			}
+		});
+	} else if (search) {
+		baseQuery.push({
+			$match: {
+				$or: searchableInputs.map((option) => ({
 					[option]: { $regex: search, $options: 'i' }
 				}))
 			}
 		});
 	}
 
-	const logTypes = Object.entries({ todo, question, important, time })
-		.map(([type, boolean]) => ({ type, boolean }))
-		.filter(({ boolean }) => boolean);
-
-	if (logTypes.length) {
+	if (type && type.length) {
 		baseQuery.push({
 			$match: {
-				$or: logTypes.map(({ type }) => {
+				$or: type.map((t) => {
 					return {
 						type: {
-							$eq: type
+							$eq: t
 						}
 					};
 				})
