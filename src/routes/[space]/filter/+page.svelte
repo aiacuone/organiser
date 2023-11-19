@@ -34,7 +34,6 @@
 	});
 
 	const filters: Writable<Array<Array<string>>> = writable($searchParams.array);
-	$: $filters, console.log($filters);
 
 	const filtersValues = derived(filters, ($filters) => {
 		const string = arrayToSearchParamsString($filters);
