@@ -35,6 +35,7 @@
 	});
 
 	const filters: Writable<Array<Array<string>>> = writable($searchParams.array);
+	$: $filters, console.log($filters);
 
 	const filtersValues = derived(filters, ($filters) => {
 		const string = arrayToSearchParamsString($filters);
@@ -143,8 +144,8 @@
 	};
 
 	const onSearch = () => {
-		if ($filters.some((filter) => filter[0] === 'searchType')) {
-			$filters = $filters.filter((filter) => filter[0] !== 'searchType');
+		if ($filters.some((filter) => filter[0] === 'search')) {
+			$filters = $filters.filter((filter) => filter[0] !== 'search');
 		}
 
 		if ($searchValue) {
