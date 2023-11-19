@@ -24,6 +24,6 @@
 		</button>
 	{/if}
 </div>
-<Button _class="w-[30px] center" on:click={onClickClear}>
+<Button _class="w-[60px] center" onClick={onClickClear}>
 	<Icon icon={icons.reset} class="text-gray-400" />
 </Button>

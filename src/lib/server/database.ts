@@ -1,5 +1,5 @@
 import { MONGO_URL } from '$env/static/private';
-import { LogInput_enum, LogType_enum } from '$lib/types';
+import { LogInput_enum, LogType_enum, searchableInputs } from '$lib/types';
 import { MongoClient } from 'mongodb';
 
 export const getDatabase = async () => {
@@ -78,17 +78,9 @@ export const getLogs = async ({
 			}
 		});
 	} else if (search) {
-		const options = [
-			LogInput_enum.title,
-			LogInput_enum.reference,
-			LogInput_enum.content,
-			LogInput_enum.question,
-			LogInput_enum.answer
-		];
-
 		baseQuery.push({
 			$match: {
-				$or: options.map((option) => ({
+				$or: searchableInputs.map((option) => ({
 					[option]: { $regex: search, $options: 'i' }
 				}))
 			}

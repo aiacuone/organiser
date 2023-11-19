@@ -39,6 +39,7 @@
 	const onClickClear = () => {
 		$filters = [];
 		queryClient.invalidateQueries('filteredLogs');
+		searchValue = '';
 	};
 
 	let hasPageLoaded = false;
@@ -166,7 +167,7 @@
 					showEnter={false}
 					bind:onFocus={onSearchInputFocus}
 				/>
-				<div class="hstack gap-2">
+				<div class="hstack gap-2 {searchValue ? 'opacity-100' : 'opacity-20'}">
 					{#each searchableInputs as key}
 						<label class="capitalize text-xs center gap-1 hstack gap-[2px]">
 							{camelCaseToLower(key)}
