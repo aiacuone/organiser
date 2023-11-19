@@ -2,6 +2,7 @@
 	import Icon from '@iconify/svelte';
 	import Input from './Input.svelte';
 	import { icons } from '$lib/general/icons';
+	import Button from './Button.svelte';
 
 	export let value: string;
 	export let onChange: (e: Event) => void = () => {};
@@ -22,7 +23,7 @@
 			<Icon icon={icons.enter} class="text-gray-400" />
 		</button>
 	{/if}
-	<button class="w-[30px] center" on:click={onClickClear}>
-		<Icon icon={icons.close} class="text-gray-400" />
-	</button>
 </div>
+<Button _class="w-[30px] center" on:click={onClickClear}>
+	<Icon icon={icons.reset} class="text-gray-400" />
+</Button>
