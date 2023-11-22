@@ -16,10 +16,12 @@
 	import { useQuery } from '@sveltestack/svelte-query';
 	import { selectedDate } from '$lib/stores/dates';
 	import axios from 'axios';
+	import { onMount } from 'svelte';
 
 	export let space: string;
 	export let spaces: string[];
 
+	let hasPageLoaded = false;
 	let isAddingNewSpace: boolean = false;
 	let onOpen: () => void;
 	let dialog: HTMLDialogElement;
@@ -30,9 +32,14 @@
 		dialog.close();
 	};
 
+	onMount(() => {
+		hasPageLoaded = true;
+	});
+
 	const allLogsNotificationsQuery = useQuery(
 		`allLogNotifications`,
 		() => {
+			if (!hasPageLoaded) return;
 			const queryString = stringArrayToQueryString(spaces);
 
 			return axios.get(`/log/notifications?${queryString}`);
