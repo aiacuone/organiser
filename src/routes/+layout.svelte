@@ -14,6 +14,8 @@
 
 	export let data: SpaceData_int;
 
+	const { initialLogNotifications } = data;
+
 	const getDateFromHyphenatedString = (dateString: string) => {
 		const [day, month, year] = dateString.split('-').map(Number);
 
@@ -107,7 +109,7 @@
 
 <QueryClientProvider client={queryClient}>
 	<div class="stack" style={'height:100dvh'}>
-		<Header space={data.space} spaces={data.spaces} />
+		<Header space={data.space} spaces={data.spaces} {initialLogNotifications} />
 		<main class="flex-1 p-1 flex flex-col overflow-hidden">
 			<div class="flex justify-end" />
 			<slot />

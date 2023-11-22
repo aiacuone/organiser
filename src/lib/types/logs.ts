@@ -14,6 +14,7 @@ export interface SpaceData_int {
 	times: Array<Option_int>;
 	space: string;
 	date: string;
+	initialLogNotifications: Log_int[];
 }
 
 export interface Log_int {

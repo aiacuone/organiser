@@ -20,6 +20,7 @@
 
 	export let space: string;
 	export let spaces: string[];
+	export let initialLogNotifications;
 
 	let hasPageLoaded = false;
 	let isAddingNewSpace: boolean = false;
@@ -38,14 +39,19 @@
 
 	const allLogsNotificationsQuery = useQuery(
 		`allLogNotifications`,
-		() => {
+		async () => {
 			if (!hasPageLoaded) return;
 			const queryString = stringArrayToQueryString(spaces);
 
-			return axios.get(`/log/notifications?${queryString}`);
+			return await axios
+				.get(`/log/notifications?${queryString}`)
+				.then(({ data }) => data)
+				.catch((err) => console.log(err));
 		},
+
 		{
-			onSuccess: () => {}
+			initialData: initialLogNotifications,
+			refetchOnMount: false
 		}
 	);
 
@@ -112,7 +118,7 @@
 		</div>
 		<div class="flex-1 hstack justify-end gap-5">
 			{#each headerButtons as { icon, onClick, type }}
-				{@const spaceNotifications = $allLogsNotificationsQuery.data?.data.find(
+				{@const spaceNotifications = $allLogsNotificationsQuery.data?.find(
 					({ space: _space }) => _space === space
 				)}
 				{@const notificationsCount = spaceNotifications?.[type]}
@@ -134,8 +140,8 @@
 <Dialog bind:onOpen onClose={onDialogClose} bind:dialog>
 	<div class="stack gap-3">
 		<div class="stack gap-4 self-center">
-			{#if $allLogsNotificationsQuery.data?.data}
-				{#each $allLogsNotificationsQuery.data?.data as { space, todo, question }}
+			{#if $allLogsNotificationsQuery?.data}
+				{#each $allLogsNotificationsQuery?.data as { space, todo, question }}
 					{@const onClick = () => {
 						goto(
 							`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(
