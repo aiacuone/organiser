@@ -31,6 +31,7 @@
 		space: string;
 		titles: string[];
 		references: string[];
+		initialLogs: Log_int[];
 	}
 
 	export let data: PageData;
@@ -62,7 +63,8 @@
 		{
 			onSuccess: () => {
 				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
-			}
+			},
+			initialData: data.initialLogs
 		}
 	);
 

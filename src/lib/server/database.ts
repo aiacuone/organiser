@@ -29,7 +29,7 @@ export const getLogs = async ({
 	searchType
 }: {
 	space?: string;
-	date?: string;
+	date?: string | Date;
 	isCompleted?: 'true' | 'false';
 	hasAnswer?: 'true' | 'false';
 	limit?: string;
