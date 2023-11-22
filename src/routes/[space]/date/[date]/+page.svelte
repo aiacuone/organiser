@@ -38,6 +38,12 @@
 
 	const queryClient = useQueryClient();
 
+	let hasPageLoaded = false;
+
+	onMount(() => {
+		hasPageLoaded = true;
+	});
+
 	let timer: any;
 	const debounce = (fn: () => any, delay = 500) => {
 		const timeout = () => {
@@ -64,7 +70,9 @@
 			onSuccess: () => {
 				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
 			},
-			initialData: data.initialLogs
+			initialData: data.initialLogs,
+			refetchOnMount: false,
+			refetchOnReconnect: false
 		}
 	);
 
@@ -73,6 +81,7 @@
 	);
 
 	const invalidateLogsAndTitlesAndReferences = () => {
+		if (!hasPageLoaded) return;
 		queryClient.invalidateQueries('logs');
 		queryClient.invalidateQueries('titlesAndReferences');
 	};
