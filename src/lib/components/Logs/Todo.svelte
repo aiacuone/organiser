@@ -24,7 +24,6 @@
 	export let priority: number;
 	export let isCompleted: boolean = false;
 	export let isEditing: boolean;
-	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
 
 	let originalTitle = title;
@@ -144,7 +143,7 @@
 				{#if !isEditing && !title}{''}{:else}
 					<Input
 						bind:value={title}
-						autofocus={inputAutoFocus}
+						autofocus={true}
 						placeholder="Title"
 						autofillValues={$titles}
 						isDisabled={!isEditing}
@@ -173,7 +172,7 @@
 			</button>
 			<div class="flex-1">
 				{#if isEditing}
-					<Textarea bind:value={content} autofocus={inputAutoFocus} />
+					<Textarea bind:value={content} />
 				{:else}
 					<p class="text-sm">{content}</p>
 				{/if}
