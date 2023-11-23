@@ -36,7 +36,8 @@
 
 		changeReferenceInputValue && changeReferenceInputValue(correspondingReference ?? undefined);
 	};
-	export let onMetaAndEnterKeydown: () => void = () => {};
+	export let onControlShitAndEnterKeydown: () => void = () => {};
+	export let onControlShitAndDotKeydown: () => void = () => {};
 
 	let onOpen: () => void;
 
@@ -51,7 +52,10 @@
 	onMount(() => {
 		const keydown = (e: KeyboardEvent) => {
 			if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
-				onMetaAndEnterKeydown();
+				onControlShitAndEnterKeydown();
+			}
+			if (e.ctrlKey && e.shiftKey && e.key === '.') {
+				onControlShitAndDotKeydown();
 			}
 		};
 
