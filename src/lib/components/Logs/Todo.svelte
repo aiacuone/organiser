@@ -148,7 +148,7 @@
 				{#if !$isEditing && !title}{''}{:else}
 					<Input
 						bind:value={title}
-						autofocus={inputAutoFocus}
+						autofocus={true}
 						placeholder="Title"
 						autofillValues={$titles}
 						isDisabled={!$isEditing}

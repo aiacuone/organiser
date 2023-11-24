@@ -166,8 +166,11 @@
 	const onTextareaEnterKeydown: () => void = () => {
 		onAddBullet();
 	};
-	const onMetaAndEnterKeydown = () => {
+	const onControlShitAndEnterKeydown = () => {
 		onAcceptEdit();
+	};
+	const onControlShitAndDotKeydown = () => {
+		onAddBullet();
 	};
 </script>
 
@@ -181,8 +184,9 @@
 	bind:onTitleAutoFill
 	bind:isEditing
 	{changeReferenceInputValue}
-	{onMetaAndEnterKeydown}
+	{onControlShitAndEnterKeydown}
 	{editOnMount}
+	{onControlShitAndDotKeydown}
 >
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-2 stack text-sm gap-1">
