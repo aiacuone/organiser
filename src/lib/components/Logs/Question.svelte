@@ -10,10 +10,11 @@
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
-	import { titles } from '$lib/stores';
+	import { currentlyEditing, titles } from '$lib/stores';
 	import Input from '../Input.svelte';
 	import Button from '../Button.svelte';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
+	import type { Readable } from 'svelte/motion';
 
 	export let title: string;
 	export let reference: string = '';
@@ -22,7 +23,7 @@
 	export let answer: string | undefined = undefined;
 	export let id: string;
 	export let importance: number;
-	export let isEditing: boolean;
+	export let editOnMount: boolean = false;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
 
@@ -37,6 +38,7 @@
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
 	let onDelete: () => void;
+	let isEditing: Readable<boolean>;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
@@ -54,7 +56,7 @@
 			}
 		});
 
-		isEditing = false;
+		$currentlyEditing = null;
 
 		if (!haveValuesChanged) return;
 
@@ -89,7 +91,7 @@
 	};
 
 	const onResetChange = () => {
-		isEditing = false;
+		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
 		question = originalQuestion;
 		answer = originalAnswer;
@@ -103,7 +105,7 @@
 	};
 	let onFocusAnswerInput: () => void;
 	const _onFocusAnswerInput = () => {
-		isEditing = true;
+		$currentlyEditing = null;
 		//this is a hack to make sure the answer input is focused
 		setTimeout(() => {
 			onFocusAnswerInput();
@@ -121,26 +123,27 @@
 	{id}
 	bind:onTitleAutoFill
 	{changeReferenceInputValue}
+	{editOnMount}
 >
 	<div class="bg-neutral-100 p-1 rounded-sm">
 		<div class="bg-white p-2 stack gap-3 rounded-sm">
-			{#if title || reference || isEditing}
+			{#if title || reference || $isEditing}
 				<div class="stack">
-					{#if !isEditing && !title}{''}{:else}
+					{#if !$isEditing && !title}{''}{:else}
 						<Input
 							bind:value={title}
 							autofocus={inputAutoFocus}
 							placeholder="Title"
 							autofillValues={$titles}
-							isDisabled={!isEditing}
+							isDisabled={!$isEditing}
 							onAutoFill={onTitleAutoFill}
 						/>
 					{/if}
-					{#if !isEditing && !reference}{''}{:else}
+					{#if !$isEditing && !reference}{''}{:else}
 						<Input
 							bind:value={reference}
 							placeholder="Reference"
-							isDisabled={!isEditing}
+							isDisabled={!$isEditing}
 							bind:changeInputValue={changeReferenceInputValue}
 						/>
 					{/if}
@@ -151,14 +154,14 @@
 				<div class="stack gap-1 w-full min-h-[60px]">
 					<div class="hstack text-sm gap-1">
 						<p class="text-gray-300">Question:</p>
-						<Textarea bind:value={question} className="" isDisabled={!isEditing} />
+						<Textarea bind:value={question} className="" isDisabled={!$isEditing} />
 					</div>
-					{#if isEditing || answer}
+					{#if $isEditing || answer}
 						<div class="hstack text-sm gap-1">
 							<p class="text-gray-300">Answer:</p>
 							<Textarea
 								bind:value={answer}
-								isDisabled={!isEditing}
+								isDisabled={!$isEditing}
 								bind:onFocus={onFocusAnswerInput}
 							/>
 						</div>
@@ -172,10 +175,10 @@
 				{onDelete}
 				{date}
 				{onAccept}
-				{isEditing}
+				isEditing={$isEditing}
 				{incrementDecrementProps}
 				incrementDecrementValue={importance}
-				showIncrementDecrement={isEditing}
+				showIncrementDecrement={$isEditing}
 				{lastUpdated}
 			/>
 		</div>
