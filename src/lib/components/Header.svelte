@@ -98,9 +98,9 @@
 
 	const onAddSpace = () => {
 		goto(
-			`/${replaceAllSpacesWithHyphens(addInputValue)}/date/${getHyphenatedStringFromDate(
-				new Date()
-			)}`
+			`/${replaceAllSpacesWithHyphens(
+				addInputValue.toLowerCase()
+			)}/date/${getHyphenatedStringFromDate(new Date())}`
 		);
 
 		addInputValue = '';
