@@ -4,19 +4,19 @@
 	import LogContainer from './LogContainer.svelte';
 	import BottomOptions from './BottomOptions.svelte';
 	import Textarea from '../Textarea.svelte';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import { LogType_enum, type Log_int } from '$lib/types';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import Input from '../Input.svelte';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import Icon from '@iconify/svelte';
-	import { titles } from '$lib/stores';
+	import { currentlyEditing, titles } from '$lib/stores';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import { debounce } from '$lib/utils/general';
+	import type { Readable } from 'svelte/motion';
 
-	export let isEditing: boolean;
 	export let date: Date;
 	export let bullets: string[] = [];
 	export let id: string;
@@ -25,6 +25,7 @@
 	export let time: number = 0;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
+	export let editOnMount: boolean = false;
 
 	let onOpen: () => void;
 	let onClose: () => void;
@@ -41,6 +42,8 @@
 
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
+
+	let isEditing: Readable<boolean>;
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
@@ -68,7 +71,7 @@
 			}
 		});
 
-		if (!haveValuesChanged) return (isEditing = false);
+		if (!haveValuesChanged) return ($currentlyEditing = null);
 
 		let logDate: Date = date;
 		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate(date)) {
@@ -80,7 +83,7 @@
 		}
 
 		bullets = bullets.filter((c) => c);
-		isEditing = false;
+		$currentlyEditing = null;
 		try {
 			await $updateMutation.mutate({
 				id,
@@ -106,7 +109,7 @@
 	};
 
 	const onResetChange = () => {
-		isEditing = false;
+		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
 		bullets = originalBullets;
 		title = originalTitle;
@@ -114,7 +117,7 @@
 	};
 
 	const onAddBullet = () => {
-		isEditing = true;
+		$currentlyEditing = id;
 		bullets = [...bullets, ''];
 	};
 
@@ -169,7 +172,6 @@
 </script>
 
 <LogContainer
-	bind:isEditing
 	bind:onEdit
 	onConfirmReset={onResetChange}
 	bind:updateLogMutation={updateMutation}
@@ -177,20 +179,22 @@
 	bind:onDelete
 	{id}
 	bind:onTitleAutoFill
+	bind:isEditing
 	{changeReferenceInputValue}
 	{onMetaAndEnterKeydown}
+	{editOnMount}
 >
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-2 stack text-sm gap-1">
-			{#if title || reference || isEditing}
+			{#if title || reference || $isEditing}
 				<div class="stack gap-1">
-					{#if !isEditing && !title}{''}{:else}
+					{#if !$isEditing && !title}{''}{:else}
 						<Input
 							bind:value={title}
 							autofocus={inputAutoFocus}
 							placeholder="Title"
 							autofillValues={$titles}
-							isDisabled={!isEditing}
+							isDisabled={!$isEditing}
 							onAutoFill={onTitleAutoFill}
 						/>
 					{/if}
@@ -198,7 +202,7 @@
 						<Input
 							bind:value={reference}
 							placeholder="Reference"
-							isDisabled={!isEditing}
+							isDisabled={!$isEditing}
 							bind:changeInputValue={changeReferenceInputValue}
 						/>
 					{/if}
@@ -211,12 +215,12 @@
 							<Textarea
 								className="flex-1"
 								bind:value={bullets[index]}
-								isDisabled={!isEditing}
+								isDisabled={!$isEditing}
 								onEnterKeydown={onTextareaEnterKeydown}
 								autofocus={index > 0}
 							/>
 							<div class="min-w-[40px] hidden sm:flex align-center relative">
-								{#if isEditing}
+								{#if $isEditing}
 									<button class=" absolute top-0" on:click={() => onDeleteBullet(index)}>
 										<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 									</button>
@@ -224,7 +228,7 @@
 							</div>
 						</div>
 						<div class="mt-1 flex sm:hidden">
-							{#if isEditing}
+							{#if $isEditing}
 								<button class="flex sm:hidden" on:click={() => onDeleteBullet(index)}>
 									<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 								</button>
@@ -238,8 +242,8 @@
 					{incrementDecrementProps}
 					incrementDecrementValue={time}
 					{date}
-					{isEditing}
-					onAccept={isEditing ? onAcceptEdit : onAcceptNewBullet}
+					isEditing={$isEditing}
+					onAccept={$isEditing ? onAcceptEdit : onAcceptNewBullet}
 					{onAddBullet}
 					{onEdit}
 					{onDelete}

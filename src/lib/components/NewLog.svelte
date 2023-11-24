@@ -28,7 +28,8 @@
 		inputAutoFocus: true,
 		bullets: [''],
 		question: '',
-		date
+		date,
+		editOnMount: true
 	};
 </script>
 

@@ -3,12 +3,14 @@
 	import { clickOutside } from '$lib/utils/clickAway';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
-	import { titlesAndReferences } from '$lib/stores';
+	import { currentlyEditing, titlesAndReferences } from '$lib/stores';
 	import { onMount } from 'svelte';
-	export let isEditing = false;
+	import { derived } from 'svelte/store';
+
 	export let onConfirmReset: () => void;
 	export let id: string;
 	export let showDialog = true;
+	export let editOnMount = false;
 	export const updateLogMutation = useMutation(updateLog, {
 		onSuccess: () => {
 			queryClient.invalidateQueries('logs');
@@ -22,11 +24,26 @@
 			queryClient.invalidateQueries('filteredLogs');
 		}
 	});
+
+	onMount(() => {
+		if (editOnMount) {
+			$currentlyEditing = id;
+		}
+	});
+
+	export const isEditing = derived(
+		[currentlyEditing],
+		([$currentlyEditing]) => $currentlyEditing === id
+	);
+
 	export const onEdit = () => {
-		isEditing = true;
+		const isAnotherCardEditing = !!$currentlyEditing;
+		if (!isAnotherCardEditing) {
+			$currentlyEditing = id;
+		}
 	};
 	export const onDelete = () => {
-		isEditing = false;
+		$currentlyEditing = null;
 		$deleteLogMutation.mutate(id);
 	};
 	export let changeReferenceInputValue: ((value: string | undefined) => void) | undefined =
@@ -41,7 +58,7 @@
 	let onOpen: () => void;
 
 	const onClickOutside = () => {
-		isEditing && showDialog && onOpen();
+		$isEditing && showDialog && onOpen();
 	};
 
 	const queryClient = useQueryClient();

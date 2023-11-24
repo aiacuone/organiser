@@ -12,9 +12,10 @@
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import Input from '../Input.svelte';
-	import { titles } from '$lib/stores';
+	import { currentlyEditing, titles } from '$lib/stores';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import { debounce } from '$lib/utils/general';
+	import type { Readable } from 'svelte/motion';
 
 	export let title: string;
 	export let reference: string = '';
@@ -23,15 +24,17 @@
 	export let id: string;
 	export let priority: number;
 	export let isCompleted: boolean = false;
-	export let isEditing: boolean;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
+	export let editOnMount: boolean = false;
 
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalContent = content;
 	let originalPriority = priority;
 	let originalIsCompleted = isCompleted;
+
+	let isEditing: Readable<boolean>;
 
 	let onDelete: () => void;
 	let onTitleAutoFill: (title: string) => void;
@@ -76,7 +79,7 @@
 			}
 		});
 
-		if (!haveValuesChanged) return (isEditing = false);
+		if (!haveValuesChanged) return ($currentlyEditing = null);
 
 		let logDate: Date = date;
 
@@ -108,11 +111,11 @@
 			originalPriority = priority;
 			originalIsCompleted = isCompleted;
 		} catch (error) {}
-		isEditing = false;
+		$currentlyEditing = null;
 	};
 
 	const onResetChange = () => {
-		isEditing = false;
+		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
 		title = originalTitle;
 		reference = originalReference;
@@ -128,7 +131,6 @@
 </script>
 
 <LogContainer
-	bind:isEditing
 	bind:onEdit
 	onConfirmReset={onResetChange}
 	bind:updateLogMutation={updateMutation}
@@ -136,26 +138,28 @@
 	bind:onDelete
 	{id}
 	bind:onTitleAutoFill
+	bind:isEditing
 	{changeReferenceInputValue}
+	{editOnMount}
 >
 	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-4">
-		{#if title || reference || isEditing}
+		{#if title || reference || $isEditing}
 			<div class="stack gap-1">
-				{#if !isEditing && !title}{''}{:else}
+				{#if !$isEditing && !title}{''}{:else}
 					<Input
 						bind:value={title}
 						autofocus={inputAutoFocus}
 						placeholder="Title"
 						autofillValues={$titles}
-						isDisabled={!isEditing}
+						isDisabled={!$isEditing}
 						onAutoFill={onTitleAutoFill}
 					/>
 				{/if}
-				{#if !isEditing && !reference}{''}{:else}
+				{#if !$isEditing && !reference}{''}{:else}
 					<Input
 						bind:value={reference}
 						placeholder="Reference"
-						isDisabled={!isEditing}
+						isDisabled={!$isEditing}
 						bind:changeInputValue={changeReferenceInputValue}
 					/>
 				{/if}
@@ -172,7 +176,7 @@
 				{/if}
 			</button>
 			<div class="flex-1">
-				{#if isEditing}
+				{#if $isEditing}
 					<Textarea bind:value={content} autofocus={inputAutoFocus} />
 				{:else}
 					<p class="text-sm">{content}</p>
@@ -183,11 +187,11 @@
 			{onEdit}
 			{onDelete}
 			{date}
-			{isEditing}
+			isEditing={$isEditing}
 			{onAccept}
 			{incrementDecrementProps}
 			incrementDecrementValue={priority}
-			showIncrementDecrement={isEditing}
+			showIncrementDecrement={$isEditing}
 			{lastUpdated}
 		/>
 	</div>

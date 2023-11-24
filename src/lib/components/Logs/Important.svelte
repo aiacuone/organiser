@@ -11,10 +11,11 @@
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import Input from '../Input.svelte';
-	import { titles } from '$lib/stores';
+	import { currentlyEditing, titles } from '$lib/stores';
 	import Dialog from '../Dialog.svelte';
 	import Button from '../Button.svelte';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
+	import type { Readable } from 'svelte/motion';
 
 	export let title: string;
 	export let reference: string = '';
@@ -22,9 +23,9 @@
 	export let content: string;
 	export let id: string;
 	export let importance: number;
-	export let isEditing: boolean = false;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
+	export let editOnMount: boolean = false;
 
 	let originalTitle = title;
 	let originalReference = reference;
@@ -37,6 +38,8 @@
 	let onDelete: () => void;
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let onTitleAutoFill: (title: string) => void;
+
+	let isEditing: Readable<boolean>;
 
 	let onOpen: () => void;
 
@@ -62,7 +65,7 @@
 			}
 		});
 
-		isEditing = false;
+		$currentlyEditing = null;
 
 		if (!haveValuesChanged) return;
 
@@ -95,7 +98,7 @@
 	};
 
 	const onResetChange = () => {
-		isEditing = false;
+		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
 		content = originalContent;
 	};
@@ -120,25 +123,26 @@
 	bind:onDelete
 	{id}
 	showDialog={!isOpen}
+	{editOnMount}
 >
 	<div class="bg-neutral-50 p-2 sm:p-3 stack gap-3">
-		{#if title || reference || isEditing}
+		{#if title || reference || $isEditing}
 			<div class="stack">
-				{#if !isEditing && !title}{''}{:else}
+				{#if !$isEditing && !title}{''}{:else}
 					<Input
 						bind:value={title}
 						autofocus={inputAutoFocus}
 						placeholder="Title"
 						autofillValues={$titles}
-						isDisabled={!isEditing}
+						isDisabled={!$isEditing}
 						onAutoFill={onTitleAutoFill}
 					/>
 				{/if}
-				{#if !isEditing && !reference}{''}{:else}
+				{#if !$isEditing && !reference}{''}{:else}
 					<Input
 						bind:value={reference}
 						placeholder="Reference"
-						isDisabled={!isEditing}
+						isDisabled={!$isEditing}
 						bind:changeInputValue={changeReferenceInputValue}
 					/>
 				{/if}
@@ -147,7 +151,7 @@
 		<div class="hstack center gap-2">
 			<IconWithRating rating={importance} icon={icons.important} />
 			<div class="flex-1">
-				{#if isEditing}
+				{#if $isEditing}
 					<Textarea bind:value={content} autofocus={inputAutoFocus} />
 				{:else}
 					<p class="text-sm">
@@ -160,11 +164,11 @@
 			{onEdit}
 			{onDelete}
 			{date}
-			{isEditing}
+			isEditing={$isEditing}
 			{onAccept}
 			{incrementDecrementProps}
 			incrementDecrementValue={importance}
-			showIncrementDecrement={isEditing}
+			showIncrementDecrement={$isEditing}
 			{lastUpdated}
 		/>
 	</div>
