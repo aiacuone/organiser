@@ -201,7 +201,14 @@ export const getTitlesAndReferences = async (space: string) => {
 				}
 			},
 			{ $sort: { date: -1 } },
-			{ $limit: 10 }
+			{ $limit: 10 },
+			{
+				$group: {
+					_id: '$title',
+					title: { $first: '$title' },
+					reference: { $first: '$reference' }
+				}
+			}
 		])
 		.toArray();
 
