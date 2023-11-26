@@ -105,7 +105,7 @@
 	};
 	let onFocusAnswerInput: () => void;
 	const _onFocusAnswerInput = () => {
-		$currentlyEditing = null;
+		$currentlyEditing = id;
 		//this is a hack to make sure the answer input is focused
 		setTimeout(() => {
 			onFocusAnswerInput();
