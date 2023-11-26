@@ -17,6 +17,7 @@
 	import { selectedDate } from '$lib/stores/dates';
 	import axios from 'axios';
 	import { onMount } from 'svelte';
+	import PillButton from './Logs/Buttons/PillButton.svelte';
 
 	export let space: string;
 	export let spaces: string[];
@@ -150,38 +151,44 @@
 						);
 						onDialogClose();
 					}}
+
+					{@const getButtons = () => {
+						const result = [
+							{ label: replaceAllHyphensWithSpaces(space), onClick, notification: 0 }
+						];
+
+						if (todo)
+							result.push({
+								notification: todo,
+								onClick: () => {
+									onDialogClose();
+									goto(`/${space}/filter?type=todo&isCompleted=false`);
+								},
+								icon: icons.todo
+							});
+
+						if (question)
+							result.push({
+								notification: question,
+								onClick: () => {
+									onDialogClose();
+									goto(`/${space}/filter?type=question&isAnswered=false`);
+								},
+								icon: icons.question
+							});
+
+						result.push({
+							icon: icons.moreVertical,
+							onClick: () => console.log('more'),
+							notification: 0
+						});
+
+						return result;
+					}}
+					{@const buttons = getButtons()}
+
 					<div class="hstack gap-2 items-center">
-						<Button {onClick} _class="capitalize">{replaceAllHyphensWithSpaces(space)}</Button>
-						<div class="hstack gap-4">
-							{#if todo}
-								<a
-									class="relative"
-									href={`/${space}/filter?type=todo&isCompleted=false`}
-									on:click={onDialogClose}
-								>
-									<Icon icon={icons.todo} class="text-neutral-400" height="20px" />
-									<p
-										class="absolute -top-2 -right-[8px] text-[10px] rounded-full bg-blue-400 w-[15px] center text-white"
-									>
-										{todo}
-									</p>
-								</a>
-							{/if}
-							{#if question}
-								<a
-									class="relative"
-									href={`/${space}/filter?type=question&isAnswered=false`}
-									on:click={onDialogClose}
-								>
-									<Icon icon={icons.question} class="text-neutral-400" height="20px" />
-									<p
-										class="absolute -top-2 -right-[8px] text-[10px] rounded-full bg-blue-400 w-[15px] center text-white"
-									>
-										{question}
-									</p>
-								</a>
-							{/if}
-						</div>
+						<PillButton {buttons} />
 					</div>
 				{/each}
 			{/if}

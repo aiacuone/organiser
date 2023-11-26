@@ -255,7 +255,6 @@
 						buttons={[
 							{
 								onClick: () => onNoteButtonClick(type),
-								key: type,
 								icon,
 								_class: 'w-4/6'
 							},
@@ -264,7 +263,6 @@
 									$filters.includes(type)
 										? ($filters = $filters.filter((filter) => filter !== type))
 										: ($filters = [...$filters, type]),
-								key: type,
 								_class: `min-w-[30px] w-2/6 ${
 									$filters.includes(type) ? 'bg-neutral-100' : 'bg-white'
 								}`
