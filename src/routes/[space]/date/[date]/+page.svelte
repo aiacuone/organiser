@@ -24,6 +24,7 @@
 	} from '$lib/utils/strings';
 	import Search from '$lib/components/Search.svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
+	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -250,25 +251,26 @@
 
 			<div class="grid grid-cols-4 w-full gap-y-3 gap-x-3 max-w-[500px] min-w-[300px]">
 				{#each noteButtons as { icon, type }}
-					<div class="flex-1 hstack shadow-md min-h-[30px] rounded-r-md rounded-l-md">
-						<button
-							class=" w-4/6 h-full center rounded-l-md"
-							on:click={() => onNoteButtonClick(type)}
-						>
-							<Icon {icon} class="text-gray-300" height="20px" />
-						</button>
-						<button
-							class="rounded-r-md w-2/6 h-full border-l-[2px] border-neutral-100 {$filters.includes(
-								type
-							)
-								? 'bg-neutral-100'
-								: 'bg-white'}"
-							on:click={() =>
-								$filters.includes(type)
-									? ($filters = $filters.filter((filter) => filter !== type))
-									: ($filters = [...$filters, type])}
-						/>
-					</div>
+					<PillButton
+						buttons={[
+							{
+								onClick: () => onNoteButtonClick(type),
+								key: type,
+								icon,
+								_class: 'w-4/6'
+							},
+							{
+								onClick: () =>
+									$filters.includes(type)
+										? ($filters = $filters.filter((filter) => filter !== type))
+										: ($filters = [...$filters, type]),
+								key: type,
+								_class: `min-w-[30px] w-2/6 ${
+									$filters.includes(type) ? 'bg-neutral-100' : 'bg-white'
+								}`
+							}
+						]}
+					/>
 				{/each}
 			</div>
 		</div>
