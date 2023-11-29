@@ -32,18 +32,12 @@
 		space: string;
 		titles: string[];
 		references: string[];
-		initialLogs: Log_int[];
+		initialLogs: { logs: Log_int[]; total: number };
 	}
 
 	export let data: PageData;
 
 	const queryClient = useQueryClient();
-
-	let hasPageLoaded = false;
-
-	onMount(() => {
-		hasPageLoaded = true;
-	});
 
 	let timer: any;
 	const debounce = (fn: () => any, delay = 500) => {
@@ -60,7 +54,7 @@
 		'logs',
 		() => {
 			return (
-				selectedHyphenatedDateString &&
+				$selectedHyphenatedDateString &&
 				getLogs({
 					space: replaceAllSpacesWithHyphens(data.space),
 					date: $selectedDate
@@ -71,9 +65,8 @@
 			onSuccess: () => {
 				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
 			},
-			initialData: data.initialLogs,
-			refetchOnMount: false,
-			refetchOnReconnect: false
+			// this currently does not work properly because because its conflicts with deleting a space. If we want this to work, we need to find a way to refetch the logs when a space is deleted
+			initialData: data.initialLogs
 		}
 	);
 
@@ -81,8 +74,7 @@
 		getTitlesAndReferences(replaceAllSpacesWithHyphens(data.space))
 	);
 
-	const invalidateLogsAndTitlesAndReferences = () => {
-		if (!hasPageLoaded) return;
+	const invalidateLogsAndTitlesAndReferences = async () => {
 		queryClient.invalidateQueries('logs');
 		queryClient.invalidateQueries('titlesAndReferences');
 	};
