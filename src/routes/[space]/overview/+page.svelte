@@ -3,7 +3,9 @@
 	import Button from '$lib/components/Button.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 	import Input from '$lib/components/Input.svelte';
+	import { useMutation } from '@sveltestack/svelte-query';
 	import axios from 'axios';
+	import { getContext } from 'svelte';
 	import toast from 'svelte-french-toast';
 
 	export let data;
@@ -12,12 +14,23 @@
 	let onOpen: () => void;
 	let onClose: () => void;
 
-	const onConfirmDelete = () => {
+	const invalidateLogs: () => void = getContext('invalidateLogs');
+
+	export const deleteSpaceMutation = useMutation(
+		async (space: string) => await axios.delete(`/${space}`),
+		{
+			onSuccess: () => {
+				invalidateLogs();
+			}
+		}
+	);
+
+	const onConfirmDelete = async () => {
 		try {
-			axios.delete(`/${data.space}`);
+			await $deleteSpaceMutation.mutate(data.space);
 			onClose();
-			goto('/');
 			toast.success('Space deleted');
+			goto('/');
 		} catch (error) {
 			toast.error('Error deleting space');
 		}

@@ -63,8 +63,6 @@
 		};
 	});
 
-	const queryClient = new QueryClient();
-
 	const onClickPreviousDay = () => {
 		const getPreviousDate = (date: Date) => {
 			const _date = new Date(date);
@@ -106,6 +104,8 @@
 			}
 		}
 	];
+
+	const queryClient = new QueryClient();
 </script>
 
 <QueryClientProvider client={queryClient}>

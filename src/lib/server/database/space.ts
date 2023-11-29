@@ -7,7 +7,7 @@ export const getSpaces = async () => {
 };
 
 export const deleteSpace = async (space: string) => {
-	await collection.deleteOne({
+	await collection.deleteMany({
 		space
 	});
 };
