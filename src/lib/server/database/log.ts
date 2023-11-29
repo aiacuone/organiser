@@ -1,21 +1,5 @@
-import { MONGO_URL } from '$env/static/private';
-import { LogInput_enum, LogType_enum, searchableInputs } from '$lib/types';
-import { MongoClient } from 'mongodb';
-
-export const getDatabase = async () => {
-	const client = await MongoClient.connect(MONGO_URL);
-	const database = client.db('organiser');
-	return database;
-};
-
-export const getCollection = async (collectionName: string) => {
-	const db = await getDatabase();
-	const collection = db.collection(collectionName);
-
-	return collection;
-};
-
-const collection = await getCollection('aiacuone');
+import { LogType_enum, searchableInputs } from '$lib/types';
+import { collection } from './common';
 
 export const getLogs = async ({
 	space,
@@ -151,12 +135,6 @@ export const getLogs = async ({
 	const total = result[0].total[0]?.total ?? 0;
 
 	return { logs, total };
-};
-
-export const getSpaces = async () => {
-	const spaces = await collection.distinct('space');
-
-	return spaces;
 };
 
 export const updateLog = async (values: {

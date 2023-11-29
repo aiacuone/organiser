@@ -1,15 +1,6 @@
-<script lang="ts" context="module">
-	export interface PillButton_int {
-		label?: string;
-		onClick: () => void;
-		icon?: string;
-		_class?: string;
-		notification?: number;
-	}
-</script>
-
 <script lang="ts">
 	import Icon from '@iconify/svelte';
+
 	export let capitalizeLabels: boolean = true;
 
 	// NOTE: this component is to be refactored once Svelte 5.0 releases. Use snippets to pass in buttons and their handlers
@@ -26,7 +17,7 @@
 
 <div
 	bind:clientHeight={containerHeight}
-	class="pill-button hstack shadow-md min-h-[30px] rounded-r-md rounded-l-md text-sm center"
+	class="pill-button hstack shadow-md min-h-[30px] rounded-r-md rounded-l-md text-sm center relative"
 >
 	{#each buttons as { label, onClick, icon, _class, notification }, index}
 		<button

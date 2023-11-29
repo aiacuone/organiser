@@ -179,7 +179,10 @@
 
 						result.push({
 							icon: icons.moreVertical,
-							onClick: () => console.log('more'),
+							onClick: () => {
+								goto(`/${space}/overview`);
+								onDialogClose();
+							},
 							notification: 0
 						});
 
@@ -187,7 +190,7 @@
 					}}
 					{@const buttons = getButtons()}
 
-					<div class="hstack gap-2 items-center">
+					<div class="hstack gap-2 items-center relative">
 						<PillButton {buttons} />
 					</div>
 				{/each}

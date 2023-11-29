@@ -11,6 +11,7 @@
 	import { selectedDate } from '$lib/stores/dates';
 	import Header from '$lib/components/Header.svelte';
 	import { searchValue } from '$lib/stores';
+	import { Toaster } from 'svelte-french-toast';
 
 	export let data: SpaceData_int;
 
@@ -132,3 +133,5 @@
 		</footer>
 	</div>
 </QueryClientProvider>
+
+<Toaster />
