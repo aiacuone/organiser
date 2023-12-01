@@ -4,11 +4,12 @@
 
 	const queryClient = useQueryClient();
 
-	const invalidateLogs = () => {
+	const invalidateLogs = async () => {
+		// Need to await space first otherwise notifcations will be out of sync
+		await queryClient.invalidateQueries('spaces');
 		queryClient.invalidateQueries('logs');
 		queryClient.invalidateQueries('allLogNotifications');
 		queryClient.invalidateQueries('filteredLogs');
-		queryClient.invalidateQueries('spaces');
 	};
 
 	setContext('invalidateLogs', invalidateLogs);

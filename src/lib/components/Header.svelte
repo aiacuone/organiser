@@ -17,6 +17,7 @@
 	import axios from 'axios';
 	import { onMount } from 'svelte';
 	import PillButton from './Logs/Buttons/PillButton.svelte';
+	import { derived } from 'svelte/store';
 
 	export let space: string;
 	export let spaces: string[];
@@ -53,14 +54,11 @@
 	const allLogsNotificationsQuery = useQuery(
 		`allLogNotifications`,
 		async () => {
-			// if (!hasPageLoaded) return;
-
 			return await axios
 				.get(`/log/notifications`, { params: { spaces: $spacesQuery.data } })
 				.then(({ data }) => data)
 				.catch((err) => console.log(err));
 		},
-
 		{
 			initialData: initialLogNotifications,
 			refetchOnMount: false
@@ -119,6 +117,58 @@
 		onDialogClose();
 		$selectedDate = new Date();
 	};
+
+	const pillButtons = derived(allLogsNotificationsQuery, ($allLogsNotificationsQuery) => {
+		if (!$allLogsNotificationsQuery?.data) return [];
+
+		return $allLogsNotificationsQuery.data.map(({ space, todo, question }) => {
+			const result = [
+				{
+					label: replaceAllHyphensWithSpaces(space),
+					onClick: () => {
+						goto(
+							`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(
+								new Date()
+							)}`
+						);
+						onDialogClose();
+					},
+					notification: 0
+				}
+			];
+
+			if (todo)
+				result.push({
+					notification: todo,
+					onClick: () => {
+						onDialogClose();
+						goto(`/${space}/filter?type=todo&isCompleted=false`);
+					},
+					icon: icons.todo
+				});
+
+			if (question)
+				result.push({
+					notification: question,
+					onClick: () => {
+						onDialogClose();
+						goto(`/${space}/filter?type=question&isAnswered=false`);
+					},
+					icon: icons.question
+				});
+
+			result.push({
+				icon: icons.moreVertical,
+				onClick: () => {
+					goto(`/${space}/overview`);
+					onDialogClose();
+				},
+				notification: 0
+			});
+
+			return result;
+		});
+	});
 </script>
 
 <header class="center py-2 px-3 bg-gray-200">
@@ -152,60 +202,11 @@
 <Dialog bind:onOpen onClose={onDialogClose} bind:dialog>
 	<div class="stack gap-3">
 		<div class="stack gap-4 self-center">
-			{#if $allLogsNotificationsQuery?.data}
-				{#each $allLogsNotificationsQuery?.data as { space, todo, question }}
-					{@const onClick = () => {
-						goto(
-							`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(
-								new Date()
-							)}`
-						);
-						onDialogClose();
-					}}
-
-					{@const getButtons = () => {
-						const result = [
-							{ label: replaceAllHyphensWithSpaces(space), onClick, notification: 0 }
-						];
-
-						if (todo)
-							result.push({
-								notification: todo,
-								onClick: () => {
-									onDialogClose();
-									goto(`/${space}/filter?type=todo&isCompleted=false`);
-								},
-								icon: icons.todo
-							});
-
-						if (question)
-							result.push({
-								notification: question,
-								onClick: () => {
-									onDialogClose();
-									goto(`/${space}/filter?type=question&isAnswered=false`);
-								},
-								icon: icons.question
-							});
-
-						result.push({
-							icon: icons.moreVertical,
-							onClick: () => {
-								goto(`/${space}/overview`);
-								onDialogClose();
-							},
-							notification: 0
-						});
-
-						return result;
-					}}
-					{@const buttons = getButtons()}
-
-					<div class="hstack gap-2 items-center relative">
-						<PillButton {buttons} />
-					</div>
-				{/each}
-			{/if}
+			{#each $pillButtons as pillButton}
+				<div class="hstack gap-2 items-center relative">
+					<PillButton buttons={pillButton} />
+				</div>
+			{/each}
 		</div>
 		<div class="min-h-[50px] center">
 			{#if isAddingNewSpace}
