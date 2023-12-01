@@ -6,8 +6,7 @@
 	import {
 		getHyphenatedStringFromDate,
 		replaceAllHyphensWithSpaces,
-		replaceAllSpacesWithHyphens,
-		stringArrayToQueryString
+		replaceAllSpacesWithHyphens
 	} from '$lib/utils/strings';
 	import Icon from '@iconify/svelte';
 	import Button from './Button.svelte';
@@ -38,14 +37,26 @@
 		hasPageLoaded = true;
 	});
 
+	const spacesQuery = useQuery(
+		`spaces`,
+		async () => {
+			return await axios
+				.get(`/spaces`)
+				.then(({ data }) => data)
+				.catch((err) => console.log(err));
+		},
+		{
+			initialData: spaces
+		}
+	);
+
 	const allLogsNotificationsQuery = useQuery(
 		`allLogNotifications`,
 		async () => {
-			if (!hasPageLoaded) return;
-			const queryString = stringArrayToQueryString(spaces);
+			// if (!hasPageLoaded) return;
 
 			return await axios
-				.get(`/log/notifications?${queryString}`)
+				.get(`/log/notifications`, { params: { spaces: $spacesQuery.data } })
 				.then(({ data }) => data)
 				.catch((err) => console.log(err));
 		},

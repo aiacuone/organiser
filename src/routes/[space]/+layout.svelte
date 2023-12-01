@@ -8,6 +8,7 @@
 		queryClient.invalidateQueries('logs');
 		queryClient.invalidateQueries('allLogNotifications');
 		queryClient.invalidateQueries('filteredLogs');
+		queryClient.invalidateQueries('spaces');
 	};
 
 	setContext('invalidateLogs', invalidateLogs);
