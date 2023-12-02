@@ -44,7 +44,6 @@
 	let onOpen: () => void;
 	let onClose: () => void;
 	let onEdit: () => void;
-	let newBulletInput: HTMLInputElement;
 	let onDelete: () => void;
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let onTitleAutoFill: (title: string) => void;
@@ -73,10 +72,6 @@
 		$currentlyEditing = id;
 
 		$values = { ...$values, bullets: [...$values.bullets, ''] };
-	};
-
-	const onAcceptNewBullet = () => {
-		newBulletInput.value = '';
 	};
 
 	const onIncrement = () => {
@@ -179,7 +174,7 @@
 				<BottomOptions
 					{incrementDecrementProps}
 					isEditing={$isEditing}
-					onAccept={$isEditing ? onAcceptEdit : onAcceptNewBullet}
+					onAccept={onAcceptEdit}
 					{onAddBullet}
 					{onEdit}
 					{onDelete}
