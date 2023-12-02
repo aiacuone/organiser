@@ -288,16 +288,16 @@
 				{#each $filteredLogs as log}
 					{@const { type, ...rest } = log}
 					{#if type === LogType_enum.important && log.importance && log.content}
-						<Important {...rest} importance={log.importance} content={log.content} />
+						<!-- <Important {...rest} importance={log.importance} content={log.content} /> -->
 					{:else if type === LogType_enum.todo && log.priority && log.content}
-						<Todo
+						<!-- <Todo
 							{...rest}
 							priority={log.priority}
 							isCompleted={log.isCompleted}
 							content={log.content}
-						/>
+						/> -->
 					{:else if type === LogType_enum.question && log.importance && log.question}
-						<Question {...rest} importance={log.importance} content={log.content} />
+						<!-- <Question {...rest} importance={log.importance} content={log.content} /> -->
 					{:else if type === LogType_enum.time}
 						<Time
 							{...rest}

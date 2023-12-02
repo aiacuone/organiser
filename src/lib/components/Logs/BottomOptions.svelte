@@ -17,7 +17,6 @@
 	import type { Log_int } from '$lib/types';
 	import type { Writable } from 'svelte/store';
 
-	export let onDelete: (() => void) | undefined = undefined;
 	export let onEdit: (() => void) | undefined = undefined;
 	export let onAccept: () => void;
 	export let onAddBullet: (() => void) | undefined = undefined;
@@ -30,15 +29,13 @@
 				min: number;
 		  }
 		| undefined = undefined;
-	// export let date: Date;
-	export let isEditing: boolean;
 
+	export let isEditing: boolean;
 	export let showIncrementDecrement: boolean = true;
 	export let icon: string | undefined = undefined;
 	export let lastUpdated: Date | undefined = undefined;
 	export let values: Writable<Log_int>;
 	export let initialValues: Writable<Log_int>;
-	// export let id: string;
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
@@ -101,6 +98,11 @@
 
 	$: dateValues = getDayMonthYearFromDate($values.date);
 	$: lastUpdatedDateValues = lastUpdated && getDayMonthYearFromDate(lastUpdated);
+
+	const onDelete = () => {
+		$currentlyEditing = null;
+		$deleteLogMutation.mutate();
+	};
 </script>
 
 <div class="w-full hstack">

@@ -7,24 +7,10 @@
 	import { getContext, onMount } from 'svelte';
 	import { derived } from 'svelte/store';
 
-	const invalidateLogs: () => void = getContext('invalidateLogs');
-
 	export let onConfirmReset: () => void;
 	export let id: string;
 	export let showDialog = true;
 	export let editOnMount = false;
-
-	export const updateLogMutation = useMutation(updateLog, {
-		onSuccess: () => {
-			invalidateLogs();
-		}
-	});
-
-	export const deleteLogMutation = useMutation(deleteLog, {
-		onSuccess: () => {
-			invalidateLogs();
-		}
-	});
 
 	onMount(() => {
 		if (editOnMount) {
@@ -43,10 +29,7 @@
 			$currentlyEditing = id;
 		}
 	};
-	export const onDelete = () => {
-		$currentlyEditing = null;
-		$deleteLogMutation.mutate(id);
-	};
+
 	export let changeReferenceInputValue: ((value: string | undefined) => void) | undefined =
 		undefined;
 	export const onTitleAutoFill = (_title: string) => {

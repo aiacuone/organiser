@@ -13,6 +13,7 @@
 	import { debounce } from '$lib/utils/general';
 	import type { Readable } from 'svelte/motion';
 	import { writable, type Writable } from 'svelte/store';
+	import type { AxiosResponse } from 'axios';
 
 	export let date: Date;
 	export let bullets: string[] = [];
@@ -44,12 +45,11 @@
 	let onOpen: () => void;
 	let onClose: () => void;
 	let onEdit: () => void;
-	let onDelete: () => void;
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let onTitleAutoFill: (title: string) => void;
 
-	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
-	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
+	let updateMutation: MutationStoreResult<AxiosResponse<any, any>, unknown, Log_int, unknown>;
+	let deleteMutation: MutationStoreResult<AxiosResponse<any, any>, unknown, void, unknown>;
 
 	let isEditing: Readable<boolean>;
 
@@ -106,9 +106,6 @@
 <LogContainer
 	bind:onEdit
 	onConfirmReset={onResetChange}
-	bind:updateLogMutation={updateMutation}
-	bind:deleteLogMutation={deleteMutation}
-	bind:onDelete
 	{id}
 	bind:onTitleAutoFill
 	bind:isEditing
@@ -172,12 +169,13 @@
 			</ul>
 			<div class="hstack mt-2">
 				<BottomOptions
+					bind:updateLogMutation={updateMutation}
+					bind:deleteLogMutation={deleteMutation}
 					{incrementDecrementProps}
 					isEditing={$isEditing}
 					onAccept={onAcceptEdit}
 					{onAddBullet}
 					{onEdit}
-					{onDelete}
 					icon={icons.clock}
 					{lastUpdated}
 					{values}
