@@ -24,6 +24,7 @@
 	} from '$lib/utils/strings';
 	import Search from '$lib/components/Search.svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
+	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -31,18 +32,12 @@
 		space: string;
 		titles: string[];
 		references: string[];
-		initialLogs: Log_int[];
+		initialLogs: { logs: Log_int[]; total: number };
 	}
 
 	export let data: PageData;
 
 	const queryClient = useQueryClient();
-
-	let hasPageLoaded = false;
-
-	onMount(() => {
-		hasPageLoaded = true;
-	});
 
 	let timer: any;
 	const debounce = (fn: () => any, delay = 500) => {
@@ -59,7 +54,7 @@
 		'logs',
 		() => {
 			return (
-				selectedHyphenatedDateString &&
+				$selectedHyphenatedDateString &&
 				getLogs({
 					space: replaceAllSpacesWithHyphens(data.space),
 					date: $selectedDate
@@ -70,9 +65,8 @@
 			onSuccess: () => {
 				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
 			},
-			initialData: data.initialLogs,
-			refetchOnMount: false,
-			refetchOnReconnect: false
+			// this currently does not work properly because because its conflicts with deleting a space. If we want this to work, we need to find a way to refetch the logs when a space is deleted
+			initialData: data.initialLogs
 		}
 	);
 
@@ -80,8 +74,7 @@
 		getTitlesAndReferences(replaceAllSpacesWithHyphens(data.space))
 	);
 
-	const invalidateLogsAndTitlesAndReferences = () => {
-		if (!hasPageLoaded) return;
+	const invalidateLogsAndTitlesAndReferences = async () => {
 		queryClient.invalidateQueries('logs');
 		queryClient.invalidateQueries('titlesAndReferences');
 	};
@@ -250,25 +243,24 @@
 
 			<div class="grid grid-cols-4 w-full gap-y-3 gap-x-3 max-w-[500px] min-w-[300px]">
 				{#each noteButtons as { icon, type }}
-					<div class="flex-1 hstack shadow-md min-h-[30px] rounded-r-md rounded-l-md">
-						<button
-							class=" w-4/6 h-full center rounded-l-md"
-							on:click={() => onNoteButtonClick(type)}
-						>
-							<Icon {icon} class="text-gray-300" height="20px" />
-						</button>
-						<button
-							class="rounded-r-md w-2/6 h-full border-l-[2px] border-neutral-100 {$filters.includes(
-								type
-							)
-								? 'bg-neutral-100'
-								: 'bg-white'}"
-							on:click={() =>
-								$filters.includes(type)
-									? ($filters = $filters.filter((filter) => filter !== type))
-									: ($filters = [...$filters, type])}
-						/>
-					</div>
+					<PillButton
+						buttons={[
+							{
+								onClick: () => onNoteButtonClick(type),
+								icon,
+								_class: 'w-4/6'
+							},
+							{
+								onClick: () =>
+									$filters.includes(type)
+										? ($filters = $filters.filter((filter) => filter !== type))
+										: ($filters = [...$filters, type]),
+								_class: `min-w-[30px] w-2/6 ${
+									$filters.includes(type) ? 'bg-neutral-100' : 'bg-white'
+								}`
+							}
+						]}
+					/>
 				{/each}
 			</div>
 		</div>

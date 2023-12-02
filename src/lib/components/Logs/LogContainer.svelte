@@ -1,27 +1,28 @@
 <script lang="ts">
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import { clickOutside } from '$lib/utils/clickAway';
-	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
+	import { useMutation } from '@sveltestack/svelte-query';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import { currentlyEditing, titlesAndReferences } from '$lib/stores';
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import { derived } from 'svelte/store';
+
+	const invalidateLogs: () => void = getContext('invalidateLogs');
 
 	export let onConfirmReset: () => void;
 	export let id: string;
 	export let showDialog = true;
 	export let editOnMount = false;
+
 	export const updateLogMutation = useMutation(updateLog, {
 		onSuccess: () => {
-			queryClient.invalidateQueries('logs');
-			queryClient.invalidateQueries('allLogNotifications');
+			invalidateLogs();
 		}
 	});
+
 	export const deleteLogMutation = useMutation(deleteLog, {
 		onSuccess: () => {
-			queryClient.invalidateQueries('logs');
-			queryClient.invalidateQueries('allLogNotifications');
-			queryClient.invalidateQueries('filteredLogs');
+			invalidateLogs();
 		}
 	});
 
@@ -61,8 +62,6 @@
 	const onClickOutside = () => {
 		$isEditing && showDialog && onOpen();
 	};
-
-	const queryClient = useQueryClient();
 
 	let container: HTMLDivElement;
 

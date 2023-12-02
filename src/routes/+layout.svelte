@@ -11,6 +11,7 @@
 	import { selectedDate } from '$lib/stores/dates';
 	import Header from '$lib/components/Header.svelte';
 	import { searchValue } from '$lib/stores';
+	import { Toaster } from 'svelte-french-toast';
 
 	export let data: SpaceData_int;
 
@@ -62,8 +63,6 @@
 		};
 	});
 
-	const queryClient = new QueryClient();
-
 	const onClickPreviousDay = () => {
 		const getPreviousDate = (date: Date) => {
 			const _date = new Date(date);
@@ -105,6 +104,8 @@
 			}
 		}
 	];
+
+	const queryClient = new QueryClient();
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -132,3 +133,5 @@
 		</footer>
 	</div>
 </QueryClientProvider>
+
+<Toaster />

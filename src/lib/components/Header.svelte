@@ -6,8 +6,7 @@
 	import {
 		getHyphenatedStringFromDate,
 		replaceAllHyphensWithSpaces,
-		replaceAllSpacesWithHyphens,
-		stringArrayToQueryString
+		replaceAllSpacesWithHyphens
 	} from '$lib/utils/strings';
 	import Icon from '@iconify/svelte';
 	import Button from './Button.svelte';
@@ -17,6 +16,8 @@
 	import { selectedDate } from '$lib/stores/dates';
 	import axios from 'axios';
 	import { onMount } from 'svelte';
+	import PillButton from './Logs/Buttons/PillButton.svelte';
+	import { derived } from 'svelte/store';
 
 	export let space: string;
 	export let spaces: string[];
@@ -37,18 +38,27 @@
 		hasPageLoaded = true;
 	});
 
-	const allLogsNotificationsQuery = useQuery(
-		`allLogNotifications`,
+	const spacesQuery = useQuery(
+		`spaces`,
 		async () => {
-			if (!hasPageLoaded) return;
-			const queryString = stringArrayToQueryString(spaces);
-
 			return await axios
-				.get(`/log/notifications?${queryString}`)
+				.get(`/spaces`)
 				.then(({ data }) => data)
 				.catch((err) => console.log(err));
 		},
+		{
+			initialData: spaces
+		}
+	);
 
+	const allLogsNotificationsQuery = useQuery(
+		`allLogNotifications`,
+		async () => {
+			return await axios
+				.get(`/log/notifications`, { params: { spaces: $spacesQuery.data } })
+				.then(({ data }) => data)
+				.catch((err) => console.log(err));
+		},
 		{
 			initialData: initialLogNotifications,
 			refetchOnMount: false
@@ -107,6 +117,58 @@
 		onDialogClose();
 		$selectedDate = new Date();
 	};
+
+	const pillButtons = derived(allLogsNotificationsQuery, ($allLogsNotificationsQuery) => {
+		if (!$allLogsNotificationsQuery?.data) return [];
+
+		return $allLogsNotificationsQuery.data.map(({ space, todo, question }) => {
+			const result = [
+				{
+					label: replaceAllHyphensWithSpaces(space),
+					onClick: () => {
+						goto(
+							`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(
+								new Date()
+							)}`
+						);
+						onDialogClose();
+					},
+					notification: 0
+				}
+			];
+
+			if (todo)
+				result.push({
+					notification: todo,
+					onClick: () => {
+						onDialogClose();
+						goto(`/${space}/filter?type=todo&isCompleted=false`);
+					},
+					icon: icons.todo
+				});
+
+			if (question)
+				result.push({
+					notification: question,
+					onClick: () => {
+						onDialogClose();
+						goto(`/${space}/filter?type=question&isAnswered=false`);
+					},
+					icon: icons.question
+				});
+
+			result.push({
+				icon: icons.moreVertical,
+				onClick: () => {
+					goto(`/${space}/overview`);
+					onDialogClose();
+				},
+				notification: 0
+			});
+
+			return result;
+		});
+	});
 </script>
 
 <header class="center py-2 px-3 bg-gray-200">
@@ -140,51 +202,11 @@
 <Dialog bind:onOpen onClose={onDialogClose} bind:dialog>
 	<div class="stack gap-3">
 		<div class="stack gap-4 self-center">
-			{#if $allLogsNotificationsQuery?.data}
-				{#each $allLogsNotificationsQuery?.data as { space, todo, question }}
-					{@const onClick = () => {
-						goto(
-							`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(
-								new Date()
-							)}`
-						);
-						onDialogClose();
-					}}
-					<div class="hstack gap-2 items-center">
-						<Button {onClick} _class="capitalize">{replaceAllHyphensWithSpaces(space)}</Button>
-						<div class="hstack gap-4">
-							{#if todo}
-								<a
-									class="relative"
-									href={`/${space}/filter?type=todo&isCompleted=false`}
-									on:click={onDialogClose}
-								>
-									<Icon icon={icons.todo} class="text-neutral-400" height="20px" />
-									<p
-										class="absolute -top-2 -right-[8px] text-[10px] rounded-full bg-blue-400 w-[15px] center text-white"
-									>
-										{todo}
-									</p>
-								</a>
-							{/if}
-							{#if question}
-								<a
-									class="relative"
-									href={`/${space}/filter?type=question&isAnswered=false`}
-									on:click={onDialogClose}
-								>
-									<Icon icon={icons.question} class="text-neutral-400" height="20px" />
-									<p
-										class="absolute -top-2 -right-[8px] text-[10px] rounded-full bg-blue-400 w-[15px] center text-white"
-									>
-										{question}
-									</p>
-								</a>
-							{/if}
-						</div>
-					</div>
-				{/each}
-			{/if}
+			{#each $pillButtons as pillButton}
+				<div class="hstack gap-2 items-center relative">
+					<PillButton buttons={pillButton} />
+				</div>
+			{/each}
 		</div>
 		<div class="min-h-[50px] center">
 			{#if isAddingNewSpace}
