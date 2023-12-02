@@ -44,10 +44,11 @@
 			return await axios
 				.get(`/spaces`)
 				.then(({ data }) => data)
-				.catch((err) => console.log(err));
+				.catch(() => console.log('There was an issue fetching spaces'));
 		},
 		{
-			initialData: spaces
+			initialData: spaces,
+			refetchOnMount: false
 		}
 	);
 
