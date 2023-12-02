@@ -13,7 +13,7 @@
 	import { page } from '$app/stores';
 	import { useMutation } from '@sveltestack/svelte-query';
 	import axios from 'axios';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import type { Log_int } from '$lib/types';
 	import type { Writable } from 'svelte/store';
 
@@ -36,6 +36,13 @@
 	export let lastUpdated: Date | undefined = undefined;
 	export let values: Writable<Log_int>;
 	export let initialValues: Writable<Log_int>;
+	export let editOnMount = false;
+
+	onMount(() => {
+		if (editOnMount) {
+			$currentlyEditing = $values.id;
+		}
+	});
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');

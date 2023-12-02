@@ -111,7 +111,6 @@
 	bind:isEditing
 	{changeReferenceInputValue}
 	{onControlShitAndEnterKeydown}
-	{editOnMount}
 	{onControlShitAndDotKeydown}
 >
 	<div class="bg-neutral-100 p-2 rounded-sm">
@@ -180,6 +179,7 @@
 					{lastUpdated}
 					{values}
 					{initialValues}
+					{editOnMount}
 				/>
 			</div>
 		</div>

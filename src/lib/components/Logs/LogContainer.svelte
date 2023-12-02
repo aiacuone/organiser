@@ -1,22 +1,13 @@
 <script lang="ts">
-	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import { clickOutside } from '$lib/utils/clickAway';
-	import { useMutation } from '@sveltestack/svelte-query';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import { currentlyEditing, titlesAndReferences } from '$lib/stores';
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { derived } from 'svelte/store';
 
 	export let onConfirmReset: () => void;
 	export let id: string;
 	export let showDialog = true;
-	export let editOnMount = false;
-
-	onMount(() => {
-		if (editOnMount) {
-			$currentlyEditing = id;
-		}
-	});
 
 	export const isEditing = derived(
 		[currentlyEditing],
