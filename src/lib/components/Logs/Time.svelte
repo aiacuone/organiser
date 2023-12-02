@@ -4,18 +4,15 @@
 	import LogContainer from './LogContainer.svelte';
 	import BottomOptions from './BottomOptions.svelte';
 	import Textarea from '../Textarea.svelte';
-	import { getContext, onMount } from 'svelte';
-	import { LogType_enum, type Log_int } from '$lib/types';
-	import { page } from '$app/stores';
-	import { getDateFromHyphenatedString } from '$lib/utils';
+	import { getContext } from 'svelte';
+	import { LogType_enum, type Log_int, type TimeLog_int } from '$lib/types';
 	import Input from '../Input.svelte';
-	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import Icon from '@iconify/svelte';
-	import { currentlyEditing, titles } from '$lib/stores';
+	import { currentlyEditing, space, titles } from '$lib/stores';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
-	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import { debounce } from '$lib/utils/general';
 	import type { Readable } from 'svelte/motion';
+	import { writable, type Writable } from 'svelte/store';
 
 	export let date: Date;
 	export let bullets: string[] = [];
@@ -27,6 +24,23 @@
 	export let lastUpdated: Date | undefined = undefined;
 	export let editOnMount: boolean = false;
 
+	const _intialValues: TimeLog_int = {
+		date,
+		bullets,
+		id,
+		title,
+		reference,
+		time,
+		type: LogType_enum.time,
+		space: $space
+	};
+
+	const values: Writable<TimeLog_int> = writable({ ..._intialValues, bullets: [...bullets] });
+	const initialValues: Writable<TimeLog_int> = writable({
+		..._intialValues,
+		bullets: [...bullets]
+	});
+
 	let onOpen: () => void;
 	let onClose: () => void;
 	let onEdit: () => void;
@@ -34,11 +48,6 @@
 	let onDelete: () => void;
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let onTitleAutoFill: (title: string) => void;
-
-	let originalBullets = [...bullets];
-	let originalTitle = title;
-	let originalReference = reference;
-	let originalTime = time;
 
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
@@ -48,77 +57,22 @@
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onDeleteBullet = (index: number) => {
-		bullets = bullets.filter((_, i) => i !== index);
+		$values = { ...$values, bullets: $values.bullets.filter((_, i) => i !== index) };
 	};
 
-	const onAcceptEdit = async () => {
-		if (!title && !reference && !bullets.length) {
-			return onOpen();
-		}
-
-		const haveValuesChanged = getHaveValuesChanged({
-			values: {
-				title,
-				reference,
-				bullets,
-				time
-			},
-			originalValues: {
-				title: originalTitle,
-				reference: originalReference,
-				bullets: originalBullets,
-				time: originalTime
-			}
-		});
-
-		if (!haveValuesChanged) return ($currentlyEditing = null);
-
-		let logDate: Date = date;
-		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate(date)) {
-			const currentDate = new Date();
-			const _date = new Date(getDateFromHyphenatedString($page.params.date));
-			_date.setHours(currentDate.getHours());
-			_date.setMinutes(currentDate.getMinutes());
-			logDate = _date;
-		}
-
-		bullets = bullets.filter((c) => c);
-		$currentlyEditing = null;
-		try {
-			await $updateMutation.mutate({
-				id,
-				title,
-				reference,
-				bullets,
-				time,
-				date: logDate,
-				type: LogType_enum.time,
-				space: $page.params.space,
-				lastUpdated: new Date()
-			});
-			originalTitle = title;
-			originalReference = reference;
-			originalBullets = bullets;
-			originalTime = time;
-			lastUpdated = new Date();
-		} catch (error) {
-			console.log({ error });
-		}
-
-		onResetNewLogType && onResetNewLogType();
-	};
+	const onAcceptEdit = async () => {};
 
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		bullets = originalBullets;
-		title = originalTitle;
-		reference = originalReference;
+
+		$values = $initialValues;
 	};
 
 	const onAddBullet = () => {
 		$currentlyEditing = id;
-		bullets = [...bullets, ''];
+
+		$values = { ...$values, bullets: [...$values.bullets, ''] };
 	};
 
 	const onAcceptNewBullet = () => {
@@ -126,35 +80,15 @@
 	};
 
 	const onIncrement = () => {
-		time = time + 0.5;
-		debounce(() =>
-			$updateMutation.mutate({
-				id,
-				title,
-				reference,
-				bullets,
-				time,
-				date,
-				type: LogType_enum.time,
-				space: $page.params.space
-			})
-		);
+		$values = { ...$values, time: $values.time + 0.5 };
+
+		debounce(() => $updateMutation.mutate($values));
 	};
 
 	const onDecrement = () => {
-		time = time - 0.5;
-		debounce(() =>
-			$updateMutation.mutate({
-				id,
-				title,
-				reference,
-				bullets,
-				time,
-				date,
-				type: LogType_enum.time,
-				space: $page.params.space
-			})
-		);
+		$values = { ...$values, time: $values.time - 0.5 };
+
+		debounce(() => $updateMutation.mutate($values));
 	};
 
 	const incrementDecrementProps = {
@@ -190,11 +124,11 @@
 >
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-2 stack text-sm gap-1">
-			{#if title || reference || $isEditing}
+			{#if $values.title || $values.reference || $isEditing}
 				<div class="stack gap-1">
-					{#if !$isEditing && !title}{''}{:else}
+					{#if !$isEditing && !$values.title}{''}{:else}
 						<Input
-							bind:value={title}
+							bind:value={$values.title}
 							autofocus={inputAutoFocus}
 							placeholder="Title"
 							autofillValues={$titles}
@@ -202,9 +136,9 @@
 							onAutoFill={onTitleAutoFill}
 						/>
 					{/if}
-					{#if !isEditing && !reference}{''}{:else}
+					{#if !isEditing && !$values.reference}{''}{:else}
 						<Input
-							bind:value={reference}
+							bind:value={$values.reference}
 							placeholder="Reference"
 							isDisabled={!$isEditing}
 							bind:changeInputValue={changeReferenceInputValue}
@@ -213,12 +147,12 @@
 				</div>
 			{/if}
 			<ul class="ml-5 stack">
-				{#each bullets as _, index}
+				{#each $values.bullets as _, index}
 					<li>
 						<div class="flex gap-2 min-h-[20px]">
 							<Textarea
 								className="flex-1"
-								bind:value={bullets[index]}
+								bind:value={$values.bullets[index]}
 								isDisabled={!$isEditing}
 								onEnterKeydown={onTextareaEnterKeydown}
 								autofocus={index > 0}
@@ -244,8 +178,6 @@
 			<div class="hstack mt-2">
 				<BottomOptions
 					{incrementDecrementProps}
-					incrementDecrementValue={time}
-					{date}
 					isEditing={$isEditing}
 					onAccept={$isEditing ? onAcceptEdit : onAcceptNewBullet}
 					{onAddBullet}
@@ -253,6 +185,8 @@
 					{onDelete}
 					icon={icons.clock}
 					{lastUpdated}
+					{values}
+					{initialValues}
 				/>
 			</div>
 		</div>

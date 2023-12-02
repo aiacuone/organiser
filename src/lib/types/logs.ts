@@ -44,16 +44,16 @@ export enum LogType_enum {
 
 export const allLogs = Object.keys(LogType_enum).map((key) => key);
 
+// TODO: remove the use of LogBase_int and use Log_int instead, change the optional fields to required by extending
 export interface LogBase_int<T = string> {
 	id: string;
 	date: Date;
 	content: T;
 }
-export interface TimeLog_int extends LogBase_int<string[]> {
-	title: string;
-	reference: string;
-	time: number;
+export interface TimeLog_int extends Log_int {
 	type: LogType_enum.time;
+	bullets: string[];
+	time: number;
 }
 
 export interface Todo_int extends LogBase_int {

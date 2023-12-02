@@ -61,6 +61,8 @@
 		);
 	};
 
+	let commonOnAccept: () => void;
+
 	const onAccept = async () => {
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
@@ -110,6 +112,8 @@
 			originalContent = content;
 			originalPriority = priority;
 			originalIsCompleted = isCompleted;
+
+			commonOnAccept();
 		} catch (error) {}
 		$currentlyEditing = null;
 	};
@@ -184,6 +188,7 @@
 			</div>
 		</div>
 		<BottomOptions
+			{id}
 			{onEdit}
 			{onDelete}
 			{date}
@@ -193,6 +198,9 @@
 			incrementDecrementValue={priority}
 			showIncrementDecrement={$isEditing}
 			{lastUpdated}
+			{values}
+			{originalValues}
+			bind:commonOnAccept
 		/>
 	</div>
 </LogContainer>

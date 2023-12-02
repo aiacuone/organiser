@@ -1,3 +1,4 @@
+import { page } from '$app/stores';
 import type { titlesAndReferences_int } from '$lib/types';
 import { derived, writable, type Writable } from 'svelte/store';
 
@@ -26,3 +27,8 @@ export const references = derived(titlesAndReferences, ($titlesAndReferences) =>
 });
 
 export const searchValue = writable('');
+
+export const space = derived(page, ($page) => {
+	if (!$page) return '';
+	return $page.params.space;
+});

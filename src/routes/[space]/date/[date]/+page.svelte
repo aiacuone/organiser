@@ -25,6 +25,7 @@
 	import Search from '$lib/components/Search.svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
 	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
+	import { browser } from '$app/environment';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -63,10 +64,13 @@
 		},
 		{
 			onSuccess: () => {
-				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
+				// this is a check to know if the code is being run on the client or server
+				if (browser)
+					goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
 			},
 			// this currently does not work properly because because its conflicts with deleting a space. If we want this to work, we need to find a way to refetch the logs when a space is deleted
-			initialData: data.initialLogs
+			initialData: data.initialLogs,
+			refetchOnMount: false
 		}
 	);
 

@@ -161,6 +161,7 @@
 			</div>
 		</div>
 		<BottomOptions
+			{id}
 			{onEdit}
 			{onDelete}
 			{date}

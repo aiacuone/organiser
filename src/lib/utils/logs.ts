@@ -13,24 +13,24 @@ interface values_int {
 
 export const getHaveValuesChanged = ({
 	values,
-	originalValues
+	initialValues
 }: {
 	values: values_int;
-	originalValues: values_int;
+	initialValues: values_int;
 }) => {
 	return (
-		values.title !== originalValues.title ||
-		values.reference !== originalValues.reference ||
+		values.title !== initialValues.title ||
+		values.reference !== initialValues.reference ||
 		(values.bullets &&
-			originalValues.bullets &&
-			!arraysHaveSameValues(values.bullets, originalValues.bullets)) ||
-		values.time !== originalValues.time ||
-		values.content !== originalValues.content ||
-		values.priority !== originalValues.priority ||
-		values.importance !== originalValues.importance ||
-		values.isCompleted !== originalValues.isCompleted ||
-		values.question !== originalValues.question ||
-		values.answer !== originalValues.answer
+			initialValues.bullets &&
+			!arraysHaveSameValues(values.bullets, initialValues.bullets)) ||
+		values.time !== initialValues.time ||
+		values.content !== initialValues.content ||
+		values.priority !== initialValues.priority ||
+		values.importance !== initialValues.importance ||
+		values.isCompleted !== initialValues.isCompleted ||
+		values.question !== initialValues.question ||
+		values.answer !== initialValues.answer
 	);
 };
 
