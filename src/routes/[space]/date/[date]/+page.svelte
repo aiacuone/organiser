@@ -286,26 +286,19 @@
 				Error
 			{:else if $filteredLogs}
 				{#each $filteredLogs as log}
-					{@const { type, ...rest } = log}
-					{#if type === LogType_enum.important && log.importance && log.content}
+					{#if log.type === LogType_enum.important && log.importance && log.content}
 						<!-- <Important {...rest} importance={log.importance} content={log.content} /> -->
-					{:else if type === LogType_enum.todo && log.priority && log.content}
+					{:else if log.type === LogType_enum.todo && log.priority && log.content}
 						<!-- <Todo
 							{...rest}
 							priority={log.priority}
 							isCompleted={log.isCompleted}
 							content={log.content}
 						/> -->
-					{:else if type === LogType_enum.question && log.importance && log.question}
+					{:else if log.type === LogType_enum.question && log.importance && log.question}
 						<!-- <Question {...rest} importance={log.importance} content={log.content} /> -->
-					{:else if type === LogType_enum.time}
-						<Time
-							{...rest}
-							title={log.title}
-							reference={log.reference}
-							time={log.time}
-							bullets={log.bullets}
-						/>
+					{:else if log.type === LogType_enum.time}
+						<Time {...log} />
 					{/if}
 				{/each}
 			{/if}
