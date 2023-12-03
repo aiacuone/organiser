@@ -26,6 +26,7 @@
 	import { derived, writable, type Writable } from 'svelte/store';
 	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
 	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
+	import { browser } from '$app/environment';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -64,7 +65,9 @@
 		},
 		{
 			onSuccess: () => {
-				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
+				if (browser) {
+					goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
+				}
 			},
 			// this currently does not work properly because because its conflicts with deleting a space. If we want this to work, we need to find a way to refetch the logs when a space is deleted
 			initialData: data.initialLogs
@@ -372,4 +375,6 @@
 	<title>{getCapitalizedWords(data.space)} - Organiser</title>
 </svelte:head>
 
-<ExportDialog bind:onClose={onCloseExport} bind:onOpen={onOpenExport} />
+{#if $filteredLogs && $filteredLogs.length}
+	<ExportDialog bind:onClose={onCloseExport} bind:onOpen={onOpenExport} logs={$filteredLogs} />
+{/if}

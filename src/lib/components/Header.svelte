@@ -47,7 +47,8 @@
 				.catch((err) => console.log(err));
 		},
 		{
-			initialData: spaces
+			initialData: spaces,
+			refetchOnMount: false
 		}
 	);
 

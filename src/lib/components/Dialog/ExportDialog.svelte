@@ -1,40 +1,123 @@
 <script lang="ts">
-	import { icons } from '$lib/general/icons';
-	import Icon from '@iconify/svelte';
 	import Button from '../Button.svelte';
 	import Dialog from './Dialog.svelte';
+	import { logEnumNames, Log_enum, type Log_int, LogType_enum } from '$lib/types';
 
 	export let onOpen: () => void;
 	export let onClose: () => void;
+	export let logs: Log_int[];
 
-	let view: 'default' | 'csv' | 'text' = 'default';
+	const defaultLogKeyValueFilter: Record<Log_enum, boolean> = {
+		title: true,
+		reference: true,
+		date: true,
+		type: true,
+		content: true,
+		bullets: true,
+		question: true,
+		answer: true,
+		isCompleted: true,
+		lastUpdated: false,
+		priority: false,
+		importance: false,
+		space: false,
+		time: false,
+		id: false
+	};
+
+	let logKeyValueFilter: Record<Log_enum, boolean> = { ...defaultLogKeyValueFilter };
+
+	const defaultTypeFilterData: Record<LogType_enum, boolean> = {
+		[LogType_enum.time]: true,
+		[LogType_enum.important]: true,
+		[LogType_enum.todo]: true,
+		[LogType_enum.question]: true
+	};
+
+	let typeFilter: Record<LogType_enum, boolean> = { ...defaultTypeFilterData };
+
+	const logKeyValueSortFunction = ([keyA], [keyB]) => {
+		const keyOrder = [
+			Log_enum.title,
+			Log_enum.reference,
+			Log_enum.date,
+			Log_enum.type,
+			Log_enum.content,
+			Log_enum.bullets,
+			Log_enum.question,
+			Log_enum.answer,
+			Log_enum.isCompleted,
+			Log_enum.priority,
+			Log_enum.importance,
+			Log_enum.space,
+			Log_enum.time,
+			Log_enum.lastUpdated,
+			Log_enum.id
+		];
+		const indexA = keyOrder.indexOf(keyA);
+		const indexB = keyOrder.indexOf(keyB);
+
+		return indexA - indexB;
+	};
+	let logContainer: HTMLDivElement;
+	$: logContainer, console.log(logContainer?.innerText);
+
+	const copyToClipboard = () => {
+		const clipboardItem = new ClipboardItem({
+			'text/plain': new Blob([logContainer.innerText.trim()], { type: 'text/plain' })
+		});
+
+		navigator.clipboard.write([clipboardItem]);
+	};
 </script>
 
-<Dialog bind:onOpen bind:onClose>
-	<div class="stack center gap-3 w-full">
-		<div class="hstack w-full gap-5 min-h-[30px]">
-			<div class="flex-1 justify-end flex">
-				{#if view !== 'default'}
-					<Button onClick={() => (view = 'default')}>
-						<Icon icon={icons.back} />
-					</Button>
-				{/if}
+<Dialog bind:onOpen bind:onClose _class="h-full w-full max-w-screen-lg">
+	<div class="stack gap-3 w-full h-full text-sm">
+		<header class="text-center">Export/Copy</header>
+		<div class="stack gap-2">
+			<div class="flex flex-wrap gap-y-1 gap-x-2">
+				{#each Object.entries(logKeyValueFilter)
+					.filter(([key]) => {
+						return ![Log_enum.id, Log_enum.lastUpdated, Log_enum.priority, Log_enum.importance, Log_enum.space, Log_enum.time].includes(key);
+					})
+					.sort(logKeyValueSortFunction) as [key]}
+					<div class="hstack gap-2">
+						<p class="capitalize flex-1">{logEnumNames[key]}</p>
+						<input type="checkbox" bind:checked={logKeyValueFilter[key]} />
+					</div>
+				{/each}
 			</div>
-			<header>Export Logs</header>
-			<div class="flex-1" />
+			<div class="flex flex-wrap gap-y-1 gap-x-2">
+				{#each Object.entries(typeFilter) as [key]}
+					<div class="hstack gap-2">
+						<p class="capitalize flex-1">{key}</p>
+						<input type="checkbox" bind:checked={typeFilter[key]} />
+					</div>
+				{/each}
+			</div>
 		</div>
-		<div class="min-h-[150px] center">
-			{#if view === 'default'}
-				<div class="hstack gap-2">
-					<Button onClick={() => (view = 'csv')}>CSV</Button>
-					<Button onClick={() => (view = 'text')}>Text</Button>
+
+		<div class="stack flex-1" bind:this={logContainer}>
+			{#each logs.filter((log) => typeFilter[log.type]) as log}
+				<div class="stack gap-2 log-stack p-2">
+					{#each Object.entries(log)
+						.filter(([key, value]) => logKeyValueFilter[key] && value)
+						.sort(logKeyValueSortFunction) as [key, value]}
+						<p><b>{logEnumNames[key]}</b>: {value}</p>
+					{/each}
 				</div>
-			{:else if view === 'csv'}
-				CSV
-			{:else if view === 'text'}
-				Text
-			{/if}
+			{/each}
 		</div>
-		<Button onClick={onClose}>Close</Button>
+		<div class="hstack center gap-2">
+			<Button onClick={copyToClipboard} _class="self-center">Copy</Button>
+			<Button onClick={onClose} _class="self-center">CSV</Button>
+			<Button onClick={onClose} _class="self-center">Close</Button>
+		</div>
 	</div>
 </Dialog>
+
+<style>
+	.log-stack:nth-child(odd) {
+		background: rgb(246, 246, 246);
+	}
+</style>

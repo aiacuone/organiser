@@ -34,6 +34,23 @@ export interface Log_int {
 	question?: string;
 	answer?: string;
 }
+export enum Log_enum {
+	id = 'id',
+	date = 'date',
+	title = 'title',
+	content = 'content',
+	reference = 'reference',
+	time = 'time',
+	type = 'type',
+	space = 'space',
+	priority = 'priority',
+	importance = 'importance',
+	isCompleted = 'isCompleted',
+	bullets = 'bullets',
+	lastUpdated = 'lastUpdated',
+	question = 'question',
+	answer = 'answer'
+}
 
 export enum LogType_enum {
 	time = 'time',
@@ -41,6 +58,24 @@ export enum LogType_enum {
 	important = 'important',
 	question = 'question'
 }
+
+export const logEnumNames: Record<Log_enum, string> = {
+	[Log_enum.id]: 'ID',
+	[Log_enum.date]: 'Date',
+	[Log_enum.title]: 'Title',
+	[Log_enum.content]: 'Content',
+	[Log_enum.reference]: 'Reference',
+	[Log_enum.time]: 'Time',
+	[Log_enum.type]: 'Type',
+	[Log_enum.space]: 'Space',
+	[Log_enum.priority]: 'Priority',
+	[Log_enum.importance]: 'Importance',
+	[Log_enum.isCompleted]: 'Completed',
+	[Log_enum.bullets]: 'Bullets',
+	[Log_enum.lastUpdated]: 'Last Updated',
+	[Log_enum.question]: 'Question',
+	[Log_enum.answer]: 'Answer'
+};
 
 export const allLogs = Object.keys(LogType_enum).map((key) => key);
 
@@ -71,22 +106,12 @@ export interface Question_int extends LogBase_int {
 	type: LogType_enum.question;
 }
 
-export enum LogInput_enum {
-	title = 'title',
-	reference = 'reference',
-	time = 'time',
-	priority = 'priority',
-	question = 'question',
-	answer = 'answer',
-	content = 'content'
-}
-
 export const searchableInputs = [
-	LogInput_enum.title,
-	LogInput_enum.reference,
-	LogInput_enum.question,
-	LogInput_enum.answer,
-	LogInput_enum.content
+	Log_enum.title,
+	Log_enum.reference,
+	Log_enum.question,
+	Log_enum.answer,
+	Log_enum.content
 ];
 
-export const allLogInputs = Object.keys(LogInput_enum).map((key) => key as LogInput_enum);
+export const allLogInputs = searchableInputs.map((key) => key as Log_enum);
