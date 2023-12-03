@@ -25,6 +25,7 @@
 	import Search from '$lib/components/Search.svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
 	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
+	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -215,6 +216,9 @@
 	const onClickClear = () => {
 		$filters = [];
 	};
+
+	let onOpenExport: () => void;
+	let onCloseExport: () => void;
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -239,6 +243,9 @@
 					onEnterKeydown={onSearch}
 					{onClickClear}
 				/>
+				<Button onClick={onOpenExport}>
+					<Icon icon={icons.export} height="20px" class="text-gray-400" />
+				</Button>
 			</div>
 
 			<div class="grid grid-cols-4 w-full gap-y-3 gap-x-3 max-w-[500px] min-w-[300px]">
@@ -364,3 +371,5 @@
 <svelte:head>
 	<title>{getCapitalizedWords(data.space)} - Organiser</title>
 </svelte:head>
+
+<ExportDialog bind:onClose={onCloseExport} bind:onOpen={onOpenExport} />

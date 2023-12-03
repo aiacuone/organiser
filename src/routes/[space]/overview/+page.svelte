@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
-	import Dialog from '$lib/components/Dialog.svelte';
+	import Dialog from '$lib/components/Dialog/Dialog.svelte';
 	import Input from '$lib/components/Input.svelte';
 	import { useMutation } from '@sveltestack/svelte-query';
 	import axios from 'axios';

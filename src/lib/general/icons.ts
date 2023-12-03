@@ -26,5 +26,7 @@ export const icons = {
 	search: 'iconoir:search',
 	close: 'material-symbols:close',
 	home: 'ic:sharp-home',
-	date: 'uiw:date'
+	date: 'uiw:date',
+	export: 'ph:export-thin',
+	back: 'lets-icons:back-light'
 };
