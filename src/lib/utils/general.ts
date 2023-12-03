@@ -9,3 +9,11 @@ export const debounce = (fn: () => any, delay = 500) => {
 	};
 	timeout();
 };
+
+export const copyToClipboard = (text: string) => {
+	const clipboardItem = new ClipboardItem({
+		'text/plain': new Blob([text], { type: 'text/plain' })
+	});
+
+	navigator.clipboard.write([clipboardItem]);
+};

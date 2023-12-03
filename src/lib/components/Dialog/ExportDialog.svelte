@@ -2,6 +2,7 @@
 	import Button from '../Button.svelte';
 	import Dialog from './Dialog.svelte';
 	import { logEnumNames, Log_enum, type Log_int, LogType_enum } from '$lib/types';
+	import { copyToClipboard, downloadAsCSV } from '$lib/utils';
 
 	export let onOpen: () => void;
 	export let onClose: () => void;
@@ -60,14 +61,13 @@
 		return indexA - indexB;
 	};
 	let logContainer: HTMLDivElement;
-	$: logContainer, console.log(logContainer?.innerText);
 
-	const copyToClipboard = () => {
-		const clipboardItem = new ClipboardItem({
-			'text/plain': new Blob([logContainer.innerText.trim()], { type: 'text/plain' })
-		});
+	const onCopy = () => {
+		copyToClipboard(logContainer.innerText);
+	};
 
-		navigator.clipboard.write([clipboardItem]);
+	const onCsv = () => {
+		downloadAsCSV(logContainer.innerText);
 	};
 </script>
 
@@ -109,8 +109,8 @@
 			{/each}
 		</div>
 		<div class="hstack center gap-2">
-			<Button onClick={copyToClipboard} _class="self-center">Copy</Button>
-			<Button onClick={onClose} _class="self-center">CSV</Button>
+			<Button onClick={onCopy} _class="self-center">Copy</Button>
+			<Button onClick={onCsv} _class="self-center">CSV</Button>
 			<Button onClick={onClose} _class="self-center">Close</Button>
 		</div>
 	</div>
