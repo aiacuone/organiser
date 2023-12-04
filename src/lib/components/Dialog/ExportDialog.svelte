@@ -1,8 +1,14 @@
 <script lang="ts">
 	import Button from '../Button.svelte';
 	import Dialog from './Dialog.svelte';
-	import { logEnumNames, Log_enum, type Log_int, LogType_enum } from '$lib/types';
-	import { copyToClipboard, downloadAsCSV } from '$lib/utils';
+	import {
+		logEnumNames,
+		Log_enum,
+		type Log_int,
+		LogType_enum,
+		LocalStorage_enum
+	} from '$lib/types';
+	import { copyToClipboard, downloadAsCSV, getLocalStorage, setLocalStorage } from '$lib/utils';
 	import { viewport } from '$lib/hooks';
 	import type { InfiniteData } from '@sveltestack/svelte-query';
 	import type { AxiosResponse } from 'axios';
@@ -51,11 +57,11 @@
 	let typeFilter: Record<LogType_enum, boolean> = { ...defaultTypeFilterData };
 
 	onMount(() => {
-		const storageLogKeyValueFilter = localStorage.getItem('logKeyValueFilter');
-		const storageTypeFilter = localStorage.getItem('typeFilter');
+		const storageLogKeyValueFilter = getLocalStorage(LocalStorage_enum.logKeyValueFilter);
+		const storageTypeFilter = getLocalStorage(LocalStorage_enum.typeFilter);
 
-		storageLogKeyValueFilter && (logKeyValueFilter = JSON.parse(storageLogKeyValueFilter));
-		storageTypeFilter && (typeFilter = JSON.parse(storageTypeFilter));
+		storageLogKeyValueFilter && (logKeyValueFilter = storageLogKeyValueFilter);
+		storageTypeFilter && (typeFilter = storageTypeFilter);
 	});
 
 	const logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number = (
@@ -107,24 +113,21 @@
 	let dialog: HTMLDialogElement;
 
 	const onReset = () => {
-		const storageLogKeyValueFilter = localStorage.getItem('logKeyValueFilter');
-		const storageTypeFilter = localStorage.getItem('typeFilter');
+		const storageLogKeyValueFilter = getLocalStorage(LocalStorage_enum.logKeyValueFilter);
+		const storageTypeFilter = getLocalStorage(LocalStorage_enum.typeFilter);
 
-		const resetLogKeyValueFilter = storageLogKeyValueFilter
-			? JSON.parse(storageLogKeyValueFilter)
-			: defaultLogKeyValueFilter;
+		const resetLogKeyValueFilter = storageLogKeyValueFilter ?? defaultLogKeyValueFilter;
 
-		const resetTypeFilter = storageTypeFilter
-			? JSON.parse(storageTypeFilter)
-			: defaultTypeFilterData;
+		const resetTypeFilter = storageTypeFilter ?? defaultTypeFilterData;
 
 		typeFilter = { ...resetTypeFilter };
 		logKeyValueFilter = { ...resetLogKeyValueFilter };
 	};
 
 	const onConfirmSetDefault = () => {
-		localStorage.setItem('logKeyValueFilter', JSON.stringify(logKeyValueFilter));
-		localStorage.setItem('typeFilter', JSON.stringify(typeFilter));
+		setLocalStorage(LocalStorage_enum.logKeyValueFilter, { ...logKeyValueFilter });
+		setLocalStorage(LocalStorage_enum.typeFilter, { ...typeFilter });
+
 		onCloseDefaultSelection();
 	};
 

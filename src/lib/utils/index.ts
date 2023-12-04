@@ -6,3 +6,4 @@ export * from './general';
 export * from './logs';
 export * from './parse';
 export * from './strings';
+export * from './localStorage';
