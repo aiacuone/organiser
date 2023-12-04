@@ -379,7 +379,7 @@
 	<ExportDialog
 		bind:onClose={onCloseExport}
 		bind:onOpen={onOpenExport}
-		logsData={$filteredLogs}
+		logs={$filteredLogs}
 		isLoadingLogs={$logs.isLoading}
 		isLogsError={$logs.isError}
 		isFetchingLogs={$logs.isFetching}

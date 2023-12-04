@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { logEnumNames, type Log_enum } from '$lib/types';
+	import { logEnumNames, type Log_enum, type Log_int } from '$lib/types';
 
-	export let logs: [string, unknown][];
+	export let logs: Log_int[];
 	export let logKeyValueFilter: Record<Log_enum, boolean>;
 	export let logKeyValueSortFunction: ([keyA]: [any], [keyB]: [any]) => number;
 </script>

@@ -14,6 +14,7 @@
 	export let isFetchingLogs: boolean;
 	export let isLogsError: boolean;
 	export let logsData: InfiniteData<AxiosResponse<any, any>> | undefined;
+	export let logs: Log_int[] | undefined;
 	export let hasNextLogsPage: boolean | undefined = undefined;
 	export let getNextLogsPage: (() => void) | undefined = undefined;
 
@@ -142,8 +143,8 @@
 						{logsData.pages[0].data.total} Results
 					{/if}
 				</div>
-			{:else if logsData.length}
-				<ExportDialogLogs logs={logsData} {logKeyValueSortFunction} {logKeyValueFilter} />
+			{:else if logs}
+				<ExportDialogLogs {logs} {logKeyValueSortFunction} {logKeyValueFilter} />
 			{/if}
 		</div>
 		<div class="hstack center gap-2" bind:clientHeight={footerButtonsContainerHeight}>
