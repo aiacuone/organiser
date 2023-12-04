@@ -60,21 +60,32 @@
 
 		return indexA - indexB;
 	};
-	let logContainer: HTMLDivElement;
+
+	let logsContainer: HTMLDivElement;
+	let containerHeight: number;
+	let headerHeight: number;
+	let buttonsContainerHeight: number;
+	let footerButtonsContainerHeight: number;
+
+	$: containerHeight,
+		containerHeight &&
+			(logsContainer.style.height = `${
+				containerHeight - headerHeight - buttonsContainerHeight - footerButtonsContainerHeight
+			}px`);
 
 	const onCopy = () => {
-		copyToClipboard(logContainer.innerText);
+		copyToClipboard(logsContainer.innerText);
 	};
 
 	const onCsv = () => {
-		downloadAsCSV(logContainer.innerText);
+		downloadAsCSV(logsContainer.innerText);
 	};
 </script>
 
 <Dialog bind:onOpen bind:onClose _class="h-full w-full max-w-screen-lg">
-	<div class="stack gap-3 w-full h-full text-sm">
-		<header class="text-center">Export/Copy</header>
-		<div class="stack gap-2">
+	<div bind:clientHeight={containerHeight} class="stack gap-3 w-full h-full text-sm">
+		<header class="text-center" bind:clientHeight={headerHeight}>Export/Copy</header>
+		<div class="stack gap-2" bind:clientHeight={buttonsContainerHeight}>
 			<div class="flex flex-wrap gap-y-1 gap-x-2">
 				{#each Object.entries(logKeyValueFilter)
 					.filter(([key]) => {
@@ -97,7 +108,7 @@
 			</div>
 		</div>
 
-		<div class="stack flex-1" bind:this={logContainer}>
+		<div class="stack flex-1 overflow-y-scroll" bind:this={logsContainer}>
 			{#each logs.filter((log) => typeFilter[log.type]) as log}
 				<div class="stack gap-2 log-stack p-2">
 					{#each Object.entries(log)
@@ -108,7 +119,7 @@
 				</div>
 			{/each}
 		</div>
-		<div class="hstack center gap-2">
+		<div class="hstack center gap-2" bind:clientHeight={footerButtonsContainerHeight}>
 			<Button onClick={onCopy} _class="self-center">Copy</Button>
 			<Button onClick={onCsv} _class="self-center">CSV</Button>
 			<Button onClick={onClose} _class="self-center">Close</Button>
