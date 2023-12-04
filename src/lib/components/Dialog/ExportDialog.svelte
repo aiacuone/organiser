@@ -7,6 +7,8 @@
 	import type { InfiniteData } from '@sveltestack/svelte-query';
 	import type { AxiosResponse } from 'axios';
 	import ExportDialogLogs from './ExportDialogLogs.svelte';
+	import Icon from '@iconify/svelte';
+	import { icons } from '$lib/general/icons';
 
 	export let onOpen: () => void;
 	export let onClose: () => void;
@@ -94,6 +96,11 @@
 		downloadAsCSV(logsContainer.innerText);
 	};
 	let dialog: HTMLDialogElement;
+
+	const onReset = () => {
+		typeFilter = { ...defaultTypeFilterData };
+		logKeyValueFilter = { ...defaultLogKeyValueFilter };
+	};
 </script>
 
 <Dialog bind:dialog bind:onOpen bind:onClose _class="h-full w-full max-w-screen-lg">
@@ -123,6 +130,9 @@
 						</label>
 					</div>
 				{/each}
+				<Button height="22px" onClick={onReset}>
+					<Icon icon={icons.reset} />
+				</Button>
 			</div>
 		</div>
 
