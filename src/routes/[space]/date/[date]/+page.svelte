@@ -25,6 +25,8 @@
 	import Search from '$lib/components/Search.svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
 	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
+	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
+	import { browser } from '$app/environment';
 
 	interface PageData extends SpaceData_int {
 		time: Time_enum;
@@ -63,7 +65,9 @@
 		},
 		{
 			onSuccess: () => {
-				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
+				if (browser) {
+					goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
+				}
 			},
 			// this currently does not work properly because because its conflicts with deleting a space. If we want this to work, we need to find a way to refetch the logs when a space is deleted
 			initialData: data.initialLogs
@@ -215,6 +219,9 @@
 	const onClickClear = () => {
 		$filters = [];
 	};
+
+	let onOpenExport: () => void;
+	let onCloseExport: () => void;
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -239,6 +246,9 @@
 					onEnterKeydown={onSearch}
 					{onClickClear}
 				/>
+				<Button onClick={onOpenExport}>
+					<Icon icon={icons.export} height="20px" class="text-gray-400" />
+				</Button>
 			</div>
 
 			<div class="grid grid-cols-4 w-full gap-y-3 gap-x-3 max-w-[500px] min-w-[300px]">
@@ -364,3 +374,14 @@
 <svelte:head>
 	<title>{getCapitalizedWords(data.space)} - Organiser</title>
 </svelte:head>
+
+{#if $filteredLogs && $filteredLogs.length}
+	<ExportDialog
+		bind:onClose={onCloseExport}
+		bind:onOpen={onOpenExport}
+		logs={$filteredLogs}
+		isLoadingLogs={$logs.isLoading}
+		isLogsError={$logs.isError}
+		isFetchingLogs={$logs.isFetching}
+	/>
+{/if}

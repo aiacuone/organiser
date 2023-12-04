@@ -10,7 +10,7 @@
 	} from '$lib/utils/strings';
 	import Icon from '@iconify/svelte';
 	import Button from './Button.svelte';
-	import Dialog from './Dialog.svelte';
+	import Dialog from './Dialog/Dialog.svelte';
 	import Input from './Input.svelte';
 	import { useQuery } from '@sveltestack/svelte-query';
 	import { selectedDate } from '$lib/stores/dates';
@@ -47,7 +47,8 @@
 				.catch((err) => console.log(err));
 		},
 		{
-			initialData: spaces
+			initialData: spaces,
+			refetchOnMount: false
 		}
 	);
 

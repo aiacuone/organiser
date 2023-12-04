@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import Button from '$lib/components/Button.svelte';
+	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
 	import Important from '$lib/components/Logs/Important.svelte';
 	import Question from '$lib/components/Logs/Question.svelte';
 	import Time from '$lib/components/Logs/Time.svelte';
 	import Todo from '$lib/components/Logs/Todo.svelte';
 	import Search from '$lib/components/Search.svelte';
+	import { icons } from '$lib/general/icons';
 	import { viewport } from '$lib/hooks';
 	import { searchValue } from '$lib/stores';
-	import { LogType_enum, allLogs, searchableInputs } from '$lib/types';
+	import { LogType_enum, allLogs, searchableInputs, type Log_int } from '$lib/types';
 	import { arraysAreEqual } from '$lib/utils/arrays';
 	import {
 		arrayToSearchParamsString,
@@ -16,6 +19,7 @@
 		replaceAllSpacesWithHyphens,
 		camelCaseToLower
 	} from '$lib/utils/strings';
+	import Icon from '@iconify/svelte';
 	import { useInfiniteQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import axios from 'axios';
 	import { onMount } from 'svelte';
@@ -152,6 +156,15 @@
 			$filters = $filters.filter((filter) => filter[0] !== 'search');
 		}
 	};
+	let onCloseExport: () => void;
+	let onOpenExport: () => void;
+
+	const reducedPages = derived(filteredLogsQuery, ($filteredLogsQuery) =>
+		$filteredLogsQuery.data?.pages.reduce(
+			(acc, page) => [...acc, ...page.data.logs],
+			[] as Log_int[]
+		)
+	);
 </script>
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
@@ -180,6 +193,9 @@
 						</label>
 					{/each}
 				</div>
+				<Button onClick={onOpenExport}>
+					<Icon icon={icons.export} height="20px" class="text-gray-400" />
+				</Button>
 			</div>
 			<div class="hstack gap-2 flex-wrap center">
 				{#each allLogs as key, i}
@@ -245,3 +261,14 @@
 		</div>
 	</div>
 </div>
+
+<ExportDialog
+	bind:onClose={onCloseExport}
+	bind:onOpen={onOpenExport}
+	logsData={$filteredLogsQuery.data}
+	isLoadingLogs={$filteredLogsQuery.isLoading}
+	isLogsError={$filteredLogsQuery.isError}
+	isFetchingLogs={$filteredLogsQuery.isFetching}
+	hasNextLogsPage={$filteredLogsQuery.hasNextPage}
+	getNextLogsPage={onGetNextPage}
+/>

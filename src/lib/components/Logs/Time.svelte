@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { icons } from '$lib/general/icons';
-	import Dialog from '../Dialog.svelte';
+	import Dialog from '../Dialog/Dialog.svelte';
 	import LogContainer from './LogContainer.svelte';
 	import BottomOptions from './BottomOptions.svelte';
 	import Textarea from '../Textarea.svelte';

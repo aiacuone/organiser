@@ -12,7 +12,7 @@
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import Input from '../Input.svelte';
 	import { currentlyEditing, titles } from '$lib/stores';
-	import Dialog from '../Dialog.svelte';
+	import Dialog from '../Dialog/Dialog.svelte';
 	import Button from '../Button.svelte';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import type { Readable } from 'svelte/motion';

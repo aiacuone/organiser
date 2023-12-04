@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from './Button.svelte';
-	import Dialog from './Dialog.svelte';
+	import Dialog from './Dialog/Dialog.svelte';
 	export let onConfirm: () => void;
 	export let onOpen: () => void;
 
