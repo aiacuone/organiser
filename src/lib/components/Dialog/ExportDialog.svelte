@@ -47,7 +47,10 @@
 
 	let typeFilter: Record<LogType_enum, boolean> = { ...defaultTypeFilterData };
 
-	const logKeyValueSortFunction = ([keyA], [keyB]) => {
+	const logKeyValueSortFunction: (a: [string, boolean], b: [string, boolean]) => number = (
+		[keyA],
+		[keyB]
+	) => {
 		const keyOrder = [
 			Log_enum.title,
 			Log_enum.reference,
