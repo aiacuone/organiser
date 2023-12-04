@@ -47,7 +47,7 @@
 
 	let typeFilter: Record<LogType_enum, boolean> = { ...defaultTypeFilterData };
 
-	const logKeyValueSortFunction: (a: [string, boolean], b: [string, boolean]) => number = (
+	const logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number = (
 		[keyA],
 		[keyB]
 	) => {
@@ -135,7 +135,12 @@
 				Error
 			{:else if logsData?.pages}
 				{#each logsData.pages as page}
-					<ExportDialogLogs logs={page.data.logs} {logKeyValueSortFunction} {logKeyValueFilter} />
+					<ExportDialogLogs
+						logs={page.data.logs}
+						{logKeyValueSortFunction}
+						{logKeyValueFilter}
+						{typeFilter}
+					/>
 				{/each}
 				<div class="center text-gray-300">
 					{#if isFetchingLogs}
@@ -147,7 +152,7 @@
 					{/if}
 				</div>
 			{:else if logs}
-				<ExportDialogLogs {logs} {logKeyValueSortFunction} {logKeyValueFilter} />
+				<ExportDialogLogs {logs} {logKeyValueSortFunction} {logKeyValueFilter} {typeFilter} />
 			{/if}
 		</div>
 		<div class="hstack center gap-2" bind:clientHeight={footerButtonsContainerHeight}>

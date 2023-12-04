@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { logEnumNames, type Log_enum, type Log_int } from '$lib/types';
+	import { logEnumNames, type Log_enum, type Log_int, LogType_enum } from '$lib/types';
 
 	export let logs: Log_int[];
 	export let logKeyValueFilter: Record<Log_enum, boolean>;
-	export let logKeyValueSortFunction: (a: [string, boolean], b: [string, boolean]) => number;
+	export let logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number;
+	export let typeFilter: Record<LogType_enum, boolean>;
 </script>
 
-{#each logs as log}
+{#each logs.filter(({ type }) => typeFilter[type]) as log}
 	<div class="stack gap-2 log-stack p-2">
 		{#each Object.entries(log)
 			.filter(([key, value]) => logKeyValueFilter[key] && value)
