@@ -80,9 +80,10 @@
 	const onCsv = () => {
 		downloadAsCSV(logsContainer.innerText);
 	};
+	let dialog: HTMLDialogElement;
 </script>
 
-<Dialog bind:onOpen bind:onClose _class="h-full w-full max-w-screen-lg">
+<Dialog bind:dialog bind:onOpen bind:onClose _class="h-full w-full max-w-screen-lg">
 	<div bind:clientHeight={containerHeight} class="stack gap-3 w-full h-full text-sm">
 		<header class="text-center" bind:clientHeight={headerHeight}>Export/Copy</header>
 		<div class="stack gap-2" bind:clientHeight={buttonsContainerHeight}>
@@ -93,16 +94,20 @@
 					})
 					.sort(logKeyValueSortFunction) as [key]}
 					<div class="hstack gap-2">
-						<p class="capitalize flex-1">{logEnumNames[key]}</p>
-						<input type="checkbox" bind:checked={logKeyValueFilter[key]} />
+						<label>
+							{logEnumNames[key]}
+							<input type="checkbox" bind:checked={logKeyValueFilter[key]} />
+						</label>
 					</div>
 				{/each}
 			</div>
 			<div class="flex flex-wrap gap-y-1 gap-x-2">
 				{#each Object.entries(typeFilter) as [key]}
 					<div class="hstack gap-2">
-						<p class="capitalize flex-1">{key}</p>
-						<input type="checkbox" bind:checked={typeFilter[key]} />
+						<label>
+							{key}
+							<input type="checkbox" bind:checked={typeFilter[key]} />
+						</label>
 					</div>
 				{/each}
 			</div>
@@ -122,7 +127,7 @@
 		<div class="hstack center gap-2" bind:clientHeight={footerButtonsContainerHeight}>
 			<Button onClick={onCopy} _class="self-center">Copy</Button>
 			<Button onClick={onCsv} _class="self-center">CSV</Button>
-			<Button onClick={onClose} _class="self-center">Close</Button>
+			<Button onClick={() => dialog.close()} _class="self-center">Close</Button>
 		</div>
 	</div>
 </Dialog>
