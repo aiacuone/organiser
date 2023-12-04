@@ -3,10 +3,19 @@
 	import Dialog from './Dialog.svelte';
 	import { logEnumNames, Log_enum, type Log_int, LogType_enum } from '$lib/types';
 	import { copyToClipboard, downloadAsCSV } from '$lib/utils';
+	import { viewport } from '$lib/hooks';
+	import type { InfiniteData } from '@sveltestack/svelte-query';
+	import type { AxiosResponse } from 'axios';
+	import ExportDialogLogs from './ExportDialogLogs.svelte';
 
 	export let onOpen: () => void;
 	export let onClose: () => void;
-	export let logs: Log_int[];
+	export let isLoadingLogs: boolean;
+	export let isFetchingLogs: boolean;
+	export let isLogsError: boolean;
+	export let logsData: InfiniteData<AxiosResponse<any, any>> | undefined;
+	export let hasNextLogsPage: boolean | undefined = undefined;
+	export let getNextLogsPage: (() => void) | undefined = undefined;
 
 	const defaultLogKeyValueFilter: Record<Log_enum, boolean> = {
 		title: true,
@@ -113,16 +122,29 @@
 			</div>
 		</div>
 
-		<div class="stack flex-1 overflow-y-scroll" bind:this={logsContainer}>
-			{#each logs.filter((log) => typeFilter[log.type]) as log}
-				<div class="stack gap-2 log-stack p-2">
-					{#each Object.entries(log)
-						.filter(([key, value]) => logKeyValueFilter[key] && value)
-						.sort(logKeyValueSortFunction) as [key, value]}
-						<p class="capitalize"><b>{logEnumNames[key]}</b>: {value}</p>
-					{/each}
+		<div class="stack flex-1 overflow-y-scroll hide-scrollbar" bind:this={logsContainer}>
+			{#if isLoadingLogs}
+				{#each Array(5) as _}
+					<div class="bg-neutral-100 rounded-sm h-[120px] w-full" />
+				{/each}
+			{:else if isLogsError}
+				Error
+			{:else if logsData?.pages}
+				{#each logsData.pages as page}
+					<ExportDialogLogs logs={page.data.logs} {logKeyValueSortFunction} {logKeyValueFilter} />
+				{/each}
+				<div class="center text-gray-300">
+					{#if isFetchingLogs}
+						Loading more...
+					{:else if hasNextLogsPage}
+						<div use:viewport on:enterViewport={getNextLogsPage} class="h-10 w-full" />
+					{:else}
+						{logsData.pages[0].data.total} Results
+					{/if}
 				</div>
-			{/each}
+			{:else if logsData.length}
+				<ExportDialogLogs logs={logsData} {logKeyValueSortFunction} {logKeyValueFilter} />
+			{/if}
 		</div>
 		<div class="hstack center gap-2" bind:clientHeight={footerButtonsContainerHeight}>
 			<Button onClick={onCopy} _class="self-center">Copy</Button>
@@ -131,9 +153,3 @@
 		</div>
 	</div>
 </Dialog>
-
-<style>
-	.log-stack:nth-child(odd) {
-		background: rgb(246, 246, 246);
-	}
-</style>

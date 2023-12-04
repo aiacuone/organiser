@@ -262,6 +262,13 @@
 	</div>
 </div>
 
-{#if $reducedPages && $reducedPages}
-	<ExportDialog bind:onClose={onCloseExport} bind:onOpen={onOpenExport} logs={$reducedPages} />
-{/if}
+<ExportDialog
+	bind:onClose={onCloseExport}
+	bind:onOpen={onOpenExport}
+	logsData={$filteredLogsQuery.data}
+	isLoadingLogs={$filteredLogsQuery.isLoading}
+	isLogsError={$filteredLogsQuery.isError}
+	isFetchingLogs={$filteredLogsQuery.isFetching}
+	hasNextLogsPage={$filteredLogsQuery.hasNextPage}
+	getNextLogsPage={onGetNextPage}
+/>

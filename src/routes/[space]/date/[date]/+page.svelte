@@ -376,5 +376,12 @@
 </svelte:head>
 
 {#if $filteredLogs && $filteredLogs.length}
-	<ExportDialog bind:onClose={onCloseExport} bind:onOpen={onOpenExport} logs={$filteredLogs} />
+	<ExportDialog
+		bind:onClose={onCloseExport}
+		bind:onOpen={onOpenExport}
+		logsData={$filteredLogs}
+		isLoadingLogs={$logs.isLoading}
+		isLogsError={$logs.isError}
+		isFetchingLogs={$logs.isFetching}
+	/>
 {/if}
