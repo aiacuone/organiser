@@ -119,7 +119,7 @@
 					{#each Object.entries(log)
 						.filter(([key, value]) => logKeyValueFilter[key] && value)
 						.sort(logKeyValueSortFunction) as [key, value]}
-						<p><b>{logEnumNames[key]}</b>: {value}</p>
+						<p class="capitalize"><b>{logEnumNames[key]}</b>: {value}</p>
 					{/each}
 				</div>
 			{/each}
