@@ -28,5 +28,8 @@ export const icons = {
 	home: 'ic:sharp-home',
 	date: 'uiw:date',
 	export: 'ph:export-thin',
-	back: 'lets-icons:back-light'
+	back: 'lets-icons:back-light',
+	all: 'material-symbols:done-all',
+	cross: 'system-uicons:cross',
+	save: 'bi:save'
 };
