@@ -159,11 +159,6 @@
 	let onCloseExport: () => void;
 	let onOpenExport: () => void;
 
-	const _onOpenExport = () => {
-		console.log('_onOpenExport');
-		onOpenExport();
-	};
-
 	const reducedPages = derived(filteredLogsQuery, ($filteredLogsQuery) =>
 		$filteredLogsQuery.data?.pages.reduce(
 			(acc, page) => [...acc, ...page.data.logs],
@@ -198,7 +193,7 @@
 						</label>
 					{/each}
 				</div>
-				<Button onClick={_onOpenExport}>
+				<Button onClick={onOpenExport}>
 					<Icon icon={icons.export} height="20px" class="text-gray-400" />
 				</Button>
 			</div>
