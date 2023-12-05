@@ -202,7 +202,7 @@
 							onAutoFill={onTitleAutoFill}
 						/>
 					{/if}
-					{#if !isEditing && !reference}{''}{:else}
+					{#if $isEditing || reference}
 						<Input
 							bind:value={reference}
 							placeholder="Reference"

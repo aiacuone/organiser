@@ -14,8 +14,8 @@
 	import { LogType_enum, allLogs, searchableInputs, type Log_int } from '$lib/types';
 	import { arraysAreEqual } from '$lib/utils/arrays';
 	import {
-		arrayToSearchParamsString,
-		searchParamsStringToArray,
+		entriesArrayToSearchParamsString,
+		searchParamsStringToEntriesArray,
 		replaceAllSpacesWithHyphens,
 		camelCaseToLower
 	} from '$lib/utils/strings';
@@ -32,7 +32,7 @@
 
 		const string = searchParams.toString();
 
-		const array = searchParamsStringToArray(searchParams);
+		const array = searchParamsStringToEntriesArray(searchParams);
 
 		return { string, array };
 	});
@@ -40,7 +40,7 @@
 	const filters: Writable<Array<Array<string>>> = writable($searchParams.array);
 
 	const filtersValues = derived(filters, ($filters) => {
-		const string = arrayToSearchParamsString($filters);
+		const string = entriesArrayToSearchParamsString($filters);
 		return { string };
 	});
 
@@ -108,7 +108,7 @@
 	});
 
 	const updatedStateAndInvalidate = () => {
-		$filters = searchParamsStringToArray($page.url.searchParams);
+		$filters = searchParamsStringToEntriesArray($page.url.searchParams);
 		queryClient.invalidateQueries('filteredLogs');
 	};
 	$: $page.url, updatedStateAndInvalidate();

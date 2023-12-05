@@ -3,12 +3,15 @@
 
 	export let overlayClickClose: boolean = true;
 	export let dialog: HTMLDialogElement | undefined = undefined;
-
+	export let preventClose: boolean = false;
+	export let isOpen: boolean = false;
 	export const onOpen = () => {
+		isOpen = true;
 		dialog?.showModal();
 	};
-
 	export let onClose = () => {
+		isOpen = false;
+		if (preventClose) return;
 		if (dialog && dialog.open && overlayClickClose) {
 			dialog?.close();
 		}

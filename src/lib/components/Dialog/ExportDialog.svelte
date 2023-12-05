@@ -200,9 +200,17 @@
 			label: 'Close'
 		}
 	];
+
+	let isDefaultSelectionDialogOpen: boolean;
 </script>
 
-<Dialog bind:dialog bind:onOpen bind:onClose _class="h-full w-full max-w-screen-lg">
+<Dialog
+	bind:dialog
+	bind:onOpen
+	bind:onClose
+	_class="h-full w-full max-w-screen-lg"
+	preventClose={isDefaultSelectionDialogOpen}
+>
 	<div bind:clientHeight={containerHeight} class="stack gap-3 w-full h-full text-sm">
 		<header class="text-center" bind:clientHeight={headerHeight}>Export/Copy</header>
 		<div class="stack gap-2" bind:clientHeight={buttonsContainerHeight}>
@@ -278,7 +286,11 @@
 	</div>
 </Dialog>
 
-<Dialog bind:onOpen={onOpenDefaultSelection} bind:onClose={onCloseDefaultSelection}>
+<Dialog
+	bind:onOpen={onOpenDefaultSelection}
+	bind:onClose={onCloseDefaultSelection}
+	bind:isOpen={isDefaultSelectionDialogOpen}
+>
 	<div class="stack gap-2">
 		<p>Are you sure you want to create a new default selection?</p>
 		<div class="hstack gap-5 center">
