@@ -297,10 +297,12 @@
 					{:else if type === LogType_enum.todo && log.priority && (log.todos || log.content)}
 						<Todo
 							{...rest}
+							todos={[
+								...(log.todos ?? []),
+								{ content: log.content ?? '', isCompleted: log.isCompleted ?? false }
+							]}
 							priority={log.priority}
 							isCompleted={log.isCompleted}
-							content={log.content}
-							bullets={log.bullets}
 						/>
 					{:else if type === LogType_enum.question && log.importance && log.question}
 						<Question {...rest} importance={log.importance} content={log.content} />
