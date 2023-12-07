@@ -1,17 +1,5 @@
-export enum Time_enum {
-	Today = 'today',
-	Yesterday = 'yesterday',
-	Date = 'date'
-}
-
-export interface Option_int {
-	name: Time_enum;
-	href: string;
-}
-
 export interface SpaceData_int {
 	spaces: string[];
-	times: Array<Option_int>;
 	space: string;
 	date: string;
 	initialLogNotifications: Log_int[];
@@ -33,6 +21,7 @@ export interface Log_int {
 	lastUpdated?: Date;
 	question?: string;
 	answer?: string;
+	todos?: Todo_int[];
 }
 export enum Log_enum {
 	id = 'id',
@@ -79,31 +68,41 @@ export const logEnumNames: Record<Log_enum, string> = {
 
 export const allLogs = Object.keys(LogType_enum).map((key) => key);
 
-export interface LogBase_int<T = string> {
+export interface LogBase_int {
 	id: string;
 	date: Date;
-	content: T;
-}
-export interface TimeLog_int extends LogBase_int<string[]> {
+	space: string;
 	title: string;
 	reference: string;
 	time: number;
+}
+export interface TimeLog_int extends LogBase_int {
 	type: LogType_enum.time;
+	bullets: string[];
 }
 
-export interface Todo_int extends LogBase_int {
+export interface Todo_int {
 	isCompleted: boolean;
-	priority: 1 | 2 | 3;
+	content: string;
+}
+
+export interface TodoLog_int extends LogBase_int {
 	type: LogType_enum.todo;
+	isCompleted: boolean;
+	rating: 1 | 2 | 3;
+	todos: Todo_int[];
 }
 
 export interface Important_int extends LogBase_int {
-	importance: 1 | 2 | 3;
 	type: LogType_enum.important;
+	rating: 1 | 2 | 3;
+	fact: string;
 }
 export interface Question_int extends LogBase_int {
-	importance: 1 | 2 | 3;
 	type: LogType_enum.question;
+	rating: 1 | 2 | 3;
+	question: string;
+	answer: string;
 }
 
 export const searchableInputs = [

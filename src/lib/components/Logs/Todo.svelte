@@ -1,12 +1,10 @@
 <script lang="ts">
 	import { icons } from '$lib/general/icons';
-	import Icon from '@iconify/svelte';
 	import BottomOptions from './BottomOptions.svelte';
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
-	import Textarea from '../Textarea.svelte';
 	import { getContext } from 'svelte';
-	import { LogType_enum, type Log_int } from '$lib/types';
+	import { LogType_enum, type Log_int, type Todo_int } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { page } from '$app/stores';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
@@ -14,8 +12,9 @@
 	import Input from '../Input.svelte';
 	import { currentlyEditing, titles } from '$lib/stores';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
-	import { debounce } from '$lib/utils/general';
 	import type { Readable } from 'svelte/motion';
+	import toast from 'svelte-french-toast';
+	import LogListItems from './LogListItems.svelte';
 
 	export let title: string;
 	export let reference: string = '';
@@ -24,15 +23,16 @@
 	export let id: string;
 	export let priority: number;
 	export let isCompleted: boolean = false;
-	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
 	export let editOnMount: boolean = false;
+	export let todos: Todo_int[] = [];
 
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalContent = content;
 	let originalPriority = priority;
 	let originalIsCompleted = isCompleted;
+	let originalTodos = [...todos];
 
 	let isEditing: Readable<boolean>;
 
@@ -46,21 +46,6 @@
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
 
-	const onCheckboxClick = () => {
-		isCompleted = !isCompleted;
-		debounce(() =>
-			$updateMutation.mutate({
-				id,
-				content,
-				priority,
-				date,
-				type: LogType_enum.todo,
-				space: $page.params.space,
-				isCompleted
-			})
-		);
-	};
-
 	const onAccept = async () => {
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
@@ -68,14 +53,16 @@
 				priority,
 				isCompleted,
 				title,
-				reference
+				reference,
+				todos
 			},
 			originalValues: {
 				content: originalContent,
 				priority: originalPriority,
 				isCompleted: originalIsCompleted,
 				title: originalTitle,
-				reference: originalReference
+				reference: originalReference,
+				todos: originalTodos
 			}
 		});
 
@@ -91,6 +78,8 @@
 			logDate = _date;
 		}
 
+		todos = todos.filter((c) => c);
+
 		try {
 			await $updateMutation.mutate({
 				id,
@@ -102,7 +91,8 @@
 				isCompleted,
 				lastUpdated: new Date(),
 				title,
-				reference
+				reference,
+				todos
 			});
 			onResetNewLogType && onResetNewLogType();
 			originalTitle = title;
@@ -110,7 +100,10 @@
 			originalContent = content;
 			originalPriority = priority;
 			originalIsCompleted = isCompleted;
-		} catch (error) {}
+			originalTodos = todos;
+		} catch (error) {
+			toast.error('Issue updating state');
+		}
 		$currentlyEditing = null;
 	};
 
@@ -127,6 +120,19 @@
 		max: 3,
 		onIncrement: () => (priority = priority + 1),
 		onDecrement: () => (priority = priority - 1)
+	};
+
+	const onAddBullet = () => {
+		$currentlyEditing = id;
+		todos = [...todos, { isCompleted: false, content: '' }];
+	};
+
+	const onTextareaEnterKeydown: () => void = () => {
+		onAddBullet();
+	};
+
+	const onDeleteBullet = (index: number) => {
+		todos = todos.filter((_, i) => i !== index);
 	};
 </script>
 
@@ -165,22 +171,16 @@
 				{/if}
 			</div>
 		{/if}
-		<div class="hstack gap-4 items-center">
+		<div class="hstack items-center">
 			<IconWithRating icon={icons.todo} rating={priority} />
-			<button
-				on:click={onCheckboxClick}
-				class="center border-2 border-gray-300 w-[30px] h-[30px] rounded-md"
-			>
-				{#if isCompleted}
-					<Icon icon={icons.tickBold} height="15px" class="text-green-500" />
-				{/if}
-			</button>
 			<div class="flex-1">
-				{#if $isEditing}
-					<Textarea bind:value={content} autofocus={inputAutoFocus} />
-				{:else}
-					<p class="text-sm">{content}</p>
-				{/if}
+				<LogListItems
+					bind:todos
+					{isEditing}
+					onEnterKeydown={onTextareaEnterKeydown}
+					{onDeleteBullet}
+					bulletType="checkbox"
+				/>
 			</div>
 		</div>
 		<BottomOptions
@@ -193,6 +193,7 @@
 			incrementDecrementValue={priority}
 			showIncrementDecrement={$isEditing}
 			{lastUpdated}
+			{onAddBullet}
 		/>
 	</div>
 </LogContainer>

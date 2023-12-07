@@ -3,19 +3,19 @@
 	import Dialog from '../Dialog/Dialog.svelte';
 	import LogContainer from './LogContainer.svelte';
 	import BottomOptions from './BottomOptions.svelte';
-	import Textarea from '../Textarea.svelte';
-	import { getContext, onMount } from 'svelte';
+	import { getContext } from 'svelte';
 	import { LogType_enum, type Log_int } from '$lib/types';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import Input from '../Input.svelte';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
-	import Icon from '@iconify/svelte';
 	import { currentlyEditing, titles } from '$lib/stores';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import { debounce } from '$lib/utils/general';
 	import type { Readable } from 'svelte/motion';
+	import LogListItems from './LogListItems.svelte';
+	import toast from 'svelte-french-toast';
 
 	export let date: Date;
 	export let bullets: string[] = [];
@@ -102,7 +102,7 @@
 			originalTime = time;
 			lastUpdated = new Date();
 		} catch (error) {
-			console.log({ error });
+			toast.error('There was an issue updating the log');
 		}
 
 		onResetNewLogType && onResetNewLogType();
@@ -205,42 +205,19 @@
 					{#if $isEditing || reference}
 						<Input
 							bind:value={reference}
+							bind:changeInputValue={changeReferenceInputValue}
 							placeholder="Reference"
 							isDisabled={!$isEditing}
-							bind:changeInputValue={changeReferenceInputValue}
 						/>
 					{/if}
 				</div>
 			{/if}
-			<ul class="ml-5 stack">
-				{#each bullets as _, index}
-					<li>
-						<div class="flex gap-2 min-h-[20px]">
-							<Textarea
-								className="flex-1"
-								bind:value={bullets[index]}
-								isDisabled={!$isEditing}
-								onEnterKeydown={onTextareaEnterKeydown}
-								autofocus={index > 0}
-							/>
-							<div class="min-w-[40px] hidden sm:flex align-center relative">
-								{#if $isEditing}
-									<button class=" absolute top-0" on:click={() => onDeleteBullet(index)}>
-										<Icon icon={icons.delete} class="text-gray-300" height="18px" />
-									</button>
-								{/if}
-							</div>
-						</div>
-						<div class="mt-1 flex sm:hidden">
-							{#if $isEditing}
-								<button class="flex sm:hidden" on:click={() => onDeleteBullet(index)}>
-									<Icon icon={icons.delete} class="text-gray-300" height="18px" />
-								</button>
-							{/if}
-						</div>
-					</li>
-				{/each}
-			</ul>
+			<LogListItems
+				{bullets}
+				{isEditing}
+				onEnterKeydown={onTextareaEnterKeydown}
+				{onDeleteBullet}
+			/>
 			<div class="hstack mt-2">
 				<BottomOptions
 					{incrementDecrementProps}
@@ -265,9 +242,3 @@
 		<button on:click={onClose}>Close</button>
 	</div>
 </Dialog>
-
-<style>
-	ul {
-		list-style-type: disc;
-	}
-</style>

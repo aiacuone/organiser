@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Time_enum, LogType_enum, type SpaceData_int, type Log_int } from '$lib/types/logs';
+	import { LogType_enum, type SpaceData_int, type Log_int } from '$lib/types/logs';
 	import { onMount, setContext } from 'svelte';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString, getDayFromHyphenatedString } from '$lib/utils';
@@ -29,7 +29,6 @@
 	import { browser } from '$app/environment';
 
 	interface PageData extends SpaceData_int {
-		time: Time_enum;
 		date: string;
 		space: string;
 		titles: string[];
@@ -295,12 +294,13 @@
 					{@const { type, ...rest } = log}
 					{#if type === LogType_enum.important && log.importance && log.content}
 						<Important {...rest} importance={log.importance} content={log.content} />
-					{:else if type === LogType_enum.todo && log.priority && log.content}
+					{:else if type === LogType_enum.todo && log.priority && (log.todos || log.content)}
 						<Todo
 							{...rest}
 							priority={log.priority}
 							isCompleted={log.isCompleted}
 							content={log.content}
+							bullets={log.bullets}
 						/>
 					{:else if type === LogType_enum.question && log.importance && log.question}
 						<Question {...rest} importance={log.importance} content={log.content} />

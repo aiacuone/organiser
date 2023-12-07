@@ -29,7 +29,8 @@
 		bullets: [''],
 		question: '',
 		date,
-		editOnMount: true
+		editOnMount: true,
+		todos: [{ content: '', isCompleted: false }]
 	};
 </script>
 

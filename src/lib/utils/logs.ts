@@ -1,3 +1,5 @@
+import type { Todo_int } from '$lib/types';
+
 interface values_int {
 	title?: string;
 	reference?: string;
@@ -9,6 +11,7 @@ interface values_int {
 	isCompleted?: boolean;
 	question?: string;
 	answer?: string;
+	todos?: Todo_int[];
 }
 
 export const getHaveValuesChanged = ({
