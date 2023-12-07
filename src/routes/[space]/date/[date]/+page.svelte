@@ -295,12 +295,15 @@
 					{#if type === LogType_enum.important && log.importance && log.content}
 						<Important {...rest} importance={log.importance} content={log.content} />
 					{:else if type === LogType_enum.todo && log.priority && (log.todos || log.content)}
+						{@const previousShapeTodo = log.content && {
+							content: log.content,
+							isCompleted: log.isCompleted
+						}}
 						<Todo
 							{...rest}
-							todos={[
-								...(log.todos ?? []),
-								{ content: log.content ?? '', isCompleted: log.isCompleted ?? false }
-							]}
+							todos={previousShapeTodo
+								? [...log.todos, { content: log.content, isCompleted: log.isCompleted }]
+								: log.todos}
 							priority={log.priority}
 							isCompleted={log.isCompleted}
 						/>

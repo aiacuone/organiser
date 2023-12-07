@@ -33,7 +33,8 @@ export const getHaveValuesChanged = ({
 		values.importance !== originalValues.importance ||
 		values.isCompleted !== originalValues.isCompleted ||
 		values.question !== originalValues.question ||
-		values.answer !== originalValues.answer
+		values.answer !== originalValues.answer ||
+		values.todos !== originalValues.todos
 	);
 };
 

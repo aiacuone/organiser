@@ -11,15 +11,23 @@
 	export let onEnterKeydown: () => void;
 	export let onDeleteBullet: (index: number) => void;
 	export let bulletType: 'disc' | 'circle' | 'square' | 'checkbox' = 'disc';
+	export let onEdit: () => void;
+
+	const onCheckboxChange = () => {
+		onEdit();
+	};
 </script>
 
 <ul class="ml-5 stack" style={`list-style-type:${bulletType === 'checkbox' ? 'none' : bulletType}`}>
 	{#each todos ?? bullets as _, index}
 		<li>
 			<div class="hstack">
-				{#if bullets}
-					<input type="checkbox" class="mr-2" />
-				{/if}
+				<input
+					type="checkbox"
+					class="mr-2 {todos.length ? 'block' : 'hidden'}"
+					on:change={onCheckboxChange}
+					bind:checked={todos[index].isCompleted}
+				/>
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="{bullets.length ? 'block' : 'hidden'} flex-1">
 						<Textarea

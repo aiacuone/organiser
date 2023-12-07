@@ -78,7 +78,7 @@
 			logDate = _date;
 		}
 
-		todos = todos.filter((c) => c);
+		todos = todos.filter(({ content }) => content);
 
 		try {
 			await $updateMutation.mutate({
@@ -100,7 +100,7 @@
 			originalContent = content;
 			originalPriority = priority;
 			originalIsCompleted = isCompleted;
-			originalTodos = todos;
+			originalTodos = [...todos];
 		} catch (error) {
 			toast.error('Issue updating state');
 		}
@@ -113,6 +113,9 @@
 		title = originalTitle;
 		reference = originalReference;
 		content = originalContent;
+		priority = originalPriority;
+		isCompleted = originalIsCompleted;
+		todos = [...originalTodos];
 	};
 
 	const incrementDecrementProps = {
@@ -132,7 +135,7 @@
 	};
 
 	const onDeleteBullet = (index: number) => {
-		todos = todos.filter((_, i) => i !== index);
+		todos = [...todos].filter((_, i) => i !== index);
 	};
 </script>
 
@@ -148,7 +151,7 @@
 	{changeReferenceInputValue}
 	{editOnMount}
 >
-	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-4">
+	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-1">
 		{#if title || reference || $isEditing}
 			<div class="stack gap-1">
 				{#if !$isEditing && !title}{''}{:else}
@@ -180,6 +183,7 @@
 					onEnterKeydown={onTextareaEnterKeydown}
 					{onDeleteBullet}
 					bulletType="checkbox"
+					{onEdit}
 				/>
 			</div>
 		</div>
