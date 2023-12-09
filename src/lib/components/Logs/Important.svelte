@@ -22,7 +22,7 @@
 	export let date: Date;
 	export let content: string;
 	export let id: string;
-	export let importance: number;
+	export let rating: 1 | 2 | 3;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
 	export let editOnMount: boolean = false;
@@ -30,7 +30,7 @@
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalContent = content;
-	let originalImportance = importance;
+	let originalRating = rating;
 
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
@@ -55,13 +55,13 @@
 				title,
 				reference,
 				content,
-				importance
+				rating
 			},
 			originalValues: {
 				title: originalTitle,
 				reference: originalReference,
 				content: originalContent,
-				importance: originalImportance
+				rating: originalRating
 			}
 		});
 
@@ -83,7 +83,7 @@
 			title,
 			reference,
 			content,
-			importance,
+			rating,
 			date: logDate,
 			type: LogType_enum.important,
 			space: $page.params.space,
@@ -92,7 +92,7 @@
 		originalTitle = title;
 		originalReference = reference;
 		originalContent = content;
-		originalImportance = importance;
+		originalRating = rating;
 
 		onResetNewLogType && onResetNewLogType();
 	};
@@ -106,8 +106,8 @@
 	const incrementDecrementProps = {
 		min: 0,
 		max: 3,
-		onIncrement: () => (importance = importance + 1),
-		onDecrement: () => (importance = importance - 1)
+		onIncrement: () => (rating = rating + 1),
+		onDecrement: () => (rating = rating - 1)
 	};
 
 	let isOpen: boolean;
@@ -149,7 +149,7 @@
 			</div>
 		{/if}
 		<div class="hstack center gap-2">
-			<IconWithRating rating={importance} icon={icons.important} />
+			<IconWithRating {rating} icon={icons.important} />
 			<div class="flex-1">
 				{#if $isEditing}
 					<Textarea bind:value={content} autofocus={inputAutoFocus} />
@@ -167,7 +167,7 @@
 			isEditing={$isEditing}
 			{onAccept}
 			{incrementDecrementProps}
-			incrementDecrementValue={importance}
+			incrementDecrementValue={rating}
 			showIncrementDecrement={$isEditing}
 			{lastUpdated}
 		/>

@@ -14,7 +14,7 @@
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import { debounce } from '$lib/utils/general';
 	import type { Readable } from 'svelte/motion';
-	import LogListItems from './LogListItems.svelte';
+	import ListItems from './LogListItems.svelte';
 	import toast from 'svelte-french-toast';
 
 	export let date: Date;
@@ -44,6 +44,11 @@
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
 
 	let isEditing: Readable<boolean>;
+
+	const _onEdit = () => {
+		onEdit();
+		onAddBullet();
+	};
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
@@ -212,8 +217,8 @@
 					{/if}
 				</div>
 			{/if}
-			<LogListItems
-				{bullets}
+			<ListItems
+				items={bullets}
 				{isEditing}
 				onEnterKeydown={onTextareaEnterKeydown}
 				{onDeleteBullet}
@@ -226,7 +231,7 @@
 					isEditing={$isEditing}
 					onAccept={$isEditing ? onAcceptEdit : onAcceptNewBullet}
 					{onAddBullet}
-					{onEdit}
+					onEdit={_onEdit}
 					{onDelete}
 					icon={icons.clock}
 					{lastUpdated}

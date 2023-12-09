@@ -22,7 +22,7 @@
 	export let question: string;
 	export let answer: string | undefined = undefined;
 	export let id: string;
-	export let importance: number;
+	export let rating: 1 | 2 | 3;
 	export let editOnMount: boolean = false;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
@@ -33,7 +33,7 @@
 	let originalReference = reference;
 	let originalQuestion = question;
 	let originalAnswer = answer;
-	let originalImportance = importance;
+	let originalRating = rating;
 	let onEdit: () => void;
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
@@ -47,12 +47,12 @@
 			values: {
 				question,
 				answer,
-				importance
+				rating
 			},
 			originalValues: {
 				question: originalQuestion,
 				answer: originalAnswer,
-				importance: originalImportance
+				rating: originalRating
 			}
 		});
 
@@ -75,7 +75,7 @@
 			id,
 			question,
 			answer,
-			importance,
+			rating,
 			date: logDate,
 			type: LogType_enum.question,
 			space: $page.params.space,
@@ -85,7 +85,7 @@
 		originalReference = reference;
 		originalQuestion = question;
 		originalAnswer = answer;
-		originalImportance = importance;
+		originalRating = rating;
 
 		onResetNewLogType && onResetNewLogType();
 	};
@@ -100,8 +100,8 @@
 	const incrementDecrementProps = {
 		min: 1,
 		max: 3,
-		onIncrement: () => (importance = importance + 1),
-		onDecrement: () => (importance = importance - 1)
+		onIncrement: () => (rating = rating + 1),
+		onDecrement: () => (rating = rating - 1)
 	};
 	let onFocusAnswerInput: () => void;
 	const _onFocusAnswerInput = () => {
@@ -150,7 +150,7 @@
 				</div>
 			{/if}
 			<div class="hstack center gap-2">
-				<IconWithRating icon={icons.question} rating={importance} />
+				<IconWithRating icon={icons.question} {rating} />
 				<div class="stack gap-1 w-full min-h-[60px]">
 					<div class="hstack text-sm gap-1">
 						<p class="text-gray-300">Question:</p>
@@ -177,7 +177,7 @@
 				{onAccept}
 				isEditing={$isEditing}
 				{incrementDecrementProps}
-				incrementDecrementValue={importance}
+				incrementDecrementValue={rating}
 				showIncrementDecrement={$isEditing}
 				{lastUpdated}
 			/>

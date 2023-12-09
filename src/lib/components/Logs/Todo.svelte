@@ -4,7 +4,7 @@
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
 	import { getContext } from 'svelte';
-	import { LogType_enum, type Log_int, type Todo_int } from '$lib/types';
+	import { LogType_enum, Log_enum, type Log_int, type Todo_int } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { page } from '$app/stores';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
@@ -14,14 +14,14 @@
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import type { Readable } from 'svelte/motion';
 	import toast from 'svelte-french-toast';
-	import LogListItems from './LogListItems.svelte';
+	import CheckboxItems from './LogCheckboxItems.svelte';
 
 	export let title: string;
 	export let reference: string = '';
 	export let date: Date;
 	export let content: string;
 	export let id: string;
-	export let priority: number;
+	export let rating: 1 | 2 | 3;
 	export let isCompleted: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
 	export let editOnMount: boolean = false;
@@ -30,7 +30,7 @@
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalContent = content;
-	let originalPriority = priority;
+	let originalRating = rating;
 	let originalIsCompleted = isCompleted;
 	let originalTodos = [...todos];
 
@@ -49,20 +49,20 @@
 	const onAccept = async () => {
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
-				content,
-				priority,
-				isCompleted,
-				title,
-				reference,
-				todos
+				[Log_enum.content]: content,
+				[Log_enum.rating]: rating,
+				[Log_enum.isCompleted]: isCompleted,
+				[Log_enum.title]: title,
+				[Log_enum.reference]: reference,
+				[Log_enum.todos]: todos
 			},
 			originalValues: {
-				content: originalContent,
-				priority: originalPriority,
-				isCompleted: originalIsCompleted,
-				title: originalTitle,
-				reference: originalReference,
-				todos: originalTodos
+				[Log_enum.content]: originalContent,
+				[Log_enum.rating]: originalRating,
+				[Log_enum.isCompleted]: originalIsCompleted,
+				[Log_enum.title]: originalTitle,
+				[Log_enum.reference]: originalReference,
+				[Log_enum.todos]: originalTodos
 			}
 		});
 
@@ -84,7 +84,7 @@
 			await $updateMutation.mutate({
 				id,
 				content,
-				priority,
+				rating,
 				date: logDate,
 				type: LogType_enum.todo,
 				space: $page.params.space,
@@ -98,7 +98,7 @@
 			originalTitle = title;
 			originalReference = reference;
 			originalContent = content;
-			originalPriority = priority;
+			originalRating = rating;
 			originalIsCompleted = isCompleted;
 			originalTodos = [...todos];
 		} catch (error) {
@@ -113,7 +113,7 @@
 		title = originalTitle;
 		reference = originalReference;
 		content = originalContent;
-		priority = originalPriority;
+		rating = originalRating;
 		isCompleted = originalIsCompleted;
 		todos = [...originalTodos];
 	};
@@ -121,8 +121,8 @@
 	const incrementDecrementProps = {
 		min: 0,
 		max: 3,
-		onIncrement: () => (priority = priority + 1),
-		onDecrement: () => (priority = priority - 1)
+		onIncrement: () => (rating = rating + 1),
+		onDecrement: () => (rating = rating - 1)
 	};
 
 	const onAddBullet = () => {
@@ -175,14 +175,13 @@
 			</div>
 		{/if}
 		<div class="hstack items-center">
-			<IconWithRating icon={icons.todo} rating={priority} />
+			<IconWithRating icon={icons.todo} {rating} />
 			<div class="flex-1">
-				<LogListItems
-					bind:todos
+				<CheckboxItems
+					bind:checkboxes={todos}
 					{isEditing}
 					onEnterKeydown={onTextareaEnterKeydown}
 					{onDeleteBullet}
-					bulletType="checkbox"
 					{onEdit}
 				/>
 			</div>
@@ -194,7 +193,7 @@
 			isEditing={$isEditing}
 			{onAccept}
 			{incrementDecrementProps}
-			incrementDecrementValue={priority}
+			incrementDecrementValue={rating}
 			showIncrementDecrement={$isEditing}
 			{lastUpdated}
 			{onAddBullet}

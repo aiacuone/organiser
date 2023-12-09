@@ -292,9 +292,9 @@
 			{:else if $filteredLogs}
 				{#each $filteredLogs as log}
 					{@const { type, ...rest } = log}
-					{#if type === LogType_enum.important && log.importance && log.content}
+					{#if type === LogType_enum.important && log.rating && log.content}
 						<Important {...rest} importance={log.importance} content={log.content} />
-					{:else if type === LogType_enum.todo && log.priority && (log.todos || log.content)}
+					{:else if type === LogType_enum.todo && log.rating && (log.todos || log.content)}
 						{@const previousShapeTodo = log.content && {
 							content: log.content,
 							isCompleted: log.isCompleted
@@ -304,7 +304,7 @@
 							todos={previousShapeTodo
 								? [...log.todos, { content: log.content, isCompleted: log.isCompleted }]
 								: log.todos}
-							priority={log.priority}
+							rating={log.rating}
 							isCompleted={log.isCompleted}
 						/>
 					{:else if type === LogType_enum.question && log.importance && log.question}
