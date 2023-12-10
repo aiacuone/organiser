@@ -111,13 +111,13 @@
 		onDecrement: () => (rating = rating - 1)
 	};
 
-	const onAddBullet = () => {
+	const onAddItem = () => {
 		$currentlyEditing = id;
 		checkboxItems = [...checkboxItems, { isChecked: false, text: '' }];
 	};
 
 	const onTextareaEnterKeydown: () => void = () => {
-		onAddBullet();
+		onAddItem();
 	};
 
 	const onDeleteBullet = (index: number) => {
@@ -182,7 +182,7 @@
 			incrementDecrementValue={rating}
 			showIncrementDecrement={$isEditing}
 			{lastUpdated}
-			{onAddBullet}
+			{onAddItem}
 		/>
 	</div>
 </LogContainer>

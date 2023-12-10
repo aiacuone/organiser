@@ -16,9 +16,8 @@ export enum Log_enum {
 	listItems = 'listItems',
 	checkboxItems = 'checkboxItems',
 	lastUpdated = 'lastUpdated',
-	question = 'question',
-	answer = 'answer',
-	rating = 'rating'
+	rating = 'rating',
+	questions = 'questions'
 }
 
 export interface Log_int {
@@ -32,9 +31,8 @@ export interface Log_int {
 	[Log_enum.listItems]?: string[];
 	[Log_enum.checkboxItems]?: CheckboxItem_int[];
 	[Log_enum.lastUpdated]?: Date;
-	[Log_enum.question]?: string;
-	[Log_enum.answer]?: string;
 	[Log_enum.rating]?: 1 | 2 | 3;
+	[Log_enum.questions]?: QuestionItem_int[];
 	//remove these later
 	content?: string;
 	isCompleted?: boolean;
@@ -55,13 +53,11 @@ export const logEnumNames: Record<Log_enum, string> = {
 	[Log_enum.time]: 'Time',
 	[Log_enum.type]: 'Type',
 	[Log_enum.space]: 'Space',
-	// [Log_enum.isCompleted]: 'Completed',
 	[Log_enum.lastUpdated]: 'Last Updated',
-	[Log_enum.question]: 'Question',
-	[Log_enum.answer]: 'Answer',
 	[Log_enum.rating]: 'Rating',
 	[Log_enum.listItems]: 'List Items',
-	[Log_enum.checkboxItems]: 'Checkbox Items'
+	[Log_enum.checkboxItems]: 'Checkbox Items',
+	[Log_enum.questions]: 'Questions'
 };
 
 export const allLogs = Object.keys(LogType_enum).map((key) => key);
@@ -77,6 +73,11 @@ export interface LogBase_int {
 export interface CheckboxItem_int {
 	isChecked: boolean;
 	text: string;
+}
+
+export interface QuestionItem_int {
+	question: string;
+	answer?: string;
 }
 
 export interface TodoLog_int extends LogBase_int {
@@ -97,16 +98,15 @@ export interface Important_int extends LogBase_int {
 }
 export interface Question_int extends LogBase_int {
 	[Log_enum.type]: LogType_enum.question;
-	[Log_enum.question]: string;
-	[Log_enum.answer]: string;
 	[Log_enum.rating]: 1 | 2 | 3;
 }
 
 export const searchableInputs = [
 	Log_enum.title,
 	Log_enum.reference,
-	Log_enum.question,
-	Log_enum.answer
+	Log_enum.questions,
+	Log_enum.listItems,
+	Log_enum.checkboxItems
 	// todo: add list items some how?
 ];
 

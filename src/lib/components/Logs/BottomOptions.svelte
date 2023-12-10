@@ -11,7 +11,7 @@
 	export let onDelete: (() => void) | undefined = undefined;
 	export let onEdit: (() => void) | undefined = undefined;
 	export let onAccept: (() => void) | undefined = undefined;
-	export let onAddBullet: (() => void) | undefined = undefined;
+	export let onAddItem: (() => void) | undefined = undefined;
 	export let onReset: (() => void) | undefined = undefined;
 	export let incrementDecrementProps:
 		| {
@@ -34,8 +34,8 @@
 
 <div class="w-full hstack">
 	<div class="flex flex-wrap place-items-center gap-2 sm:gap-3">
-		{#if onAddBullet}
-			<AddBullet onClick={onAddBullet} />
+		{#if onAddItem}
+			<AddBullet onClick={onAddItem} />
 		{/if}
 		{#if isEditing || (incrementDecrementProps && showIncrementDecrement && incrementDecrementValue)}
 			<IncrementDecrement {...incrementDecrementProps} value={incrementDecrementValue} />

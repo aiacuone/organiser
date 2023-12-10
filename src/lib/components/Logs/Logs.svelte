@@ -15,8 +15,8 @@
 		<Important {...rest} rating={log.rating} listItems={log.listItems} />
 	{:else if type === LogType_enum.todo && log.rating && log.checkboxItems}
 		<Todo {...rest} checkboxItems={log.checkboxItems} rating={log.rating} />
-	{:else if type === LogType_enum.question && log.rating && log.question}
-		<Question question={log.question} rating={log.rating} {...rest} />
+	{:else if type === LogType_enum.question && log.rating && log.questions}
+		<Question questions={log.questions} rating={log.rating} {...rest} />
 	{:else if type === LogType_enum.time && log.listItems}
 		<Time
 			{...rest}

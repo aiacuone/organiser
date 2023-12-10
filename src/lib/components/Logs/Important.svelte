@@ -113,13 +113,13 @@
 	let isOpen: boolean;
 	let onClose: () => void;
 
-	const onAddBullet = () => {
+	const onAddItem = () => {
 		$currentlyEditing = id;
 		listItems = [...listItems, ''];
 	};
 
 	const onTextareaEnterKeydown: () => void = () => {
-		onAddBullet();
+		onAddItem();
 	};
 
 	const onDeleteItem = (index: number) => {
@@ -182,7 +182,7 @@
 			incrementDecrementValue={rating}
 			showIncrementDecrement={$isEditing}
 			{lastUpdated}
-			{onAddBullet}
+			{onAddItem}
 		/>
 	</div>
 </LogContainer>

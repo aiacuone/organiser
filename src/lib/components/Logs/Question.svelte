@@ -3,24 +3,22 @@
 	import BottomOptions from './BottomOptions.svelte';
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
-	import Textarea from '../Textarea.svelte';
 	import { getContext } from 'svelte';
 	import { page } from '$app/stores';
-	import { LogType_enum, type Log_int } from '$lib/types';
+	import { LogType_enum, type Log_int, type QuestionItem_int } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import { currentlyEditing, titles } from '$lib/stores';
 	import Input from '../Input.svelte';
-	import Button from '../Button.svelte';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import type { Readable } from 'svelte/motion';
+	import LogQuestionItems from './LogQuestionItems.svelte';
 
 	export let title: string = '';
 	export let reference: string = '';
 	export let date: Date;
-	export let question: string = '';
-	export let answer: string | undefined = undefined;
+	export let questions: QuestionItem_int[];
 	export let id: string;
 	export let rating: 1 | 2 | 3;
 	export let editOnMount: boolean = false;
@@ -31,8 +29,7 @@
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let originalTitle = title;
 	let originalReference = reference;
-	let originalQuestion = question;
-	let originalAnswer = answer;
+	let originalQuestions = [...questions];
 	let originalRating = rating;
 	let onEdit: () => void;
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
@@ -45,13 +42,11 @@
 	const onAccept = () => {
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
-				question,
-				answer,
+				questions,
 				rating
 			},
 			originalValues: {
-				question: originalQuestion,
-				answer: originalAnswer,
+				questions: originalQuestions,
 				rating: originalRating
 			}
 		});
@@ -73,8 +68,7 @@
 			title,
 			reference,
 			id,
-			question,
-			answer,
+			questions,
 			rating,
 			date: logDate,
 			type: LogType_enum.question,
@@ -83,8 +77,7 @@
 		});
 		originalTitle = title;
 		originalReference = reference;
-		originalQuestion = question;
-		originalAnswer = answer;
+		originalQuestions = questions;
 		originalRating = rating;
 
 		onResetNewLogType && onResetNewLogType();
@@ -93,8 +86,7 @@
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		question = originalQuestion;
-		answer = originalAnswer;
+		questions = originalQuestions;
 	};
 
 	const incrementDecrementProps = {
@@ -110,6 +102,11 @@
 		setTimeout(() => {
 			onFocusAnswerInput();
 		}, 0);
+	};
+
+	const onAddQuestion = () => {
+		$currentlyEditing = id;
+		questions = [...questions, { question: '' }];
 	};
 </script>
 
@@ -151,24 +148,12 @@
 			{/if}
 			<div class="hstack center gap-2">
 				<IconWithRating icon={icons.question} {rating} />
-				<div class="stack gap-1 w-full min-h-[60px]">
-					<div class="hstack text-sm gap-1">
-						<p class="text-gray-300">Question:</p>
-						<Textarea bind:value={question} className="" isDisabled={!$isEditing} />
-					</div>
-					{#if $isEditing || answer}
-						<div class="hstack text-sm gap-1">
-							<p class="text-gray-300">Answer:</p>
-							<Textarea
-								bind:value={answer}
-								isDisabled={!$isEditing}
-								bind:onFocus={onFocusAnswerInput}
-							/>
-						</div>
-					{:else}
-						<Button _class="self-start" onClick={_onFocusAnswerInput}>Answer</Button>
-					{/if}
-				</div>
+				<LogQuestionItems
+					bind:questions
+					onFocusAnswerInput={_onFocusAnswerInput}
+					{id}
+					isDisabled={!$isEditing}
+				/>
 			</div>
 			<BottomOptions
 				{onEdit}
@@ -180,6 +165,7 @@
 				incrementDecrementValue={rating}
 				showIncrementDecrement={$isEditing}
 				{lastUpdated}
+				onAddItem={onAddQuestion}
 			/>
 		</div>
 	</div>

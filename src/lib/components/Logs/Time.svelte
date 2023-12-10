@@ -116,7 +116,7 @@
 		reference = originalReference;
 	};
 
-	const onAddBullet = () => {
+	const onAddItem = () => {
 		$currentlyEditing = id;
 		listItems = [...listItems, ''];
 	};
@@ -164,13 +164,13 @@
 		onDecrement
 	};
 	const onTextareaEnterKeydown: () => void = () => {
-		onAddBullet();
+		onAddItem();
 	};
 	const onControlShitAndEnterKeydown = () => {
 		onAcceptEdit();
 	};
 	const onControlShitAndDotKeydown = () => {
-		onAddBullet();
+		onAddItem();
 	};
 </script>
 
@@ -225,7 +225,7 @@
 					{date}
 					isEditing={$isEditing}
 					onAccept={$isEditing ? onAcceptEdit : onAcceptNewBullet}
-					{onAddBullet}
+					{onAddItem}
 					{onEdit}
 					{onDelete}
 					icon={icons.clock}

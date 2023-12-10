@@ -29,7 +29,8 @@
 		date,
 		editOnMount: true,
 		listItems: [''],
-		checkboxItems: [{ text: '', isChecked: false }]
+		checkboxItems: [{ text: '', isChecked: false }],
+		questions: [{ question: '' }]
 	};
 </script>
 
