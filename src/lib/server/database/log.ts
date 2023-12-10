@@ -4,7 +4,7 @@ import { collection } from './common';
 export const getLogs = async ({
 	space,
 	date,
-	isCompleted,
+	isChecked,
 	hasAnswer,
 	limit = '10',
 	skip,
@@ -14,7 +14,7 @@ export const getLogs = async ({
 }: {
 	space?: string;
 	date?: string | Date;
-	isCompleted?: 'true' | 'false';
+	isChecked?: 'true' | 'false';
 	hasAnswer?: 'true' | 'false';
 	limit?: string;
 	skip?: string;
@@ -85,9 +85,13 @@ export const getLogs = async ({
 		});
 	}
 
-	if (isCompleted) {
-		const parsedBoolean = JSON.parse(isCompleted);
-		baseQuery.push({ $match: { isCompleted: parsedBoolean } });
+	if (isChecked) {
+		const parsedBoolean = JSON.parse(isChecked);
+		baseQuery.push({
+			$match: {
+				'checkboxItems.isChecked': { $eq: parsedBoolean }
+			}
+		});
 	}
 
 	if (hasAnswer) {
@@ -210,7 +214,7 @@ export const getAllLogNotifications = async (spaces: string[]) => {
 				},
 				{
 					$match: {
-						isCompleted: false
+						'checkboxItems.isChecked': { $eq: false }
 					}
 				},
 				{

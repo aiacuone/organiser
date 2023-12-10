@@ -81,7 +81,7 @@
 			icon: icons.todo,
 			onClick: (hasNotification: boolean) => {
 				const url = hasNotification
-					? `/${$page.params.space}/filter?type=${LogType_enum.todo}&isCompleted=false`
+					? `/${$page.params.space}/filter?type=${LogType_enum.todo}&isChecked=false`
 					: `/${$page.params.space}/filter?type=${LogType_enum.todo}`;
 				goto(url);
 			}
@@ -143,7 +143,7 @@
 					notification: todo,
 					onClick: () => {
 						onDialogClose();
-						goto(`/${space}/filter?type=todo&isCompleted=false`);
+						goto(`/${space}/filter?type=todo&isChecked=false`);
 					},
 					icon: icons.todo
 				});
