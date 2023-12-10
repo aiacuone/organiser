@@ -7,10 +7,6 @@
 	import { darkMode } from '$lib/stores';
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
-	import Important from '$lib/components/Logs/Important.svelte';
-	import Time from '$lib/components/Logs/Time.svelte';
-	import Todo from '$lib/components/Logs/Todo.svelte';
-	import Question from '$lib/components/Logs/Question.svelte';
 	import NewLog from '$lib/components/NewLog.svelte';
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import { getLogs, getTitlesAndReferences } from '$lib/api/logsLocalApi';
@@ -27,6 +23,7 @@
 	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
 	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
 	import { browser } from '$app/environment';
+	import Logs from '$lib/components/Logs/Logs.svelte';
 
 	interface PageData extends SpaceData_int {
 		date: string;
@@ -290,35 +287,7 @@
 			{:else if $logs.isError}
 				Error
 			{:else if $filteredLogs}
-				{#each $filteredLogs as log}
-					{@const { type, ...rest } = log}
-					{#if type === LogType_enum.important && log.rating && log.listItems}
-						<Important {...rest} rating={log.rating} listItems={log.listItems} />
-					{:else if type === LogType_enum.todo && log.rating && (log.checkboxItems || log.content)}
-						{@const previousShapeTodo = log.content && {
-							text: log.content,
-							isChecked: log.isCompleted
-						}}
-						<Todo
-							{...rest}
-							checkboxItems={previousShapeTodo
-								? [...log.checkboxItems, { text: log.content, isChecked: log.isCompleted }]
-								: log.checkboxItems}
-							rating={log.rating}
-							isChecked={log.isChecked}
-						/>
-					{:else if type === LogType_enum.question && log.rating && log.question}
-						<Question {...rest} />
-					{:else if type === LogType_enum.time && log.listItems}
-						<Time
-							{...rest}
-							title={log.title}
-							reference={log.reference}
-							time={log.time}
-							listItems={log.listItems}
-						/>
-					{/if}
-				{/each}
+				<Logs logs={$filteredLogs} />
 			{/if}
 		</div>
 		<div class="stack gap-2">

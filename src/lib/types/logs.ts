@@ -35,6 +35,9 @@ export interface Log_int {
 	[Log_enum.question]?: string;
 	[Log_enum.answer]?: string;
 	[Log_enum.rating]?: 1 | 2 | 3;
+	//remove these later
+	content?: string;
+	isCompleted?: boolean;
 }
 
 export enum LogType_enum {

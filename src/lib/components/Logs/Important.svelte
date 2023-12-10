@@ -17,7 +17,7 @@
 	import type { Readable } from 'svelte/motion';
 	import ListItems from './LogListItems.svelte';
 
-	export let title: string;
+	export let title: string = '';
 	export let reference: string = '';
 	export let date: Date;
 	export let id: string;

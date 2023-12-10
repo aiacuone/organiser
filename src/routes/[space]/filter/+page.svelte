@@ -3,15 +3,12 @@
 	import { page } from '$app/stores';
 	import Button from '$lib/components/Button.svelte';
 	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
-	import Important from '$lib/components/Logs/Important.svelte';
-	import Question from '$lib/components/Logs/Question.svelte';
-	import Time from '$lib/components/Logs/Time.svelte';
-	import Todo from '$lib/components/Logs/Todo.svelte';
+	import Logs from '$lib/components/Logs/Logs.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import { icons } from '$lib/general/icons';
 	import { viewport } from '$lib/hooks';
 	import { searchValue } from '$lib/stores';
-	import { LogType_enum, allLogs, searchableInputs, type Log_int } from '$lib/types';
+	import { allLogs, searchableInputs } from '$lib/types';
 	import { arraysAreEqual } from '$lib/utils/arrays';
 	import {
 		entriesArrayToSearchParamsString,
@@ -40,7 +37,7 @@
 	const filters: Writable<Array<Array<string>>> = writable($searchParams.array);
 
 	const filtersValues = derived(filters, ($filters) => {
-		const string = entriesArrayToSearchParamsString($filters);
+		const string = entriesArrayToSearchParamsString($filters as Array<[string, string]>);
 		return { string };
 	});
 
@@ -158,13 +155,6 @@
 	};
 	let onCloseExport: () => void;
 	let onOpenExport: () => void;
-
-	const reducedPages = derived(filteredLogsQuery, ($filteredLogsQuery) =>
-		$filteredLogsQuery.data?.pages.reduce(
-			(acc, page) => [...acc, ...page.data.logs],
-			[] as Log_int[]
-		)
-	);
 </script>
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
@@ -224,35 +214,7 @@
 				Error
 			{:else if $filteredLogsQuery.data}
 				{#each $filteredLogsQuery.data.pages as page}
-					{#each page.data.logs as log}
-						{@const { type, ...rest } = log}
-						{#if type === LogType_enum.important && log.importance && log.content}
-							<Important {...rest} importance={log.importance} content={log.content} />
-						{:else if type === LogType_enum.todo && log.priority && (log.todos || log.content)}
-							{@const previousShapeTodo = log.content && {
-								content: log.content,
-								isCompleted: log.isCompleted
-							}}
-							<Todo
-								{...rest}
-								todos={previousShapeTodo
-									? [...log.todos, { content: log.content, isCompleted: log.isCompleted }]
-									: log.todos}
-								priority={log.priority}
-								isCompleted={log.isCompleted}
-							/>
-						{:else if type === LogType_enum.question && log.importance && log.question}
-							<Question {...rest} importance={log.importance} content={log.content} />
-						{:else if type === LogType_enum.time && log.title}
-							<Time
-								{...rest}
-								title={log.title}
-								reference={log.reference}
-								time={log.time}
-								bullets={log.bullets}
-							/>
-						{/if}
-					{/each}
+					<Logs logs={page.data.logs} />
 				{/each}
 				<div class="center text-gray-300">
 					{#if $filteredLogsQuery.isFetching}

@@ -16,10 +16,10 @@
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import type { Readable } from 'svelte/motion';
 
-	export let title: string;
+	export let title: string = '';
 	export let reference: string = '';
 	export let date: Date;
-	export let question: string;
+	export let question: string = '';
 	export let answer: string | undefined = undefined;
 	export let id: string;
 	export let rating: 1 | 2 | 3;

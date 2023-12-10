@@ -16,10 +16,9 @@
 	import toast from 'svelte-french-toast';
 	import CheckboxItems from './LogCheckboxItems.svelte';
 
-	export let title: string;
+	export let title: string = '';
 	export let reference: string = '';
 	export let date: Date;
-	export let content: string;
 	export let id: string;
 	export let rating: 1 | 2 | 3;
 	export let lastUpdated: Date | undefined = undefined;
@@ -28,7 +27,6 @@
 
 	let originalTitle = title;
 	let originalReference = reference;
-	let originalContent = content;
 	let originalRating = rating;
 	let originalCheckboxItems = [...checkboxItems];
 
@@ -89,7 +87,6 @@
 			onResetNewLogType && onResetNewLogType();
 			originalTitle = title;
 			originalReference = reference;
-			originalContent = content;
 			originalRating = rating;
 			originalCheckboxItems = [...checkboxItems];
 		} catch (error) {
@@ -103,7 +100,6 @@
 		onResetNewLogType && onResetNewLogType();
 		title = originalTitle;
 		reference = originalReference;
-		content = originalContent;
 		rating = originalRating;
 		checkboxItems = [...originalCheckboxItems];
 	};
