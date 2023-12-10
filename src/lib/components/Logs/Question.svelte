@@ -42,14 +42,18 @@
 	const onAccept = () => {
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
-				questions,
+				questions: [...questions],
 				rating
 			},
 			originalValues: {
-				questions: originalQuestions,
+				questions: [...originalQuestions],
 				rating: originalRating
 			}
 		});
+
+		const filteredQuestions = questions.filter(
+			({ question, answer }) => question || (answer && question)
+		);
 
 		$currentlyEditing = null;
 
@@ -68,7 +72,7 @@
 			title,
 			reference,
 			id,
-			questions,
+			questions: filteredQuestions,
 			rating,
 			date: logDate,
 			type: LogType_enum.question,
@@ -77,16 +81,18 @@
 		});
 		originalTitle = title;
 		originalReference = reference;
-		originalQuestions = questions;
+		originalQuestions = [...filteredQuestions];
 		originalRating = rating;
 
 		onResetNewLogType && onResetNewLogType();
+		onResetItems();
 	};
 
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		questions = originalQuestions;
+		questions = [...originalQuestions];
+		onResetItems();
 	};
 
 	const incrementDecrementProps = {
@@ -108,6 +114,8 @@
 		$currentlyEditing = id;
 		questions = [...questions, { question: '' }];
 	};
+
+	let onResetItems: () => void;
 </script>
 
 <LogContainer
@@ -153,6 +161,7 @@
 					onFocusAnswerInput={_onFocusAnswerInput}
 					{id}
 					isDisabled={!$isEditing}
+					bind:onReset={onResetItems}
 				/>
 			</div>
 			<BottomOptions

@@ -8,12 +8,15 @@
 	export let isDisabled: boolean;
 	export let onFocusAnswerInput: () => void;
 	export let id: string;
+	export const onReset: () => void = () => {
+		isAnswering = undefined;
+	};
 
-	let isAnswering = false;
+	let isAnswering: undefined | number = undefined;
 
-	const _onFocusAnswerInput = () => {
+	const _onFocusAnswerInput = (index: number) => {
 		$currentlyEditing = id;
-		isAnswering = true;
+		isAnswering = index;
 		//this is a hack to make sure the answer input is focused
 		setTimeout(() => {
 			onFocusAnswerInput();
@@ -36,9 +39,10 @@
 						className=""
 						{isDisabled}
 						_class="flex-1"
+						autofocus
 					/>
 				</div>
-				{#if questions[index].answer || isAnswering}
+				{#if questions[index].answer || isAnswering === index}
 					<div class="text-sm gap-1 flex-1 flex">
 						<p class="text-gray-300">Answer:</p>
 						<Textarea
@@ -52,8 +56,10 @@
 				{/if}
 				{#if !questions[index].answer}
 					<Button
-						_class="self-start {questions[index].answer || isAnswering ? 'hidden' : 'block'}"
-						onClick={_onFocusAnswerInput}>Answer</Button
+						_class="self-start text-xs {questions[index].answer || isAnswering === index
+							? 'hidden'
+							: 'block'}"
+						onClick={() => _onFocusAnswerInput(index)}>Answer</Button
 					>
 				{/if}
 			</div>

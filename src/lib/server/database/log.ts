@@ -99,9 +99,19 @@ export const getLogs = async ({
 		baseQuery.push({
 			$match: {
 				$or: [
-					{ answer: { $exists: parsedBoolean } },
 					{
-						answer: { $eq: '' }
+						questions: {
+							$elemMatch: {
+								answer: { $exists: parsedBoolean }
+							}
+						}
+					},
+					{
+						questions: {
+							$elemMatch: {
+								answer: { $eq: '' }
+							}
+						}
 					}
 				]
 			}
@@ -236,15 +246,17 @@ export const getAllLogNotifications = async (spaces: string[]) => {
 					$match: {
 						$or: [
 							{
-								answer: {
-									$not: {
-										$exists: true
+								questions: {
+									$elemMatch: {
+										answer: { $exists: false }
 									}
 								}
 							},
 							{
-								answer: {
-									$eq: ''
+								questions: {
+									$elemMatch: {
+										answer: { $eq: '' }
+									}
 								}
 							}
 						]
