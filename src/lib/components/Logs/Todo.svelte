@@ -4,7 +4,7 @@
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
 	import { getContext } from 'svelte';
-	import { LogType_enum, Log_enum, type Log_int, type Todo_int } from '$lib/types';
+	import { LogType_enum, Log_enum, type Log_int, type CheckboxItem_int } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { page } from '$app/stores';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
@@ -22,17 +22,15 @@
 	export let content: string;
 	export let id: string;
 	export let rating: 1 | 2 | 3;
-	export let isCompleted: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
 	export let editOnMount: boolean = false;
-	export let todos: Todo_int[] = [];
+	export let checkboxItems: CheckboxItem_int[] = [];
 
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalContent = content;
 	let originalRating = rating;
-	let originalIsCompleted = isCompleted;
-	let originalTodos = [...todos];
+	let originalCheckboxItems = [...checkboxItems];
 
 	let isEditing: Readable<boolean>;
 
@@ -49,20 +47,16 @@
 	const onAccept = async () => {
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
-				[Log_enum.content]: content,
 				[Log_enum.rating]: rating,
-				[Log_enum.isCompleted]: isCompleted,
 				[Log_enum.title]: title,
 				[Log_enum.reference]: reference,
-				[Log_enum.todos]: todos
+				[Log_enum.checkboxItems]: checkboxItems
 			},
 			originalValues: {
-				[Log_enum.content]: originalContent,
 				[Log_enum.rating]: originalRating,
-				[Log_enum.isCompleted]: originalIsCompleted,
 				[Log_enum.title]: originalTitle,
 				[Log_enum.reference]: originalReference,
-				[Log_enum.todos]: originalTodos
+				[Log_enum.checkboxItems]: originalCheckboxItems
 			}
 		});
 
@@ -78,29 +72,26 @@
 			logDate = _date;
 		}
 
-		todos = todos.filter(({ content }) => content);
+		checkboxItems = checkboxItems.filter(({ text }) => text);
 
 		try {
 			await $updateMutation.mutate({
 				id,
-				content,
 				rating,
 				date: logDate,
 				type: LogType_enum.todo,
 				space: $page.params.space,
-				isCompleted,
 				lastUpdated: new Date(),
 				title,
 				reference,
-				todos
+				checkboxItems: checkboxItems
 			});
 			onResetNewLogType && onResetNewLogType();
 			originalTitle = title;
 			originalReference = reference;
 			originalContent = content;
 			originalRating = rating;
-			originalIsCompleted = isCompleted;
-			originalTodos = [...todos];
+			originalCheckboxItems = [...checkboxItems];
 		} catch (error) {
 			toast.error('Issue updating state');
 		}
@@ -114,8 +105,7 @@
 		reference = originalReference;
 		content = originalContent;
 		rating = originalRating;
-		isCompleted = originalIsCompleted;
-		todos = [...originalTodos];
+		checkboxItems = [...originalCheckboxItems];
 	};
 
 	const incrementDecrementProps = {
@@ -127,7 +117,7 @@
 
 	const onAddBullet = () => {
 		$currentlyEditing = id;
-		todos = [...todos, { isCompleted: false, content: '' }];
+		checkboxItems = [...checkboxItems, { isChecked: false, text: '' }];
 	};
 
 	const onTextareaEnterKeydown: () => void = () => {
@@ -135,7 +125,7 @@
 	};
 
 	const onDeleteBullet = (index: number) => {
-		todos = [...todos].filter((_, i) => i !== index);
+		checkboxItems = [...checkboxItems].filter((_, i) => i !== index);
 	};
 </script>
 
@@ -178,7 +168,7 @@
 			<IconWithRating icon={icons.todo} {rating} />
 			<div class="flex-1">
 				<CheckboxItems
-					bind:checkboxes={todos}
+					bind:checkboxes={checkboxItems}
 					{isEditing}
 					onEnterKeydown={onTextareaEnterKeydown}
 					{onDeleteBullet}

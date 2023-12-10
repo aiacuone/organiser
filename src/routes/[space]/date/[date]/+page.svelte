@@ -292,30 +292,30 @@
 			{:else if $filteredLogs}
 				{#each $filteredLogs as log}
 					{@const { type, ...rest } = log}
-					{#if type === LogType_enum.important && log.rating && log.content}
-						<Important {...rest} importance={log.importance} content={log.content} />
-					{:else if type === LogType_enum.todo && log.rating && (log.todos || log.content)}
+					{#if type === LogType_enum.important && log.rating && log.listItems}
+						<Important {...rest} rating={log.rating} listItems={log.listItems} />
+					{:else if type === LogType_enum.todo && log.rating && (log.checkboxItems || log.content)}
 						{@const previousShapeTodo = log.content && {
-							content: log.content,
-							isCompleted: log.isCompleted
+							text: log.content,
+							isChecked: log.isCompleted
 						}}
 						<Todo
 							{...rest}
-							todos={previousShapeTodo
-								? [...log.todos, { content: log.content, isCompleted: log.isCompleted }]
-								: log.todos}
+							checkboxItems={previousShapeTodo
+								? [...log.checkboxItems, { text: log.content, isChecked: log.isCompleted }]
+								: log.checkboxItems}
 							rating={log.rating}
-							isCompleted={log.isCompleted}
+							isChecked={log.isChecked}
 						/>
-					{:else if type === LogType_enum.question && log.importance && log.question}
-						<Question {...rest} importance={log.importance} content={log.content} />
-					{:else if type === LogType_enum.time}
+					{:else if type === LogType_enum.question && log.rating && log.question}
+						<Question {...rest} />
+					{:else if type === LogType_enum.time && log.listItems}
 						<Time
 							{...rest}
 							title={log.title}
 							reference={log.reference}
 							time={log.time}
-							bullets={log.bullets}
+							listItems={log.listItems}
 						/>
 					{/if}
 				{/each}

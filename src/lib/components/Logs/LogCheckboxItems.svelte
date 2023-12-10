@@ -4,9 +4,9 @@
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
-	import type { Todo_int } from '$lib/types';
+	import type { CheckboxItem_int } from '$lib/types';
 
-	export let checkboxes: Todo_int[] = [];
+	export let checkboxes: CheckboxItem_int[] = [];
 	export let isEditing: Readable<boolean>;
 	export let onEnterKeydown: () => void;
 	export let onDeleteBullet: (index: number) => void;
@@ -26,13 +26,13 @@
 					type="checkbox"
 					class="mr-2"
 					on:change={onCheckboxesChange}
-					bind:checked={checkboxes[index].isCompleted}
+					bind:checked={checkboxes[index].isChecked}
 				/>
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="flex-1">
 						<Textarea
 							className="flex-1"
-							bind:value={checkboxes[index].content}
+							bind:value={checkboxes[index].text}
 							isDisabled={!$isEditing}
 							{onEnterKeydown}
 							autofocus={index > 0}

@@ -18,7 +18,7 @@
 	import toast from 'svelte-french-toast';
 
 	export let date: Date;
-	export let bullets: string[] = [];
+	export let listItems: string[] = [];
 	export let id: string;
 	export let title: string = '';
 	export let reference: string = '';
@@ -35,7 +35,7 @@
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let onTitleAutoFill: (title: string) => void;
 
-	let originalBullets = [...bullets];
+	let originalListItems = [...listItems];
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalTime = time;
@@ -45,19 +45,14 @@
 
 	let isEditing: Readable<boolean>;
 
-	const _onEdit = () => {
-		onEdit();
-		onAddBullet();
-	};
-
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
-	const onDeleteBullet = (index: number) => {
-		bullets = bullets.filter((_, i) => i !== index);
+	const onDeleteItem = (index: number) => {
+		listItems = listItems.filter((_, i) => i !== index);
 	};
 
 	const onAcceptEdit = async () => {
-		if (!title && !reference && !bullets.length) {
+		if (!title && !reference && !listItems.length) {
 			return onOpen();
 		}
 
@@ -65,13 +60,13 @@
 			values: {
 				title,
 				reference,
-				bullets,
+				listItems,
 				time
 			},
 			originalValues: {
 				title: originalTitle,
 				reference: originalReference,
-				bullets: originalBullets,
+				listItems: originalListItems,
 				time: originalTime
 			}
 		});
@@ -87,14 +82,14 @@
 			logDate = _date;
 		}
 
-		bullets = bullets.filter((c) => c);
+		listItems = listItems.filter((c) => c);
 		$currentlyEditing = null;
 		try {
 			await $updateMutation.mutate({
 				id,
 				title,
 				reference,
-				bullets,
+				listItems,
 				time,
 				date: logDate,
 				type: LogType_enum.time,
@@ -103,7 +98,7 @@
 			});
 			originalTitle = title;
 			originalReference = reference;
-			originalBullets = bullets;
+			originalListItems = listItems;
 			originalTime = time;
 			lastUpdated = new Date();
 		} catch (error) {
@@ -116,14 +111,14 @@
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		bullets = originalBullets;
+		listItems = originalListItems;
 		title = originalTitle;
 		reference = originalReference;
 	};
 
 	const onAddBullet = () => {
 		$currentlyEditing = id;
-		bullets = [...bullets, ''];
+		listItems = [...listItems, ''];
 	};
 
 	const onAcceptNewBullet = () => {
@@ -137,7 +132,7 @@
 				id,
 				title,
 				reference,
-				bullets,
+				listItems,
 				time,
 				date,
 				type: LogType_enum.time,
@@ -153,7 +148,7 @@
 				id,
 				title,
 				reference,
-				bullets,
+				listItems,
 				time,
 				date,
 				type: LogType_enum.time,
@@ -218,10 +213,10 @@
 				</div>
 			{/if}
 			<ListItems
-				items={bullets}
+				items={listItems}
 				{isEditing}
 				onEnterKeydown={onTextareaEnterKeydown}
-				{onDeleteBullet}
+				{onDeleteItem}
 			/>
 			<div class="hstack mt-2">
 				<BottomOptions
@@ -231,7 +226,7 @@
 					isEditing={$isEditing}
 					onAccept={$isEditing ? onAcceptEdit : onAcceptNewBullet}
 					{onAddBullet}
-					onEdit={_onEdit}
+					{onEdit}
 					{onDelete}
 					icon={icons.clock}
 					{lastUpdated}

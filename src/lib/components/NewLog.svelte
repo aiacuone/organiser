@@ -15,7 +15,7 @@
 	date.setMonth(parseInt(month) - 1);
 	date.setDate(parseInt(day));
 
-	const sharedProps = {
+	const defaultValues = {
 		id: uuidv4(),
 		title: '',
 		content: '',
@@ -25,20 +25,20 @@
 		isCompleted: false,
 		rating: 2 as 1 | 2 | 3,
 		inputAutoFocus: true,
-		bullets: [''],
 		question: '',
 		date,
 		editOnMount: true,
-		todos: [{ content: '', isCompleted: false }]
+		listItems: [''],
+		checkboxItems: [{ text: '', isChecked: false }]
 	};
 </script>
 
 {#if type === LogType_enum.time}
-	<Time {...sharedProps} />
+	<Time {...defaultValues} />
 {:else if type === LogType_enum.todo}
-	<Todo {...sharedProps} />
+	<Todo {...defaultValues} />
 {:else if type === LogType_enum.question}
-	<Question {...sharedProps} />
+	<Question {...defaultValues} />
 {:else if type === LogType_enum.important}
-	<Important {...sharedProps} />
+	<Important {...defaultValues} />
 {/if}
