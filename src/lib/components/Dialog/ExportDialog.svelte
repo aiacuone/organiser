@@ -239,7 +239,6 @@
 				{/each}
 			</div>
 		</div>
-
 		<div class="stack flex-1 overflow-y-scroll hide-scrollbar" bind:this={logsContainer}>
 			{#if isLoadingLogs}
 				{#each Array(5) as _}
