@@ -19,7 +19,7 @@
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="flex-1">
 						<Textarea
-							className="flex-1"
+							_class="w-full"
 							bind:value={items[index]}
 							isDisabled={!$isEditing}
 							{onEnterKeydown}

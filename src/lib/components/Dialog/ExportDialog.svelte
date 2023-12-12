@@ -210,7 +210,7 @@
 		<header class="text-center" bind:clientHeight={headerHeight}>Export/Copy</header>
 		<div class="stack gap-2" bind:clientHeight={buttonsContainerHeight}>
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
-				{#each Object.entries(logKeyValueFilter).filter(([key]) => {
+				{#each Object.keys(logKeyValueFilter).filter((key) => {
 					return ![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(key);
 				}) as [key]}
 					<div class="hstack gap-2">
