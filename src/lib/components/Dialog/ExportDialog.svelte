@@ -6,7 +6,8 @@
 		Log_enum,
 		type Log_int,
 		LogType_enum,
-		LocalStorage_enum
+		LocalStorage_enum,
+		logTypeEnumNames
 	} from '$lib/types';
 	import { copyToClipboard, downloadAsCSV, getLocalStorage, setLocalStorage } from '$lib/utils';
 	import { viewport } from '$lib/hooks';
@@ -28,21 +29,18 @@
 	export let getNextLogsPage: (() => void) | undefined = undefined;
 
 	let defaultLogKeyValueFilter: Record<Log_enum, boolean> = {
+		id: false,
+		date: true,
 		title: true,
 		reference: true,
-		date: true,
-		type: true,
-		content: true,
-		bullets: true,
-		question: true,
-		answer: true,
-		isCompleted: true,
-		lastUpdated: false,
-		priority: false,
-		importance: false,
-		space: false,
 		time: false,
-		id: false
+		type: true,
+		space: false,
+		listItems: true,
+		checkboxItems: true,
+		lastUpdated: false,
+		rating: false,
+		questions: true
 	};
 
 	let logKeyValueFilter: Record<Log_enum, boolean> = { ...defaultLogKeyValueFilter };
@@ -68,18 +66,15 @@
 		[keyA],
 		[keyB]
 	) => {
-		const keyOrder = [
+		const keyOrder: Log_enum[] = [
 			Log_enum.title,
 			Log_enum.reference,
 			Log_enum.date,
 			Log_enum.type,
-			Log_enum.content,
-			Log_enum.bullets,
-			Log_enum.question,
-			Log_enum.answer,
-			Log_enum.isCompleted,
-			Log_enum.priority,
-			Log_enum.importance,
+			Log_enum.questions,
+			Log_enum.listItems,
+			Log_enum.checkboxItems,
+			Log_enum.rating,
 			Log_enum.space,
 			Log_enum.time,
 			Log_enum.lastUpdated,
@@ -215,11 +210,9 @@
 		<header class="text-center" bind:clientHeight={headerHeight}>Export/Copy</header>
 		<div class="stack gap-2" bind:clientHeight={buttonsContainerHeight}>
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
-				{#each Object.entries(logKeyValueFilter)
-					.filter(([key]) => {
-						return ![Log_enum.id, Log_enum.lastUpdated, Log_enum.priority, Log_enum.importance, Log_enum.space, Log_enum.time].includes(key);
-					})
-					.sort(logKeyValueSortFunction) as [key]}
+				{#each Object.entries(logKeyValueFilter).filter(([key]) => {
+					return ![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(key);
+				}) as [key]}
 					<div class="hstack gap-2">
 						<label>
 							{logEnumNames[key]}
@@ -232,7 +225,7 @@
 				{#each Object.entries(typeFilter) as [key]}
 					<div class="hstack gap-2">
 						<label class="capitalize">
-							{key}
+							{logTypeEnumNames[key]}
 							<input type="checkbox" bind:checked={typeFilter[key]} />
 						</label>
 					</div>

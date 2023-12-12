@@ -18,11 +18,9 @@
 	const defaultValues = {
 		id: uuidv4(),
 		title: '',
-		content: '',
 		reference: '',
 		time: 0,
 		isEditing: true,
-		isCompleted: false,
 		rating: 2 as 1 | 2 | 3,
 		inputAutoFocus: true,
 		question: '',
