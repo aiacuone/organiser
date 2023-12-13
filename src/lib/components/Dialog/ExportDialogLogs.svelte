@@ -12,10 +12,16 @@
 		{#each Object.entries(log)
 			.filter(([key, value]) => logKeyValueFilter[key] && value)
 			.sort(logKeyValueSortFunction) as [key, value]}
-			{#if key === 'bullets'}
+			{#if key === 'listItems'}
 				<ul>
-					{#each value as bullet}
-						<li>{bullet}</li>
+					{#each value as listItem}
+						<li>{listItem}</li>
+					{/each}
+				</ul>
+			{:else if key === 'checkboxItems'}
+				<ul>
+					{#each value as { isChecked, text }}
+						<li class="{isChecked ? 'isChecked' : ''} checkbox">{text}</li>
 					{/each}
 				</ul>
 			{:else}
@@ -33,5 +39,13 @@
 	.log-stack ul {
 		list-style-type: disc;
 		padding-left: 17px;
+	}
+
+	.isChecked {
+		text-decoration: line-through;
+	}
+
+	.checkbox {
+		list-style-type: circle;
 	}
 </style>
