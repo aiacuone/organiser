@@ -23,8 +23,8 @@
 	export let isLoadingLogs: boolean;
 	export let isFetchingLogs: boolean;
 	export let isLogsError: boolean;
-	export let logsData: InfiniteData<AxiosResponse<any, any>> | undefined;
-	export let logs: Log_int[] | undefined;
+	export let logsData: InfiniteData<AxiosResponse<any, any>> | undefined = undefined;
+	export let logs: Log_int[] | undefined = undefined;
 	export let hasNextLogsPage: boolean | undefined = undefined;
 	export let getNextLogsPage: (() => void) | undefined = undefined;
 
@@ -212,7 +212,7 @@
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
 				{#each Object.keys(logKeyValueFilter).filter((key) => {
 					return ![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(key);
-				}) as [key]}
+				}) as key}
 					<div class="hstack gap-2">
 						<label>
 							{logEnumNames[key]}
