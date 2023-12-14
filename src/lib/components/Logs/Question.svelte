@@ -129,6 +129,8 @@
 	bind:onTitleAutoFill
 	{changeReferenceInputValue}
 	{editOnMount}
+	onControlShitAndDotKeydown={onAddQuestion}
+	onControlShitAndEnterKeydown={onAccept}
 >
 	<div class="bg-neutral-100 p-1 rounded-sm">
 		<div class="bg-white p-2 stack gap-3 rounded-sm">

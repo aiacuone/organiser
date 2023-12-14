@@ -137,6 +137,8 @@
 	{id}
 	showDialog={!isOpen}
 	{editOnMount}
+	onControlShitAndDotKeydown={onAddItem}
+	onControlShitAndEnterKeydown={onAccept}
 >
 	<div class="bg-neutral-50 p-2 sm:p-3 stack gap-3">
 		{#if title || reference || $isEditing}

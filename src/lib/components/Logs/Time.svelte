@@ -51,7 +51,7 @@
 		listItems = listItems.filter((_, i) => i !== index);
 	};
 
-	const onAcceptEdit = async () => {
+	const onAccept = async () => {
 		if (!title && !reference && !listItems.length) {
 			return onOpen();
 		}
@@ -166,12 +166,6 @@
 	const onTextareaEnterKeydown: () => void = () => {
 		onAddItem();
 	};
-	const onControlShitAndEnterKeydown = () => {
-		onAcceptEdit();
-	};
-	const onControlShitAndDotKeydown = () => {
-		onAddItem();
-	};
 </script>
 
 <LogContainer
@@ -184,9 +178,9 @@
 	bind:onTitleAutoFill
 	bind:isEditing
 	{changeReferenceInputValue}
-	{onControlShitAndEnterKeydown}
 	{editOnMount}
-	{onControlShitAndDotKeydown}
+	onControlShitAndDotKeydown={onAddItem}
+	onControlShitAndEnterKeydown={onAccept}
 >
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-2 stack text-sm gap-1">
@@ -224,7 +218,7 @@
 					incrementDecrementValue={time}
 					{date}
 					isEditing={$isEditing}
-					onAccept={$isEditing ? onAcceptEdit : onAcceptNewBullet}
+					onAccept={$isEditing ? onAccept : onAcceptNewBullet}
 					{onAddItem}
 					{onEdit}
 					{onDelete}

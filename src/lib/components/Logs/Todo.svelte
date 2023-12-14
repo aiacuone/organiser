@@ -136,6 +136,8 @@
 	bind:isEditing
 	{changeReferenceInputValue}
 	{editOnMount}
+	onControlShitAndDotKeydown={onAddItem}
+	onControlShitAndEnterKeydown={onAccept}
 >
 	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-1">
 		{#if title || reference || $isEditing}
