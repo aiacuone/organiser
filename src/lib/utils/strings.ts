@@ -34,3 +34,8 @@ export const searchParamsStringToEntriesArray = (
 export const camelCaseToLower = (string: string) => {
 	return string.replace(/([A-Z])/g, ' $1').toLowerCase();
 };
+
+export const camelCaseToCapitalized = (inputString: string): string => {
+	const spacedString = inputString.replace(/([A-Z])/g, ' $1');
+	return spacedString.charAt(0).toUpperCase() + spacedString.slice(1).trim();
+};

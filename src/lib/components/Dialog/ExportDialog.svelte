@@ -9,7 +9,13 @@
 		LocalStorage_enum,
 		logTypeEnumNames
 	} from '$lib/types';
-	import { copyToClipboard, downloadAsCSV, getLocalStorage, setLocalStorage } from '$lib/utils';
+	import {
+		camelCaseToCapitalized,
+		copyToClipboard,
+		downloadAsCSV,
+		getLocalStorage,
+		setLocalStorage
+	} from '$lib/utils';
 	import { viewport } from '$lib/hooks';
 	import type { InfiniteData } from '@sveltestack/svelte-query';
 	import type { AxiosResponse } from 'axios';
@@ -54,12 +60,22 @@
 
 	let typeFilter: Record<LogType_enum, boolean> = { ...defaultTypeFilterData };
 
+	const defaultPreferences: Record<string, boolean> = {
+		showKeys: true
+	};
+
+	let preferences = { ...defaultPreferences };
+
 	onMount(() => {
-		const storageLogKeyValueFilter = getLocalStorage(LocalStorage_enum.logKeyValueFilter);
-		const storageTypeFilter = getLocalStorage(LocalStorage_enum.typeFilter);
+		const [storageLogKeyValueFilter, storageTypeFilter, storagePreferences] = getLocalStorage([
+			LocalStorage_enum.exportLogKeyValueFilterDefaults,
+			LocalStorage_enum.exportTypeFilterDefaults,
+			LocalStorage_enum.exportPreferenceDefaults
+		]);
 
 		storageLogKeyValueFilter && (logKeyValueFilter = storageLogKeyValueFilter);
 		storageTypeFilter && (typeFilter = storageTypeFilter);
+		storagePreferences && (preferences = storagePreferences);
 	});
 
 	const logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number = (
@@ -108,20 +124,27 @@
 	let dialog: HTMLDialogElement;
 
 	const onReset = () => {
-		const storageLogKeyValueFilter = getLocalStorage(LocalStorage_enum.logKeyValueFilter);
-		const storageTypeFilter = getLocalStorage(LocalStorage_enum.typeFilter);
+		const [storageLogKeyValueFilter, storageTypeFilter, storagePreferences] = getLocalStorage([
+			LocalStorage_enum.exportLogKeyValueFilterDefaults,
+			LocalStorage_enum.exportTypeFilterDefaults,
+			LocalStorage_enum.exportPreferenceDefaults
+		]);
 
 		const resetLogKeyValueFilter = storageLogKeyValueFilter ?? defaultLogKeyValueFilter;
-
 		const resetTypeFilter = storageTypeFilter ?? defaultTypeFilterData;
+		const resetPreferences = storagePreferences ?? defaultPreferences;
 
 		typeFilter = { ...resetTypeFilter };
 		logKeyValueFilter = { ...resetLogKeyValueFilter };
+		preferences = { ...resetPreferences };
 	};
 
 	const onConfirmSetDefault = () => {
-		setLocalStorage(LocalStorage_enum.logKeyValueFilter, { ...logKeyValueFilter });
-		setLocalStorage(LocalStorage_enum.typeFilter, { ...typeFilter });
+		setLocalStorage([
+			{ key: LocalStorage_enum.exportLogKeyValueFilterDefaults, value: logKeyValueFilter },
+			{ key: LocalStorage_enum.exportTypeFilterDefaults, value: typeFilter },
+			{ key: LocalStorage_enum.exportPreferenceDefaults, value: preferences }
+		]);
 
 		onCloseDefaultSelection();
 	};
@@ -135,6 +158,7 @@
 		};
 		typeFilter = makeAllFalse({ ...typeFilter });
 		logKeyValueFilter = makeAllFalse({ ...logKeyValueFilter });
+		preferences = makeAllFalse({ ...preferences });
 	};
 
 	const onSelectAll = () => {
@@ -146,6 +170,7 @@
 		};
 		typeFilter = makeAllTrue({ ...typeFilter });
 		logKeyValueFilter = makeAllTrue({ ...logKeyValueFilter });
+		preferences = makeAllTrue({ ...preferences });
 	};
 
 	let onOpenDefaultSelection: () => void;
@@ -209,6 +234,7 @@
 	<div bind:clientHeight={containerHeight} class="stack gap-3 w-full h-full text-sm">
 		<header class="text-center" bind:clientHeight={headerHeight}>Export/Copy</header>
 		<div class="stack gap-2" bind:clientHeight={buttonsContainerHeight}>
+			<!-- TODO: Svelte 5: use snippet for these, they are being repeated -->
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
 				{#each Object.keys(logKeyValueFilter).filter((key) => {
 					return ![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(key);
@@ -222,11 +248,21 @@
 				{/each}
 			</div>
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
-				{#each Object.entries(typeFilter) as [key]}
+				{#each Object.keys(typeFilter) as key}
 					<div class="hstack gap-2">
 						<label class="capitalize">
 							{logTypeEnumNames[key]}
 							<input type="checkbox" bind:checked={typeFilter[key]} />
+						</label>
+					</div>
+				{/each}
+			</div>
+			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
+				{#each Object.keys(preferences) as key}
+					<div class="hstack gap-2">
+						<label class="capitalize">
+							{camelCaseToCapitalized(key)}
+							<input type="checkbox" bind:checked={preferences[key]} />
 						</label>
 					</div>
 				{/each}
@@ -254,6 +290,7 @@
 						{logKeyValueSortFunction}
 						{logKeyValueFilter}
 						{typeFilter}
+						showKeys={preferences.showKeys}
 					/>
 				{/each}
 				<div class="center text-gray-300">
@@ -266,7 +303,13 @@
 					{/if}
 				</div>
 			{:else if logs}
-				<ExportDialogLogs {logs} {logKeyValueSortFunction} {logKeyValueFilter} {typeFilter} />
+				<ExportDialogLogs
+					{logs}
+					{logKeyValueSortFunction}
+					{logKeyValueFilter}
+					{typeFilter}
+					showKeys={preferences.showKeys}
+				/>
 			{/if}
 		</div>
 		<div class="hstack center gap-2" bind:clientHeight={footerButtonsContainerHeight}>

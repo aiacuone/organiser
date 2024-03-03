@@ -1,4 +1,5 @@
 export enum LocalStorage_enum {
-	logKeyValueFilter = 'logKeyValueFilter',
-	typeFilter = 'typeFilter'
+	exportLogKeyValueFilterDefaults = 'exportLogKeyValueFilterDefaults',
+	exportTypeFilterDefaults = 'exportTypeFilterDefaults',
+	exportPreferenceDefaults = 'exportPreferenceDefaults'
 }

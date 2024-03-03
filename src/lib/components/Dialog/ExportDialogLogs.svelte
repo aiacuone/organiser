@@ -5,6 +5,7 @@
 	export let logKeyValueFilter: Record<Log_enum, boolean>;
 	export let logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number;
 	export let typeFilter: Record<LogType_enum, boolean>;
+	export let showKeys: boolean;
 </script>
 
 {#each logs.filter(({ type }) => typeFilter[type]) as log}
@@ -25,7 +26,12 @@
 					{/each}
 				</ul>
 			{:else}
-				<p class="capitalize"><b>{logEnumNames[key]}</b>: {value}</p>
+				<p class="capitalize">
+					{#if showKeys}
+						<b>{logEnumNames[key]}</b>:
+					{/if}
+					{value}
+				</p>
 			{/if}
 		{/each}
 	</div>
