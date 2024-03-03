@@ -1,36 +1,16 @@
-interface values_int {
-	title?: string;
-	reference?: string;
-	bullets?: string[];
-	time?: number;
-	content?: string;
-	priority?: number;
-	importance?: number;
-	isCompleted?: boolean;
-	question?: string;
-	answer?: string;
-}
+import type { Log_enum, Log_int } from '$lib/types';
+
+interface OptionalLogInt extends Partial<Log_int> {}
 
 export const getHaveValuesChanged = ({
 	values,
 	originalValues
 }: {
-	values: values_int;
-	originalValues: values_int;
+	values: OptionalLogInt;
+	originalValues: OptionalLogInt;
 }) => {
-	return (
-		values.title !== originalValues.title ||
-		values.reference !== originalValues.reference ||
-		(values.bullets &&
-			originalValues.bullets &&
-			!arraysHaveSameValues(values.bullets, originalValues.bullets)) ||
-		values.time !== originalValues.time ||
-		values.content !== originalValues.content ||
-		values.priority !== originalValues.priority ||
-		values.importance !== originalValues.importance ||
-		values.isCompleted !== originalValues.isCompleted ||
-		values.question !== originalValues.question ||
-		values.answer !== originalValues.answer
+	return Object.keys(values).some(
+		(key) => values[key as Log_enum] !== originalValues[key as Log_enum]
 	);
 };
 

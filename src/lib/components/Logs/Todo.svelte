@@ -1,12 +1,10 @@
 <script lang="ts">
 	import { icons } from '$lib/general/icons';
-	import Icon from '@iconify/svelte';
 	import BottomOptions from './BottomOptions.svelte';
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
-	import Textarea from '../Textarea.svelte';
 	import { getContext } from 'svelte';
-	import { LogType_enum, type Log_int } from '$lib/types';
+	import { LogType_enum, Log_enum, type Log_int, type CheckboxItem_int } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { page } from '$app/stores';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
@@ -14,25 +12,23 @@
 	import Input from '../Input.svelte';
 	import { currentlyEditing, titles } from '$lib/stores';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
-	import { debounce } from '$lib/utils/general';
 	import type { Readable } from 'svelte/motion';
+	import toast from 'svelte-french-toast';
+	import CheckboxItems from './LogCheckboxItems.svelte';
 
-	export let title: string;
+	export let title: string = '';
 	export let reference: string = '';
 	export let date: Date;
-	export let content: string;
 	export let id: string;
-	export let priority: number;
-	export let isCompleted: boolean = false;
-	export let inputAutoFocus: boolean = false;
+	export let rating: 1 | 2 | 3;
 	export let lastUpdated: Date | undefined = undefined;
 	export let editOnMount: boolean = false;
+	export let checkboxItems: CheckboxItem_int[] = [];
 
 	let originalTitle = title;
 	let originalReference = reference;
-	let originalContent = content;
-	let originalPriority = priority;
-	let originalIsCompleted = isCompleted;
+	let originalRating = rating;
+	let originalCheckboxItems = [...checkboxItems];
 
 	let isEditing: Readable<boolean>;
 
@@ -46,36 +42,19 @@
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
 
-	const onCheckboxClick = () => {
-		isCompleted = !isCompleted;
-		debounce(() =>
-			$updateMutation.mutate({
-				id,
-				content,
-				priority,
-				date,
-				type: LogType_enum.todo,
-				space: $page.params.space,
-				isCompleted
-			})
-		);
-	};
-
 	const onAccept = async () => {
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
-				content,
-				priority,
-				isCompleted,
-				title,
-				reference
+				[Log_enum.rating]: rating,
+				[Log_enum.title]: title,
+				[Log_enum.reference]: reference,
+				[Log_enum.checkboxItems]: checkboxItems
 			},
 			originalValues: {
-				content: originalContent,
-				priority: originalPriority,
-				isCompleted: originalIsCompleted,
-				title: originalTitle,
-				reference: originalReference
+				[Log_enum.rating]: originalRating,
+				[Log_enum.title]: originalTitle,
+				[Log_enum.reference]: originalReference,
+				[Log_enum.checkboxItems]: originalCheckboxItems
 			}
 		});
 
@@ -91,26 +70,28 @@
 			logDate = _date;
 		}
 
+		checkboxItems = checkboxItems.filter(({ text }) => text);
+
 		try {
 			await $updateMutation.mutate({
 				id,
-				content,
-				priority,
+				rating,
 				date: logDate,
 				type: LogType_enum.todo,
 				space: $page.params.space,
-				isCompleted,
 				lastUpdated: new Date(),
 				title,
-				reference
+				reference,
+				checkboxItems: checkboxItems
 			});
 			onResetNewLogType && onResetNewLogType();
 			originalTitle = title;
 			originalReference = reference;
-			originalContent = content;
-			originalPriority = priority;
-			originalIsCompleted = isCompleted;
-		} catch (error) {}
+			originalRating = rating;
+			originalCheckboxItems = [...checkboxItems];
+		} catch (error) {
+			toast.error('Issue updating state');
+		}
 		$currentlyEditing = null;
 	};
 
@@ -119,14 +100,28 @@
 		onResetNewLogType && onResetNewLogType();
 		title = originalTitle;
 		reference = originalReference;
-		content = originalContent;
+		rating = originalRating;
+		checkboxItems = [...originalCheckboxItems];
 	};
 
 	const incrementDecrementProps = {
 		min: 0,
 		max: 3,
-		onIncrement: () => (priority = priority + 1),
-		onDecrement: () => (priority = priority - 1)
+		onIncrement: () => (rating = rating + 1),
+		onDecrement: () => (rating = rating - 1)
+	};
+
+	const onAddItem = () => {
+		$currentlyEditing = id;
+		checkboxItems = [...checkboxItems, { isChecked: false, text: '' }];
+	};
+
+	const onTextareaEnterKeydown: () => void = () => {
+		onAddItem();
+	};
+
+	const onDeleteBullet = (index: number) => {
+		checkboxItems = [...checkboxItems].filter((_, i) => i !== index);
 	};
 </script>
 
@@ -141,8 +136,10 @@
 	bind:isEditing
 	{changeReferenceInputValue}
 	{editOnMount}
+	onControlShitAndDotKeydown={onAddItem}
+	onControlShitAndEnterKeydown={onAccept}
 >
-	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-4">
+	<div class="border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-1">
 		{#if title || reference || $isEditing}
 			<div class="stack gap-1">
 				{#if !$isEditing && !title}{''}{:else}
@@ -165,22 +162,16 @@
 				{/if}
 			</div>
 		{/if}
-		<div class="hstack gap-4 items-center">
-			<IconWithRating icon={icons.todo} rating={priority} />
-			<button
-				on:click={onCheckboxClick}
-				class="center border-2 border-gray-300 w-[30px] h-[30px] rounded-md"
-			>
-				{#if isCompleted}
-					<Icon icon={icons.tickBold} height="15px" class="text-green-500" />
-				{/if}
-			</button>
+		<div class="hstack items-center">
+			<IconWithRating icon={icons.todo} {rating} />
 			<div class="flex-1">
-				{#if $isEditing}
-					<Textarea bind:value={content} autofocus={inputAutoFocus} />
-				{:else}
-					<p class="text-sm">{content}</p>
-				{/if}
+				<CheckboxItems
+					bind:checkboxes={checkboxItems}
+					{isEditing}
+					onEnterKeydown={onTextareaEnterKeydown}
+					{onDeleteBullet}
+					{onEdit}
+				/>
 			</div>
 		</div>
 		<BottomOptions
@@ -190,9 +181,10 @@
 			isEditing={$isEditing}
 			{onAccept}
 			{incrementDecrementProps}
-			incrementDecrementValue={priority}
+			incrementDecrementValue={rating}
 			showIncrementDecrement={$isEditing}
 			{lastUpdated}
+			{onAddItem}
 		/>
 	</div>
 </LogContainer>

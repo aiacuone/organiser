@@ -3,22 +3,22 @@
 	import Dialog from '../Dialog/Dialog.svelte';
 	import LogContainer from './LogContainer.svelte';
 	import BottomOptions from './BottomOptions.svelte';
-	import Textarea from '../Textarea.svelte';
-	import { getContext, onMount } from 'svelte';
+	import { getContext } from 'svelte';
 	import { LogType_enum, type Log_int } from '$lib/types';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import Input from '../Input.svelte';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
-	import Icon from '@iconify/svelte';
 	import { currentlyEditing, titles } from '$lib/stores';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import { debounce } from '$lib/utils/general';
 	import type { Readable } from 'svelte/motion';
+	import ListItems from './LogListItems.svelte';
+	import toast from 'svelte-french-toast';
 
 	export let date: Date;
-	export let bullets: string[] = [];
+	export let listItems: string[] = [];
 	export let id: string;
 	export let title: string = '';
 	export let reference: string = '';
@@ -35,7 +35,7 @@
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let onTitleAutoFill: (title: string) => void;
 
-	let originalBullets = [...bullets];
+	let originalListItems = [...listItems];
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalTime = time;
@@ -47,12 +47,12 @@
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
-	const onDeleteBullet = (index: number) => {
-		bullets = bullets.filter((_, i) => i !== index);
+	const onDeleteItem = (index: number) => {
+		listItems = listItems.filter((_, i) => i !== index);
 	};
 
-	const onAcceptEdit = async () => {
-		if (!title && !reference && !bullets.length) {
+	const onAccept = async () => {
+		if (!title && !reference && !listItems.length) {
 			return onOpen();
 		}
 
@@ -60,13 +60,13 @@
 			values: {
 				title,
 				reference,
-				bullets,
+				listItems,
 				time
 			},
 			originalValues: {
 				title: originalTitle,
 				reference: originalReference,
-				bullets: originalBullets,
+				listItems: originalListItems,
 				time: originalTime
 			}
 		});
@@ -82,14 +82,14 @@
 			logDate = _date;
 		}
 
-		bullets = bullets.filter((c) => c);
+		listItems = listItems.filter((c) => c);
 		$currentlyEditing = null;
 		try {
 			await $updateMutation.mutate({
 				id,
 				title,
 				reference,
-				bullets,
+				listItems,
 				time,
 				date: logDate,
 				type: LogType_enum.time,
@@ -98,11 +98,11 @@
 			});
 			originalTitle = title;
 			originalReference = reference;
-			originalBullets = bullets;
+			originalListItems = listItems;
 			originalTime = time;
 			lastUpdated = new Date();
 		} catch (error) {
-			console.log({ error });
+			toast.error('There was an issue updating the log');
 		}
 
 		onResetNewLogType && onResetNewLogType();
@@ -111,14 +111,14 @@
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		bullets = originalBullets;
+		listItems = originalListItems;
 		title = originalTitle;
 		reference = originalReference;
 	};
 
-	const onAddBullet = () => {
+	const onAddItem = () => {
 		$currentlyEditing = id;
-		bullets = [...bullets, ''];
+		listItems = [...listItems, ''];
 	};
 
 	const onAcceptNewBullet = () => {
@@ -132,7 +132,7 @@
 				id,
 				title,
 				reference,
-				bullets,
+				listItems,
 				time,
 				date,
 				type: LogType_enum.time,
@@ -148,7 +148,7 @@
 				id,
 				title,
 				reference,
-				bullets,
+				listItems,
 				time,
 				date,
 				type: LogType_enum.time,
@@ -164,13 +164,7 @@
 		onDecrement
 	};
 	const onTextareaEnterKeydown: () => void = () => {
-		onAddBullet();
-	};
-	const onControlShitAndEnterKeydown = () => {
-		onAcceptEdit();
-	};
-	const onControlShitAndDotKeydown = () => {
-		onAddBullet();
+		onAddItem();
 	};
 </script>
 
@@ -184,9 +178,9 @@
 	bind:onTitleAutoFill
 	bind:isEditing
 	{changeReferenceInputValue}
-	{onControlShitAndEnterKeydown}
 	{editOnMount}
-	{onControlShitAndDotKeydown}
+	onControlShitAndDotKeydown={onAddItem}
+	onControlShitAndEnterKeydown={onAccept}
 >
 	<div class="bg-neutral-100 p-2 rounded-sm">
 		<div class="bg-white rounded-sm p-2 stack text-sm gap-1">
@@ -205,50 +199,27 @@
 					{#if $isEditing || reference}
 						<Input
 							bind:value={reference}
+							bind:changeInputValue={changeReferenceInputValue}
 							placeholder="Reference"
 							isDisabled={!$isEditing}
-							bind:changeInputValue={changeReferenceInputValue}
 						/>
 					{/if}
 				</div>
 			{/if}
-			<ul class="ml-5 stack">
-				{#each bullets as _, index}
-					<li>
-						<div class="flex gap-2 min-h-[20px]">
-							<Textarea
-								className="flex-1"
-								bind:value={bullets[index]}
-								isDisabled={!$isEditing}
-								onEnterKeydown={onTextareaEnterKeydown}
-								autofocus={index > 0}
-							/>
-							<div class="min-w-[40px] hidden sm:flex align-center relative">
-								{#if $isEditing}
-									<button class=" absolute top-0" on:click={() => onDeleteBullet(index)}>
-										<Icon icon={icons.delete} class="text-gray-300" height="18px" />
-									</button>
-								{/if}
-							</div>
-						</div>
-						<div class="mt-1 flex sm:hidden">
-							{#if $isEditing}
-								<button class="flex sm:hidden" on:click={() => onDeleteBullet(index)}>
-									<Icon icon={icons.delete} class="text-gray-300" height="18px" />
-								</button>
-							{/if}
-						</div>
-					</li>
-				{/each}
-			</ul>
+			<ListItems
+				items={listItems}
+				{isEditing}
+				onEnterKeydown={onTextareaEnterKeydown}
+				{onDeleteItem}
+			/>
 			<div class="hstack mt-2">
 				<BottomOptions
 					{incrementDecrementProps}
 					incrementDecrementValue={time}
 					{date}
 					isEditing={$isEditing}
-					onAccept={$isEditing ? onAcceptEdit : onAcceptNewBullet}
-					{onAddBullet}
+					onAccept={$isEditing ? onAccept : onAcceptNewBullet}
+					{onAddItem}
 					{onEdit}
 					{onDelete}
 					icon={icons.clock}
@@ -265,9 +236,3 @@
 		<button on:click={onClose}>Close</button>
 	</div>
 </Dialog>
-
-<style>
-	ul {
-		list-style-type: disc;
-	}
-</style>

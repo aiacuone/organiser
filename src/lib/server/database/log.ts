@@ -1,10 +1,10 @@
-import { LogType_enum, searchableInputs } from '$lib/types';
+import { LogType_enum, Log_enum } from '$lib/types';
 import { collection } from './common';
 
 export const getLogs = async ({
 	space,
 	date,
-	isCompleted,
+	isChecked,
 	hasAnswer,
 	limit = '10',
 	skip,
@@ -14,7 +14,7 @@ export const getLogs = async ({
 }: {
 	space?: string;
 	date?: string | Date;
-	isCompleted?: 'true' | 'false';
+	isChecked?: 'true' | 'false';
 	hasAnswer?: 'true' | 'false';
 	limit?: string;
 	skip?: string;
@@ -53,22 +53,49 @@ export const getLogs = async ({
 		});
 	}
 
-	if (search && searchType && searchType.length) {
-		baseQuery.push({
-			$match: {
-				$or: searchType.map((s) => ({
-					[s]: { $regex: search, $options: 'i' }
-				}))
+	if (search) {
+		const searchTypeArrays = {
+			[Log_enum.questions]: [
+				{ questions: { $elemMatch: { question: { $regex: search, $options: 'i' } } } },
+				{ questions: { $elemMatch: { answer: { $regex: search, $options: 'i' } } } }
+			],
+			[Log_enum.listItems]: [{ listItems: { $elemMatch: { $regex: search, $options: 'i' } } }],
+			[Log_enum.checkboxItems]: [
+				{ checkboxItems: { $elemMatch: { text: { $regex: search, $options: 'i' } } } }
+			],
+			[Log_enum.title]: [{ title: { $regex: search, $options: 'i' } }],
+			[Log_enum.reference]: [{ reference: { $regex: search, $options: 'i' } }]
+		};
+
+		if (search && searchType && searchType.length) {
+			const orArray = [];
+			if (searchType.includes(Log_enum.questions)) {
+				orArray.push(...searchTypeArrays[Log_enum.questions]);
 			}
-		});
-	} else if (search) {
-		baseQuery.push({
-			$match: {
-				$or: searchableInputs.map((option) => ({
-					[option]: { $regex: search, $options: 'i' }
-				}))
+			if (searchType.includes(Log_enum.listItems)) {
+				orArray.push(...searchTypeArrays[Log_enum.listItems]);
 			}
-		});
+			if (searchType.includes(Log_enum.checkboxItems)) {
+				orArray.push(...searchTypeArrays[Log_enum.checkboxItems]);
+			}
+			if (searchType.includes(Log_enum.title)) {
+				orArray.push(...searchTypeArrays[Log_enum.title]);
+			}
+			if (searchType.includes(Log_enum.reference)) {
+				orArray.push(...searchTypeArrays[Log_enum.reference]);
+			}
+			baseQuery.push({
+				$match: {
+					$or: orArray
+				}
+			});
+		} else {
+			baseQuery.push({
+				$match: {
+					$or: Object.values(searchTypeArrays).flat()
+				}
+			});
+		}
 	}
 
 	if (type && type.length) {
@@ -85,9 +112,13 @@ export const getLogs = async ({
 		});
 	}
 
-	if (isCompleted) {
-		const parsedBoolean = JSON.parse(isCompleted);
-		baseQuery.push({ $match: { isCompleted: parsedBoolean } });
+	if (isChecked) {
+		const parsedBoolean = JSON.parse(isChecked);
+		baseQuery.push({
+			$match: {
+				'checkboxItems.isChecked': { $eq: parsedBoolean }
+			}
+		});
 	}
 
 	if (hasAnswer) {
@@ -95,9 +126,19 @@ export const getLogs = async ({
 		baseQuery.push({
 			$match: {
 				$or: [
-					{ answer: { $exists: parsedBoolean } },
 					{
-						answer: { $eq: '' }
+						questions: {
+							$elemMatch: {
+								answer: { $exists: parsedBoolean }
+							}
+						}
+					},
+					{
+						questions: {
+							$elemMatch: {
+								answer: { $eq: '' }
+							}
+						}
 					}
 				]
 			}
@@ -141,7 +182,6 @@ export const updateLog = async (values: {
 	id: string;
 	date: Date;
 	title?: string;
-	content: string | string[];
 	reference?: string;
 	time?: number;
 	importance?: number;
@@ -210,7 +250,7 @@ export const getAllLogNotifications = async (spaces: string[]) => {
 				},
 				{
 					$match: {
-						isCompleted: false
+						'checkboxItems.isChecked': { $eq: false }
 					}
 				},
 				{
@@ -232,15 +272,17 @@ export const getAllLogNotifications = async (spaces: string[]) => {
 					$match: {
 						$or: [
 							{
-								answer: {
-									$not: {
-										$exists: true
+								questions: {
+									$elemMatch: {
+										answer: { $exists: false }
 									}
 								}
 							},
 							{
-								answer: {
-									$eq: ''
+								questions: {
+									$elemMatch: {
+										answer: { $eq: '' }
+									}
 								}
 							}
 						]

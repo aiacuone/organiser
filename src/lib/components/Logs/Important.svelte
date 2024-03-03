@@ -3,7 +3,6 @@
 	import BottomOptions from './BottomOptions.svelte';
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
-	import Textarea from '../Textarea.svelte';
 	import { getContext } from 'svelte';
 	import { LogType_enum, type Log_int } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
@@ -16,21 +15,22 @@
 	import Button from '../Button.svelte';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import type { Readable } from 'svelte/motion';
+	import ListItems from './LogListItems.svelte';
 
-	export let title: string;
+	export let title: string = '';
 	export let reference: string = '';
 	export let date: Date;
-	export let content: string;
 	export let id: string;
-	export let importance: number;
+	export let rating: 1 | 2 | 3;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
 	export let editOnMount: boolean = false;
+	export let listItems: string[];
 
 	let originalTitle = title;
 	let originalReference = reference;
-	let originalContent = content;
-	let originalImportance = importance;
+	let originalRating = rating;
+	let originalListItems = [...listItems];
 
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
@@ -46,7 +46,8 @@
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onAccept = () => {
-		if (!content) {
+		const filteredListItems = listItems.filter((item) => item !== '');
+		if (!filteredListItems.length) {
 			return onOpen();
 		}
 
@@ -54,14 +55,14 @@
 			values: {
 				title,
 				reference,
-				content,
-				importance
+				rating,
+				listItems: listItems
 			},
 			originalValues: {
 				title: originalTitle,
 				reference: originalReference,
-				content: originalContent,
-				importance: originalImportance
+				rating: originalRating,
+				listItems: originalListItems
 			}
 		});
 
@@ -82,8 +83,8 @@
 			id,
 			title,
 			reference,
-			content,
-			importance,
+			rating,
+			listItems: filteredListItems,
 			date: logDate,
 			type: LogType_enum.important,
 			space: $page.params.space,
@@ -91,8 +92,7 @@
 		});
 		originalTitle = title;
 		originalReference = reference;
-		originalContent = content;
-		originalImportance = importance;
+		originalRating = rating;
 
 		onResetNewLogType && onResetNewLogType();
 	};
@@ -100,18 +100,31 @@
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		content = originalContent;
+		listItems = originalListItems;
 	};
 
 	const incrementDecrementProps = {
 		min: 0,
 		max: 3,
-		onIncrement: () => (importance = importance + 1),
-		onDecrement: () => (importance = importance - 1)
+		onIncrement: () => (rating = rating + 1),
+		onDecrement: () => (rating = rating - 1)
 	};
 
 	let isOpen: boolean;
 	let onClose: () => void;
+
+	const onAddItem = () => {
+		$currentlyEditing = id;
+		listItems = [...listItems, ''];
+	};
+
+	const onTextareaEnterKeydown: () => void = () => {
+		onAddItem();
+	};
+
+	const onDeleteItem = (index: number) => {
+		listItems = listItems.filter((_, i) => i !== index);
+	};
 </script>
 
 <LogContainer
@@ -124,6 +137,8 @@
 	{id}
 	showDialog={!isOpen}
 	{editOnMount}
+	onControlShitAndDotKeydown={onAddItem}
+	onControlShitAndEnterKeydown={onAccept}
 >
 	<div class="bg-neutral-50 p-2 sm:p-3 stack gap-3">
 		{#if title || reference || $isEditing}
@@ -149,15 +164,14 @@
 			</div>
 		{/if}
 		<div class="hstack center gap-2">
-			<IconWithRating rating={importance} icon={icons.important} />
+			<IconWithRating {rating} icon={icons.important} />
 			<div class="flex-1">
-				{#if $isEditing}
-					<Textarea bind:value={content} autofocus={inputAutoFocus} />
-				{:else}
-					<p class="text-sm">
-						{content}
-					</p>
-				{/if}
+				<ListItems
+					items={listItems}
+					{isEditing}
+					onEnterKeydown={onTextareaEnterKeydown}
+					{onDeleteItem}
+				/>
 			</div>
 		</div>
 		<BottomOptions
@@ -167,9 +181,10 @@
 			isEditing={$isEditing}
 			{onAccept}
 			{incrementDecrementProps}
-			incrementDecrementValue={importance}
+			incrementDecrementValue={rating}
 			showIncrementDecrement={$isEditing}
 			{lastUpdated}
+			{onAddItem}
 		/>
 	</div>
 </LogContainer>

@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { afterUpdate, onMount } from 'svelte';
+	import type { ChangeEventHandler } from 'svelte/elements';
 	export let value: string | string[];
 	export let className = '';
 	export let autofocus = false;
 	export let isDisabled = false;
 	export let _class = '';
 	export let onEnterKeydown: () => void = () => {};
+	export let onChange: ChangeEventHandler<HTMLTextAreaElement> = () => {};
 
 	let textarea: HTMLTextAreaElement;
 	export const onFocus = () => {
@@ -42,10 +44,11 @@
 
 <textarea
 	bind:value
-	class="resize-none {className} w-full text-sm center bg-transparent h-[20px] px-2 {_class}"
+	class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 {_class}"
 	bind:this={textarea}
 	on:input={resize}
 	disabled={isDisabled}
+	on:change={onChange}
 />
 
 <svelte:window on:resize={resize} />

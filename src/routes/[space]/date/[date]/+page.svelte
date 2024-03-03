@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Time_enum, LogType_enum, type SpaceData_int, type Log_int } from '$lib/types/logs';
+	import { LogType_enum, type SpaceData_int, type Log_int } from '$lib/types/logs';
 	import { onMount, setContext } from 'svelte';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString, getDayFromHyphenatedString } from '$lib/utils';
@@ -7,10 +7,6 @@
 	import { darkMode } from '$lib/stores';
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
-	import Important from '$lib/components/Logs/Important.svelte';
-	import Time from '$lib/components/Logs/Time.svelte';
-	import Todo from '$lib/components/Logs/Todo.svelte';
-	import Question from '$lib/components/Logs/Question.svelte';
 	import NewLog from '$lib/components/NewLog.svelte';
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import { getLogs, getTitlesAndReferences } from '$lib/api/logsLocalApi';
@@ -27,9 +23,9 @@
 	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
 	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
 	import { browser } from '$app/environment';
+	import Logs from '$lib/components/Logs/Logs.svelte';
 
 	interface PageData extends SpaceData_int {
-		time: Time_enum;
 		date: string;
 		space: string;
 		titles: string[];
@@ -291,29 +287,7 @@
 			{:else if $logs.isError}
 				Error
 			{:else if $filteredLogs}
-				{#each $filteredLogs as log}
-					{@const { type, ...rest } = log}
-					{#if type === LogType_enum.important && log.importance && log.content}
-						<Important {...rest} importance={log.importance} content={log.content} />
-					{:else if type === LogType_enum.todo && log.priority && log.content}
-						<Todo
-							{...rest}
-							priority={log.priority}
-							isCompleted={log.isCompleted}
-							content={log.content}
-						/>
-					{:else if type === LogType_enum.question && log.importance && log.question}
-						<Question {...rest} importance={log.importance} content={log.content} />
-					{:else if type === LogType_enum.time}
-						<Time
-							{...rest}
-							title={log.title}
-							reference={log.reference}
-							time={log.time}
-							bullets={log.bullets}
-						/>
-					{/if}
-				{/each}
+				<Logs logs={$filteredLogs} />
 			{/if}
 		</div>
 		<div class="stack gap-2">

@@ -3,26 +3,24 @@
 	import BottomOptions from './BottomOptions.svelte';
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
-	import Textarea from '../Textarea.svelte';
 	import { getContext } from 'svelte';
 	import { page } from '$app/stores';
-	import { LogType_enum, type Log_int } from '$lib/types';
+	import { LogType_enum, type Log_int, type QuestionItem_int } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { getHaveValuesChanged } from '$lib/utils/logs';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import { currentlyEditing, titles } from '$lib/stores';
 	import Input from '../Input.svelte';
-	import Button from '../Button.svelte';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import type { Readable } from 'svelte/motion';
+	import LogQuestionItems from './LogQuestionItems.svelte';
 
-	export let title: string;
+	export let title: string = '';
 	export let reference: string = '';
 	export let date: Date;
-	export let question: string;
-	export let answer: string | undefined = undefined;
+	export let questions: QuestionItem_int[];
 	export let id: string;
-	export let importance: number;
+	export let rating: 1 | 2 | 3;
 	export let editOnMount: boolean = false;
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
@@ -31,9 +29,8 @@
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let originalTitle = title;
 	let originalReference = reference;
-	let originalQuestion = question;
-	let originalAnswer = answer;
-	let originalImportance = importance;
+	let originalQuestions = [...questions];
+	let originalRating = rating;
 	let onEdit: () => void;
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
@@ -45,16 +42,18 @@
 	const onAccept = () => {
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
-				question,
-				answer,
-				importance
+				questions: [...questions],
+				rating
 			},
 			originalValues: {
-				question: originalQuestion,
-				answer: originalAnswer,
-				importance: originalImportance
+				questions: [...originalQuestions],
+				rating: originalRating
 			}
 		});
+
+		const filteredQuestions = questions.filter(
+			({ question, answer }) => question || (answer && question)
+		);
 
 		$currentlyEditing = null;
 
@@ -73,9 +72,8 @@
 			title,
 			reference,
 			id,
-			question,
-			answer,
-			importance,
+			questions: filteredQuestions,
+			rating,
 			date: logDate,
 			type: LogType_enum.question,
 			space: $page.params.space,
@@ -83,25 +81,25 @@
 		});
 		originalTitle = title;
 		originalReference = reference;
-		originalQuestion = question;
-		originalAnswer = answer;
-		originalImportance = importance;
+		originalQuestions = [...filteredQuestions];
+		originalRating = rating;
 
 		onResetNewLogType && onResetNewLogType();
+		onResetItems();
 	};
 
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		question = originalQuestion;
-		answer = originalAnswer;
+		questions = [...originalQuestions];
+		onResetItems();
 	};
 
 	const incrementDecrementProps = {
 		min: 1,
 		max: 3,
-		onIncrement: () => (importance = importance + 1),
-		onDecrement: () => (importance = importance - 1)
+		onIncrement: () => (rating = rating + 1),
+		onDecrement: () => (rating = rating - 1)
 	};
 	let onFocusAnswerInput: () => void;
 	const _onFocusAnswerInput = () => {
@@ -111,6 +109,13 @@
 			onFocusAnswerInput();
 		}, 0);
 	};
+
+	const onAddQuestion = () => {
+		$currentlyEditing = id;
+		questions = [...questions, { question: '' }];
+	};
+
+	let onResetItems: () => void;
 </script>
 
 <LogContainer
@@ -124,6 +129,8 @@
 	bind:onTitleAutoFill
 	{changeReferenceInputValue}
 	{editOnMount}
+	onControlShitAndDotKeydown={onAddQuestion}
+	onControlShitAndEnterKeydown={onAccept}
 >
 	<div class="bg-neutral-100 p-1 rounded-sm">
 		<div class="bg-white p-2 stack gap-3 rounded-sm">
@@ -150,25 +157,14 @@
 				</div>
 			{/if}
 			<div class="hstack center gap-2">
-				<IconWithRating icon={icons.question} rating={importance} />
-				<div class="stack gap-1 w-full min-h-[60px]">
-					<div class="hstack text-sm gap-1">
-						<p class="text-gray-300">Question:</p>
-						<Textarea bind:value={question} className="" isDisabled={!$isEditing} />
-					</div>
-					{#if $isEditing || answer}
-						<div class="hstack text-sm gap-1">
-							<p class="text-gray-300">Answer:</p>
-							<Textarea
-								bind:value={answer}
-								isDisabled={!$isEditing}
-								bind:onFocus={onFocusAnswerInput}
-							/>
-						</div>
-					{:else}
-						<Button _class="self-start" onClick={_onFocusAnswerInput}>Answer</Button>
-					{/if}
-				</div>
+				<IconWithRating icon={icons.question} {rating} />
+				<LogQuestionItems
+					bind:questions
+					onFocusAnswerInput={_onFocusAnswerInput}
+					{id}
+					isDisabled={!$isEditing}
+					bind:onReset={onResetItems}
+				/>
 			</div>
 			<BottomOptions
 				{onEdit}
@@ -177,9 +173,10 @@
 				{onAccept}
 				isEditing={$isEditing}
 				{incrementDecrementProps}
-				incrementDecrementValue={importance}
+				incrementDecrementValue={rating}
 				showIncrementDecrement={$isEditing}
 				{lastUpdated}
+				onAddItem={onAddQuestion}
 			/>
 		</div>
 	</div>
