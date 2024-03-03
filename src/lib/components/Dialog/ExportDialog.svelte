@@ -23,7 +23,6 @@
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
 	import { onMount } from 'svelte';
-	import { writable } from 'svelte/store';
 
 	export let onOpen: () => void;
 	export let onClose: () => void;
@@ -68,11 +67,11 @@
 	let preferences = { ...defaultPreferences };
 
 	onMount(() => {
-		const storageLogKeyValueFilter = getLocalStorage(
-			LocalStorage_enum.exportLogKeyValueFilterDefaults
-		);
-		const storageTypeFilter = getLocalStorage(LocalStorage_enum.exportTypeFilterDefaults);
-		const storagePreferences = getLocalStorage(LocalStorage_enum.exportPreferenceDefaults);
+		const [storageLogKeyValueFilter, storageTypeFilter, storagePreferences] = getLocalStorage([
+			LocalStorage_enum.exportLogKeyValueFilterDefaults,
+			LocalStorage_enum.exportTypeFilterDefaults,
+			LocalStorage_enum.exportPreferenceDefaults
+		]);
 
 		storageLogKeyValueFilter && (logKeyValueFilter = storageLogKeyValueFilter);
 		storageTypeFilter && (typeFilter = storageTypeFilter);
@@ -125,11 +124,11 @@
 	let dialog: HTMLDialogElement;
 
 	const onReset = () => {
-		const storageLogKeyValueFilter = getLocalStorage(
-			LocalStorage_enum.exportLogKeyValueFilterDefaults
-		);
-		const storageTypeFilter = getLocalStorage(LocalStorage_enum.exportTypeFilterDefaults);
-		const storagePreferences = getLocalStorage(LocalStorage_enum.exportPreferenceDefaults);
+		const [storageLogKeyValueFilter, storageTypeFilter, storagePreferences] = getLocalStorage([
+			LocalStorage_enum.exportLogKeyValueFilterDefaults,
+			LocalStorage_enum.exportTypeFilterDefaults,
+			LocalStorage_enum.exportPreferenceDefaults
+		]);
 
 		const resetLogKeyValueFilter = storageLogKeyValueFilter ?? defaultLogKeyValueFilter;
 		const resetTypeFilter = storageTypeFilter ?? defaultTypeFilterData;
@@ -141,9 +140,11 @@
 	};
 
 	const onConfirmSetDefault = () => {
-		setLocalStorage(LocalStorage_enum.exportLogKeyValueFilterDefaults, { ...logKeyValueFilter });
-		setLocalStorage(LocalStorage_enum.exportTypeFilterDefaults, { ...typeFilter });
-		setLocalStorage(LocalStorage_enum.exportPreferenceDefaults, { ...preferences });
+		setLocalStorage([
+			{ key: LocalStorage_enum.exportLogKeyValueFilterDefaults, value: logKeyValueFilter },
+			{ key: LocalStorage_enum.exportTypeFilterDefaults, value: typeFilter },
+			{ key: LocalStorage_enum.exportPreferenceDefaults, value: preferences }
+		]);
 
 		onCloseDefaultSelection();
 	};
