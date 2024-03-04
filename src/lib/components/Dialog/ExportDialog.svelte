@@ -114,8 +114,12 @@
 				containerHeight - headerHeight - buttonsContainerHeight - footerButtonsContainerHeight
 			}px`);
 
-	const onCopy = () => {
+	const onCopy = (index: number) => {
 		copyToClipboard(logsContainer.innerText);
+		footerButtons[index].isAnimating = true;
+		setTimeout(() => {
+			footerButtons[index].isAnimating = false;
+		}, 1500);
 	};
 
 	const onCsv = () => {
@@ -209,15 +213,19 @@
 	const footerButtons = [
 		{
 			onClick: onCopy,
-			label: 'Copy'
+			label: 'Copy',
+			isAnimating: false,
+			animatingText: 'Copied ✅'
 		},
 		{
 			onClick: onCsv,
-			label: 'CSV'
+			label: 'CSV',
+			key: 'csv'
 		},
 		{
 			onClick: () => dialog.close(),
-			label: 'Close'
+			label: 'Close',
+			key: 'close'
 		}
 	];
 
@@ -313,9 +321,13 @@
 			{/if}
 		</div>
 		<div class="hstack center gap-2" bind:clientHeight={footerButtonsContainerHeight}>
-			{#each footerButtons as { onClick, label }}
-				<Button {onClick}>
-					{label}
+			{#each footerButtons as { onClick, label }, index}
+				<Button onClick={() => onClick(index)}>
+					{#if footerButtons[index].isAnimating}
+						{footerButtons[index].animatingText}
+					{:else}
+						{label}
+					{/if}
 				</Button>
 			{/each}
 		</div>
