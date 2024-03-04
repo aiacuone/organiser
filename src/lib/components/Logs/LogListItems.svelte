@@ -14,7 +14,7 @@
 
 <ul class="ml-5 stack" style={`list-style-type:${bulletType === 'checkbox' ? 'none' : bulletType}`}>
 	{#each items as _, index}
-		<li>
+		<li class={index % 2 === 0 ? 'bg-transparent' : 'bg-gray-100'}>
 			<div class="hstack">
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="flex-1">
