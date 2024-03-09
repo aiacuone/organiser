@@ -8,7 +8,11 @@
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import Input from '../Input.svelte';
-	import { getHaveValuesChanged } from '$lib/utils/logs';
+	import {
+		getHaveValuesChanged,
+		getListItemsFromMappedListItems,
+		getMappedListItems
+	} from '$lib/utils/logs';
 	import { currentlyEditing, titles } from '$lib/stores';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
@@ -35,7 +39,8 @@
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let onTitleAutoFill: (title: string) => void;
 
-	let originalListItems = [...listItems];
+	let mappedListItems = getMappedListItems(listItems);
+	let originalMappedListItems = getMappedListItems(listItems);
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalTime = time;
@@ -48,7 +53,7 @@
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onDeleteItem = (index: number) => {
-		listItems = listItems.filter((_, i) => i !== index);
+		mappedListItems = mappedListItems.filter((_, i) => i !== index);
 	};
 
 	const onAccept = async () => {
@@ -60,13 +65,13 @@
 			values: {
 				title,
 				reference,
-				listItems,
+				listItems: mappedListItems,
 				time
 			},
 			originalValues: {
 				title: originalTitle,
 				reference: originalReference,
-				listItems: originalListItems,
+				listItems: originalMappedListItems,
 				time: originalTime
 			}
 		});
@@ -82,14 +87,14 @@
 			logDate = _date;
 		}
 
-		listItems = listItems.filter((c) => c);
+		mappedListItems = mappedListItems.filter((c) => c);
 		$currentlyEditing = null;
 		try {
 			await $updateMutation.mutate({
 				id,
 				title,
 				reference,
-				listItems,
+				listItems: getListItemsFromMappedListItems(mappedListItems),
 				time,
 				date: logDate,
 				type: LogType_enum.time,
@@ -98,11 +103,12 @@
 			});
 			originalTitle = title;
 			originalReference = reference;
-			originalListItems = listItems;
+			originalMappedListItems = mappedListItems;
 			originalTime = time;
 			lastUpdated = new Date();
 		} catch (error) {
 			toast.error('There was an issue updating the log');
+			console.log(error);
 		}
 
 		onResetNewLogType && onResetNewLogType();
@@ -111,14 +117,14 @@
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		listItems = originalListItems;
+		mappedListItems = originalMappedListItems;
 		title = originalTitle;
 		reference = originalReference;
 	};
 
 	const onAddItem = () => {
 		$currentlyEditing = id;
-		listItems = [...listItems, ''];
+		mappedListItems = [...mappedListItems, { id: mappedListItems.length, item: '' }];
 	};
 
 	const onAcceptNewBullet = () => {
@@ -132,7 +138,7 @@
 				id,
 				title,
 				reference,
-				listItems,
+				listItems: getListItemsFromMappedListItems(mappedListItems),
 				time,
 				date,
 				type: LogType_enum.time,
@@ -148,7 +154,7 @@
 				id,
 				title,
 				reference,
-				listItems,
+				listItems: getListItemsFromMappedListItems(mappedListItems),
 				time,
 				date,
 				type: LogType_enum.time,
@@ -207,7 +213,7 @@
 				</div>
 			{/if}
 			<ListItems
-				items={listItems}
+				items={mappedListItems}
 				{isEditing}
 				onEnterKeydown={onTextareaEnterKeydown}
 				{onDeleteItem}

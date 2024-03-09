@@ -30,3 +30,8 @@ export const arraysHaveSameValues = (arr1: string[], arr2: string[]): boolean =>
 
 	return true;
 };
+
+export const getMappedListItems = (items: string[]) =>
+	items.map((item, index) => ({ id: index, item }));
+export const getListItemsFromMappedListItems = (mappedListItems: { id: number; item: string }[]) =>
+	mappedListItems.map(({ item }) => item);

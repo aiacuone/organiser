@@ -4,8 +4,9 @@
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
+	import type { MappedListItem_int } from '$lib/types';
 
-	export let items: string[] = [];
+	export let items: MappedListItem_int[] = [];
 	export let isEditing: Readable<boolean>;
 	export let onEnterKeydown: () => void;
 	export let onDeleteItem: (index: number) => void;
@@ -20,7 +21,7 @@
 					<div class="flex-1">
 						<Textarea
 							_class="w-full"
-							bind:value={items[index]}
+							bind:value={items[index].item}
 							isDisabled={!$isEditing}
 							{onEnterKeydown}
 							autofocus={index > 0}

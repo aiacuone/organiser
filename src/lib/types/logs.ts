@@ -114,3 +114,8 @@ export const searchableInputs = [
 ];
 
 export const allLogInputs = searchableInputs.map((key) => key as Log_enum);
+
+export interface MappedListItem_int {
+	id: number;
+	item: string;
+}
