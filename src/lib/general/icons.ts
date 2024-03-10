@@ -31,5 +31,6 @@ export const icons = {
 	back: 'lets-icons:back-light',
 	all: 'material-symbols:done-all',
 	cross: 'system-uicons:cross',
-	save: 'bi:save'
+	save: 'bi:save',
+	vertical: 'carbon:pan-vertical'
 };

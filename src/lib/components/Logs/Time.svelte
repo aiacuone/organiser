@@ -20,6 +20,7 @@
 	import type { Readable } from 'svelte/motion';
 	import ListItems from './LogListItems.svelte';
 	import toast from 'svelte-french-toast';
+	import { writable } from 'svelte/store';
 
 	export let date: Date;
 	export let listItems: string[] = [];
@@ -39,7 +40,7 @@
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let onTitleAutoFill: (title: string) => void;
 
-	let mappedListItems = getMappedListItems(listItems);
+	const mappedListItems = writable(getMappedListItems(listItems));
 	let originalMappedListItems = getMappedListItems(listItems);
 	let originalTitle = title;
 	let originalReference = reference;
@@ -53,7 +54,7 @@
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onDeleteItem = (index: number) => {
-		mappedListItems = mappedListItems.filter((_, i) => i !== index);
+		$mappedListItems = $mappedListItems.filter((_, i) => i !== index);
 	};
 
 	const onAccept = async () => {
@@ -65,7 +66,7 @@
 			values: {
 				title,
 				reference,
-				listItems: mappedListItems,
+				listItems: $mappedListItems,
 				time
 			},
 			originalValues: {
@@ -87,14 +88,14 @@
 			logDate = _date;
 		}
 
-		mappedListItems = mappedListItems.filter((c) => c);
+		$mappedListItems = $mappedListItems.filter((c) => c);
 		$currentlyEditing = null;
 		try {
 			await $updateMutation.mutate({
 				id,
 				title,
 				reference,
-				listItems: getListItemsFromMappedListItems(mappedListItems),
+				listItems: getListItemsFromMappedListItems($mappedListItems),
 				time,
 				date: logDate,
 				type: LogType_enum.time,
@@ -103,7 +104,7 @@
 			});
 			originalTitle = title;
 			originalReference = reference;
-			originalMappedListItems = mappedListItems;
+			originalMappedListItems = [...$mappedListItems];
 			originalTime = time;
 			lastUpdated = new Date();
 		} catch (error) {
@@ -117,14 +118,14 @@
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		mappedListItems = originalMappedListItems;
+		$mappedListItems = originalMappedListItems;
 		title = originalTitle;
 		reference = originalReference;
 	};
 
 	const onAddItem = () => {
 		$currentlyEditing = id;
-		mappedListItems = [...mappedListItems, { id: mappedListItems.length, item: '' }];
+		$mappedListItems = [...$mappedListItems, { id: $mappedListItems.length, item: '' }];
 	};
 
 	const onAcceptNewBullet = () => {
@@ -138,7 +139,7 @@
 				id,
 				title,
 				reference,
-				listItems: getListItemsFromMappedListItems(mappedListItems),
+				listItems: getListItemsFromMappedListItems($mappedListItems),
 				time,
 				date,
 				type: LogType_enum.time,
@@ -154,7 +155,7 @@
 				id,
 				title,
 				reference,
-				listItems: getListItemsFromMappedListItems(mappedListItems),
+				listItems: getListItemsFromMappedListItems($mappedListItems),
 				time,
 				date,
 				type: LogType_enum.time,
