@@ -7,13 +7,18 @@
 	import { page } from '$app/stores';
 	import { LogType_enum, type Log_int, type QuestionItem_int } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
-	import { getHaveValuesChanged } from '$lib/utils/logs';
+	import {
+		getHaveValuesChanged,
+		getMappedQuestions,
+		getQuestionsFromMappedQuestions
+	} from '$lib/utils/logs';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import { currentlyEditing, titles } from '$lib/stores';
 	import Input from '../Input.svelte';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import type { Readable } from 'svelte/motion';
 	import LogQuestionItems from './LogQuestionItems.svelte';
+	import { writable } from 'svelte/store';
 
 	export let title: string = '';
 	export let reference: string = '';
@@ -37,21 +42,24 @@
 	let onDelete: () => void;
 	let isEditing: Readable<boolean>;
 
+	const mappedQuestions = writable(getMappedQuestions(questions));
+	let originalMappedQuestions = getMappedQuestions(questions);
+
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onAccept = () => {
 		const haveValuesChanged = getHaveValuesChanged({
 			values: {
-				questions: [...questions],
+				questions: [...$mappedQuestions],
 				rating
 			},
 			originalValues: {
-				questions: [...originalQuestions],
+				questions: [...originalMappedQuestions],
 				rating: originalRating
 			}
 		});
 
-		const filteredQuestions = questions.filter(
+		const filteredQuestions = $mappedQuestions.filter(
 			({ question, answer }) => question || (answer && question)
 		);
 
@@ -72,7 +80,7 @@
 			title,
 			reference,
 			id,
-			questions: filteredQuestions,
+			questions: getQuestionsFromMappedQuestions(filteredQuestions),
 			rating,
 			date: logDate,
 			type: LogType_enum.question,
@@ -91,7 +99,7 @@
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		questions = [...originalQuestions];
+		$mappedQuestions = [...originalMappedQuestions];
 		onResetItems();
 	};
 
@@ -112,7 +120,7 @@
 
 	const onAddQuestion = () => {
 		$currentlyEditing = id;
-		questions = [...questions, { question: '' }];
+		$mappedQuestions = [...$mappedQuestions, { question: '', id: $mappedQuestions.length }];
 	};
 
 	let onResetItems: () => void;
@@ -159,11 +167,12 @@
 			<div class="hstack center gap-2">
 				<IconWithRating icon={icons.question} {rating} />
 				<LogQuestionItems
-					bind:questions
+					questions={mappedQuestions}
 					onFocusAnswerInput={_onFocusAnswerInput}
 					{id}
 					isDisabled={!$isEditing}
 					bind:onReset={onResetItems}
+					{isEditing}
 				/>
 			</div>
 			<BottomOptions

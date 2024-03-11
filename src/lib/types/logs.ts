@@ -74,6 +74,11 @@ export interface LogBase_int {
 	[Log_enum.reference]: string;
 	[Log_enum.time]: number;
 }
+
+export interface ListItem_int {
+	item: string;
+}
+
 export interface CheckboxItem_int {
 	isChecked: boolean;
 	text: string;
@@ -115,7 +120,11 @@ export const searchableInputs = [
 
 export const allLogInputs = searchableInputs.map((key) => key as Log_enum);
 
-export interface MappedListItem_int {
+// export interface MappedListItem_int {
+// 	id: number;
+// 	item: string;
+// }
+
+export interface BaseMappedListItem_int {
 	id: number;
-	item: string;
 }

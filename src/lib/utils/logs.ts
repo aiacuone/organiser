@@ -1,13 +1,18 @@
-import type { Log_enum, Log_int } from '$lib/types';
-
-interface OptionalLogInt extends Partial<Log_int> {}
+import type {
+	BaseMappedListItem_int,
+	CheckboxItem_int,
+	ListItem_int,
+	Log_enum,
+	Log_int,
+	QuestionItem_int
+} from '$lib/types';
 
 export const getHaveValuesChanged = ({
 	values,
 	originalValues
 }: {
-	values: OptionalLogInt;
-	originalValues: OptionalLogInt;
+	values: Partial<Log_int>;
+	originalValues: Partial<Log_int>;
 }) => {
 	return Object.keys(values).some(
 		(key) => values[key as Log_enum] !== originalValues[key as Log_enum]
@@ -31,7 +36,29 @@ export const arraysHaveSameValues = (arr1: string[], arr2: string[]): boolean =>
 	return true;
 };
 
-export const getMappedListItems = (items: string[]) =>
+// List Items
+export const getMappedListItems = (items: string[]): (BaseMappedListItem_int & ListItem_int)[] =>
 	items.map((item, index) => ({ id: index, item }));
-export const getListItemsFromMappedListItems = (mappedListItems: { id: number; item: string }[]) =>
-	mappedListItems.map(({ item }) => item);
+
+export const getListItemsFromMappedListItems = (
+	mappedListItems: (BaseMappedListItem_int & ListItem_int)[]
+): string[] => mappedListItems.map(({ item }) => item);
+
+// Checkbox Items
+export const getMappedCheckboxItems = (
+	items: CheckboxItem_int[]
+): (BaseMappedListItem_int & CheckboxItem_int)[] =>
+	items.map((item, index) => ({ id: index, ...item }));
+
+export const getCheckboxItemsFromMappedCheckboxItems = (
+	mappedCheckboxItems: (BaseMappedListItem_int & CheckboxItem_int)[]
+): CheckboxItem_int[] => mappedCheckboxItems.map(({ text, isChecked }) => ({ text, isChecked }));
+
+export const getMappedQuestions = (
+	items: QuestionItem_int[]
+): (BaseMappedListItem_int & QuestionItem_int)[] =>
+	items.map((question, index) => ({ id: index, ...question }));
+
+export const getQuestionsFromMappedQuestions = (
+	mappedQuestions: (BaseMappedListItem_int & QuestionItem_int)[]
+): QuestionItem_int[] => mappedQuestions.map(({ question, answer }) => ({ question, answer }));

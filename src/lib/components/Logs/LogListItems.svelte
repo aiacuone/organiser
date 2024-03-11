@@ -4,11 +4,11 @@
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
-	import type { MappedListItem_int } from '$lib/types';
 	import { flip } from 'svelte/animate';
 	import { dndzone } from 'svelte-dnd-action';
+	import type { BaseMappedListItem_int, ListItem_int } from '$lib/types';
 
-	export let items: Writable<MappedListItem_int[]>;
+	export let items: Writable<(BaseMappedListItem_int & ListItem_int)[]>;
 	export let isEditing: Readable<boolean>;
 	export let onEnterKeydown: () => void;
 	export let onDeleteItem: (index: number) => void;
