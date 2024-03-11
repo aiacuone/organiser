@@ -36,7 +36,6 @@ export const arraysHaveSameValues = (arr1: string[], arr2: string[]): boolean =>
 	return true;
 };
 
-// List Items
 export const getMappedListItems = (items: string[]): (BaseMappedListItem_int & ListItem_int)[] =>
 	items.map((item, index) => ({ id: index, item }));
 
@@ -44,7 +43,6 @@ export const getListItemsFromMappedListItems = (
 	mappedListItems: (BaseMappedListItem_int & ListItem_int)[]
 ): string[] => mappedListItems.map(({ item }) => item);
 
-// Checkbox Items
 export const getMappedCheckboxItems = (
 	items: CheckboxItem_int[]
 ): (BaseMappedListItem_int & CheckboxItem_int)[] =>
