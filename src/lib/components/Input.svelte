@@ -61,8 +61,8 @@
 		on:keydown={onKeydown}
 	/>
 	{#if isInputFocused && !value}
-		<div class="relative">
-			<div class="absolute stack bg-white border-l border-r border-b rounded-b-md">
+		<div class="relative z-50">
+			<div class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full">
 				{#each autofillValues as autofillValue}
 					<button
 						class="text-xs text-neutral-400 cursor-pointer hover:bg-gray-100 px-4 py-2 z-99 flex justify-start"

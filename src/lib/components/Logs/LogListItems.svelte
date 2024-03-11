@@ -1,26 +1,43 @@
 <!-- todo: combine this with LogListItems when svelte 5 is released -->
 <script lang="ts">
-	import type { Readable } from 'svelte/store';
+	import type { Readable, Writable } from 'svelte/store';
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
+	import { flip } from 'svelte/animate';
+	import { dndzone } from 'svelte-dnd-action';
+	import type { BaseMappedListItem_int, ListItem_int } from '$lib/types';
 
-	export let items: string[] = [];
+	export let items: Writable<(BaseMappedListItem_int & ListItem_int)[]>;
 	export let isEditing: Readable<boolean>;
 	export let onEnterKeydown: () => void;
 	export let onDeleteItem: (index: number) => void;
 	export let bulletType: 'disc' | 'circle' | 'square' | 'checkbox' = 'disc';
 </script>
 
-<ul class="ml-5 stack" style={`list-style-type:${bulletType === 'checkbox' ? 'none' : bulletType}`}>
-	{#each items as _, index}
-		<li class={index % 2 === 0 ? 'bg-transparent' : 'bg-gray-100'}>
+<ul
+	class="ml-5 stack"
+	style={`list-style-type:${$isEditing ? 'none' : bulletType === 'checkbox' ? 'none' : bulletType}`}
+	use:dndzone={{
+		items: $items,
+		flipDurationMs: 300,
+		dropTargetStyle: {},
+		dragDisabled: !$isEditing
+	}}
+	on:consider={(e) => ($items = e.detail.items)}
+	on:finalize={(e) => ($items = e.detail.items)}
+>
+	{#each $items as item, index (item.id)}
+		<li class="{index % 2 === 0 ? 'bg-transparent' : 'bg-gray-100'} relative">
+			{#if $isEditing}
+				<Icon icon={icons.vertical} class="absolute -left-4 top-1" />
+			{/if}
 			<div class="hstack">
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="flex-1">
 						<Textarea
 							_class="w-full"
-							bind:value={items[index]}
+							bind:value={$items[index].item}
 							isDisabled={!$isEditing}
 							{onEnterKeydown}
 							autofocus={index > 0}

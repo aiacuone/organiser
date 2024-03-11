@@ -38,6 +38,7 @@
 		"@sveltestack/svelte-query": "^1.6.0",
 		"axios": "^1.5.0",
 		"mongodb": "^6.1.0",
+		"svelte-dnd-action": "^0.9.40",
 		"svelte-french-toast": "^1.2.0",
 		"uuid": "^9.0.0"
 	}

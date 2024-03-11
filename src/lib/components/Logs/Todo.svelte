@@ -7,7 +7,11 @@
 	import { LogType_enum, Log_enum, type Log_int, type CheckboxItem_int } from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { page } from '$app/stores';
-	import { getHaveValuesChanged } from '$lib/utils/logs';
+	import {
+		getCheckboxItemsFromMappedCheckboxItems,
+		getHaveValuesChanged,
+		getMappedCheckboxItems
+	} from '$lib/utils/logs';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import Input from '../Input.svelte';
 	import { currentlyEditing, titles } from '$lib/stores';
@@ -15,6 +19,7 @@
 	import type { Readable } from 'svelte/motion';
 	import toast from 'svelte-french-toast';
 	import CheckboxItems from './LogCheckboxItems.svelte';
+	import { writable } from 'svelte/store';
 
 	export let title: string = '';
 	export let reference: string = '';
@@ -25,10 +30,13 @@
 	export let editOnMount: boolean = false;
 	export let checkboxItems: CheckboxItem_int[] = [];
 
+	const mappedCheckboxItems = writable(getMappedCheckboxItems(checkboxItems));
+	let mappedOriginalcheckboxItems = getMappedCheckboxItems(checkboxItems);
+
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalRating = rating;
-	let originalCheckboxItems = [...checkboxItems];
+	let originalCheckboxItems = [...mappedOriginalcheckboxItems];
 
 	let isEditing: Readable<boolean>;
 
@@ -48,7 +56,7 @@
 				[Log_enum.rating]: rating,
 				[Log_enum.title]: title,
 				[Log_enum.reference]: reference,
-				[Log_enum.checkboxItems]: checkboxItems
+				[Log_enum.checkboxItems]: $mappedCheckboxItems
 			},
 			originalValues: {
 				[Log_enum.rating]: originalRating,
@@ -70,7 +78,7 @@
 			logDate = _date;
 		}
 
-		checkboxItems = checkboxItems.filter(({ text }) => text);
+		$mappedCheckboxItems = $mappedCheckboxItems.filter(({ text }) => text);
 
 		try {
 			await $updateMutation.mutate({
@@ -82,13 +90,13 @@
 				lastUpdated: new Date(),
 				title,
 				reference,
-				checkboxItems: checkboxItems
+				checkboxItems: getCheckboxItemsFromMappedCheckboxItems($mappedCheckboxItems)
 			});
 			onResetNewLogType && onResetNewLogType();
 			originalTitle = title;
 			originalReference = reference;
 			originalRating = rating;
-			originalCheckboxItems = [...checkboxItems];
+			originalCheckboxItems = [...$mappedCheckboxItems];
 		} catch (error) {
 			toast.error('Issue updating state');
 		}
@@ -101,7 +109,7 @@
 		title = originalTitle;
 		reference = originalReference;
 		rating = originalRating;
-		checkboxItems = [...originalCheckboxItems];
+		$mappedCheckboxItems = [...originalCheckboxItems];
 	};
 
 	const incrementDecrementProps = {
@@ -113,7 +121,10 @@
 
 	const onAddItem = () => {
 		$currentlyEditing = id;
-		checkboxItems = [...checkboxItems, { isChecked: false, text: '' }];
+		$mappedCheckboxItems = [
+			...$mappedCheckboxItems,
+			{ id: $mappedCheckboxItems.length, isChecked: false, text: '' }
+		];
 	};
 
 	const onTextareaEnterKeydown: () => void = () => {
@@ -121,7 +132,7 @@
 	};
 
 	const onDeleteBullet = (index: number) => {
-		checkboxItems = [...checkboxItems].filter((_, i) => i !== index);
+		$mappedCheckboxItems = [...$mappedCheckboxItems].filter((_, i) => i !== index);
 	};
 </script>
 
@@ -166,7 +177,7 @@
 			<IconWithRating icon={icons.todo} {rating} />
 			<div class="flex-1">
 				<CheckboxItems
-					bind:checkboxes={checkboxItems}
+					checkboxes={mappedCheckboxItems}
 					{isEditing}
 					onEnterKeydown={onTextareaEnterKeydown}
 					{onDeleteBullet}
