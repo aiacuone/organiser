@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { isDropdownOpen } from '$lib/stores';
 	import { clickOutside } from '$lib/utils/clickAway';
 	import { onMount } from 'svelte';
 
@@ -46,6 +47,9 @@
 			onEnterKeydown();
 		}
 	};
+
+	$: _isDropdownOpen = isInputFocused && !value && autofillValues.length > 0;
+	$: _isDropdownOpen, ($isDropdownOpen = _isDropdownOpen);
 </script>
 
 <div use:clickOutside on:click_outside={onClickOutside}>
@@ -60,7 +64,7 @@
 		on:input={onChange}
 		on:keydown={onKeydown}
 	/>
-	{#if isInputFocused && !value}
+	{#if _isDropdownOpen}
 		<div class="relative z-50">
 			<div class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full">
 				{#each autofillValues as autofillValue}

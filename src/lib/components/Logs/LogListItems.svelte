@@ -29,7 +29,7 @@
 >
 	{#each $items as item, index (item.id)}
 		<li class="{index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'} relative">
-			{#if $isEditing}
+			{#if $isEditing && $items.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-4 top-1" />
 			{/if}
 			<div class="hstack">

@@ -32,7 +32,7 @@
 >
 	{#each $checkboxes as item, index (item.id)}
 		<li class="relative">
-			{#if $isEditing}
+			{#if $isEditing && $checkboxes.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-[18px] top-[2px]" />
 			{/if}
 			<div class="hstack">
