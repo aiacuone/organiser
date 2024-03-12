@@ -124,6 +124,10 @@
 	};
 
 	let onResetItems: () => void;
+
+	const onDeleteQuestion = (index: number) => {
+		$mappedQuestions = $mappedQuestions.filter((_, i) => i !== index);
+	};
 </script>
 
 <LogContainer
@@ -173,6 +177,7 @@
 					isDisabled={!$isEditing}
 					bind:onReset={onResetItems}
 					{isEditing}
+					{onDeleteQuestion}
 				/>
 			</div>
 			<BottomOptions

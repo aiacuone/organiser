@@ -6,6 +6,8 @@
 	import Textarea from '../Textarea.svelte';
 	import { dndzone } from 'svelte-dnd-action';
 	import type { Readable } from 'svelte/motion';
+	import Icon from '@iconify/svelte';
+	import { icons } from '$lib/general/icons';
 
 	export let questions: Writable<(BaseMappedListItem_int & QuestionItem_int)[]>;
 	export let isDisabled: boolean;
@@ -15,6 +17,7 @@
 		isAnswering = undefined;
 	};
 	export let isEditing: Readable<boolean>;
+	export let onDeleteQuestion: (index: number) => void;
 
 	let isAnswering: undefined | number = undefined;
 
@@ -44,10 +47,10 @@
 	on:finalize={(e) => ($questions = e.detail.items)}
 >
 	{#each $questions as item, index (item.id)}
-		<li>
+		<li class="hstack {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'} px-2 py-1 rounded">
 			<div class="stack gap-1 w-full min-h-[60px]">
 				<div class="hstack text-sm gap-1">
-					<p class="text-gray-300">Question:</p>
+					<p class="text-neutral-400">Question:</p>
 					<Textarea
 						bind:value={$questions[index].question}
 						className=""
@@ -58,7 +61,7 @@
 				</div>
 				{#if $questions[index].answer || isAnswering === index}
 					<div class="text-sm gap-1 flex-1 flex">
-						<p class="text-gray-300">Answer:</p>
+						<p class="text-neutral-400">Answer:</p>
 						<Textarea
 							value={$questions[index].answer ?? ''}
 							_class="flex-1"
@@ -75,6 +78,13 @@
 							: 'block'}"
 						onClick={() => _onFocusAnswerInput(index)}>Answer</Button
 					>
+				{/if}
+			</div>
+			<div class="center">
+				{#if $isEditing}
+					<button class="flex" on:click={() => onDeleteQuestion(index)}>
+						<Icon icon={icons.delete} class="text-gray-300" height="18px" />
+					</button>
 				{/if}
 			</div>
 		</li>
