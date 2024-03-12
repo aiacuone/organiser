@@ -28,7 +28,7 @@
 	on:finalize={(e) => ($items = e.detail.items)}
 >
 	{#each $items as item, index (item.id)}
-		<li class="{index % 2 === 0 ? 'bg-transparent' : 'bg-gray-100'} relative">
+		<li class="{index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'} relative">
 			{#if $isEditing}
 				<Icon icon={icons.vertical} class="absolute -left-4 top-1" />
 			{/if}
