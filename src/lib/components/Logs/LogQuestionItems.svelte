@@ -47,7 +47,12 @@
 	on:finalize={(e) => ($questions = e.detail.items)}
 >
 	{#each $questions as item, index (item.id)}
-		<li class="hstack {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'} px-2 py-1 rounded">
+		<li
+			class="hstack {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'} px-2 py-1 rounded relative"
+		>
+			{#if $isEditing && $questions.length > 1}
+				<Icon icon={icons.vertical} class="absolute -left-4 top-6" />
+			{/if}
 			<div class="stack gap-1 w-full min-h-[60px]">
 				<div class="hstack text-sm gap-1">
 					<p class="text-neutral-400">Question:</p>

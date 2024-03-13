@@ -17,7 +17,9 @@
 
 <ul
 	class="ml-5 stack"
-	style={`list-style-type:${$isEditing ? 'none' : bulletType === 'checkbox' ? 'none' : bulletType}`}
+	style={`list-style-type:${
+		$isEditing && $items.length > 1 ? 'none' : bulletType === 'checkbox' ? 'none' : bulletType
+	}`}
 	use:dndzone={{
 		items: $items,
 		flipDurationMs: 300,
