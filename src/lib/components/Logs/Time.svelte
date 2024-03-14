@@ -87,7 +87,7 @@
 			logDate = _date;
 		}
 
-		listItems = listItems.filter((c) => c);
+		listItems = listItems.filter(({ item }) => item);
 		$currentlyEditing = null;
 		try {
 			await $updateMutation.mutate({
