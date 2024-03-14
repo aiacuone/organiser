@@ -4,15 +4,16 @@
 	import LogContainer from './LogContainer.svelte';
 	import BottomOptions from './BottomOptions.svelte';
 	import { getContext } from 'svelte';
-	import { LogType_enum, type Log_int } from '$lib/types';
+	import {
+		LogType_enum,
+		type BaseMappedListItem_int,
+		type Log_int,
+		type ListItem_int
+	} from '$lib/types';
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import Input from '../Input.svelte';
-	import {
-		getHaveValuesChanged,
-		getListItemsFromMappedListItems,
-		getMappedListItems
-	} from '$lib/utils/logs';
+	import { getHaveValuesChanged, getListItemsFromMappedListItems } from '$lib/utils/logs';
 	import { currentlyEditing, titles } from '$lib/stores';
 	import type { MutationStoreResult } from '@sveltestack/svelte-query';
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
@@ -20,10 +21,9 @@
 	import type { Readable } from 'svelte/motion';
 	import ListItems from './LogListItems.svelte';
 	import toast from 'svelte-french-toast';
-	import { writable } from 'svelte/store';
 
 	export let date: Date;
-	export let listItems: string[] = [];
+	export let listItems: (BaseMappedListItem_int & ListItem_int)[] = [];
 	export let id: string;
 	export let title: string = '';
 	export let reference: string = '';
@@ -40,11 +40,10 @@
 	let changeReferenceInputValue: (value: string | undefined) => void;
 	let onTitleAutoFill: (title: string) => void;
 
-	const mappedListItems = writable(getMappedListItems(listItems));
-	let originalMappedListItems = getMappedListItems(listItems);
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalTime = time;
+	let originalListItems = listItems;
 
 	let updateMutation: MutationStoreResult<void, unknown, Log_int, unknown>;
 	let deleteMutation: MutationStoreResult<void, unknown, string, unknown>;
@@ -54,7 +53,7 @@
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onDeleteItem = (index: number) => {
-		$mappedListItems = $mappedListItems.filter((_, i) => i !== index);
+		listItems = listItems.filter((_, i) => i !== index);
 	};
 
 	const onAccept = async () => {
@@ -66,13 +65,13 @@
 			values: {
 				title,
 				reference,
-				listItems: $mappedListItems,
+				listItems,
 				time
 			},
 			originalValues: {
 				title: originalTitle,
 				reference: originalReference,
-				listItems: originalMappedListItems,
+				listItems: originalListItems,
 				time: originalTime
 			}
 		});
@@ -88,14 +87,14 @@
 			logDate = _date;
 		}
 
-		$mappedListItems = $mappedListItems.filter((c) => c);
+		listItems = listItems.filter((c) => c);
 		$currentlyEditing = null;
 		try {
 			await $updateMutation.mutate({
 				id,
 				title,
 				reference,
-				listItems: getListItemsFromMappedListItems($mappedListItems),
+				listItems: getListItemsFromMappedListItems(listItems),
 				time,
 				date: logDate,
 				type: LogType_enum.time,
@@ -104,7 +103,7 @@
 			});
 			originalTitle = title;
 			originalReference = reference;
-			originalMappedListItems = [...$mappedListItems];
+			originalListItems = [...listItems];
 			originalTime = time;
 			lastUpdated = new Date();
 		} catch (error) {
@@ -118,14 +117,14 @@
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		$mappedListItems = originalMappedListItems;
+		listItems = originalListItems;
 		title = originalTitle;
 		reference = originalReference;
 	};
 
 	const onAddItem = () => {
 		$currentlyEditing = id;
-		$mappedListItems = [...$mappedListItems, { id: $mappedListItems.length, item: '' }];
+		listItems = [...listItems, { id: listItems.length, item: '' }];
 	};
 
 	const onAcceptNewBullet = () => {
@@ -139,7 +138,7 @@
 				id,
 				title,
 				reference,
-				listItems: getListItemsFromMappedListItems($mappedListItems),
+				listItems: getListItemsFromMappedListItems(listItems),
 				time,
 				date,
 				type: LogType_enum.time,
@@ -155,7 +154,7 @@
 				id,
 				title,
 				reference,
-				listItems: getListItemsFromMappedListItems($mappedListItems),
+				listItems: getListItemsFromMappedListItems(listItems),
 				time,
 				date,
 				type: LogType_enum.time,
@@ -214,7 +213,7 @@
 				</div>
 			{/if}
 			<ListItems
-				items={mappedListItems}
+				bind:items={listItems}
 				{isEditing}
 				onEnterKeydown={onTextareaEnterKeydown}
 				{onDeleteItem}

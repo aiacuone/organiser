@@ -4,7 +4,12 @@
 	import IconWithRating from '../IconWithRating.svelte';
 	import LogContainer from './LogContainer.svelte';
 	import { getContext } from 'svelte';
-	import { LogType_enum, type Log_int } from '$lib/types';
+	import {
+		LogType_enum,
+		type BaseMappedListItem_int,
+		type Log_int,
+		type ListItem_int
+	} from '$lib/types';
 	import { getDateFromHyphenatedString } from '$lib/utils';
 	import { page } from '$app/stores';
 	import {
@@ -20,7 +25,6 @@
 	import { getHyphenatedStringFromDate } from '$lib/utils/strings';
 	import type { Readable } from 'svelte/motion';
 	import ListItems from './LogListItems.svelte';
-	import { writable } from 'svelte/store';
 
 	export let title: string = '';
 	export let reference: string = '';
@@ -30,11 +34,9 @@
 	export let inputAutoFocus: boolean = false;
 	export let lastUpdated: Date | undefined = undefined;
 	export let editOnMount: boolean = false;
-	export let listItems: string[];
+	export let listItems: (BaseMappedListItem_int & ListItem_int)[];
 
-	const mappedListItems = writable(getMappedListItems(listItems));
-	let originalMappedListItems = getMappedListItems(listItems);
-
+	let originalListItems = listItems;
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalRating = rating;
@@ -53,7 +55,7 @@
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
 	const onAccept = () => {
-		const filteredListItems = $mappedListItems.filter(({ item }) => item !== '');
+		const filteredListItems = listItems.filter(({ item }) => item !== '');
 		if (!filteredListItems.length) {
 			return onOpen();
 		}
@@ -63,13 +65,13 @@
 				title,
 				reference,
 				rating,
-				listItems: $mappedListItems
+				listItems
 			},
 			originalValues: {
 				title: originalTitle,
 				reference: originalReference,
 				rating: originalRating,
-				listItems: originalMappedListItems
+				listItems: originalListItems
 			}
 		});
 
@@ -100,14 +102,14 @@
 		originalTitle = title;
 		originalReference = reference;
 		originalRating = rating;
-		originalMappedListItems = [...$mappedListItems];
+		originalListItems = [...listItems];
 		onResetNewLogType && onResetNewLogType();
 	};
 
 	const onResetChange = () => {
 		$currentlyEditing = null;
 		onResetNewLogType && onResetNewLogType();
-		$mappedListItems = originalMappedListItems;
+		listItems = originalListItems;
 	};
 
 	const incrementDecrementProps = {
@@ -122,7 +124,7 @@
 
 	const onAddItem = () => {
 		$currentlyEditing = id;
-		$mappedListItems = [...$mappedListItems, { item: '', id: $mappedListItems.length }];
+		listItems = [...listItems, { item: '', id: listItems.length }];
 	};
 
 	const onTextareaEnterKeydown: () => void = () => {
@@ -130,7 +132,7 @@
 	};
 
 	const onDeleteItem = (index: number) => {
-		$mappedListItems = $mappedListItems.filter((_, i) => i !== index);
+		listItems = listItems.filter((_, i) => i !== index);
 	};
 </script>
 
@@ -174,7 +176,7 @@
 			<IconWithRating {rating} icon={icons.important} />
 			<div class="flex-1">
 				<ListItems
-					items={mappedListItems}
+					bind:items={listItems}
 					{isEditing}
 					onEnterKeydown={onTextareaEnterKeydown}
 					{onDeleteItem}

@@ -6,6 +6,7 @@
 	import Question from './Logs/Question.svelte';
 	import Important from './Logs/Important.svelte';
 	import { page } from '$app/stores';
+	import { getMappedCheckboxItems, getMappedListItems, getMappedQuestions } from '$lib/utils';
 
 	export let type: LogType_enum;
 
@@ -26,9 +27,9 @@
 		question: '',
 		date,
 		editOnMount: true,
-		listItems: [''],
-		checkboxItems: [{ text: '', isChecked: false }],
-		questions: [{ question: '' }]
+		listItems: getMappedListItems(['']),
+		checkboxItems: getMappedCheckboxItems([{ text: '', isChecked: false }]),
+		questions: getMappedQuestions([{ question: '' }])
 	};
 </script>
 
