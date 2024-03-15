@@ -9,6 +9,7 @@
 		type Log_int
 	} from '$lib/types';
 	import {
+		clickOutside,
 		getCheckboxItemsFromMappedCheckboxItems,
 		getDateFromHyphenatedString,
 		getHaveValuesChanged,
@@ -17,11 +18,16 @@
 		getQuestionsFromMappedQuestions
 	} from '$lib/utils';
 	import { page } from '$app/stores';
-	import { currentlyEditing } from '$lib/stores';
 	import { useMutation } from '@sveltestack/svelte-query/dist/mutation/useMutation';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
+	import { derived } from 'svelte/store';
+	import Dialog from '../Dialog/Dialog.svelte';
+	import Button from '../Button.svelte';
+	import { isDropdownOpen } from '$lib/stores';
+	import { currentlyEditing, titlesAndReferences } from '$lib/stores';
+	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 
 	export let logType: LogType_enum;
 	export let title: string = '';
@@ -47,6 +53,13 @@
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 
+	let container: HTMLDivElement;
+
+	export const isEditing = derived(
+		[currentlyEditing],
+		([$currentlyEditing]) => $currentlyEditing === id
+	);
+
 	const updateLogMutation = useMutation(updateLog, {
 		onSuccess: () => {
 			invalidateLogs();
@@ -62,6 +75,21 @@
 	export const onDelete = () => {
 		$currentlyEditing = null;
 		$deleteLogMutation.mutate(id);
+	};
+
+	const onEdit = () => {
+		const isAnotherCardEditing = !!$currentlyEditing;
+		if (!isAnotherCardEditing) {
+			$currentlyEditing = id;
+		}
+	};
+
+	let changeReferenceInputValue: ((value: string | undefined) => void) | undefined = undefined;
+
+	const onTitleAutoFill = (_title: string) => {
+		const correspondingReference = $titlesAndReferences.find((t) => t.title === _title)?.reference;
+
+		changeReferenceInputValue && changeReferenceInputValue(correspondingReference ?? undefined);
 	};
 
 	const onAccept = async () => {
@@ -126,4 +154,86 @@
 		originalRating = rating;
 		$currentlyEditing = null;
 	};
+
+	const onAddItem = () => {
+		$currentlyEditing = id;
+		if (logType === LogType_enum.todo) {
+			checkboxItems = [...checkboxItems, { id: checkboxItems.length, isChecked: false, text: '' }];
+		} else if (logType === LogType_enum.question) {
+			questions = [...questions, { id: questions.length, question: '' }];
+		} else if (logType === LogType_enum.important || logType === LogType_enum.time) {
+			listItems = [...listItems, { id: listItems.length, item: '' }];
+		}
+	};
+
+	const onDeleteItem = (id: number) => {
+		if (logType === LogType_enum.todo) {
+			checkboxItems = checkboxItems.filter((_, i) => i !== id);
+		} else if (logType === LogType_enum.question) {
+			questions = questions.filter((_, i) => i !== id);
+		} else if (logType === LogType_enum.important || logType === LogType_enum.time) {
+			listItems = listItems.filter((_, i) => i !== id);
+		}
+	};
+
+	const onControlShitAndDotKeydown = () => {
+		onAddItem();
+	};
+	const onControlShitAndEnterKeydown = () => {
+		onAccept();
+	};
+
+	const onResetChange = () => {
+		$currentlyEditing = null;
+		onResetNewLogType && onResetNewLogType();
+		listItems = originalListItems;
+		title = originalTitle;
+		reference = originalReference;
+	};
+
+	onMount(() => {
+		const keydown = (e: KeyboardEvent) => {
+			if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
+				onControlShitAndEnterKeydown();
+			}
+			if (e.ctrlKey && e.shiftKey && e.key === '.') {
+				onControlShitAndDotKeydown();
+			}
+		};
+
+		onMount(() => {
+			if (editOnMount) {
+				$currentlyEditing = id;
+			}
+		});
+
+		container.addEventListener('keydown', keydown);
+
+		return () => {
+			container.removeEventListener('keydown', keydown);
+		};
+	});
+
+	let onOpen: () => void;
+	let onClose: () => void;
+	let isOpen: boolean;
+
+	const onClickOutside = () => {
+		$isEditing && !isOpen && !$isDropdownOpen && onOpen();
+	};
 </script>
+
+<div bind:this={container} use:clickOutside on:click_outside={onClickOutside} class="">
+	<div />
+</div>
+
+<Dialog bind:onOpen bind:isOpen bind:onClose>
+	<div class="stack center gap-1">
+		Please add some content to your log.
+		<Button onClick={onClose}>OK</Button>
+	</div>
+</Dialog>
+
+<ConfirmationDialog onConfirm={onResetChange} bind:onOpen
+	>Did you want to reset your changes?</ConfirmationDialog
+>
