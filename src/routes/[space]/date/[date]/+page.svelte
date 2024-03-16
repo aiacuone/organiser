@@ -136,28 +136,33 @@
 		return $logs.data?.logs.filter((log: Log_int) => $filters.includes(log.type));
 	});
 
-	const noteButtons = [
-		{
+	const noteButtons: Record<LogType_enum, { label: string; icon: string; type: LogType_enum }> = {
+		[LogType_enum.time]: {
 			label: 'log',
 			icon: icons.clock,
 			type: LogType_enum.time
 		},
-		{
+		[LogType_enum.todo]: {
 			label: 'todo',
 			icon: icons.todo,
 			type: LogType_enum.todo
 		},
-		{
+		[LogType_enum.important]: {
 			label: 'important',
 			icon: icons.important,
 			type: LogType_enum.important
 		},
-		{
+		[LogType_enum.question]: {
 			label: 'question',
 			icon: icons.question,
 			type: LogType_enum.question
+		},
+		[LogType_enum.list]: {
+			label: 'list',
+			icon: icons.list,
+			type: LogType_enum.list
 		}
-	];
+	};
 
 	const onResetNewLogType = () => {
 		newLogType = undefined;
@@ -248,7 +253,7 @@
 			</div>
 
 			<div class="grid grid-cols-4 w-full gap-y-3 gap-x-3 max-w-[500px] min-w-[300px]">
-				{#each noteButtons as { icon, type }}
+				{#each Object.values(noteButtons) as { icon, type }}
 					<PillButton
 						buttons={[
 							{

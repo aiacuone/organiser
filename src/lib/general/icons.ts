@@ -32,5 +32,6 @@ export const icons = {
 	all: 'material-symbols:done-all',
 	cross: 'system-uicons:cross',
 	save: 'bi:save',
-	vertical: 'carbon:pan-vertical'
+	vertical: 'carbon:pan-vertical',
+	list: 'fluent:text-number-list-16-filled'
 };
