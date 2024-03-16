@@ -1,13 +1,9 @@
 <script lang="ts">
-	import { LogType_enum } from '$lib/types';
 	import { v4 as uuidv4 } from 'uuid';
-	import Time from './Logs/Time.svelte';
-	import Todo from './Logs/Todo.svelte';
-	// import Question from './Logs/Question.svelte';
-	import Important from './Logs/Important.svelte';
 	import { page } from '$app/stores';
 	import { getMappedCheckboxItems, getMappedListItems, getMappedQuestions } from '$lib/utils';
 	import Log from './Logs/Log.svelte';
+	import type { LogType_enum } from '$lib/types';
 
 	export let type: LogType_enum;
 
@@ -33,12 +29,4 @@
 	};
 </script>
 
-{#if type === LogType_enum.time}
-	<Log logType={type} {...defaultValues} />
-{:else if type === LogType_enum.todo}
-	<Log logType={type} {...defaultValues} />
-{:else if type === LogType_enum.question}
-	<Log logType={type} {...defaultValues} />
-{:else if type === LogType_enum.important}
-	<Log logType={type} {...defaultValues} />
-{/if}
+<Log logType={type} {...defaultValues} />

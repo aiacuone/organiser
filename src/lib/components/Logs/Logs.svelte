@@ -1,34 +1,18 @@
 <script lang="ts">
-	import { LogType_enum, type Log_int } from '$lib/types';
+	import type { Log_int } from '$lib/types';
 	import { getMappedCheckboxItems, getMappedListItems, getMappedQuestions } from '$lib/utils';
-	import Important from './Important.svelte';
 	import Log from './Log.svelte';
 
 	export let logs: Log_int[];
-	[];
 </script>
 
 {#each logs as log}
-	{@const { type, questions, checkboxItems, listItems, rating, time, ...rest } = log}
-	{#if type === LogType_enum.important && log.rating && listItems}
-		<Log logType={type} {...rest} rating={log.rating} listItems={getMappedListItems(listItems)} />
-	{:else if type === LogType_enum.todo && log.rating && checkboxItems}
-		<Log
-			logType={type}
-			{...rest}
-			checkboxItems={getMappedCheckboxItems(checkboxItems)}
-			rating={log.rating}
-		/>
-	{:else if type === LogType_enum.question && log.rating && questions}
-		<Log logType={type} {...rest} questions={getMappedQuestions(questions)} rating={log.rating} />
-	{:else if type === LogType_enum.time && listItems}
-		<Log
-			logType={type}
-			{...rest}
-			title={log.title}
-			reference={log.reference}
-			{time}
-			listItems={getMappedListItems(listItems)}
-		/>
-	{/if}
+	{@const { questions, checkboxItems, listItems, type, ...rest } = log}
+	<Log
+		questions={questions && getMappedQuestions(questions)}
+		checkboxItems={checkboxItems && getMappedCheckboxItems(checkboxItems)}
+		listItems={listItems && getMappedListItems(listItems)}
+		logType={type}
+		{...rest}
+	/>
 {/each}
