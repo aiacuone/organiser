@@ -41,7 +41,7 @@
 	export let reference: string = '';
 	export let date: Date;
 	export let id: string;
-	export let rating: 1 | 2 | 3;
+	export let rating: 1 | 2 | 3 = 1;
 	export let lastUpdated: Date | undefined = undefined;
 	export let editOnMount: boolean = false;
 	export let checkboxItems: (BaseMappedListItem_int & CheckboxItem_int)[] = [];
@@ -247,7 +247,7 @@
 	});
 
 	let onOpen: () => void;
-	let onClose: () => void;
+	// let onClose: () => void;
 	let isOpen: boolean;
 
 	const onClickOutside = () => {
@@ -264,18 +264,20 @@
 	const onIncrement = () => {
 		if (logType === LogType_enum.time) {
 			time = time + 0.5;
-			debounce(() =>
-				$updateLogMutation.mutate({
-					id,
-					title,
-					reference,
-					listItems: getListItemsFromMappedListItems(listItems),
-					time,
-					date,
-					type: LogType_enum.time,
-					space: $page.params.space
-				})
-			);
+			if (!$isEditing) {
+				debounce(() =>
+					$updateLogMutation.mutate({
+						id,
+						title,
+						reference,
+						listItems: getListItemsFromMappedListItems(listItems),
+						time,
+						date,
+						type: LogType_enum.time,
+						space: $page.params.space
+					})
+				);
+			}
 		} else {
 			rating = rating + 1;
 		}
@@ -284,18 +286,20 @@
 	const onDecrement = () => {
 		if (logType === LogType_enum.time) {
 			time = time - 0.5;
-			debounce(() =>
-				$updateLogMutation.mutate({
-					id,
-					title,
-					reference,
-					listItems: getListItemsFromMappedListItems(listItems),
-					time,
-					date,
-					type: LogType_enum.time,
-					space: $page.params.space
-				})
-			);
+			if (!$isEditing) {
+				debounce(() =>
+					$updateLogMutation.mutate({
+						id,
+						title,
+						reference,
+						listItems: getListItemsFromMappedListItems(listItems),
+						time,
+						date,
+						type: LogType_enum.time,
+						space: $page.params.space
+					})
+				);
+			}
 		} else {
 			rating = rating - 1;
 		}

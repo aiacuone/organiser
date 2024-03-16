@@ -34,7 +34,7 @@
 </script>
 
 {#if type === LogType_enum.time}
-	<Time {...defaultValues} />
+	<Log logType={type} {...defaultValues} />
 {:else if type === LogType_enum.todo}
 	<Log logType={type} {...defaultValues} />
 {:else if type === LogType_enum.question}
