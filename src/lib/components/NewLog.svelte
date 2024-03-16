@@ -36,7 +36,7 @@
 {#if type === LogType_enum.time}
 	<Time {...defaultValues} />
 {:else if type === LogType_enum.todo}
-	<Todo {...defaultValues} />
+	<Log logType={type} {...defaultValues} />
 {:else if type === LogType_enum.question}
 	<Log logType={type} {...defaultValues} />
 {:else if type === LogType_enum.important}

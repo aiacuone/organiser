@@ -15,7 +15,12 @@
 	{#if type === LogType_enum.important && log.rating && listItems}
 		<Important {...rest} rating={log.rating} listItems={getMappedListItems(listItems)} />
 	{:else if type === LogType_enum.todo && log.rating && checkboxItems}
-		<Todo {...rest} checkboxItems={getMappedCheckboxItems(checkboxItems)} rating={log.rating} />
+		<Log
+			logType={type}
+			{...rest}
+			checkboxItems={getMappedCheckboxItems(checkboxItems)}
+			rating={log.rating}
+		/>
 	{:else if type === LogType_enum.question && log.rating && questions}
 		<Log logType={type} {...rest} questions={getMappedQuestions(questions)} rating={log.rating} />
 	{:else if type === LogType_enum.time && listItems}

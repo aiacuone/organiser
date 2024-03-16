@@ -24,8 +24,6 @@
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
 	import { derived } from 'svelte/store';
-	import Dialog from '../Dialog/Dialog.svelte';
-	import Button from '../Button.svelte';
 	import { isDropdownOpen } from '$lib/stores';
 	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
@@ -322,24 +320,24 @@
 		<div class={containerClasses[logType][1]}>
 			{#if title || reference || $isEditing}
 				<div class="stack gap-1">
-					<!-- {#if !$isEditing && !title}{''}{:else} -->
-					<Input
-						bind:value={title}
-						autofocus={inputAutoFocus}
-						placeholder="Title"
-						autofillValues={$titles}
-						isDisabled={!$isEditing}
-						onAutoFill={onTitleAutoFill}
-					/>
-					<!-- {/if} -->
-					<!-- {#if $isEditing || reference} -->
-					<Input
-						bind:value={reference}
-						bind:changeInputValue={changeReferenceInputValue}
-						placeholder="Reference"
-						isDisabled={!$isEditing}
-					/>
-					<!-- {/if} -->
+					{#if !$isEditing && !title}{''}{:else}
+						<Input
+							bind:value={title}
+							autofocus={inputAutoFocus}
+							placeholder="Title"
+							autofillValues={$titles}
+							isDisabled={!$isEditing}
+							onAutoFill={onTitleAutoFill}
+						/>
+					{/if}
+					{#if $isEditing || reference}
+						<Input
+							bind:value={reference}
+							bind:changeInputValue={changeReferenceInputValue}
+							placeholder="Reference"
+							isDisabled={!$isEditing}
+						/>
+					{/if}
 				</div>
 			{/if}
 			<div class="hstack center gap-2">
@@ -382,7 +380,7 @@
 					onIncrement,
 					onDecrement
 				}}
-				incrementDecrementValue={time}
+				incrementDecrementValue={logType === LogType_enum.time ? time : rating}
 				{date}
 				isEditing={$isEditing}
 				{onAccept}
@@ -395,13 +393,6 @@
 		</div>
 	</div>
 </div>
-
-<Dialog bind:onOpen bind:isOpen bind:onClose>
-	<div class="stack center gap-1">
-		Please add some content to your log.
-		<Button onClick={onClose}>OK</Button>
-	</div>
-</Dialog>
 
 <ConfirmationDialog onConfirm={onResetChange} bind:onOpen
 	>Did you want to reset your changes?</ConfirmationDialog
