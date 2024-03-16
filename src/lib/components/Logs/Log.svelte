@@ -10,6 +10,7 @@
 	} from '$lib/types';
 	import {
 		clickOutside,
+		debounce,
 		getCheckboxItemsFromMappedCheckboxItems,
 		getDateFromHyphenatedString,
 		getHaveValuesChanged,
@@ -26,8 +27,15 @@
 	import Dialog from '../Dialog/Dialog.svelte';
 	import Button from '../Button.svelte';
 	import { isDropdownOpen } from '$lib/stores';
-	import { currentlyEditing, titlesAndReferences } from '$lib/stores';
+	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
+	import Input from '../Input.svelte';
+	import BottomOptions from './BottomOptions.svelte';
+	import ListItems from './LogListItems.svelte';
+	import CheckboxItems from './LogCheckboxItems.svelte';
+	import LogQuestionItems from './LogQuestionItems.svelte';
+	import IconWithRating from '../IconWithRating.svelte';
+	import { icons } from '$lib/general/icons';
 
 	export let logType: LogType_enum;
 	export let title: string = '';
@@ -37,23 +45,25 @@
 	export let rating: 1 | 2 | 3;
 	export let lastUpdated: Date | undefined = undefined;
 	export let editOnMount: boolean = false;
+	export let checkboxItems: (BaseMappedListItem_int & CheckboxItem_int)[] = [];
+	export let questions: (BaseMappedListItem_int & QuestionItem_int)[] = [];
+	export let listItems: (BaseMappedListItem_int & ListItem_int)[] = [];
+	export let inputAutoFocus: boolean = false;
+	export let time: number = 0;
 
 	let originalTitle = title;
 	let originalReference = reference;
 	let originalRating = rating;
-
-	export let checkboxItems: (BaseMappedListItem_int & CheckboxItem_int)[] = [];
-	export let questions: (BaseMappedListItem_int & QuestionItem_int)[] = [];
-	export let listItems: (BaseMappedListItem_int & ListItem_int)[] = [];
-
-	let originalCheckboxItems = [...checkboxItems];
+	let originalCheckboxItems = checkboxItems;
 	let originalQuestions = questions;
 	let originalListItems = listItems;
+	let originalTime = time;
+
+	let isAnswering: undefined | number = undefined;
+	let container: HTMLDivElement;
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
-
-	let container: HTMLDivElement;
 
 	export const isEditing = derived(
 		[currentlyEditing],
@@ -84,12 +94,25 @@
 		}
 	};
 
+	export const onResetItems: () => void = () => {
+		isAnswering = undefined;
+	};
+
 	let changeReferenceInputValue: ((value: string | undefined) => void) | undefined = undefined;
 
 	const onTitleAutoFill = (_title: string) => {
 		const correspondingReference = $titlesAndReferences.find((t) => t.title === _title)?.reference;
 
 		changeReferenceInputValue && changeReferenceInputValue(correspondingReference ?? undefined);
+	};
+
+	let onFocusAnswerInput: () => void;
+	const _onFocusAnswerInput = () => {
+		$currentlyEditing = id;
+		//this is a hack to make sure the answer input is focused
+		setTimeout(() => {
+			onFocusAnswerInput();
+		}, 0);
 	};
 
 	const onAccept = async () => {
@@ -124,6 +147,7 @@
 		} else if (logType === LogType_enum.important || logType === LogType_enum.time) {
 			const filteredListItems = listItems.filter(({ item }) => item);
 			values[Log_enum.listItems] = getListItemsFromMappedListItems(filteredListItems);
+			values[Log_enum.time] = time;
 			originalListItems = [...filteredListItems];
 		}
 
@@ -153,6 +177,17 @@
 		originalReference = reference;
 		originalRating = rating;
 		$currentlyEditing = null;
+
+		if (logType === LogType_enum.todo) {
+			originalCheckboxItems = [...checkboxItems];
+		} else if (logType === LogType_enum.question) {
+			originalQuestions = [...questions];
+			onResetItems();
+		} else if (logType === LogType_enum.important) {
+			originalListItems = [...listItems];
+		} else if (logType === LogType_enum.time) {
+			originalTime = time;
+		}
 	};
 
 	const onAddItem = () => {
@@ -166,21 +201,14 @@
 		}
 	};
 
-	const onDeleteItem = (id: number) => {
+	const onDeleteItem = (index: number) => {
 		if (logType === LogType_enum.todo) {
-			checkboxItems = checkboxItems.filter((_, i) => i !== id);
+			checkboxItems = checkboxItems.filter((_, i) => i !== index);
 		} else if (logType === LogType_enum.question) {
-			questions = questions.filter((_, i) => i !== id);
+			questions = questions.filter((_, i) => i !== index);
 		} else if (logType === LogType_enum.important || logType === LogType_enum.time) {
-			listItems = listItems.filter((_, i) => i !== id);
+			listItems = listItems.filter((_, i) => i !== index);
 		}
-	};
-
-	const onControlShitAndDotKeydown = () => {
-		onAddItem();
-	};
-	const onControlShitAndEnterKeydown = () => {
-		onAccept();
 	};
 
 	const onResetChange = () => {
@@ -191,13 +219,17 @@
 		reference = originalReference;
 	};
 
+	const onTextareaEnterKeydown: () => void = () => {
+		onAddItem();
+	};
+
 	onMount(() => {
 		const keydown = (e: KeyboardEvent) => {
 			if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
-				onControlShitAndEnterKeydown();
+				onAccept();
 			}
 			if (e.ctrlKey && e.shiftKey && e.key === '.') {
-				onControlShitAndDotKeydown();
+				onAddItem();
 			}
 		};
 
@@ -221,10 +253,145 @@
 	const onClickOutside = () => {
 		$isEditing && !isOpen && !$isDropdownOpen && onOpen();
 	};
+
+	const incrementDecrementPropValues: Record<LogType_enum, { min: number; max: number }> = {
+		[LogType_enum.todo]: { min: 0, max: 3 },
+		[LogType_enum.question]: { min: 1, max: 3 },
+		[LogType_enum.important]: { min: 0, max: 3 },
+		[LogType_enum.time]: { min: 0, max: 24 }
+	};
+
+	const onIncrement = () => {
+		if (logType === LogType_enum.time) {
+			time = time + 0.5;
+			debounce(() =>
+				$updateLogMutation.mutate({
+					id,
+					title,
+					reference,
+					listItems: getListItemsFromMappedListItems(listItems),
+					time,
+					date,
+					type: LogType_enum.time,
+					space: $page.params.space
+				})
+			);
+		} else {
+			rating = rating + 1;
+		}
+	};
+
+	const onDecrement = () => {
+		if (logType === LogType_enum.time) {
+			time = time - 0.5;
+			debounce(() =>
+				$updateLogMutation.mutate({
+					id,
+					title,
+					reference,
+					listItems: getListItemsFromMappedListItems(listItems),
+					time,
+					date,
+					type: LogType_enum.time,
+					space: $page.params.space
+				})
+			);
+		} else {
+			rating = rating - 1;
+		}
+	};
+
+	const containerClasses: Record<LogType_enum, string[]> = {
+		[LogType_enum.todo]: ['', 'border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-1'],
+		[LogType_enum.question]: [
+			'bg-neutral-100 p-1 rounded-sm',
+			'bg-white p-2 stack gap-3 rounded-sm'
+		],
+		[LogType_enum.time]: [
+			'bg-neutral-100 p-2 rounded-sm',
+			'bg-white rounded-sm p-2 stack text-sm gap-1'
+		],
+		[LogType_enum.important]: ['', 'bg-neutral-50 p-2 sm:p-3 stack gap-3']
+	};
 </script>
 
 <div bind:this={container} use:clickOutside on:click_outside={onClickOutside} class="">
-	<div />
+	<div class={containerClasses[logType][0]}>
+		<div class={containerClasses[logType][1]}>
+			{#if title || reference || $isEditing}
+				<div class="stack gap-1">
+					{#if !$isEditing && !title}{''}{:else}
+						<Input
+							bind:value={title}
+							autofocus={inputAutoFocus}
+							placeholder="Title"
+							autofillValues={$titles}
+							isDisabled={!$isEditing}
+							onAutoFill={onTitleAutoFill}
+						/>
+					{/if}
+					{#if $isEditing || reference}
+						<Input
+							bind:value={reference}
+							bind:changeInputValue={changeReferenceInputValue}
+							placeholder="Reference"
+							isDisabled={!$isEditing}
+						/>
+					{/if}
+				</div>
+			{/if}
+			<div class="hstack center gap-2">
+				{#if logType === LogType_enum.todo}
+					<IconWithRating icon={icons.todo} {rating} />
+					<div class="flex-1">
+						<CheckboxItems
+							bind:checkboxes={checkboxItems}
+							{isEditing}
+							onEnterKeydown={onTextareaEnterKeydown}
+							onDeleteBullet={onDeleteItem}
+							{onEdit}
+						/>
+					</div>
+				{/if}
+				{#if logType === LogType_enum.question}
+					<IconWithRating icon={icons.question} {rating} />
+					<LogQuestionItems
+						bind:questions
+						onFocusAnswerInput={_onFocusAnswerInput}
+						isDisabled={!$isEditing}
+						{isEditing}
+						onDeleteQuestion={onDeleteItem}
+						{id}
+					/>
+				{/if}
+				{#if logType === LogType_enum.important || logType === LogType_enum.time}
+					<ListItems
+						bind:items={listItems}
+						{isEditing}
+						onEnterKeydown={onTextareaEnterKeydown}
+						{onDeleteItem}
+					/>
+				{/if}
+			</div>
+			<BottomOptions
+				incrementDecrementProps={{
+					min: incrementDecrementPropValues[logType].min,
+					max: incrementDecrementPropValues[logType].max,
+					onIncrement,
+					onDecrement
+				}}
+				incrementDecrementValue={time}
+				{date}
+				isEditing={$isEditing}
+				{onAccept}
+				{onAddItem}
+				{onEdit}
+				{onDelete}
+				icon={icons.clock}
+				{lastUpdated}
+			/>
+		</div>
+	</div>
 </div>
 
 <Dialog bind:onOpen bind:isOpen bind:onClose>

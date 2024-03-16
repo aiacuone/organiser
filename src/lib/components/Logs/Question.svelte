@@ -129,7 +129,6 @@
 	const onDeleteQuestion = (index: number) => {
 		questions = questions.filter((_, i) => i !== index);
 	};
-	$: questions, console.log({ questions });
 </script>
 
 <LogContainer
