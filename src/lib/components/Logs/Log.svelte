@@ -32,8 +32,6 @@
 	import ListItems from './LogListItems.svelte';
 	import CheckboxItems from './LogCheckboxItems.svelte';
 	import LogQuestionItems from './LogQuestionItems.svelte';
-	import IconWithRating from '../IconWithRating.svelte';
-	import { icons } from '$lib/general/icons';
 	import { useMutation } from '@sveltestack/svelte-query';
 
 	export let logType: LogType_enum;
@@ -307,7 +305,7 @@
 	};
 
 	const containerClasses: Record<LogType_enum, string[]> = {
-		[LogType_enum.todo]: ['', 'border-dashed border-neutral-200 border p-2 sm:p-3 stack gap-1'],
+		[LogType_enum.todo]: ['', 'border-dashed border-neutral-200 border p-2 stack gap-1'],
 		[LogType_enum.question]: [
 			'bg-neutral-100 p-1 rounded-sm',
 			'bg-white p-2 stack gap-3 rounded-sm'
@@ -348,7 +346,6 @@
 			{/if}
 			<div class="hstack center gap-2">
 				{#if logType === LogType_enum.todo}
-					<IconWithRating icon={icons.todo} {rating} />
 					<div class="flex-1">
 						<CheckboxItems
 							bind:checkboxes={checkboxItems}
@@ -360,7 +357,6 @@
 					</div>
 				{/if}
 				{#if logType === LogType_enum.question}
-					<IconWithRating icon={icons.question} {rating} />
 					<LogQuestionItems
 						bind:questions
 						onFocusAnswerInput={_onFocusAnswerInput}
@@ -393,8 +389,8 @@
 				{onAddItem}
 				{onEdit}
 				{onDelete}
-				icon={icons.clock}
 				{lastUpdated}
+				{logType}
 			/>
 		</div>
 	</div>
