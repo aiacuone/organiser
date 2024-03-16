@@ -346,7 +346,6 @@
 			{/if}
 			<div class="hstack center gap-2">
 				{#if logType === LogType_enum.todo}
-					<IconWithRating icon={icons.todo} {rating} />
 					<div class="flex-1">
 						<CheckboxItems
 							bind:checkboxes={checkboxItems}
@@ -391,8 +390,8 @@
 				{onAddItem}
 				{onEdit}
 				{onDelete}
-				icon={icons.clock}
 				{lastUpdated}
+				{logType}
 			/>
 		</div>
 	</div>

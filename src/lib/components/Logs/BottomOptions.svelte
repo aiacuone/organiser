@@ -5,8 +5,9 @@
 	import Edit from './Buttons/Edit.svelte';
 	import Reset from './Buttons/Reset.svelte';
 	import IncrementDecrement from './Buttons/IncrementDecrement.svelte';
-	import { getDayMonthYearFromDate } from '$lib/utils';
+	import { getDayMonthYearFromDate, logIcons } from '$lib/utils';
 	import Icon from '@iconify/svelte';
+	import type { LogType_enum } from '$lib/types';
 
 	export let onDelete: (() => void) | undefined = undefined;
 	export let onEdit: (() => void) | undefined = undefined;
@@ -25,8 +26,8 @@
 	export let isEditing: boolean;
 	export let incrementDecrementValue: number | undefined = undefined;
 	export let showIncrementDecrement: boolean = true;
-	export let icon: string | undefined = undefined;
 	export let lastUpdated: Date | undefined = undefined;
+	export let logType: LogType_enum;
 
 	$: dateValues = getDayMonthYearFromDate(date);
 	$: lastUpdatedDateValues = lastUpdated && getDayMonthYearFromDate(lastUpdated);
@@ -34,6 +35,7 @@
 
 <div class="w-full hstack">
 	<div class="flex flex-wrap place-items-center gap-2 sm:gap-3">
+		<Icon icon={logIcons[logType]} height="25px" class="text-gray-300" />
 		{#if onAddItem}
 			<AddBullet onClick={onAddItem} />
 		{/if}
@@ -63,10 +65,5 @@
 				</p>
 			{/if}
 		</div>
-	</div>
-	<div class="flex-1 flex justify-end items-end">
-		{#if icon}
-			<Icon {icon} height="20px" class="text-gray-300" />
-		{/if}
 	</div>
 </div>

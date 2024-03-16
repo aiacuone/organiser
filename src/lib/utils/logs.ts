@@ -1,10 +1,12 @@
-import type {
-	BaseMappedListItem_int,
-	CheckboxItem_int,
-	ListItem_int,
-	Log_enum,
-	Log_int,
-	QuestionItem_int
+import { icons } from '$lib/general/icons';
+import {
+	LogType_enum,
+	type BaseMappedListItem_int,
+	type CheckboxItem_int,
+	type ListItem_int,
+	type Log_enum,
+	type Log_int,
+	type QuestionItem_int
 } from '$lib/types';
 
 export const getHaveValuesChanged = ({
@@ -60,3 +62,10 @@ export const getMappedQuestions = (
 export const getQuestionsFromMappedQuestions = (
 	mappedQuestions: (BaseMappedListItem_int & QuestionItem_int)[]
 ): QuestionItem_int[] => mappedQuestions.map(({ question, answer }) => ({ question, answer }));
+
+export const logIcons: Record<LogType_enum, string> = {
+	[LogType_enum.time]: icons.clock,
+	[LogType_enum.important]: icons.important,
+	[LogType_enum.todo]: icons.todo,
+	[LogType_enum.question]: icons.question
+};
