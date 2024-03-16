@@ -357,7 +357,6 @@
 					</div>
 				{/if}
 				{#if logType === LogType_enum.question}
-					<IconWithRating icon={icons.question} {rating} />
 					<LogQuestionItems
 						bind:questions
 						onFocusAnswerInput={_onFocusAnswerInput}
