@@ -54,14 +54,16 @@ export enum LogType_enum {
 	time = 'time',
 	todo = 'todo',
 	important = 'important',
-	question = 'question'
+	question = 'question',
+	list = 'list'
 }
 
 export const logTypeEnumNames: Record<LogType_enum, string> = {
 	time: 'Time',
 	todo: 'Todo',
 	important: 'Important',
-	question: 'Question'
+	question: 'Question',
+	list: 'List'
 };
 
 export const allLogs = Object.keys(LogType_enum).map((key) => key);

@@ -55,7 +55,8 @@
 		[LogType_enum.time]: true,
 		[LogType_enum.important]: true,
 		[LogType_enum.todo]: true,
-		[LogType_enum.question]: true
+		[LogType_enum.question]: true,
+		[LogType_enum.list]: true
 	};
 
 	let typeFilter: Record<LogType_enum, boolean> = { ...defaultTypeFilterData };

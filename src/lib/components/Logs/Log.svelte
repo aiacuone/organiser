@@ -258,6 +258,7 @@
 		[LogType_enum.todo]: { min: 0, max: 3 },
 		[LogType_enum.question]: { min: 1, max: 3 },
 		[LogType_enum.important]: { min: 0, max: 3 },
+		[LogType_enum.list]: { min: 0, max: 3 },
 		[LogType_enum.time]: { min: 0, max: 24 }
 	};
 
@@ -315,7 +316,8 @@
 			'bg-neutral-100 p-2 rounded-sm',
 			'bg-white rounded-sm p-2 stack text-sm gap-1'
 		],
-		[LogType_enum.important]: ['', 'bg-neutral-50 p-2 stack gap-1 text-sm']
+		[LogType_enum.important]: ['', 'bg-neutral-50 p-2 stack gap-1 text-sm'],
+		[LogType_enum.list]: ['', 'bg-neutral-50 p-2 stack gap-1 text-sm']
 	};
 </script>
 
