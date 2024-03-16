@@ -130,23 +130,34 @@
 			[Log_enum.reference]: originalReference
 		};
 
-		if (logType === LogType_enum.todo) {
-			const filteredCheckboxItems = checkboxItems.filter(({ text }) => text);
-			values[Log_enum.checkboxItems] =
-				getCheckboxItemsFromMappedCheckboxItems(filteredCheckboxItems);
-			originalCheckboxItems = [...filteredCheckboxItems];
-		} else if (logType === LogType_enum.question) {
-			const filteredQuestions = questions.filter(
-				({ question, answer }) => question || (answer && question)
-			);
-			values[Log_enum.questions] = getQuestionsFromMappedQuestions(filteredQuestions);
-			originalQuestions = [...filteredQuestions];
-		} else if (logType === LogType_enum.important || logType === LogType_enum.time) {
+		const setListItems = () => {
 			const filteredListItems = listItems.filter(({ item }) => item);
 			values[Log_enum.listItems] = getListItemsFromMappedListItems(filteredListItems);
-			values[Log_enum.time] = time;
 			originalListItems = [...filteredListItems];
-		}
+		};
+		const setValuesTypeMethods: Record<LogType_enum, () => void> = {
+			[LogType_enum.todo]: () => {
+				const filteredCheckboxItems = checkboxItems.filter(({ text }) => text);
+				values[Log_enum.checkboxItems] =
+					getCheckboxItemsFromMappedCheckboxItems(filteredCheckboxItems);
+				originalCheckboxItems = [...filteredCheckboxItems];
+			},
+			[LogType_enum.question]: () => {
+				const filteredQuestions = questions.filter(
+					({ question, answer }) => question || (answer && question)
+				);
+				values[Log_enum.questions] = getQuestionsFromMappedQuestions(filteredQuestions);
+				originalQuestions = [...filteredQuestions];
+			},
+			[LogType_enum.important]: setListItems,
+			[LogType_enum.time]: () => {
+				setListItems();
+				values[Log_enum.time] = time;
+				originalTime = time;
+			},
+			[LogType_enum.list]: setListItems
+		};
+		setValuesTypeMethods[logType]();
 
 		const haveValuesChanged = getHaveValuesChanged({
 			values,
@@ -175,38 +186,58 @@
 		originalRating = rating;
 		$currentlyEditing = null;
 
-		if (logType === LogType_enum.todo) {
-			originalCheckboxItems = [...checkboxItems];
-		} else if (logType === LogType_enum.question) {
-			originalQuestions = [...questions];
-			onResetItems();
-		} else if (logType === LogType_enum.important) {
-			originalListItems = [...listItems];
-		} else if (logType === LogType_enum.time) {
-			originalListItems = [...listItems];
-			originalTime = time;
-		}
+		const setOriginalListItems = () => (originalListItems = [...listItems]);
+		const setOriginalTypeItems: Record<LogType_enum, () => void> = {
+			[LogType_enum.todo]: () => {
+				originalCheckboxItems = [...checkboxItems];
+			},
+			[LogType_enum.question]: () => {
+				originalQuestions = [...questions];
+			},
+			[LogType_enum.important]: setOriginalListItems,
+			[LogType_enum.time]: () => {
+				setOriginalListItems();
+				originalTime = time;
+			},
+			[LogType_enum.list]: setOriginalListItems
+		};
+		setOriginalTypeItems[logType]();
 	};
 
 	const onAddItem = () => {
 		$currentlyEditing = id;
-		if (logType === LogType_enum.todo) {
-			checkboxItems = [...checkboxItems, { id: checkboxItems.length, isChecked: false, text: '' }];
-		} else if (logType === LogType_enum.question) {
-			questions = [...questions, { id: questions.length, question: '' }];
-		} else if (logType === LogType_enum.important || logType === LogType_enum.time) {
-			listItems = [...listItems, { id: listItems.length, item: '' }];
-		}
+		const addListItem = () => (listItems = [...listItems, { id: listItems.length, item: '' }]);
+		const addItemTypeMethods: Record<LogType_enum, () => void> = {
+			[LogType_enum.todo]: () => {
+				checkboxItems = [
+					...checkboxItems,
+					{ id: checkboxItems.length, isChecked: false, text: '' }
+				];
+			},
+			[LogType_enum.question]: () => {
+				questions = [...questions, { id: questions.length, question: '' }];
+			},
+			[LogType_enum.important]: addListItem,
+			[LogType_enum.time]: addListItem,
+			[LogType_enum.list]: addListItem
+		};
+		addItemTypeMethods[logType]();
 	};
 
 	const onDeleteItem = (index: number) => {
-		if (logType === LogType_enum.todo) {
-			checkboxItems = checkboxItems.filter((_, i) => i !== index);
-		} else if (logType === LogType_enum.question) {
-			questions = questions.filter((_, i) => i !== index);
-		} else if (logType === LogType_enum.important || logType === LogType_enum.time) {
-			listItems = listItems.filter((_, i) => i !== index);
-		}
+		const removeListItem = () => (listItems = listItems.filter((_, i) => i !== index));
+		const removeItemTypeMethods: Record<LogType_enum, (index: number) => void> = {
+			[LogType_enum.todo]: (index) => {
+				checkboxItems = checkboxItems.filter((_, i) => i !== index);
+			},
+			[LogType_enum.question]: (index) => {
+				questions = questions.filter((_, i) => i !== index);
+			},
+			[LogType_enum.important]: removeListItem,
+			[LogType_enum.time]: removeListItem,
+			[LogType_enum.list]: removeListItem
+		};
+		removeItemTypeMethods[logType](index);
 	};
 
 	const onResetChange = () => {
@@ -366,12 +397,13 @@
 						{id}
 					/>
 				{/if}
-				{#if logType === LogType_enum.important || logType === LogType_enum.time}
+				{#if logType === LogType_enum.important || logType === LogType_enum.time || logType === LogType_enum.list}
 					<ListItems
 						bind:items={listItems}
 						{isEditing}
 						onEnterKeydown={onTextareaEnterKeydown}
 						{onDeleteItem}
+						{logType}
 					/>
 				{/if}
 			</div>

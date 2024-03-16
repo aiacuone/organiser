@@ -6,13 +6,22 @@
 	import { icons } from '$lib/general/icons';
 	import { flip } from 'svelte/animate';
 	import { dndzone } from 'svelte-dnd-action';
-	import type { BaseMappedListItem_int, ListItem_int } from '$lib/types';
+	import { LogType_enum, type BaseMappedListItem_int, type ListItem_int } from '$lib/types';
 
 	export let items: (BaseMappedListItem_int & ListItem_int)[];
 	export let isEditing: Readable<boolean>;
 	export let onEnterKeydown: () => void;
 	export let onDeleteItem: (index: number) => void;
 	export let bulletType: 'disc' | 'circle' | 'square' | 'checkbox' = 'disc';
+	export let logType: LogType_enum;
+
+	const checkeredColor: Record<LogType_enum, string> = {
+		[LogType_enum.important]: 'bg-gray-50',
+		[LogType_enum.question]: 'bg-gray-50',
+		[LogType_enum.todo]: 'bg-gray-50',
+		[LogType_enum.time]: 'bg-gray-50',
+		[LogType_enum.list]: 'bg-gray-100'
+	};
 </script>
 
 <ul
@@ -30,7 +39,7 @@
 	on:finalize={(e) => (items = e.detail.items)}
 >
 	{#each items as item, index (item.id)}
-		<li class="{index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'} relative">
+		<li class="{index % 2 === 0 ? 'bg-transparent' : checkeredColor[logType]} relative">
 			{#if $isEditing && items.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-4 top-1" />
 			{/if}
