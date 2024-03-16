@@ -11,7 +11,7 @@
 {#each logs as log}
 	{@const { type, questions, checkboxItems, listItems, rating, time, ...rest } = log}
 	{#if type === LogType_enum.important && log.rating && listItems}
-		<Important {...rest} rating={log.rating} listItems={getMappedListItems(listItems)} />
+		<Log logType={type} {...rest} rating={log.rating} listItems={getMappedListItems(listItems)} />
 	{:else if type === LogType_enum.todo && log.rating && checkboxItems}
 		<Log
 			logType={type}

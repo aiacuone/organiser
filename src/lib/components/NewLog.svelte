@@ -40,5 +40,5 @@
 {:else if type === LogType_enum.question}
 	<Log logType={type} {...defaultValues} />
 {:else if type === LogType_enum.important}
-	<Important {...defaultValues} />
+	<Log logType={type} {...defaultValues} />
 {/if}
