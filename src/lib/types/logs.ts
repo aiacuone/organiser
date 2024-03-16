@@ -125,3 +125,9 @@ export const allLogInputs = searchableInputs.map((key) => key as Log_enum);
 export interface BaseMappedListItem_int {
 	id: number;
 }
+
+export enum LogListType_enum {
+	checkbox = 'checkbox',
+	unordered = 'list',
+	ordered = 'ordered'
+}

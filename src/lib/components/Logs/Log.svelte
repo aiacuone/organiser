@@ -6,7 +6,8 @@
 		type CheckboxItem_int,
 		type QuestionItem_int,
 		type ListItem_int,
-		type Log_int
+		type Log_int,
+		LogListType_enum
 	} from '$lib/types';
 	import {
 		clickOutside,
@@ -58,6 +59,8 @@
 
 	let isAnswering: undefined | number = undefined;
 	let container: HTMLDivElement;
+	let listType: LogListType_enum =
+		logType === LogType_enum.list ? LogListType_enum.ordered : LogListType_enum.unordered;
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
@@ -400,6 +403,7 @@
 				{#if logType === LogType_enum.important || logType === LogType_enum.time || logType === LogType_enum.list}
 					<ListItems
 						bind:items={listItems}
+						bind:listType
 						{isEditing}
 						onEnterKeydown={onTextareaEnterKeydown}
 						{onDeleteItem}
