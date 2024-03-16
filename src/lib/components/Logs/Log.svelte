@@ -32,8 +32,6 @@
 	import ListItems from './LogListItems.svelte';
 	import CheckboxItems from './LogCheckboxItems.svelte';
 	import LogQuestionItems from './LogQuestionItems.svelte';
-	import IconWithRating from '../IconWithRating.svelte';
-	import { icons } from '$lib/general/icons';
 	import { useMutation } from '@sveltestack/svelte-query';
 
 	export let logType: LogType_enum;

@@ -7,7 +7,7 @@
 	import IncrementDecrement from './Buttons/IncrementDecrement.svelte';
 	import { getDayMonthYearFromDate, logIcons } from '$lib/utils';
 	import Icon from '@iconify/svelte';
-	import type { LogType_enum } from '$lib/types';
+	import { LogType_enum } from '$lib/types';
 
 	export let onDelete: (() => void) | undefined = undefined;
 	export let onEdit: (() => void) | undefined = undefined;
@@ -35,7 +35,11 @@
 
 <div class="w-full hstack">
 	<div class="flex flex-wrap place-items-center gap-2">
-		<Icon icon={logIcons[logType]} height="25px" class="text-gray-300" />
+		<Icon
+			icon={logIcons[logType]}
+			height={logType === LogType_enum.important ? '30px' : '25px'}
+			class="text-gray-300"
+		/>
 		{#if onAddItem}
 			<AddBullet onClick={onAddItem} />
 		{/if}
