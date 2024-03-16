@@ -315,7 +315,7 @@
 			'bg-neutral-100 p-2 rounded-sm',
 			'bg-white rounded-sm p-2 stack text-sm gap-1'
 		],
-		[LogType_enum.important]: ['', 'bg-neutral-50 p-2 sm:p-3 stack gap-3']
+		[LogType_enum.important]: ['', 'bg-neutral-50 p-2 stack gap-1 text-sm']
 	};
 </script>
 
