@@ -19,7 +19,7 @@
 		getQuestionsFromMappedQuestions
 	} from '$lib/utils';
 	import { page } from '$app/stores';
-	import { useMutation } from '@sveltestack/svelte-query/dist/mutation/useMutation';
+
 	import { getContext, onMount } from 'svelte';
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
@@ -36,6 +36,7 @@
 	import LogQuestionItems from './LogQuestionItems.svelte';
 	import IconWithRating from '../IconWithRating.svelte';
 	import { icons } from '$lib/general/icons';
+	import { useMutation } from '@sveltestack/svelte-query';
 
 	export let logType: LogType_enum;
 	export let title: string = '';
@@ -186,6 +187,7 @@
 		} else if (logType === LogType_enum.important) {
 			originalListItems = [...listItems];
 		} else if (logType === LogType_enum.time) {
+			originalListItems = [...listItems];
 			originalTime = time;
 		}
 	};
@@ -233,17 +235,17 @@
 			}
 		};
 
-		onMount(() => {
-			if (editOnMount) {
-				$currentlyEditing = id;
-			}
-		});
-
 		container.addEventListener('keydown', keydown);
 
 		return () => {
 			container.removeEventListener('keydown', keydown);
 		};
+	});
+
+	onMount(() => {
+		if (editOnMount) {
+			$currentlyEditing = id;
+		}
 	});
 
 	let onOpen: () => void;
@@ -320,24 +322,24 @@
 		<div class={containerClasses[logType][1]}>
 			{#if title || reference || $isEditing}
 				<div class="stack gap-1">
-					{#if !$isEditing && !title}{''}{:else}
-						<Input
-							bind:value={title}
-							autofocus={inputAutoFocus}
-							placeholder="Title"
-							autofillValues={$titles}
-							isDisabled={!$isEditing}
-							onAutoFill={onTitleAutoFill}
-						/>
-					{/if}
-					{#if $isEditing || reference}
-						<Input
-							bind:value={reference}
-							bind:changeInputValue={changeReferenceInputValue}
-							placeholder="Reference"
-							isDisabled={!$isEditing}
-						/>
-					{/if}
+					<!-- {#if !$isEditing && !title}{''}{:else} -->
+					<Input
+						bind:value={title}
+						autofocus={inputAutoFocus}
+						placeholder="Title"
+						autofillValues={$titles}
+						isDisabled={!$isEditing}
+						onAutoFill={onTitleAutoFill}
+					/>
+					<!-- {/if} -->
+					<!-- {#if $isEditing || reference} -->
+					<Input
+						bind:value={reference}
+						bind:changeInputValue={changeReferenceInputValue}
+						placeholder="Reference"
+						isDisabled={!$isEditing}
+					/>
+					<!-- {/if} -->
 				</div>
 			{/if}
 			<div class="hstack center gap-2">
