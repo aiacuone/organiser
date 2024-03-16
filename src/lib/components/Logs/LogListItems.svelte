@@ -16,7 +16,7 @@
 </script>
 
 <ul
-	class="ml-5 stack"
+	class="ml-5 stack w-full"
 	style={`list-style-type:${
 		$isEditing && items.length > 1 ? 'none' : bulletType === 'checkbox' ? 'none' : bulletType
 	}`}
