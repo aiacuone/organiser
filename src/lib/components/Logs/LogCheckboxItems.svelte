@@ -31,7 +31,7 @@
 	on:finalize={(e) => (checkboxes = e.detail.items)}
 >
 	{#each checkboxes as item, index (item.id)}
-		<li class="relative">
+		<li class="relative {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'}">
 			{#if $isEditing && checkboxes.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-[18px] top-[2px]" />
 			{/if}
