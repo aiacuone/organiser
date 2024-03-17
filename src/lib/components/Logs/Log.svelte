@@ -45,7 +45,9 @@
 	export let editOnMount: boolean = false;
 	export let checkboxItems: (BaseMappedListItem_int & CheckboxItem_int)[] = [];
 	export let questions: (BaseMappedListItem_int & QuestionItem_int)[] = [];
-	export let listItems: (BaseMappedListItem_int & ListItem_int)[] = [];
+	export let listItems:
+		| ((BaseMappedListItem_int & ListItem_int) | (BaseMappedListItem_int & CheckboxItem_int))[] =
+		[];
 	export let inputAutoFocus: boolean = false;
 	export let time: number = 0;
 	export let listType: LogListType_enum =
@@ -135,7 +137,9 @@
 
 		const setListItems = () => {
 			const filteredListItems = listItems.filter(({ item }) => item);
-			values[Log_enum.listItems] = getListItemsFromMappedListItems(filteredListItems);
+			values[Log_enum.listItems] = getListItemsFromMappedListItems(
+				filteredListItems as (BaseMappedListItem_int & ListItem_int)[]
+			);
 			originalListItems = [...filteredListItems];
 		};
 		const setCheckboxItems = () => {
@@ -360,7 +364,9 @@
 						id,
 						title,
 						reference,
-						listItems: getListItemsFromMappedListItems(listItems),
+						listItems: getListItemsFromMappedListItems(
+							listItems as (BaseMappedListItem_int & ListItem_int)[]
+						),
 						time,
 						date,
 						type: LogType_enum.time,
@@ -382,7 +388,9 @@
 						id,
 						title,
 						reference,
-						listItems: getListItemsFromMappedListItems(listItems),
+						listItems: getListItemsFromMappedListItems(
+							listItems as (BaseMappedListItem_int & ListItem_int)[]
+						),
 						time,
 						date,
 						type: LogType_enum.time,
@@ -446,8 +454,7 @@
 							{onEdit}
 						/>
 					</div>
-				{/if}
-				{#if logType === LogType_enum.question}
+				{:else if logType === LogType_enum.question}
 					<LogQuestionItems
 						bind:questions
 						onFocusAnswerInput={_onFocusAnswerInput}
@@ -456,8 +463,7 @@
 						onDeleteQuestion={onDeleteItem}
 						{id}
 					/>
-				{/if}
-				{#if logType === LogType_enum.important || logType === LogType_enum.time || logType === LogType_enum.list}
+				{:else if logType === LogType_enum.important || logType === LogType_enum.time || (logType === LogType_enum.list && listType !== LogListType_enum.checkbox)}
 					<ListItems
 						bind:items={listItems}
 						bind:listType
@@ -466,10 +472,19 @@
 						{onDeleteItem}
 						{logType}
 					/>
+				{:else if logType === LogType_enum.list && listType === LogListType_enum.checkbox}
+					<CheckboxItems
+						bind:checkboxes={listItems}
+						{isEditing}
+						onEnterKeydown={onTextareaEnterKeydown}
+						onDeleteBullet={onDeleteItem}
+						{onEdit}
+					/>
 				{/if}
 			</div>
 			<BottomOptions
 				bind:listType
+				bind:listItems
 				incrementDecrementProps={{
 					min: incrementDecrementPropValues[logType].min,
 					max: incrementDecrementPropValues[logType].max,

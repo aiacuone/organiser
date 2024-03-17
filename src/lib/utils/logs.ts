@@ -70,3 +70,15 @@ export const logIcons: Record<LogType_enum, string> = {
 	[LogType_enum.question]: icons.question,
 	[LogType_enum.list]: icons.list
 };
+
+export const getCheckboxItemsFromMappedListItems = (
+	listItems: (BaseMappedListItem_int & ListItem_int)[]
+): (BaseMappedListItem_int & CheckboxItem_int)[] => {
+	return listItems.map(({ item, id }) => ({ id, text: item, isChecked: false }));
+};
+
+export const getListItemsFromMappedCheckboxItems = (
+	checkboxItems: (BaseMappedListItem_int & CheckboxItem_int)[]
+): (BaseMappedListItem_int & ListItem_int)[] => {
+	return checkboxItems.map(({ text, id }) => ({ id, item: text }));
+};

@@ -139,3 +139,7 @@ export enum LogListType_enum {
 export const allLogListTypes = Object.values(LogListType_enum).map(
 	(key) => key as LogListType_enum
 );
+
+export type MappedCheckboxItem = BaseMappedListItem_int & CheckboxItem_int;
+export type MappedListItem = BaseMappedListItem_int & ListItem_int;
+export type MappedQuestionItem = BaseMappedListItem_int & QuestionItem_int;

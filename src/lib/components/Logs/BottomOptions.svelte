@@ -1,8 +1,20 @@
 <script lang="ts">
 	import IncrementDecrement from './Buttons/IncrementDecrement.svelte';
-	import { getDayMonthYearFromDate, logIcons } from '$lib/utils';
+	import {
+		getCheckboxItemsFromMappedListItems,
+		getDayMonthYearFromDate,
+		getListItemsFromMappedCheckboxItems,
+		logIcons
+	} from '$lib/utils';
 	import Icon from '@iconify/svelte';
-	import { LogListType_enum, LogType_enum, allLogListTypes } from '$lib/types';
+	import {
+		LogListType_enum,
+		LogType_enum,
+		allLogListTypes,
+		type BaseMappedListItem_int,
+		type ListItem_int,
+		type CheckboxItem_int
+	} from '$lib/types';
 	import { icons } from '$lib/general/icons';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import LogButton from './Buttons/LogButton.svelte';
@@ -26,6 +38,9 @@
 	export let lastUpdated: Date | undefined = undefined;
 	export let logType: LogType_enum;
 	export let listType: LogListType_enum = LogListType_enum.unordered;
+	export let listItems:
+		| ((BaseMappedListItem_int & ListItem_int) | (BaseMappedListItem_int & CheckboxItem_int))[] =
+		[];
 
 	let onOpenDelete: () => void;
 
@@ -38,10 +53,22 @@
 
 	const onChangeList = () => {
 		const indexOfListType = allLogListTypes.indexOf(listType);
-		const nextIndex = indexOfListType + 1;
-		nextIndex >= allLogListTypes.length
-			? (listType = allLogListTypes[0])
-			: (listType = allLogListTypes[nextIndex]);
+		const nextIndex = indexOfListType + 1 > allLogListTypes.length - 1 ? 0 : indexOfListType + 1;
+
+		listType = allLogListTypes[nextIndex];
+
+		const nextIndexListType = allLogListTypes[nextIndex];
+		const currentIndexListType = allLogListTypes[indexOfListType];
+
+		if (nextIndexListType === LogListType_enum.checkbox) {
+			listItems = getCheckboxItemsFromMappedListItems(
+				listItems as (BaseMappedListItem_int & ListItem_int)[]
+			);
+		} else if (currentIndexListType === LogListType_enum.checkbox) {
+			listItems = getListItemsFromMappedCheckboxItems(
+				listItems as (BaseMappedListItem_int & CheckboxItem_int)[]
+			);
+		}
 	};
 
 	const listIcons: Record<LogListType_enum, string> = {
@@ -68,13 +95,12 @@
 		},
 		{
 			icon: icons.addList,
-			onClick: onAddItem,
-			isHidden: isEditing
+			onClick: onAddItem
 		},
 		{
 			icon: listIcons[listType],
 			onClick: onChangeList,
-			isHidden: !isEditing
+			isHidden: !isEditing || logType !== LogType_enum.list
 		}
 	];
 </script>
