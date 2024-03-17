@@ -35,5 +35,7 @@ export const icons = {
 	vertical: 'carbon:pan-vertical',
 	list: 'fluent:list-16-filled',
 	addList: 'ci:list-add',
-	listSettings: 'ri:list-settings-fill'
+	unorderedList: 'ion:list',
+	orderedList: 'fa-solid:list-ol',
+	checkboxList: 'icon-park-outline:list-checkbox'
 };

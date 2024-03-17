@@ -132,4 +132,6 @@ export enum LogListType_enum {
 	ordered = 'ordered'
 }
 
-export const allLogListTypes = Object.keys(LogListType_enum).map((key) => key as LogListType_enum);
+export const allLogListTypes = Object.values(LogListType_enum).map(
+	(key) => key as LogListType_enum
+);

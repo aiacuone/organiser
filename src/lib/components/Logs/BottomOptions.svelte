@@ -6,8 +6,6 @@
 	import { icons } from '$lib/general/icons';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import LogButton from './Buttons/LogButton.svelte';
-	import Dialog from '../Dialog/Dialog.svelte';
-	import Button from '../Button.svelte';
 
 	export let onDelete: () => void;
 	export let onEdit: () => void;
@@ -30,14 +28,26 @@
 	export let listType: LogListType_enum = LogListType_enum.unordered;
 
 	let onOpenDelete: () => void;
-	let onOpenChangeList: () => void;
-	let onCloseChangeList: () => void;
 
 	$: dateValues = getDayMonthYearFromDate(date);
 	$: lastUpdatedDateValues = lastUpdated && getDayMonthYearFromDate(lastUpdated);
 
 	const onConfirmDelete: () => void = () => {
 		onDelete();
+	};
+
+	const onChangeList = () => {
+		const indexOfListType = allLogListTypes.indexOf(listType);
+		const nextIndex = indexOfListType + 1;
+		nextIndex >= allLogListTypes.length
+			? (listType = allLogListTypes[0])
+			: (listType = allLogListTypes[nextIndex]);
+	};
+
+	const listIcons: Record<LogListType_enum, string> = {
+		[LogListType_enum.unordered]: icons.unorderedList,
+		[LogListType_enum.ordered]: icons.orderedList,
+		[LogListType_enum.checkbox]: icons.checkboxList
 	};
 
 	$: buttons = [
@@ -62,16 +72,11 @@
 			isHidden: isEditing
 		},
 		{
-			icon: icons.listSettings,
-			onClick: onOpenChangeList,
-			isHidden: !isEditing
+			icon: listIcons[listType],
+			onClick: onChangeList,
+			isHidden: isEditing
 		}
 	];
-
-	const onChangeList = (_listType: LogListType_enum) => {
-		listType = _listType;
-		onCloseChangeList();
-	};
 </script>
 
 <div class="w-full hstack">
@@ -107,14 +112,3 @@
 <ConfirmationDialog bind:onOpen={onOpenDelete} onConfirm={onConfirmDelete}
 	>Are you sure you want to delete?</ConfirmationDialog
 >
-
-<Dialog bind:onOpen={onOpenChangeList} bind:onClose={onCloseChangeList}>
-	<div class="stack gap-3">
-		<div class="hstack gap-3">
-			{#each allLogListTypes as logListType}
-				<Button _class="capitalize" onClick={() => onChangeList(logListType)}>{logListType}</Button>
-			{/each}
-		</div>
-		<Button onClick={onCloseChangeList}>Close</Button>
-	</div>
-</Dialog>
