@@ -2,10 +2,12 @@
 	import IncrementDecrement from './Buttons/IncrementDecrement.svelte';
 	import { getDayMonthYearFromDate, logIcons } from '$lib/utils';
 	import Icon from '@iconify/svelte';
-	import { LogType_enum } from '$lib/types';
+	import { LogListType_enum, LogType_enum, allLogListTypes } from '$lib/types';
 	import { icons } from '$lib/general/icons';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import LogButton from './Buttons/LogButton.svelte';
+	import Dialog from '../Dialog/Dialog.svelte';
+	import Button from '../Button.svelte';
 
 	export let onDelete: () => void;
 	export let onEdit: () => void;
@@ -25,8 +27,11 @@
 	export let showIncrementDecrement: boolean = true;
 	export let lastUpdated: Date | undefined = undefined;
 	export let logType: LogType_enum;
+	export let listType: LogListType_enum = LogListType_enum.unordered;
 
-	let onOpen: () => void;
+	let onOpenDelete: () => void;
+	let onOpenChangeList: () => void;
+	let onCloseChangeList: () => void;
 
 	$: dateValues = getDayMonthYearFromDate(date);
 	$: lastUpdatedDateValues = lastUpdated && getDayMonthYearFromDate(lastUpdated);
@@ -38,23 +43,35 @@
 	$: buttons = [
 		{
 			icon: icons.delete,
-			className: 'w-[60px]',
-			onClick: onOpen,
+			onClick: onOpenDelete,
 			isHidden: !isEditing
 		},
 		{
 			icon: icons.tick,
-			className: 'w-[60px]',
 			onClick: onAccept,
 			isHidden: !isEditing
 		},
 		{
 			icon: icons.edit,
-			className: 'w-[60px]',
 			onClick: onEdit,
 			isHidden: isEditing
+		},
+		{
+			icon: icons.addList,
+			onClick: onAddItem,
+			isHidden: isEditing
+		},
+		{
+			icon: icons.listSettings,
+			onClick: onOpenChangeList,
+			isHidden: !isEditing
 		}
 	];
+
+	const onChangeList = (_listType: LogListType_enum) => {
+		listType = _listType;
+		onCloseChangeList();
+	};
 </script>
 
 <div class="w-full hstack">
@@ -66,7 +83,7 @@
 		/>
 		{#each buttons as { icon, isHidden, ...rest }}
 			{#if !isHidden}
-				<LogButton {...rest}>
+				<LogButton _class="w-[60px]" {...rest}>
 					<Icon {icon} height="20px" class="text-gray-300" />
 				</LogButton>
 			{/if}
@@ -87,6 +104,17 @@
 	</div>
 </div>
 
-<ConfirmationDialog bind:onOpen onConfirm={onConfirmDelete}
+<ConfirmationDialog bind:onOpen={onOpenDelete} onConfirm={onConfirmDelete}
 	>Are you sure you want to delete?</ConfirmationDialog
 >
+
+<Dialog bind:onOpen={onOpenChangeList} bind:onClose={onCloseChangeList}>
+	<div class="stack gap-3">
+		<div class="hstack gap-3">
+			{#each allLogListTypes as logListType}
+				<Button _class="capitalize" onClick={() => onChangeList(logListType)}>{logListType}</Button>
+			{/each}
+		</div>
+		<Button onClick={onCloseChangeList}>Close</Button>
+	</div>
+</Dialog>

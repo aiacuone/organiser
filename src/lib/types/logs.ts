@@ -128,6 +128,8 @@ export interface BaseMappedListItem_int {
 
 export enum LogListType_enum {
 	checkbox = 'checkbox',
-	unordered = 'list',
+	unordered = 'unordered',
 	ordered = 'ordered'
 }
+
+export const allLogListTypes = Object.keys(LogListType_enum).map((key) => key as LogListType_enum);

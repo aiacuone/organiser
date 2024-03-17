@@ -33,5 +33,7 @@ export const icons = {
 	cross: 'system-uicons:cross',
 	save: 'bi:save',
 	vertical: 'carbon:pan-vertical',
-	list: 'fluent:list-16-filled'
+	list: 'fluent:list-16-filled',
+	addList: 'ci:list-add',
+	listSettings: 'ri:list-settings-fill'
 };

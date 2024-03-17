@@ -412,6 +412,7 @@
 				{/if}
 			</div>
 			<BottomOptions
+				bind:listType
 				incrementDecrementProps={{
 					min: incrementDecrementPropValues[logType].min,
 					max: incrementDecrementPropValues[logType].max,
