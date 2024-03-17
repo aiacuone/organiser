@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Log_int } from '$lib/types';
+	import { LogListType_enum, type Log_int } from '$lib/types';
 	import { getMappedCheckboxItems, getMappedListItems, getMappedQuestions } from '$lib/utils';
 	import Log from './Log.svelte';
 
@@ -7,12 +7,17 @@
 </script>
 
 {#each logs as log}
-	{@const { questions, checkboxItems, listItems, type, ...rest } = log}
+	{@const { questions, checkboxItems, listItems, type, listType, ...rest } = log}
 	<Log
 		questions={questions && getMappedQuestions(questions)}
 		checkboxItems={checkboxItems && getMappedCheckboxItems(checkboxItems)}
-		listItems={listItems && getMappedListItems(listItems)}
+		listItems={listItems &&
+			(listType === LogListType_enum.checkbox
+				? //TODO: Fix these with svelte 5 upgrade
+				  getMappedCheckboxItems(listItems)
+				: getMappedListItems(listItems))}
 		logType={type}
+		{listType}
 		{...rest}
 	/>
 {/each}

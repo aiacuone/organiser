@@ -3,7 +3,6 @@ import {
 	LogType_enum,
 	type BaseMappedListItem_int,
 	type CheckboxItem_int,
-	type ListItem_int,
 	type Log_enum,
 	type Log_int,
 	type QuestionItem_int,

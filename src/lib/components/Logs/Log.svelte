@@ -132,7 +132,8 @@
 		};
 
 		const setListItems = () => {
-			const filteredListItems = listItems.filter(({ item }) => item);
+			const _listItems = listItems as MappedListItem[];
+			const filteredListItems = _listItems.filter(({ item }) => item);
 			values[Log_enum.listItems] = getListItemsFromMappedListItems(
 				filteredListItems as MappedListItem[]
 			);
@@ -167,7 +168,11 @@
 			[LogType_enum.list]: () => {
 				values[Log_enum.listType] = listType;
 				if (listType === LogListType_enum.checkbox) {
-					setCheckboxItems();
+					const filteredCheckboxItems = listItems.filter(({ text }) => text);
+					values[Log_enum.listItems] = getCheckboxItemsFromMappedCheckboxItems(
+						filteredCheckboxItems as MappedCheckboxItem[]
+					);
+					originalListItems = [...filteredCheckboxItems];
 				} else {
 					setListItems();
 				}
