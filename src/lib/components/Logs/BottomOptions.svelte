@@ -1,19 +1,16 @@
 <script lang="ts">
-	import Accept from './Buttons/Accept.svelte';
-	import AddBullet from './Buttons/AddBullet.svelte';
-	import Delete from './Buttons/Delete.svelte';
-	import Edit from './Buttons/Edit.svelte';
-	import Reset from './Buttons/Reset.svelte';
 	import IncrementDecrement from './Buttons/IncrementDecrement.svelte';
 	import { getDayMonthYearFromDate, logIcons } from '$lib/utils';
 	import Icon from '@iconify/svelte';
 	import { LogType_enum } from '$lib/types';
+	import { icons } from '$lib/general/icons';
+	import ConfirmationDialog from '../ConfirmationDialog.svelte';
+	import LogButton from './Buttons/LogButton.svelte';
 
-	export let onDelete: (() => void) | undefined = undefined;
-	export let onEdit: (() => void) | undefined = undefined;
-	export let onAccept: (() => void) | undefined = undefined;
-	export let onAddItem: (() => void) | undefined = undefined;
-	export let onReset: (() => void) | undefined = undefined;
+	export let onDelete: () => void;
+	export let onEdit: () => void;
+	export let onAccept: () => void;
+	export let onAddItem: () => void;
 	export let incrementDecrementProps:
 		| {
 				onIncrement: () => void;
@@ -29,8 +26,35 @@
 	export let lastUpdated: Date | undefined = undefined;
 	export let logType: LogType_enum;
 
+	let onOpen: () => void;
+
 	$: dateValues = getDayMonthYearFromDate(date);
 	$: lastUpdatedDateValues = lastUpdated && getDayMonthYearFromDate(lastUpdated);
+
+	const onConfirmDelete: () => void = () => {
+		onDelete();
+	};
+
+	$: buttons = [
+		{
+			icon: icons.delete,
+			className: 'w-[60px]',
+			onClick: onOpen,
+			isHidden: !isEditing
+		},
+		{
+			icon: icons.tick,
+			className: 'w-[60px]',
+			onClick: onAccept,
+			isHidden: !isEditing
+		},
+		{
+			icon: icons.edit,
+			className: 'w-[60px]',
+			onClick: onEdit,
+			isHidden: isEditing
+		}
+	];
 </script>
 
 <div class="w-full hstack">
@@ -40,24 +64,15 @@
 			height={logType === LogType_enum.important ? '30px' : '25px'}
 			class="text-gray-300"
 		/>
-		{#if onAddItem}
-			<AddBullet onClick={onAddItem} />
-		{/if}
+		{#each buttons as { icon, isHidden, ...rest }}
+			{#if !isHidden}
+				<LogButton {...rest}>
+					<Icon {icon} height="20px" class="text-gray-300" />
+				</LogButton>
+			{/if}
+		{/each}
 		{#if isEditing || (incrementDecrementProps && showIncrementDecrement && incrementDecrementValue)}
 			<IncrementDecrement {...incrementDecrementProps} value={incrementDecrementValue} />
-		{/if}
-		{#if isEditing}
-			{#if onDelete}
-				<Delete iconClass="w-[40px]" {onDelete} />
-			{/if}
-			{#if onAccept}
-				<Accept {onAccept} />
-			{/if}
-			{#if onReset}
-				<Reset {onReset} />
-			{/if}
-		{:else if onEdit}
-			<Edit {onEdit} />
 		{/if}
 		<div class="stack">
 			<p class="text-xs text-gray-200 text-black">
@@ -71,3 +86,7 @@
 		</div>
 	</div>
 </div>
+
+<ConfirmationDialog bind:onOpen onConfirm={onConfirmDelete}
+	>Are you sure you want to delete?</ConfirmationDialog
+>
