@@ -132,11 +132,8 @@
 		};
 
 		const setListItems = () => {
-			const _listItems = listItems as MappedListItem[];
-			const filteredListItems = _listItems.filter(({ item }) => item);
-			values[Log_enum.listItems] = getListItemsFromMappedListItems(
-				filteredListItems as MappedListItem[]
-			);
+			const filteredListItems = listItems.filter(({ item }) => item);
+			values[Log_enum.listItems] = getListItemsFromMappedListItems(filteredListItems);
 			originalListItems = [...filteredListItems];
 		};
 		const setCheckboxItems = () => {
@@ -361,7 +358,7 @@
 						id,
 						title,
 						reference,
-						listItems: getListItemsFromMappedListItems(listItems as MappedListItem[]),
+						listItems: getListItemsFromMappedListItems(listItems),
 						time,
 						date,
 						type: LogType_enum.time,
@@ -383,7 +380,7 @@
 						id,
 						title,
 						reference,
-						listItems: getListItemsFromMappedListItems(listItems as MappedListItem[]),
+						listItems: getListItemsFromMappedListItems(listItems),
 						time,
 						date,
 						type: LogType_enum.time,

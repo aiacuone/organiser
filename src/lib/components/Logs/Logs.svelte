@@ -7,13 +7,12 @@
 </script>
 
 {#each logs as log}
-	{@const { questions, checkboxItems, listItems, type, listType, ...rest } = log}
+	{@const { questions, checkboxItems, listItems, type, ...rest } = log}
 	<Log
 		questions={questions && getMappedQuestions(questions)}
 		checkboxItems={checkboxItems && getMappedCheckboxItems(checkboxItems)}
 		listItems={listItems && getMappedListItems(listItems)}
 		logType={type}
-		{listType}
 		{...rest}
 	/>
 {/each}
