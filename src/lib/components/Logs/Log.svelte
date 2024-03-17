@@ -43,7 +43,7 @@
 	export let editOnMount: boolean = false;
 	export let checkboxItems: MappedCheckboxItem[] = [];
 	export let questions: MappedQuestionItem[] = [];
-	export let listItems: (MappedListItem | MappedCheckboxItem)[] = [];
+	export let listItems: MappedListItem[] = [];
 	export let inputAutoFocus: boolean = false;
 	export let time: number = 0;
 	export let listType: LogListType_enum =
@@ -168,12 +168,7 @@
 			[LogType_enum.list]: () => {
 				values[Log_enum.listType] = listType;
 				if (listType === LogListType_enum.checkbox) {
-					const _checkboxItems = listItems as MappedCheckboxItem[];
-					const filteredCheckboxItems = _checkboxItems.filter(({ text }) => text);
-					values[Log_enum.listItems] = getCheckboxItemsFromMappedCheckboxItems(
-						filteredCheckboxItems as MappedCheckboxItem[]
-					);
-					originalListItems = [...filteredCheckboxItems];
+					setCheckboxItems();
 				} else {
 					setListItems();
 				}
@@ -442,7 +437,7 @@
 				</div>
 			{/if}
 			<div class="hstack center gap-2">
-				{#if logType === LogType_enum.todo}
+				{#if logType === LogType_enum.todo || (logType === LogType_enum.list && listType === LogListType_enum.checkbox)}
 					<div class="flex-1">
 						<CheckboxItems
 							bind:checkboxes={checkboxItems}
@@ -470,19 +465,12 @@
 						{onDeleteItem}
 						{logType}
 					/>
-				{:else if logType === LogType_enum.list && listType === LogListType_enum.checkbox}
-					<CheckboxItems
-						bind:checkboxes={listItems}
-						{isEditing}
-						onEnterKeydown={onTextareaEnterKeydown}
-						onDeleteBullet={onDeleteItem}
-						{onEdit}
-					/>
 				{/if}
 			</div>
 			<BottomOptions
 				bind:listType
 				bind:listItems
+				bind:checkboxItems
 				incrementDecrementProps={{
 					min: incrementDecrementPropValues[logType].min,
 					max: incrementDecrementPropValues[logType].max,

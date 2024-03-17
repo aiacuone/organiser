@@ -29,13 +29,11 @@ export interface Log_int {
 	[Log_enum.time]?: number;
 	[Log_enum.type]: LogType_enum;
 	[Log_enum.space]: string;
-	[Log_enum.listItems]?: string[] | CheckboxItem_int[];
-	//TODO: Get rid of checkboxItems, and just use listItems with listType checkbox. Otherwise we are duplicateing the use of checkboxes, one in listItems and one in checkboxItems
+	[Log_enum.listItems]?: string[];
 	[Log_enum.checkboxItems]?: CheckboxItem_int[];
 	[Log_enum.lastUpdated]?: Date;
 	[Log_enum.rating]?: 1 | 2 | 3;
 	[Log_enum.questions]?: QuestionItem_int[];
-	// NOTE: listType is a sub type of listItems, it is only used when listItems is present
 	[Log_enum.listType]?: LogListType_enum;
 }
 
