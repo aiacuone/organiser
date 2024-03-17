@@ -17,7 +17,8 @@ export enum Log_enum {
 	checkboxItems = 'checkboxItems',
 	lastUpdated = 'lastUpdated',
 	rating = 'rating',
-	questions = 'questions'
+	questions = 'questions',
+	listType = 'listType'
 }
 
 export interface Log_int {
@@ -33,6 +34,8 @@ export interface Log_int {
 	[Log_enum.lastUpdated]?: Date;
 	[Log_enum.rating]?: 1 | 2 | 3;
 	[Log_enum.questions]?: QuestionItem_int[];
+	// NOTE: listType is a sub type of listItems, it is only used when listItems is present
+	[Log_enum.listType]?: LogListType_enum;
 }
 
 export const logEnumNames: Record<Log_enum, string> = {
@@ -47,7 +50,8 @@ export const logEnumNames: Record<Log_enum, string> = {
 	[Log_enum.rating]: 'Rating',
 	[Log_enum.listItems]: 'List Items',
 	[Log_enum.checkboxItems]: 'Checkbox Items',
-	[Log_enum.questions]: 'Questions'
+	[Log_enum.questions]: 'Questions',
+	[Log_enum.listType]: 'List Type'
 };
 
 export enum LogType_enum {
