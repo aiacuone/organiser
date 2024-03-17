@@ -136,28 +136,33 @@
 		return $logs.data?.logs.filter((log: Log_int) => $filters.includes(log.type));
 	});
 
-	const noteButtons = [
-		{
+	const noteButtons: Record<LogType_enum, { label: string; icon: string; type: LogType_enum }> = {
+		[LogType_enum.time]: {
 			label: 'log',
 			icon: icons.clock,
 			type: LogType_enum.time
 		},
-		{
+		[LogType_enum.todo]: {
 			label: 'todo',
 			icon: icons.todo,
 			type: LogType_enum.todo
 		},
-		{
+		[LogType_enum.important]: {
 			label: 'important',
 			icon: icons.important,
 			type: LogType_enum.important
 		},
-		{
+		[LogType_enum.question]: {
 			label: 'question',
 			icon: icons.question,
 			type: LogType_enum.question
+		},
+		[LogType_enum.list]: {
+			label: 'list',
+			icon: icons.list,
+			type: LogType_enum.list
 		}
-	];
+	};
 
 	const onResetNewLogType = () => {
 		newLogType = undefined;
@@ -247,8 +252,8 @@
 				</Button>
 			</div>
 
-			<div class="grid grid-cols-4 w-full gap-y-3 gap-x-3 max-w-[500px] min-w-[300px]">
-				{#each noteButtons as { icon, type }}
+			<div class="flex flex-wrap center w-full gap-y-3 gap-x-3 min-w-[300px]">
+				{#each Object.values(noteButtons) as { icon, type }}
 					<PillButton
 						buttons={[
 							{
@@ -261,7 +266,7 @@
 									$filters.includes(type)
 										? ($filters = $filters.filter((filter) => filter !== type))
 										: ($filters = [...$filters, type]),
-								_class: `min-w-[30px] w-2/6 ${
+								_class: `min-w-[50px] w-2/6 ${
 									$filters.includes(type) ? 'bg-neutral-100' : 'bg-white'
 								}`
 							}

@@ -1,13 +1,13 @@
 <!-- todo: combine this with LogCheckboxItems when svelte 5 is released -->
 <script lang="ts">
-	import type { Readable, Writable } from 'svelte/store';
+	import type { Readable } from 'svelte/store';
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
-	import type { BaseMappedListItem_int, CheckboxItem_int } from '$lib/types';
+	import type { BaseMappedListItem_int, CheckboxItem_int, MappedCheckboxItem } from '$lib/types';
 	import { dndzone } from 'svelte-dnd-action';
 
-	export let checkboxes: (BaseMappedListItem_int & CheckboxItem_int)[];
+	export let checkboxes: MappedCheckboxItem[];
 	export let isEditing: Readable<boolean>;
 	export let onEnterKeydown: () => void;
 	export let onDeleteBullet: (index: number) => void;
@@ -20,7 +20,7 @@
 </script>
 
 <ul
-	class="ml-5 stack"
+	class="ml-3 stack flex-1"
 	use:dndzone={{
 		items: checkboxes,
 		flipDurationMs: 300,
@@ -33,12 +33,12 @@
 	{#each checkboxes as item, index (item.id)}
 		<li class="relative {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'}">
 			{#if $isEditing && checkboxes.length > 1}
-				<Icon icon={icons.vertical} class="absolute -left-[18px] top-[2px]" />
+				<Icon icon={icons.vertical} class="absolute -left-[16px] top-1" />
 			{/if}
 			<div class="hstack">
 				<input
 					type="checkbox"
-					class="mr-2"
+					class="mr-[7px]"
 					on:change={onCheckboxesChange}
 					bind:checked={checkboxes[index].isChecked}
 				/>

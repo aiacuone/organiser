@@ -12,7 +12,7 @@ export const icons = {
 	exit: 'iconamoon:exit-thin',
 	darkMode: 'gg:dark-mode',
 	clock: 'carbon:time',
-	todo: 'icon-park-outline:list',
+	todo: 'mdi:checkbox-outline',
 	question: 'ph:question-fill',
 	important: 'gridicons:notice-outline',
 	add: 'material-symbols:add',
@@ -32,5 +32,10 @@ export const icons = {
 	all: 'material-symbols:done-all',
 	cross: 'system-uicons:cross',
 	save: 'bi:save',
-	vertical: 'carbon:pan-vertical'
+	vertical: 'carbon:pan-vertical',
+	list: 'fluent:list-16-filled',
+	addList: 'ci:list-add',
+	unorderedList: 'ion:list',
+	orderedList: 'fa-solid:list-ol',
+	checkboxList: 'icon-park-outline:list-checkbox'
 };
