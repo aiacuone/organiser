@@ -35,9 +35,7 @@
 
 <ul
 	class="ml-8 stack w-full"
-	style={`list-style-type:${
-		items.length === 1 && listType !== LogListType_enum.checkbox ? 'none' : bulletType[listType]
-	}`}
+	style={`list-style-type:${bulletType[listType]}`}
 	use:dndzone={{
 		items,
 		flipDurationMs: 300,
