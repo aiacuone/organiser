@@ -2,12 +2,11 @@
 	import {
 		Log_enum,
 		LogType_enum,
-		type BaseMappedListItem_int,
-		type CheckboxItem_int,
-		type QuestionItem_int,
-		type ListItem_int,
 		type Log_int,
-		LogListType_enum
+		LogListType_enum,
+		type MappedCheckboxItem,
+		type MappedListItem,
+		type MappedQuestionItem
 	} from '$lib/types';
 	import {
 		clickOutside,
@@ -20,7 +19,6 @@
 		getQuestionsFromMappedQuestions
 	} from '$lib/utils';
 	import { page } from '$app/stores';
-
 	import { getContext, onMount } from 'svelte';
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
@@ -43,11 +41,9 @@
 	export let rating: 1 | 2 | 3 = 1;
 	export let lastUpdated: Date | undefined = undefined;
 	export let editOnMount: boolean = false;
-	export let checkboxItems: (BaseMappedListItem_int & CheckboxItem_int)[] = [];
-	export let questions: (BaseMappedListItem_int & QuestionItem_int)[] = [];
-	export let listItems:
-		| ((BaseMappedListItem_int & ListItem_int) | (BaseMappedListItem_int & CheckboxItem_int))[] =
-		[];
+	export let checkboxItems: MappedCheckboxItem[] = [];
+	export let questions: MappedQuestionItem[] = [];
+	export let listItems: (MappedListItem | MappedCheckboxItem)[] = [];
 	export let inputAutoFocus: boolean = false;
 	export let time: number = 0;
 	export let listType: LogListType_enum =
@@ -138,7 +134,7 @@
 		const setListItems = () => {
 			const filteredListItems = listItems.filter(({ item }) => item);
 			values[Log_enum.listItems] = getListItemsFromMappedListItems(
-				filteredListItems as (BaseMappedListItem_int & ListItem_int)[]
+				filteredListItems as MappedListItem[]
 			);
 			originalListItems = [...filteredListItems];
 		};
@@ -364,9 +360,7 @@
 						id,
 						title,
 						reference,
-						listItems: getListItemsFromMappedListItems(
-							listItems as (BaseMappedListItem_int & ListItem_int)[]
-						),
+						listItems: getListItemsFromMappedListItems(listItems as MappedListItem[]),
 						time,
 						date,
 						type: LogType_enum.time,
@@ -388,9 +382,7 @@
 						id,
 						title,
 						reference,
-						listItems: getListItemsFromMappedListItems(
-							listItems as (BaseMappedListItem_int & ListItem_int)[]
-						),
+						listItems: getListItemsFromMappedListItems(listItems as MappedListItem[]),
 						time,
 						date,
 						type: LogType_enum.time,

@@ -4,10 +4,10 @@
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
-	import type { BaseMappedListItem_int, CheckboxItem_int } from '$lib/types';
+	import type { BaseMappedListItem_int, CheckboxItem_int, MappedCheckboxItem } from '$lib/types';
 	import { dndzone } from 'svelte-dnd-action';
 
-	export let checkboxes: (BaseMappedListItem_int & CheckboxItem_int)[];
+	export let checkboxes: MappedCheckboxItem[];
 	export let isEditing: Readable<boolean>;
 	export let onEnterKeydown: () => void;
 	export let onDeleteBullet: (index: number) => void;

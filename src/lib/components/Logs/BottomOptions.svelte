@@ -11,9 +11,8 @@
 		LogListType_enum,
 		LogType_enum,
 		allLogListTypes,
-		type BaseMappedListItem_int,
-		type ListItem_int,
-		type CheckboxItem_int
+		type MappedCheckboxItem,
+		type MappedListItem
 	} from '$lib/types';
 	import { icons } from '$lib/general/icons';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
@@ -38,9 +37,7 @@
 	export let lastUpdated: Date | undefined = undefined;
 	export let logType: LogType_enum;
 	export let listType: LogListType_enum = LogListType_enum.unordered;
-	export let listItems:
-		| ((BaseMappedListItem_int & ListItem_int) | (BaseMappedListItem_int & CheckboxItem_int))[] =
-		[];
+	export let listItems: (MappedListItem | MappedCheckboxItem)[] = [];
 
 	let onOpenDelete: () => void;
 
@@ -61,13 +58,9 @@
 		const currentIndexListType = allLogListTypes[indexOfListType];
 
 		if (nextIndexListType === LogListType_enum.checkbox) {
-			listItems = getCheckboxItemsFromMappedListItems(
-				listItems as (BaseMappedListItem_int & ListItem_int)[]
-			);
+			listItems = getCheckboxItemsFromMappedListItems(listItems as MappedListItem[]);
 		} else if (currentIndexListType === LogListType_enum.checkbox) {
-			listItems = getListItemsFromMappedCheckboxItems(
-				listItems as (BaseMappedListItem_int & CheckboxItem_int)[]
-			);
+			listItems = getListItemsFromMappedCheckboxItems(listItems as MappedCheckboxItem[]);
 		}
 	};
 

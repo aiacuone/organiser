@@ -6,15 +6,9 @@
 	import { icons } from '$lib/general/icons';
 	import { flip } from 'svelte/animate';
 	import { dndzone } from 'svelte-dnd-action';
-	import {
-		LogType_enum,
-		type BaseMappedListItem_int,
-		type ListItem_int,
-		LogListType_enum
-	} from '$lib/types';
-	import { onMount } from 'svelte';
+	import { LogType_enum, LogListType_enum, type MappedListItem } from '$lib/types';
 
-	export let items: (BaseMappedListItem_int & ListItem_int)[];
+	export let items: MappedListItem[];
 	export let isEditing: Readable<boolean>;
 	export let onEnterKeydown: () => void;
 	export let onDeleteItem: (index: number) => void;
