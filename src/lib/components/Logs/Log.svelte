@@ -168,7 +168,8 @@
 			[LogType_enum.list]: () => {
 				values[Log_enum.listType] = listType;
 				if (listType === LogListType_enum.checkbox) {
-					const filteredCheckboxItems = listItems.filter(({ text }) => text);
+					const _checkboxItems = listItems as MappedCheckboxItem[];
+					const filteredCheckboxItems = _checkboxItems.filter(({ text }) => text);
 					values[Log_enum.listItems] = getCheckboxItemsFromMappedCheckboxItems(
 						filteredCheckboxItems as MappedCheckboxItem[]
 					);
