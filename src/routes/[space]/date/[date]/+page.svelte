@@ -255,6 +255,7 @@
 			<div class="flex flex-wrap center w-full gap-y-3 gap-x-3 min-w-[300px]">
 				{#each Object.values(noteButtons) as { icon, type }}
 					<PillButton
+						_class="w-[90px]"
 						buttons={[
 							{
 								onClick: () => onNoteButtonClick(type),
@@ -266,9 +267,7 @@
 									$filters.includes(type)
 										? ($filters = $filters.filter((filter) => filter !== type))
 										: ($filters = [...$filters, type]),
-								_class: `min-w-[50px] w-2/6 ${
-									$filters.includes(type) ? 'bg-neutral-100' : 'bg-white'
-								}`
+								_class: `w-2/6 ${$filters.includes(type) ? 'bg-neutral-100' : 'bg-white'}`
 							}
 						]}
 					/>

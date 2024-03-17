@@ -13,11 +13,12 @@
 	}[] = [];
 
 	let containerHeight: number = 0;
+	export let _class: string = '';
 </script>
 
 <div
 	bind:clientHeight={containerHeight}
-	class="pill-button hstack shadow-md min-h-[30px] rounded-r-md rounded-l-md text-sm center relative"
+	class="pill-button hstack shadow-md min-h-[30px] rounded-r-md rounded-l-md text-sm center relative {_class}"
 >
 	{#each buttons as { label, onClick, icon, _class, notification }, index}
 		<button
