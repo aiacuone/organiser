@@ -74,7 +74,7 @@
 		{
 			icon: listIcons[listType],
 			onClick: onChangeList,
-			isHidden: isEditing
+			isHidden: !isEditing
 		}
 	];
 </script>

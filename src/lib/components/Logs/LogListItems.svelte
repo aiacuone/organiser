@@ -40,8 +40,10 @@
 </script>
 
 <ul
-	class="ml-5 stack w-full"
-	style={`list-style-type:${$isEditing && items.length > 1 ? 'none' : bulletType[listType]}`}
+	class="ml-8 stack w-full"
+	style={`list-style-type:${
+		items.length === 1 && listType !== LogListType_enum.checkbox ? 'none' : bulletType[listType]
+	}`}
 	use:dndzone={{
 		items,
 		flipDurationMs: 300,
@@ -54,7 +56,7 @@
 	{#each items as item, index (item.id)}
 		<li class="{index % 2 === 0 ? 'bg-transparent' : checkeredColor[logType]} relative">
 			{#if $isEditing && items.length > 1}
-				<Icon icon={icons.vertical} class="absolute -left-4 top-1" />
+				<Icon icon={icons.vertical} class="absolute -left-9 top-1" />
 			{/if}
 			<div class="hstack">
 				<div class="flex gap-2 min-h-[20px] flex-1">
