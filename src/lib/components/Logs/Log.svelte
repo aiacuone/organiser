@@ -231,7 +231,7 @@
 				{ id: checkboxItems.length, isChecked: false, text: '' }
 			]);
 		const addQuestionItem = () =>
-			(questions = [...questions, { id: questions.length, question: '' }]);
+			(questions = [...questions, { id: questions.length, question: '', answer: '' }]);
 		const addItemTypeMethods: Record<LogType_enum, () => void> = {
 			[LogType_enum.todo]: () => {
 				addCheckboxItem();

@@ -57,7 +57,11 @@ export const getMappedQuestions = (items: QuestionItem_int[]): MappedQuestionIte
 
 export const getQuestionsFromMappedQuestions = (
 	mappedQuestions: MappedQuestionItem[]
-): QuestionItem_int[] => mappedQuestions.map(({ question, answer }) => ({ question, answer }));
+): QuestionItem_int[] => {
+	return mappedQuestions.map(({ question, answer }) => {
+		return { question, answer };
+	});
+};
 
 export const logIcons: Record<LogType_enum, string> = {
 	[LogType_enum.time]: icons.clock,
