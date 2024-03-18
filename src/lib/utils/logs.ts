@@ -1,13 +1,13 @@
 import { icons } from '$lib/general/icons';
 import {
 	LogType_enum,
-	type BaseMappedListItem_int,
 	type CheckboxItem_int,
 	type Log_enum,
 	type Log_int,
 	type QuestionItem_int,
 	type MappedCheckboxItem,
-	type MappedListItem
+	type MappedListItem,
+	type MappedQuestionItem
 } from '$lib/types';
 
 export const getHaveValuesChanged = ({
@@ -52,13 +52,11 @@ export const getCheckboxItemsFromMappedCheckboxItems = (
 	mappedCheckboxItems: MappedCheckboxItem[]
 ): CheckboxItem_int[] => mappedCheckboxItems.map(({ text, isChecked }) => ({ text, isChecked }));
 
-export const getMappedQuestions = (
-	items: QuestionItem_int[]
-): (BaseMappedListItem_int & QuestionItem_int)[] =>
+export const getMappedQuestions = (items: QuestionItem_int[]): MappedQuestionItem[] =>
 	items.map((question, index) => ({ id: index, ...question }));
 
 export const getQuestionsFromMappedQuestions = (
-	mappedQuestions: (BaseMappedListItem_int & QuestionItem_int)[]
+	mappedQuestions: MappedQuestionItem[]
 ): QuestionItem_int[] => mappedQuestions.map(({ question, answer }) => ({ question, answer }));
 
 export const logIcons: Record<LogType_enum, string> = {

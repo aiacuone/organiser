@@ -57,7 +57,6 @@
 	let originalListItems = listItems;
 	let originalTime = time;
 
-	let isAnswering: undefined | number = undefined;
 	let container: HTMLDivElement;
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
@@ -90,10 +89,6 @@
 		if (!isAnotherCardEditing) {
 			$currentlyEditing = id;
 		}
-	};
-
-	export const onResetItems: () => void = () => {
-		isAnswering = undefined;
 	};
 
 	let changeReferenceInputValue: ((value: string | undefined) => void) | undefined = undefined;
