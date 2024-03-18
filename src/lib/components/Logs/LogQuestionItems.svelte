@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { currentlyEditing } from '$lib/stores';
-	import type { BaseMappedListItem_int, QuestionItem_int } from '$lib/types';
+	import type { MappedQuestionItem } from '$lib/types';
 	import Button from '../Button.svelte';
 	import Textarea from '../Textarea.svelte';
 	import { dndzone } from 'svelte-dnd-action';
@@ -8,7 +8,7 @@
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
 
-	export let questions: (BaseMappedListItem_int & QuestionItem_int)[];
+	export let questions: MappedQuestionItem[];
 	export let isDisabled: boolean;
 	export let onFocusAnswerInput: () => void;
 	export let id: string;
@@ -67,7 +67,7 @@
 					<div class="text-sm gap-1 flex-1 flex">
 						<p class="text-neutral-400">Answer:</p>
 						<Textarea
-							value={questions[index].answer ?? ''}
+							bind:value={questions[index].answer}
 							_class="flex-1"
 							onChange={(e) => onAnswerChange(index, e.target?.value)}
 							{isDisabled}

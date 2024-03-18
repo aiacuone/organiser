@@ -91,7 +91,7 @@ export interface CheckboxItem_int {
 
 export interface QuestionItem_int {
 	question: string;
-	answer?: string;
+	answer: string;
 }
 
 export interface TodoLog_int extends LogBase_int {
