@@ -77,7 +77,7 @@
 				{/if}
 				{#if !questions[index].answer}
 					<Button
-						_class="self-start text-xs {questions[index].answer || isAnswering === index
+						_class="self-start text-xs bg-white {questions[index].answer || isAnswering === index
 							? 'hidden'
 							: 'block'}"
 						onClick={() => _onFocusAnswerInput(index)}>Answer</Button
