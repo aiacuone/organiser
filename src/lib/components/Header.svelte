@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { icons } from '$lib/general/icons';
 	import { LogType_enum } from '$lib/types';
 	import {
@@ -18,6 +17,8 @@
 	import { onMount } from 'svelte';
 	import PillButton from './Logs/Buttons/PillButton.svelte';
 	import { derived } from 'svelte/store';
+	import { logIcons } from '$lib/utils';
+	import { page } from '$app/stores';
 
 	export let space: string;
 	export let spaces: string[];
@@ -66,47 +67,43 @@
 		}
 	);
 
-	const headerButtons = [
-		{
-			label: 'time',
-			type: LogType_enum.time,
-			icon: icons.clock,
-			onClick: () => {
-				goto(`/${$page.params.space}/filter?type=${LogType_enum.time}`);
-			}
-		},
-		{
-			label: 'todo',
-			type: LogType_enum.todo,
-			icon: icons.todo,
-			onClick: (hasNotification: boolean) => {
-				const url = hasNotification
-					? `/${$page.params.space}/filter?type=${LogType_enum.todo}&isChecked=false`
-					: `/${$page.params.space}/filter?type=${LogType_enum.todo}`;
-				goto(url);
-			}
-		},
-		{
-			label: 'important',
-			type: LogType_enum.important,
-			icon: icons.important,
-			onClick: () => {
-				goto(`/${$page.params.space}/filter?type=${LogType_enum.important}`);
-			}
-		},
-		{
-			label: 'question',
-			type: LogType_enum.question,
-			icon: icons.question,
-			onClick: (hasNotification: boolean) => {
-				const url = hasNotification
-					? `/${$page.params.space}/filter?type=${LogType_enum.question}&hasAnswer=false`
-					: `/${$page.params.space}/filter?type=${LogType_enum.question}`;
-				goto(url);
-			}
+	const gotoLogType = (type: LogType_enum, hasNotification: boolean = false) => {
+		let url = `/${$page.params.space}/filter?type=${type}`;
+		if (hasNotification) {
+			if (type === LogType_enum.todo) url = `${url}&isChecked=false`;
+			if (type === LogType_enum.question) url = `${url}&isAnswered=false`;
 		}
-	];
+		goto(url);
+	};
 
+	const headerButtons: Record<
+		LogType_enum,
+		{
+			icon: string;
+			onClick: (hasNotification?: boolean) => void;
+		}
+	> = {
+		[LogType_enum.time]: {
+			icon: logIcons.time,
+			onClick: () => gotoLogType(LogType_enum.time)
+		},
+		[LogType_enum.todo]: {
+			icon: logIcons.todo,
+			onClick: (hasNotification?: boolean) => gotoLogType(LogType_enum.todo, hasNotification)
+		},
+		[LogType_enum.important]: {
+			icon: logIcons.important,
+			onClick: () => gotoLogType(LogType_enum.important)
+		},
+		[LogType_enum.question]: {
+			icon: logIcons.question,
+			onClick: (hasNotification?: boolean) => gotoLogType(LogType_enum.question, hasNotification)
+		},
+		[LogType_enum.list]: {
+			icon: logIcons.list,
+			onClick: () => gotoLogType(LogType_enum.list)
+		}
+	};
 	const onAddSpace = () => {
 		goto(
 			`/${replaceAllSpacesWithHyphens(
@@ -180,7 +177,7 @@
 			>
 		</div>
 		<div class="flex-1 hstack justify-end gap-5">
-			{#each headerButtons as { icon, onClick, type }}
+			{#each Object.entries(headerButtons) as [type, { icon, onClick }]}
 				{@const spaceNotifications = $allLogsNotificationsQuery.data?.find(
 					({ space: _space }) => _space === space
 				)}
