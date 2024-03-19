@@ -389,20 +389,17 @@
 	};
 
 	const containerClasses: Record<LogType_enum, string[]> = {
-		[LogType_enum.todo]: ['', 'border-dashed border-neutral-200 border p-2 stack gap-1'],
-		[LogType_enum.question]: ['bg-neutral-100 p-1 rounded-sm', 'bg-white p-2 stack rounded-sm'],
-		[LogType_enum.time]: [
-			'bg-neutral-100 p-2 rounded-sm',
-			'bg-white rounded-sm p-2 stack text-sm gap-1'
-		],
-		[LogType_enum.important]: ['', 'bg-neutral-50 p-2 stack gap-1 text-sm'],
-		[LogType_enum.list]: ['', 'bg-neutral-50 p-2 stack gap-1 text-sm']
+		[LogType_enum.todo]: ['', 'border-dashed border-neutral-200 border p-2 gap-1'],
+		[LogType_enum.question]: ['bg-neutral-100 p-1 rounded-sm', 'bg-white p-2 rounded-sm'],
+		[LogType_enum.time]: ['p-1', 'shadow-md bg-white rounded-sm p-2 text-sm gap-1'],
+		[LogType_enum.important]: ['', 'bg-neutral-50 p-2 gap-1 text-sm'],
+		[LogType_enum.list]: ['', 'p-2 gap-1 text-sm border border-neutral-200 rounded-lg']
 	};
 </script>
 
 <div bind:this={container} use:clickOutside on:click_outside={onClickOutside} class="">
 	<div class={containerClasses[logType][0]}>
-		<div class={containerClasses[logType][1]}>
+		<div class="stack {containerClasses[logType][1]}">
 			{#if title || reference || $isEditing}
 				<div class="stack gap-1">
 					{#if !$isEditing && !title}{''}{:else}
