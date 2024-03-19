@@ -35,7 +35,7 @@
 </script>
 
 <ul
-	class="ml-5 stack flex-1 gap-3"
+	class="ml-2 stack flex-1 gap-3"
 	use:dndzone={{
 		items: questions,
 		flipDurationMs: 300,
