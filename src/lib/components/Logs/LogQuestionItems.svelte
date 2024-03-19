@@ -35,7 +35,7 @@
 </script>
 
 <ul
-	class="ml-5 stack flex-1"
+	class="ml-5 stack flex-1 gap-3"
 	use:dndzone={{
 		items: questions,
 		flipDurationMs: 300,
@@ -52,7 +52,7 @@
 			{#if $isEditing && questions.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-4 top-6" />
 			{/if}
-			<div class="stack gap-1 w-full min-h-[60px]">
+			<div class="stack gap-1 w-full">
 				<div class="hstack text-sm gap-1">
 					<p class="text-neutral-400">Question:</p>
 					<Textarea

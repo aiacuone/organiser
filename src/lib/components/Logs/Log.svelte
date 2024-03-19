@@ -390,10 +390,7 @@
 
 	const containerClasses: Record<LogType_enum, string[]> = {
 		[LogType_enum.todo]: ['', 'border-dashed border-neutral-200 border p-2 stack gap-1'],
-		[LogType_enum.question]: [
-			'bg-neutral-100 p-1 rounded-sm',
-			'bg-white p-2 stack gap-3 rounded-sm'
-		],
+		[LogType_enum.question]: ['bg-neutral-100 p-1 rounded-sm', 'bg-white p-2 stack rounded-sm'],
 		[LogType_enum.time]: [
 			'bg-neutral-100 p-2 rounded-sm',
 			'bg-white rounded-sm p-2 stack text-sm gap-1'
