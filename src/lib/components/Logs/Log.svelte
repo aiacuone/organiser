@@ -57,7 +57,7 @@
 	let originalListItems = listItems;
 	let originalTime = time;
 
-	let container: HTMLDivElement;
+	let container: HTMLButtonElement;
 
 	const onEditLog = () => {
 		$currentlyEditing = id;
@@ -397,9 +397,19 @@
 		[LogType_enum.important]: ['', 'bg-neutral-50 p-2 gap-1 text-sm'],
 		[LogType_enum.list]: ['', 'p-2 gap-1 text-sm border border-neutral-200 rounded-lg']
 	};
+
+	const onClickLog = () => {
+		onEditLog();
+	};
 </script>
 
-<div bind:this={container} use:clickOutside on:click_outside={onClickOutside} class="">
+<button
+	bind:this={container}
+	use:clickOutside
+	on:click_outside={onClickOutside}
+	class=""
+	on:click={onClickLog}
+>
 	<div class={containerClasses[logType][0]}>
 		<div class="stack {containerClasses[logType][1]}">
 			{#if title || reference || $isEditing}
@@ -477,7 +487,7 @@
 			/>
 		</div>
 	</div>
-</div>
+</button>
 
 <ConfirmationDialog onConfirm={onResetChange} bind:onOpen
 	>Did you want to reset your changes?</ConfirmationDialog
