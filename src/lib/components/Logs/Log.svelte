@@ -19,7 +19,7 @@
 		getQuestionsFromMappedQuestions
 	} from '$lib/utils';
 	import { page } from '$app/stores';
-	import { getContext, onMount } from 'svelte';
+	import { getContext, onMount, setContext } from 'svelte';
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
 	import { derived } from 'svelte/store';
@@ -59,13 +59,15 @@
 
 	let container: HTMLDivElement;
 
+	const onEditLog = () => {
+		$currentlyEditing = id;
+	};
+
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
+	setContext('onEditLog', onEditLog);
 
-	export const isEditing = derived(
-		[currentlyEditing],
-		([$currentlyEditing]) => $currentlyEditing === id
-	);
+	const isEditing = derived([currentlyEditing], ([$currentlyEditing]) => $currentlyEditing === id);
 
 	const updateLogMutation = useMutation(updateLog, {
 		onSuccess: () => {
@@ -79,7 +81,7 @@
 		}
 	});
 
-	export const onDelete = () => {
+	const onDelete = () => {
 		$currentlyEditing = null;
 		$deleteLogMutation.mutate(id);
 	};
@@ -87,7 +89,7 @@
 	const onEdit = () => {
 		const isAnotherCardEditing = !!$currentlyEditing;
 		if (!isAnotherCardEditing) {
-			$currentlyEditing = id;
+			onEditLog();
 		}
 	};
 
@@ -101,7 +103,7 @@
 
 	let onFocusAnswerInput: () => void;
 	const _onFocusAnswerInput = () => {
-		$currentlyEditing = id;
+		onEditLog();
 		//this is a hack to make sure the answer input is focused
 		setTimeout(() => {
 			onFocusAnswerInput();
@@ -222,7 +224,7 @@
 	};
 
 	const onAddItem = () => {
-		$currentlyEditing = id;
+		onEditLog();
 
 		const addListItem = () => (listItems = [...listItems, { id: listItems.length, item: '' }]);
 		const addCheckboxItem = () =>
@@ -325,7 +327,7 @@
 
 	onMount(() => {
 		if (editOnMount) {
-			$currentlyEditing = id;
+			onEditLog();
 		}
 	});
 
