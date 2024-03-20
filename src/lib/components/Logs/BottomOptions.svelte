@@ -82,11 +82,12 @@
 			onClick: onAccept,
 			isHidden: !isEditing
 		},
-		{
-			icon: icons.edit,
-			onClick: onEdit,
-			isHidden: isEditing
-		},
+		//trialing not using this, TODO: remove or use after trial
+		// {
+		// 	icon: icons.edit,
+		// 	onClick: onEdit,
+		// 	isHidden: isEditing
+		// },
 		{
 			icon: icons.addList,
 			onClick: onAddItem

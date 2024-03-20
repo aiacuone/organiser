@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { isDropdownOpen } from '$lib/stores';
 	import { clickOutside } from '$lib/utils/clickAway';
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 
 	export let value: string = '';
 	export let placeholder: string | undefined = undefined;
@@ -22,6 +22,8 @@
 
 	let input: HTMLInputElement;
 	let isInputFocused: boolean = false;
+
+	const onEditLog: (() => void) | undefined = getContext('onEditLog');
 
 	onMount(() => {
 		if (autofocus) {
@@ -50,9 +52,16 @@
 
 	$: _isDropdownOpen = isInputFocused && !value && autofillValues.length > 0;
 	$: _isDropdownOpen, ($isDropdownOpen = _isDropdownOpen);
+
+	const onClick = () => {
+		onEditLog && onEditLog();
+		onFocus();
+	};
 </script>
 
-<div use:clickOutside on:click_outside={onClickOutside}>
+<div use:clickOutside on:click_outside={onClickOutside} class="relative">
+	<!-- Needed to use this button because when the input is disabled, it won't trigger the onClick event -->
+	<button on:click={onClick} class="w-full h-full absolute" />
 	<input
 		type="text"
 		bind:value
@@ -60,7 +69,6 @@
 		placeholder={isDisabled ? '' : placeholder}
 		bind:this={input}
 		on:focus={_onFocus}
-		disabled={isDisabled}
 		on:input={onChange}
 		on:keydown={onKeydown}
 	/>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { afterUpdate, onMount } from 'svelte';
+	import { afterUpdate, getContext, onMount } from 'svelte';
 	import type { ChangeEventHandler } from 'svelte/elements';
 	export let value: string | string[];
 	export let className = '';
@@ -18,6 +18,8 @@
 		textarea.style.height = '20px';
 		if (textarea.scrollHeight > 20) textarea.style.height = textarea.scrollHeight + 'px';
 	};
+
+	const onEditLog: (() => void) | undefined = getContext('onEditLog');
 
 	afterUpdate(() => {
 		resize();
@@ -40,15 +42,27 @@
 			textarea.removeEventListener('keydown', keydown);
 		};
 	});
+
+	const onClick = () => {
+		onEditLog && onEditLog();
+		setTimeout(() => {
+			// this is a hack to ensure the textarea is focused
+			onFocus();
+		}, 0);
+	};
 </script>
 
-<textarea
-	bind:value
-	class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 {_class}"
-	bind:this={textarea}
-	on:input={resize}
-	disabled={isDisabled}
-	on:change={onChange}
-/>
+<div class="w-full">
+	<!-- Needed to use this button because when the textarea is disabled, it won't trigger the onClick event -->
+	<button on:click={onClick} class="w-full h-full absolute" />
+	<textarea
+		bind:value
+		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"
+		bind:this={textarea}
+		on:input={resize}
+		disabled={isDisabled}
+		on:change={onChange}
+	/>
+</div>
 
 <svelte:window on:resize={resize} />
