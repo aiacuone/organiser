@@ -63,6 +63,10 @@
 		$currentlyEditing = id;
 	};
 
+	const onStopEditing = () => {
+		$currentlyEditing = null;
+	};
+
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 	setContext('onEditLog', onEditLog);
@@ -82,7 +86,7 @@
 	});
 
 	const onDelete = () => {
-		$currentlyEditing = null;
+		onStopEditing();
 		$deleteLogMutation.mutate(id);
 	};
 
@@ -175,7 +179,7 @@
 			originalValues
 		});
 
-		if (!haveValuesChanged) return ($currentlyEditing = null);
+		if (!haveValuesChanged) return onStopEditing();
 
 		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate(date)) {
 			const currentDate = new Date();
@@ -195,7 +199,7 @@
 		originalTitle = title;
 		originalReference = reference;
 		originalRating = rating;
-		$currentlyEditing = null;
+		onStopEditing();
 
 		const setOriginalListItems = () => (originalListItems = [...listItems]);
 		const setOriginalCheckboxItems = () => (originalCheckboxItems = [...checkboxItems]);
@@ -301,7 +305,7 @@
 		};
 		resetTypeItems[logType]();
 
-		$currentlyEditing = null;
+		onStopEditing();
 	};
 
 	const onTextareaEnterKeydown: () => void = () => {

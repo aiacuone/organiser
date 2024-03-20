@@ -4,7 +4,6 @@
 	export let value: string | string[];
 	export let className = '';
 	export let autofocus = false;
-	export let isDisabled = false;
 	export let _class = '';
 	export let onEnterKeydown: () => void = () => {};
 	export let onChange: ChangeEventHandler<HTMLTextAreaElement> = () => {};
@@ -42,28 +41,14 @@
 			textarea.removeEventListener('keydown', keydown);
 		};
 	});
-
-	const onClick = () => {
-		onEditLog && onEditLog();
-		setTimeout(() => {
-			// this is a hack to ensure the textarea is focused
-			onFocus();
-		}, 0);
-	};
 </script>
 
 <div class="w-full relative">
-	<!-- Needed to use this button because when the textarea is disabled, it won't trigger the onClick event -->
-	<button
-		on:click={onClick}
-		class="w-full h-full absolute left-0 {isDisabled ? 'flex' : 'hidden'}"
-	/>
 	<textarea
 		bind:value
 		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"
 		bind:this={textarea}
 		on:input={resize}
-		disabled={isDisabled}
 		on:change={onChange}
 	/>
 </div>
