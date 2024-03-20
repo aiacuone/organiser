@@ -62,7 +62,6 @@
 		on:input={resize}
 		disabled={isDisabled}
 		on:change={onChange}
-		on:click={onClick}
 	/>
 </div>
 
