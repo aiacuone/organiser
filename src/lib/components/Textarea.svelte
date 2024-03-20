@@ -52,9 +52,9 @@
 	};
 </script>
 
-<div class="w-full">
+<div class="w-full relative">
 	<!-- Needed to use this button because when the textarea is disabled, it won't trigger the onClick event -->
-	<button on:click={onClick} class="w-full h-full absolute" />
+	<button on:click={onClick} class="w-full h-full absolute left-0" />
 	<textarea
 		bind:value
 		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"
