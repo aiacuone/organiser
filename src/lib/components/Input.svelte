@@ -23,8 +23,6 @@
 	let input: HTMLInputElement;
 	let isInputFocused: boolean = false;
 
-	const onEditLog: (() => void) | undefined = getContext('onEditLog');
-
 	onMount(() => {
 		if (autofocus) {
 			input.focus();

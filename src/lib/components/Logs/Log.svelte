@@ -13,7 +13,6 @@
 		debounce,
 		getCheckboxItemsFromMappedCheckboxItems,
 		getDateFromHyphenatedString,
-		getHaveValuesChanged,
 		getHyphenatedStringFromDate,
 		getListItemsFromMappedListItems,
 		getQuestionsFromMappedQuestions
@@ -32,6 +31,7 @@
 	import CheckboxItems from './LogCheckboxItems.svelte';
 	import LogQuestionItems from './LogQuestionItems.svelte';
 	import { useMutation } from '@sveltestack/svelte-query';
+	import isEqual from 'lodash.isequal';
 
 	export let logType: LogType_enum;
 	export let title: string = '';
@@ -117,13 +117,8 @@
 		}, 0);
 	};
 
-	const onAccept = async () => {
-		const values: Log_int = {
-			[Log_enum.id]: id,
-			[Log_enum.date]: date,
-			[Log_enum.type]: logType,
-			[Log_enum.space]: $page.params.space,
-			[Log_enum.lastUpdated]: new Date(),
+	const getHaveValuesChanged = () => {
+		const values: Partial<Log_int> = {
 			[Log_enum.rating]: rating,
 			[Log_enum.title]: title,
 			[Log_enum.reference]: reference
@@ -138,21 +133,23 @@
 		const setListItems = () => {
 			const filteredListItems = listItems.filter(({ item }) => item);
 			values[Log_enum.listItems] = getListItemsFromMappedListItems(filteredListItems);
-			originalListItems = [...filteredListItems];
+			originalValues[Log_enum.listItems] = getListItemsFromMappedListItems(originalListItems);
 		};
 		const setCheckboxItems = () => {
 			const filteredCheckboxItems = checkboxItems.filter(({ text }) => text);
 			values[Log_enum.checkboxItems] =
 				getCheckboxItemsFromMappedCheckboxItems(filteredCheckboxItems);
-			originalCheckboxItems = [...filteredCheckboxItems];
+			originalValues[Log_enum.checkboxItems] =
+				getCheckboxItemsFromMappedCheckboxItems(originalCheckboxItems);
 		};
 		const setQuestionItems = () => {
 			const filteredQuestions = questions.filter(
 				({ question, answer }) => question || (answer && question)
 			);
 			values[Log_enum.questions] = getQuestionsFromMappedQuestions(filteredQuestions);
-			originalQuestions = [...filteredQuestions];
+			originalValues[Log_enum.questions] = getQuestionsFromMappedQuestions(originalQuestions);
 		};
+
 		const setValuesTypeMethods: Record<LogType_enum, () => void> = {
 			[LogType_enum.todo]: () => {
 				setCheckboxItems();
@@ -164,10 +161,10 @@
 			[LogType_enum.time]: () => {
 				setListItems();
 				values[Log_enum.time] = time;
+				originalValues[Log_enum.time] = originalTime;
 				originalTime = time;
 			},
 			[LogType_enum.list]: () => {
-				values[Log_enum.listType] = listType;
 				if (listType === LogListType_enum.checkbox) {
 					setCheckboxItems();
 				} else {
@@ -177,11 +174,25 @@
 		};
 		setValuesTypeMethods[logType]();
 
-		const haveValuesChanged = getHaveValuesChanged({
-			values,
-			originalValues
-		});
+		const haveValuesChanged = !isEqual(values, originalValues);
+		console.log({ haveValuesChanged, values, originalValues });
+		return haveValuesChanged;
+	};
 
+	const onAccept = async () => {
+		const values: Log_int = {
+			[Log_enum.id]: id,
+			[Log_enum.date]: date,
+			[Log_enum.type]: logType,
+			[Log_enum.space]: $page.params.space,
+			[Log_enum.lastUpdated]: new Date(),
+			[Log_enum.rating]: rating,
+			[Log_enum.title]: title,
+			[Log_enum.reference]: reference
+		};
+
+		const haveValuesChanged = getHaveValuesChanged();
+		console.log({ haveValuesChanged });
 		if (!haveValuesChanged) return onStopEditing();
 
 		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate(date)) {
@@ -343,7 +354,12 @@
 	let isOpen: boolean;
 
 	const onClickOutside = () => {
-		$isEditing && !isOpen && !$isDropdownOpen && onOpen();
+		if ($isEditing) {
+			const haveValuesChanged = getHaveValuesChanged();
+			if (haveValuesChanged && !isOpen && !$isDropdownOpen) {
+				onOpen();
+			}
+		}
 	};
 
 	const incrementDecrementPropValues: Record<LogType_enum, { min: number; max: number }> = {

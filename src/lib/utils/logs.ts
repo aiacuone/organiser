@@ -2,25 +2,11 @@ import { icons } from '$lib/general/icons';
 import {
 	LogType_enum,
 	type CheckboxItem_int,
-	type Log_enum,
-	type Log_int,
 	type QuestionItem_int,
 	type MappedCheckboxItem,
 	type MappedListItem,
 	type MappedQuestionItem
 } from '$lib/types';
-
-export const getHaveValuesChanged = ({
-	values,
-	originalValues
-}: {
-	values: Partial<Log_int>;
-	originalValues: Partial<Log_int>;
-}) => {
-	return Object.keys(values).some(
-		(key) => values[key as Log_enum] !== originalValues[key as Log_enum]
-	);
-};
 
 export const arraysHaveSameValues = (arr1: string[], arr2: string[]): boolean => {
 	if (arr1.length !== arr2.length) {
