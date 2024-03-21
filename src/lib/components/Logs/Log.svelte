@@ -195,7 +195,9 @@
 
 	const getHaveValuesChanged = () => {
 		const { values, originalValues } = getAllValues();
-		return !isEqual(values, originalValues);
+		const haveValuesChanged = !isEqual(values, originalValues);
+
+		return haveValuesChanged;
 	};
 
 	const onAccept = async () => {
