@@ -63,6 +63,13 @@
 		$currentlyEditing = id;
 	};
 
+	const onStopEditing = () => {
+		setTimeout(() => {
+			// this is a hack to ensure this is at the end of the race condition so that all other updates are done before this is changed
+			$currentlyEditing = null;
+		}, 0);
+	};
+
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 	setContext('onEditLog', onEditLog);
@@ -82,7 +89,7 @@
 	});
 
 	const onDelete = () => {
-		$currentlyEditing = null;
+		onStopEditing();
 		$deleteLogMutation.mutate(id);
 	};
 
@@ -195,7 +202,8 @@
 		originalTitle = title;
 		originalReference = reference;
 		originalRating = rating;
-		$currentlyEditing = null;
+
+		onStopEditing();
 
 		const setOriginalListItems = () => (originalListItems = [...listItems]);
 		const setOriginalCheckboxItems = () => (originalCheckboxItems = [...checkboxItems]);
@@ -301,7 +309,7 @@
 		};
 		resetTypeItems[logType]();
 
-		$currentlyEditing = null;
+		onStopEditing();
 	};
 
 	const onTextareaEnterKeydown: () => void = () => {
@@ -399,6 +407,7 @@
 	};
 
 	const onClickLog = () => {
+		if ($currentlyEditing) return;
 		onEditLog();
 	};
 </script>
