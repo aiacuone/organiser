@@ -64,7 +64,10 @@
 	};
 
 	const onStopEditing = () => {
-		$currentlyEditing = null;
+		setTimeout(() => {
+			// this is a hack to ensure this is at the end of the race condition so that all other updates are done before this is changed
+			$currentlyEditing = null;
+		}, 0);
 	};
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
@@ -199,6 +202,7 @@
 		originalTitle = title;
 		originalReference = reference;
 		originalRating = rating;
+
 		onStopEditing();
 
 		const setOriginalListItems = () => (originalListItems = [...listItems]);
@@ -403,6 +407,7 @@
 	};
 
 	const onClickLog = () => {
+		if ($currentlyEditing) return;
 		onEditLog();
 	};
 </script>
