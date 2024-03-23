@@ -69,8 +69,11 @@
 	});
 
 	const onDelete = () => {
-		onStopEditing();
 		$deleteLogMutation.mutate($log.id);
+		setTimeout(() => {
+			// this is a hack to ensure the last log in the list of logs is not editing after delete
+			onStopEditing();
+		}, 0);
 	};
 
 	const onEdit = () => {
