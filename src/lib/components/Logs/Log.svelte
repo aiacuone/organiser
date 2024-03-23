@@ -41,10 +41,10 @@
 	};
 
 	const onStopEditing = () => {
-		setTimeout(() => {
-			// this is a hack to ensure this is at the end of the race condition so that all other updates are done before this is changed
-			$currentlyEditing = null;
-		}, 0);
+		// setTimeout(() => {
+		// 	// this is a hack to ensure this is at the end of the race condition so that all other updates are done before this is changed
+		$currentlyEditing = null;
+		// }, 0);
 	};
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
@@ -126,7 +126,11 @@
 
 		onResetNewLogType && onResetNewLogType();
 		initialLog = updatedLog;
-		onStopEditing();
+		// onStopEditing();
+		setTimeout(() => {
+			// this is a hack to ensure this is at the end of the race condition so that all other updates are done before this is changed
+			onStopEditing();
+		}, 0);
 	};
 
 	const onAddItem = () => {
