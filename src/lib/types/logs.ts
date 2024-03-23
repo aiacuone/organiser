@@ -78,6 +78,8 @@ export interface LogBase_int {
 	[Log_enum.title]: string;
 	[Log_enum.reference]: string;
 	[Log_enum.time]: number;
+	[Log_enum.type]: LogType_enum;
+	[Log_enum.lastUpdated]?: Date;
 }
 
 export interface ListItem_int {
@@ -142,3 +144,12 @@ export const allLogListTypes = Object.values(LogListType_enum).map(
 export type MappedCheckboxItem = BaseMappedListItem_int & CheckboxItem_int;
 export type MappedListItem = BaseMappedListItem_int & ListItem_int;
 export type MappedQuestionItem = BaseMappedListItem_int & QuestionItem_int;
+
+export interface MappedLog_int extends LogBase_int {
+	[Log_enum.listItems]: MappedListItem[];
+	[Log_enum.checkboxItems]: MappedCheckboxItem[];
+	[Log_enum.questions]: MappedQuestionItem[];
+	[Log_enum.rating]: 1 | 2 | 3;
+	inputAutoFocus: boolean;
+	editOnMount?: boolean;
+}
