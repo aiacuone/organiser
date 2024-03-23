@@ -17,3 +17,9 @@ export const copyToClipboard = (text: string) => {
 
 	navigator.clipboard.write([clipboardItem]);
 };
+
+export const addToEndOfRaceCondition = (callback: () => void) => {
+	setTimeout(() => {
+		callback();
+	}, 0);
+};

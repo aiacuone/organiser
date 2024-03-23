@@ -7,7 +7,8 @@
 		getHyphenatedStringFromDate,
 		getListItemsFromMappedListItems,
 		getLogFromMappedLog,
-		getMappedLog
+		getMappedLog,
+		addToEndOfRaceCondition
 	} from '$lib/utils';
 	import { page } from '$app/stores';
 	import { getContext, onMount, setContext } from 'svelte';
@@ -41,10 +42,7 @@
 	};
 
 	const onStopEditing = () => {
-		// setTimeout(() => {
-		// 	// this is a hack to ensure this is at the end of the race condition so that all other updates are done before this is changed
 		$currentlyEditing = null;
-		// }, 0);
 	};
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
@@ -70,10 +68,7 @@
 
 	const onDelete = () => {
 		$deleteLogMutation.mutate($log.id);
-		setTimeout(() => {
-			// this is a hack to ensure the last log in the list of logs is not editing after delete
-			onStopEditing();
-		}, 0);
+		addToEndOfRaceCondition(onStopEditing);
 	};
 
 	const onEdit = () => {
@@ -129,11 +124,7 @@
 
 		onResetNewLogType && onResetNewLogType();
 		initialLog = updatedLog;
-		// onStopEditing();
-		setTimeout(() => {
-			// this is a hack to ensure this is at the end of the race condition so that all other updates are done before this is changed
-			onStopEditing();
-		}, 0);
+		addToEndOfRaceCondition(onStopEditing);
 	};
 
 	const onAddItem = () => {
