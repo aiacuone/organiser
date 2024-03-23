@@ -367,8 +367,6 @@
 			</div>
 			<BottomOptions
 				bind:listType
-				bind:listItems={$log.listItems}
-				bind:checkboxItems={$log.checkboxItems}
 				incrementDecrementProps={{
 					min: incrementDecrementPropValues[$log.type].min,
 					max: incrementDecrementPropValues[$log.type].max,
@@ -376,14 +374,11 @@
 					onDecrement
 				}}
 				incrementDecrementValue={$log.type === LogType_enum.time ? $log.time : $log.rating}
-				date={$log.date}
 				isEditing={$isEditing}
 				{onAccept}
 				{onAddItem}
-				{onEdit}
 				{onDelete}
-				lastUpdated={$log.lastUpdated}
-				logType={$log.type}
+				{log}
 			/>
 		</div>
 	</div>

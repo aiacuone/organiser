@@ -7,16 +7,11 @@
 		logIcons
 	} from '$lib/utils';
 	import Icon from '@iconify/svelte';
-	import {
-		LogListType_enum,
-		LogType_enum,
-		allLogListTypes,
-		type MappedListItem,
-		type MappedCheckboxItem
-	} from '$lib/types';
+	import { LogListType_enum, LogType_enum, allLogListTypes, type MappedLog_int } from '$lib/types';
 	import { icons } from '$lib/general/icons';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import LogButton from './Buttons/LogButton.svelte';
+	import type { Writable } from 'svelte/store';
 
 	export let onDelete: () => void;
 	export let onAccept: () => void;
@@ -29,20 +24,16 @@
 				min: number;
 		  }
 		| undefined = undefined;
-	export let date: Date;
 	export let isEditing: boolean;
 	export let incrementDecrementValue: number | undefined = undefined;
 	export let showIncrementDecrement: boolean = true;
-	export let lastUpdated: Date | undefined = undefined;
-	export let logType: LogType_enum;
 	export let listType: LogListType_enum = LogListType_enum.unordered;
-	export let listItems: MappedListItem[];
-	export let checkboxItems: MappedCheckboxItem[];
+	export let log: Writable<MappedLog_int>;
 
 	let onOpenDelete: () => void;
 
-	$: dateValues = getDayMonthYearFromDate(date);
-	$: lastUpdatedDateValues = lastUpdated && getDayMonthYearFromDate(lastUpdated);
+	$: dateValues = getDayMonthYearFromDate($log.date);
+	$: lastUpdatedDateValues = $log.lastUpdated && getDayMonthYearFromDate($log.lastUpdated);
 
 	const onConfirmDelete: () => void = () => {
 		onDelete();
@@ -58,9 +49,9 @@
 		const currentIndexListType = allLogListTypes[indexOfListType];
 
 		if (nextIndexListType === LogListType_enum.checkbox) {
-			checkboxItems = getCheckboxItemsFromMappedListItems(listItems);
+			$log.checkboxItems = getCheckboxItemsFromMappedListItems($log.listItems);
 		} else if (currentIndexListType === LogListType_enum.checkbox) {
-			listItems = getListItemsFromMappedCheckboxItems(checkboxItems);
+			$log.listItems = getListItemsFromMappedCheckboxItems($log.checkboxItems);
 		}
 	};
 
@@ -88,7 +79,7 @@
 		{
 			icon: listIcons[listType],
 			onClick: onChangeList,
-			isHidden: !isEditing || logType !== LogType_enum.list
+			isHidden: !isEditing || $log.type !== LogType_enum.list
 		}
 	];
 </script>
@@ -96,8 +87,8 @@
 <div class="w-full hstack">
 	<div class="flex flex-wrap place-items-center gap-2">
 		<Icon
-			icon={logIcons[logType]}
-			height={logType === LogType_enum.important ? '30px' : '25px'}
+			icon={logIcons[$log.type]}
+			height={$log.type === LogType_enum.important ? '30px' : '25px'}
 			class="text-gray-300"
 		/>
 		{#each buttons as { icon, isHidden, ...rest }}
