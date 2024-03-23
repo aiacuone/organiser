@@ -26,9 +26,7 @@
 	import isEqual from 'lodash.isequal';
 
 	export let initialLog: Log_int;
-	const log: Writable<MappedLog_int> = writable({
-		...getMappedLog(initialLog)
-	});
+	const log: Writable<MappedLog_int> = writable(getMappedLog(initialLog));
 
 	export let editOnMount: boolean = false;
 	export let inputAutoFocus: boolean = false;
@@ -117,9 +115,7 @@
 			$log.date = _date;
 		}
 
-		const updatedLog: Log_int = {
-			...getLogFromMappedLog({ ...$log })
-		};
+		const updatedLog: Log_int = getLogFromMappedLog($log);
 
 		try {
 			await $updateLogMutation.mutate(updatedLog);
@@ -128,9 +124,7 @@
 		}
 
 		onResetNewLogType && onResetNewLogType();
-		initialLog = {
-			...updatedLog
-		};
+		initialLog = updatedLog;
 		onStopEditing();
 	};
 
@@ -200,9 +194,7 @@
 
 	const onResetChange = () => {
 		onResetNewLogType && onResetNewLogType();
-		$log = {
-			...getMappedLog(initialLog)
-		};
+		$log = getMappedLog(initialLog);
 
 		onStopEditing();
 	};
