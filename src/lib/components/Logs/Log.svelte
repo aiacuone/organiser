@@ -3,17 +3,17 @@
 	import {
 		clickOutside,
 		debounce,
-		getCheckboxItemsFromMappedCheckboxItems,
 		getDateFromHyphenatedString,
 		getHyphenatedStringFromDate,
 		getListItemsFromMappedListItems,
-		getQuestionsFromMappedQuestions
+		getLogFromMappedLog,
+		getMappedLog
 	} from '$lib/utils';
 	import { page } from '$app/stores';
 	import { getContext, onMount, setContext } from 'svelte';
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
-	import { derived, type Writable } from 'svelte/store';
+	import { derived, writable, type Writable } from 'svelte/store';
 	import { isDropdownOpen } from '$lib/stores';
 	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
@@ -25,8 +25,11 @@
 	import { useMutation } from '@sveltestack/svelte-query';
 	import isEqual from 'lodash.isequal';
 
-	export let log: Writable<MappedLog_int>;
-	export let initialLog: Writable<MappedLog_int>;
+	export let initialLog: Log_int;
+	const log: Writable<MappedLog_int> = writable({
+		...getMappedLog(initialLog)
+	});
+
 	export let editOnMount: boolean = false;
 	export let inputAutoFocus: boolean = false;
 	export let listType: LogListType_enum =
@@ -96,7 +99,9 @@
 	};
 
 	const getHaveValuesChanged = () => {
-		return !isEqual($log, $initialLog);
+		const haveValuesChanged = !isEqual(getLogFromMappedLog($log), initialLog);
+
+		return haveValuesChanged;
 	};
 
 	const onAccept = async () => {
@@ -113,11 +118,7 @@
 		}
 
 		const updatedLog: Log_int = {
-			...$log,
-			listItems: getListItemsFromMappedListItems($log.listItems),
-			checkboxItems: getCheckboxItemsFromMappedCheckboxItems($log.checkboxItems),
-			questions: getQuestionsFromMappedQuestions($log.questions),
-			space: $page.params.space
+			...getLogFromMappedLog({ ...$log })
 		};
 
 		try {
@@ -127,7 +128,9 @@
 		}
 
 		onResetNewLogType && onResetNewLogType();
-		$initialLog = $log;
+		initialLog = {
+			...updatedLog
+		};
 		onStopEditing();
 	};
 
@@ -197,7 +200,9 @@
 
 	const onResetChange = () => {
 		onResetNewLogType && onResetNewLogType();
-		$log = $initialLog;
+		$log = {
+			...getMappedLog(initialLog)
+		};
 
 		onStopEditing();
 	};

@@ -19,7 +19,6 @@
 	import LogButton from './Buttons/LogButton.svelte';
 
 	export let onDelete: () => void;
-	export let onEdit: () => void;
 	export let onAccept: () => void;
 	export let onAddItem: () => void;
 	export let incrementDecrementProps:
