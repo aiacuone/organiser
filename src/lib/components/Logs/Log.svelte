@@ -27,6 +27,7 @@
 
 	export let initialLog: Log_int;
 	const log: Writable<MappedLog_int> = writable(getMappedLog(initialLog));
+	$: initialLog, ($log = getMappedLog(initialLog));
 
 	export let editOnMount: boolean = false;
 	export let inputAutoFocus: boolean = false;
