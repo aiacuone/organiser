@@ -27,7 +27,6 @@
 	export let isEditing: boolean;
 	export let incrementDecrementValue: number | undefined = undefined;
 	export let showIncrementDecrement: boolean = true;
-	export let listType: LogListType_enum = LogListType_enum.unordered;
 	export let log: Writable<MappedLog_int>;
 
 	let onOpenDelete: () => void;
@@ -40,10 +39,10 @@
 	};
 
 	const onChangeList = () => {
-		const indexOfListType = allLogListTypes.indexOf(listType);
+		const indexOfListType = allLogListTypes.indexOf($log.listType);
 		const nextIndex = indexOfListType + 1 > allLogListTypes.length - 1 ? 0 : indexOfListType + 1;
 
-		listType = allLogListTypes[nextIndex];
+		$log.listType = allLogListTypes[nextIndex];
 
 		const nextIndexListType = allLogListTypes[nextIndex];
 		const currentIndexListType = allLogListTypes[indexOfListType];
@@ -77,7 +76,7 @@
 			onClick: onAddItem
 		},
 		{
-			icon: listIcons[listType],
+			icon: listIcons[$log.listType],
 			onClick: onChangeList,
 			isHidden: !isEditing || $log.type !== LogType_enum.list
 		}

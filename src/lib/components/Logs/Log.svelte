@@ -32,8 +32,6 @@
 
 	export let editOnMount: boolean = false;
 	export let inputAutoFocus: boolean = false;
-	export let listType: LogListType_enum =
-		$log.type === LogType_enum.list ? LogListType_enum.ordered : LogListType_enum.unordered;
 
 	let container: HTMLButtonElement;
 
@@ -158,7 +156,7 @@
 			[LogType_enum.important]: addListItem,
 			[LogType_enum.time]: addListItem,
 			[LogType_enum.list]: () => {
-				if (listType === LogListType_enum.checkbox) addCheckboxItem();
+				if ($log.listType === LogListType_enum.checkbox) addCheckboxItem();
 				else addListItem();
 			}
 		};
@@ -184,7 +182,7 @@
 			[LogType_enum.important]: removeListItem,
 			[LogType_enum.time]: removeListItem,
 			[LogType_enum.list]: () => {
-				if (listType === LogListType_enum.checkbox) removeCheckboxItem();
+				if ($log.listType === LogListType_enum.checkbox) removeCheckboxItem();
 				else removeListItem();
 			}
 		};
@@ -326,7 +324,7 @@
 				</div>
 			{/if}
 			<div class="hstack center gap-2">
-				{#if $log.type === LogType_enum.todo || ($log.type === LogType_enum.list && listType === LogListType_enum.checkbox)}
+				{#if $log.type === LogType_enum.todo || ($log.type === LogType_enum.list && $log.listType === LogListType_enum.checkbox)}
 					<div class="flex-1">
 						<CheckboxItems
 							bind:checkboxes={$log.checkboxItems}
@@ -345,10 +343,10 @@
 						onDeleteQuestion={onDeleteItem}
 						id={$log.id}
 					/>
-				{:else if $log.type === LogType_enum.important || $log.type === LogType_enum.time || ($log.type === LogType_enum.list && listType !== LogListType_enum.checkbox)}
+				{:else if $log.type === LogType_enum.important || $log.type === LogType_enum.time || ($log.type === LogType_enum.list && $log.listType !== LogListType_enum.checkbox)}
 					<ListItems
 						bind:items={$log.listItems}
-						bind:listType
+						bind:listType={$log.listType}
 						{isEditing}
 						onEnterKeydown={onTextareaEnterKeydown}
 						{onDeleteItem}
@@ -357,7 +355,6 @@
 				{/if}
 			</div>
 			<BottomOptions
-				bind:listType
 				incrementDecrementProps={{
 					min: incrementDecrementPropValues[$log.type].min,
 					max: incrementDecrementPropValues[$log.type].max,

@@ -152,4 +152,5 @@ export interface MappedLog_int extends LogBase_int {
 	[Log_enum.rating]: 1 | 2 | 3;
 	inputAutoFocus: boolean;
 	editOnMount?: boolean;
+	listType: LogListType_enum;
 }
