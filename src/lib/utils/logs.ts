@@ -8,23 +8,6 @@ import {
 	type MappedQuestionItem
 } from '$lib/types';
 
-export const arraysHaveSameValues = (arr1: string[], arr2: string[]): boolean => {
-	if (arr1.length !== arr2.length) {
-		return false;
-	}
-
-	const sortedArr1 = arr1.slice().sort();
-	const sortedArr2 = arr2.slice().sort();
-
-	for (let i = 0; i < sortedArr1.length; i++) {
-		if (sortedArr1[i] !== sortedArr2[i]) {
-			return false;
-		}
-	}
-
-	return true;
-};
-
 export const getMappedListItems = (items: string[] = []): MappedListItem[] =>
 	items.map((item, index) => ({ id: index, item }));
 
@@ -49,14 +32,6 @@ export const getQuestionsFromMappedQuestions = (
 	});
 };
 
-export const logIcons: Record<LogType_enum, string> = {
-	[LogType_enum.time]: icons.clock,
-	[LogType_enum.important]: icons.important,
-	[LogType_enum.todo]: icons.todo,
-	[LogType_enum.question]: icons.question,
-	[LogType_enum.list]: icons.list
-};
-
 export const getCheckboxItemsFromMappedListItems = (
 	listItems: MappedListItem[] = []
 ): MappedCheckboxItem[] => {
@@ -67,4 +42,12 @@ export const getListItemsFromMappedCheckboxItems = (
 	checkboxItems: MappedCheckboxItem[] = []
 ): MappedListItem[] => {
 	return checkboxItems.map(({ text, id }) => ({ id, item: text }));
+};
+
+export const logIcons: Record<LogType_enum, string> = {
+	[LogType_enum.time]: icons.clock,
+	[LogType_enum.important]: icons.important,
+	[LogType_enum.todo]: icons.todo,
+	[LogType_enum.question]: icons.question,
+	[LogType_enum.list]: icons.list
 };

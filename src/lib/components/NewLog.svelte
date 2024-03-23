@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { getMappedCheckboxItems, getMappedListItems, getMappedQuestions } from '$lib/utils';
 	import Log from './Logs/Log.svelte';
-	import type { LogType_enum, Log_int, MappedLog_int } from '$lib/types';
+	import type { LogType_enum, MappedLog_int } from '$lib/types';
 	import { writable } from 'svelte/store';
 
 	export let type: LogType_enum;
@@ -14,7 +14,7 @@
 	date.setMonth(parseInt(month) - 1);
 	date.setDate(parseInt(day));
 
-	const defaultValues: MappedLog_int = {
+	const mappedLog: MappedLog_int = {
 		id: uuidv4(),
 		title: '',
 		reference: '',
@@ -28,9 +28,6 @@
 		space: $page.params.space,
 		type: type
 	};
-
-	const log = writable({ ...defaultValues });
-	const originalLog = writable({ ...defaultValues });
 </script>
 
-<Log {log} {originalLog} editOnMount />
+<Log log={writable({ ...mappedLog })} initialLog={writable({ ...mappedLog })} editOnMount />

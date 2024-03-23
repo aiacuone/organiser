@@ -25,12 +25,10 @@
 	import { useMutation } from '@sveltestack/svelte-query';
 	import isEqual from 'lodash.isequal';
 
+	export let log: Writable<MappedLog_int>;
+	export let initialLog: Writable<MappedLog_int>;
 	export let editOnMount: boolean = false;
 	export let inputAutoFocus: boolean = false;
-
-	export let log: Writable<MappedLog_int>;
-	export let originalLog: Writable<MappedLog_int>;
-
 	export let listType: LogListType_enum =
 		$log.type === LogType_enum.list ? LogListType_enum.ordered : LogListType_enum.unordered;
 
@@ -98,7 +96,7 @@
 	};
 
 	const getHaveValuesChanged = () => {
-		return !isEqual($log, $originalLog);
+		return !isEqual($log, $initialLog);
 	};
 
 	const onAccept = async () => {
@@ -129,8 +127,7 @@
 		}
 
 		onResetNewLogType && onResetNewLogType();
-		$originalLog = $log;
-
+		$initialLog = $log;
 		onStopEditing();
 	};
 
@@ -200,7 +197,7 @@
 
 	const onResetChange = () => {
 		onResetNewLogType && onResetNewLogType();
-		$log = $originalLog;
+		$log = $initialLog;
 
 		onStopEditing();
 	};
@@ -267,7 +264,7 @@
 				);
 			}
 		} else {
-			$log.rating = $log.rating + 1;
+			$log.rating = ($log.rating + 1) as 1 | 2 | 3;
 		}
 	};
 
@@ -283,7 +280,7 @@
 				);
 			}
 		} else {
-			$log.rating = $log.rating - 1;
+			$log.rating = ($log.rating - 1) as 1 | 2 | 3;
 		}
 	};
 

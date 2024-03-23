@@ -20,5 +20,5 @@
 		time: log.time || 0
 	}}
 
-	<Log log={writable({ ...mappedLog })} originalLog={writable({ ...mappedLog })} />
+	<Log log={writable({ ...mappedLog })} initialLog={writable({ ...mappedLog })} />
 {/each}
