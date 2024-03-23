@@ -4,7 +4,6 @@
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
-	import { flip } from 'svelte/animate';
 	import { dndzone } from 'svelte-dnd-action';
 	import { LogType_enum, LogListType_enum, type MappedListItem } from '$lib/types';
 
@@ -56,7 +55,6 @@
 						<Textarea
 							_class="w-full"
 							bind:value={items[index].item}
-							isDisabled={!$isEditing}
 							{onEnterKeydown}
 							autofocus={index > 0}
 						/>

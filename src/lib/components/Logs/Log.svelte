@@ -1,28 +1,19 @@
 <script lang="ts">
-	import {
-		Log_enum,
-		LogType_enum,
-		type Log_int,
-		LogListType_enum,
-		type MappedCheckboxItem,
-		type MappedListItem,
-		type MappedQuestionItem
-	} from '$lib/types';
+	import { LogType_enum, LogListType_enum, type MappedLog_int, type Log_int } from '$lib/types';
 	import {
 		clickOutside,
 		debounce,
-		getCheckboxItemsFromMappedCheckboxItems,
 		getDateFromHyphenatedString,
-		getHaveValuesChanged,
 		getHyphenatedStringFromDate,
 		getListItemsFromMappedListItems,
-		getQuestionsFromMappedQuestions
+		getLogFromMappedLog,
+		getMappedLog
 	} from '$lib/utils';
 	import { page } from '$app/stores';
 	import { getContext, onMount, setContext } from 'svelte';
 	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
-	import { derived } from 'svelte/store';
+	import { derived, writable, type Writable } from 'svelte/store';
 	import { isDropdownOpen } from '$lib/stores';
 	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
@@ -32,35 +23,21 @@
 	import CheckboxItems from './LogCheckboxItems.svelte';
 	import LogQuestionItems from './LogQuestionItems.svelte';
 	import { useMutation } from '@sveltestack/svelte-query';
+	import isEqual from 'lodash.isequal';
 
-	export let logType: LogType_enum;
-	export let title: string = '';
-	export let reference: string = '';
-	export let date: Date;
-	export let id: string;
-	export let rating: 1 | 2 | 3 = 1;
-	export let lastUpdated: Date | undefined = undefined;
+	export let initialLog: Log_int;
+	const log: Writable<MappedLog_int> = writable(getMappedLog(initialLog));
+	$: initialLog, ($log = getMappedLog(initialLog));
+
 	export let editOnMount: boolean = false;
-	export let checkboxItems: MappedCheckboxItem[] = [];
-	export let questions: MappedQuestionItem[] = [];
-	export let listItems: MappedListItem[] = [];
 	export let inputAutoFocus: boolean = false;
-	export let time: number = 0;
 	export let listType: LogListType_enum =
-		logType === LogType_enum.list ? LogListType_enum.ordered : LogListType_enum.unordered;
-
-	let originalTitle = title;
-	let originalReference = reference;
-	let originalRating = rating;
-	let originalCheckboxItems = checkboxItems;
-	let originalQuestions = questions;
-	let originalListItems = listItems;
-	let originalTime = time;
+		$log.type === LogType_enum.list ? LogListType_enum.ordered : LogListType_enum.unordered;
 
 	let container: HTMLButtonElement;
 
 	const onEditLog = () => {
-		$currentlyEditing = id;
+		$currentlyEditing = $log.id;
 	};
 
 	const onStopEditing = () => {
@@ -74,7 +51,10 @@
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 	setContext('onEditLog', onEditLog);
 
-	const isEditing = derived([currentlyEditing], ([$currentlyEditing]) => $currentlyEditing === id);
+	const isEditing = derived(
+		[currentlyEditing],
+		([$currentlyEditing]) => $currentlyEditing === $log.id
+	);
 
 	const updateLogMutation = useMutation(updateLog, {
 		onSuccess: () => {
@@ -90,7 +70,7 @@
 
 	const onDelete = () => {
 		onStopEditing();
-		$deleteLogMutation.mutate(id);
+		$deleteLogMutation.mutate($log.id);
 	};
 
 	const onEdit = () => {
@@ -117,131 +97,59 @@
 		}, 0);
 	};
 
+	const getHaveValuesChanged = () => {
+		const haveValuesChanged = !isEqual(getLogFromMappedLog($log), initialLog);
+
+		return haveValuesChanged;
+	};
+
 	const onAccept = async () => {
-		const values: Log_int = {
-			[Log_enum.id]: id,
-			[Log_enum.date]: date,
-			[Log_enum.type]: logType,
-			[Log_enum.space]: $page.params.space,
-			[Log_enum.lastUpdated]: new Date(),
-			[Log_enum.rating]: rating,
-			[Log_enum.title]: title,
-			[Log_enum.reference]: reference
-		};
+		const haveValuesChanged = getHaveValuesChanged();
 
-		const originalValues: Partial<Log_int> = {
-			[Log_enum.rating]: originalRating,
-			[Log_enum.title]: originalTitle,
-			[Log_enum.reference]: originalReference
-		};
+		if (!haveValuesChanged) return onStopEditing();
 
-		const setListItems = () => {
-			const filteredListItems = listItems.filter(({ item }) => item);
-			values[Log_enum.listItems] = getListItemsFromMappedListItems(filteredListItems);
-			originalListItems = [...filteredListItems];
-		};
-		const setCheckboxItems = () => {
-			const filteredCheckboxItems = checkboxItems.filter(({ text }) => text);
-			values[Log_enum.checkboxItems] =
-				getCheckboxItemsFromMappedCheckboxItems(filteredCheckboxItems);
-			originalCheckboxItems = [...filteredCheckboxItems];
-		};
-		const setQuestionItems = () => {
-			const filteredQuestions = questions.filter(
-				({ question, answer }) => question || (answer && question)
-			);
-			values[Log_enum.questions] = getQuestionsFromMappedQuestions(filteredQuestions);
-			originalQuestions = [...filteredQuestions];
-		};
-		const setValuesTypeMethods: Record<LogType_enum, () => void> = {
-			[LogType_enum.todo]: () => {
-				setCheckboxItems();
-			},
-			[LogType_enum.question]: () => {
-				setQuestionItems();
-			},
-			[LogType_enum.important]: setListItems,
-			[LogType_enum.time]: () => {
-				setListItems();
-				values[Log_enum.time] = time;
-				originalTime = time;
-			},
-			[LogType_enum.list]: () => {
-				values[Log_enum.listType] = listType;
-				if (listType === LogListType_enum.checkbox) {
-					setCheckboxItems();
-				} else {
-					setListItems();
-				}
-			}
-		};
-		setValuesTypeMethods[logType]();
-
-		const haveValuesChanged = getHaveValuesChanged({
-			values,
-			originalValues
-		});
-
-		if (!haveValuesChanged) return ($currentlyEditing = null);
-
-		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate(date)) {
+		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate($log.date)) {
 			const currentDate = new Date();
 			const _date = new Date(getDateFromHyphenatedString($page.params.date));
 			_date.setHours(currentDate.getHours());
 			_date.setMinutes(currentDate.getMinutes());
-			values[Log_enum.date] = _date;
+			$log.date = _date;
 		}
 
+		const updatedLog: Log_int = getLogFromMappedLog($log);
+
 		try {
-			await $updateLogMutation.mutate(values);
+			await $updateLogMutation.mutate(updatedLog);
 		} catch (error) {
 			toast.error('Issue updating state');
 		}
 
 		onResetNewLogType && onResetNewLogType();
-		originalTitle = title;
-		originalReference = reference;
-		originalRating = rating;
-
+		initialLog = updatedLog;
 		onStopEditing();
-
-		const setOriginalListItems = () => (originalListItems = [...listItems]);
-		const setOriginalCheckboxItems = () => (originalCheckboxItems = [...checkboxItems]);
-		const setOriginalQuestions = () => (originalQuestions = [...questions]);
-		const setOriginalTypeItems: Record<LogType_enum, () => void> = {
-			[LogType_enum.todo]: () => {
-				setOriginalCheckboxItems();
-			},
-			[LogType_enum.question]: () => {
-				setOriginalQuestions();
-			},
-			[LogType_enum.important]: setOriginalListItems,
-			[LogType_enum.time]: () => {
-				setOriginalListItems();
-				originalTime = time;
-			},
-			[LogType_enum.list]: () => {
-				if (listType === LogListType_enum.checkbox) {
-					setOriginalCheckboxItems();
-				} else {
-					setOriginalListItems();
-				}
-			}
-		};
-		setOriginalTypeItems[logType]();
 	};
 
 	const onAddItem = () => {
 		onEditLog();
 
-		const addListItem = () => (listItems = [...listItems, { id: listItems.length, item: '' }]);
+		const addListItem = () =>
+			$log.listItems &&
+			($log.listItems = [...$log.listItems, { id: $log.listItems.length, item: '' }]);
+
 		const addCheckboxItem = () =>
-			(checkboxItems = [
-				...checkboxItems,
-				{ id: checkboxItems.length, isChecked: false, text: '' }
+			$log.checkboxItems &&
+			($log.checkboxItems = [
+				...$log.checkboxItems,
+				{ id: $log.checkboxItems.length, isChecked: false, text: '' }
 			]);
+
 		const addQuestionItem = () =>
-			(questions = [...questions, { id: questions.length, question: '', answer: '' }]);
+			$log.questions &&
+			($log.questions = [
+				...$log.questions,
+				{ id: $log.questions.length, question: '', answer: '' }
+			]);
+
 		const addItemTypeMethods: Record<LogType_enum, () => void> = {
 			[LogType_enum.todo]: () => {
 				addCheckboxItem();
@@ -256,13 +164,18 @@
 				else addListItem();
 			}
 		};
-		addItemTypeMethods[logType]();
+		addItemTypeMethods[$log.type]();
 	};
 
 	const onDeleteItem = (index: number) => {
-		const removeListItem = () => (listItems = listItems.filter((_, i) => i !== index));
-		const removeCheckboxItem = () => (checkboxItems = checkboxItems.filter((_, i) => i !== index));
-		const removeQuestionItem = () => (questions = questions.filter((_, i) => i !== index));
+		const removeListItem = () =>
+			$log.listItems && ($log.listItems = $log.listItems.filter((_, i) => i !== index));
+
+		const removeCheckboxItem = () =>
+			$log.checkboxItems && ($log.checkboxItems = $log.checkboxItems.filter((_, i) => i !== index));
+		const removeQuestionItem = () =>
+			$log.questions && ($log.questions = $log.questions.filter((_, i) => i !== index));
+
 		const removeItemTypeMethods: Record<LogType_enum, () => void> = {
 			[LogType_enum.todo]: () => {
 				removeCheckboxItem();
@@ -277,37 +190,12 @@
 				else removeListItem();
 			}
 		};
-		removeItemTypeMethods[logType]();
+		removeItemTypeMethods[$log.type]();
 	};
 
 	const onResetChange = () => {
 		onResetNewLogType && onResetNewLogType();
-		title = originalTitle;
-		reference = originalReference;
-
-		const resetListItems = () => (listItems = [...originalListItems]);
-		const resetCheckboxItems = () => (checkboxItems = [...originalCheckboxItems]);
-		const resetQuestions = () => (questions = [...originalQuestions]);
-		const resetTypeItems: Record<LogType_enum, () => void> = {
-			[LogType_enum.todo]: () => {
-				resetCheckboxItems();
-			},
-			[LogType_enum.question]: () => {
-				resetQuestions();
-			},
-			[LogType_enum.important]: () => {
-				resetListItems();
-			},
-			[LogType_enum.time]: () => {
-				resetListItems();
-				time = originalTime;
-			},
-			[LogType_enum.list]: () => {
-				if (listType === LogListType_enum.checkbox) resetCheckboxItems();
-				else resetListItems();
-			}
-		};
-		resetTypeItems[logType]();
+		$log = getMappedLog(initialLog);
 
 		onStopEditing();
 	};
@@ -343,7 +231,14 @@
 	let isOpen: boolean;
 
 	const onClickOutside = () => {
-		$isEditing && !isOpen && !$isDropdownOpen && onOpen();
+		if ($isEditing) {
+			const haveValuesChanged = getHaveValuesChanged();
+			if (haveValuesChanged && !isOpen && !$isDropdownOpen) {
+				onOpen();
+			} else {
+				onStopEditing();
+			}
+		}
 	};
 
 	const incrementDecrementPropValues: Record<LogType_enum, { min: number; max: number }> = {
@@ -355,46 +250,35 @@
 	};
 
 	const onIncrement = () => {
-		if (logType === LogType_enum.time) {
-			time = time + 0.5;
+		if ($log.type === LogType_enum.time) {
+			$log.time = $log.time + 0.5;
+
 			if (!$isEditing) {
 				debounce(() =>
 					$updateLogMutation.mutate({
-						id,
-						title,
-						reference,
-						listItems: getListItemsFromMappedListItems(listItems),
-						time,
-						date,
-						type: LogType_enum.time,
-						space: $page.params.space
+						...$log,
+						listItems: getListItemsFromMappedListItems($log.listItems)
 					})
 				);
 			}
 		} else {
-			rating = rating + 1;
+			$log.rating = ($log.rating + 1) as 1 | 2 | 3;
 		}
 	};
 
 	const onDecrement = () => {
-		if (logType === LogType_enum.time) {
-			time = time - 0.5;
+		if ($log.type === LogType_enum.time) {
+			$log.time = $log.time - 0.5;
 			if (!$isEditing) {
 				debounce(() =>
 					$updateLogMutation.mutate({
-						id,
-						title,
-						reference,
-						listItems: getListItemsFromMappedListItems(listItems),
-						time,
-						date,
-						type: LogType_enum.time,
-						space: $page.params.space
+						...$log,
+						listItems: getListItemsFromMappedListItems($log.listItems)
 					})
 				);
 			}
 		} else {
-			rating = rating - 1;
+			$log.rating = ($log.rating - 1) as 1 | 2 | 3;
 		}
 	};
 
@@ -419,13 +303,13 @@
 	class=""
 	on:click={onClickLog}
 >
-	<div class={containerClasses[logType][0]}>
-		<div class="stack {containerClasses[logType][1]}">
-			{#if title || reference || $isEditing}
+	<div class={containerClasses[$log.type][0]}>
+		<div class="stack {containerClasses[$log.type][1]}">
+			{#if $log.title || $log.reference || $isEditing}
 				<div class="stack gap-1">
-					{#if !$isEditing && !title}{''}{:else}
+					{#if !$isEditing && !$log.title}{''}{:else}
 						<Input
-							bind:value={title}
+							bind:value={$log.title}
 							autofocus={inputAutoFocus}
 							placeholder="Title"
 							autofillValues={$titles}
@@ -433,9 +317,9 @@
 							onAutoFill={onTitleAutoFill}
 						/>
 					{/if}
-					{#if $isEditing || reference}
+					{#if $isEditing || $log.reference}
 						<Input
-							bind:value={reference}
+							bind:value={$log.reference}
 							bind:changeInputValue={changeReferenceInputValue}
 							placeholder="Reference"
 							isDisabled={!$isEditing}
@@ -444,55 +328,50 @@
 				</div>
 			{/if}
 			<div class="hstack center gap-2">
-				{#if logType === LogType_enum.todo || (logType === LogType_enum.list && listType === LogListType_enum.checkbox)}
+				{#if $log.type === LogType_enum.todo || ($log.type === LogType_enum.list && listType === LogListType_enum.checkbox)}
 					<div class="flex-1">
 						<CheckboxItems
-							bind:checkboxes={checkboxItems}
+							bind:checkboxes={$log.checkboxItems}
 							{isEditing}
 							onEnterKeydown={onTextareaEnterKeydown}
 							onDeleteBullet={onDeleteItem}
 							{onEdit}
 						/>
 					</div>
-				{:else if logType === LogType_enum.question}
+				{:else if $log.type === LogType_enum.question}
 					<LogQuestionItems
-						bind:questions
+						bind:questions={$log.questions}
 						onFocusAnswerInput={_onFocusAnswerInput}
 						isDisabled={!$isEditing}
 						{isEditing}
 						onDeleteQuestion={onDeleteItem}
-						{id}
+						id={$log.id}
 					/>
-				{:else if logType === LogType_enum.important || logType === LogType_enum.time || (logType === LogType_enum.list && listType !== LogListType_enum.checkbox)}
+				{:else if $log.type === LogType_enum.important || $log.type === LogType_enum.time || ($log.type === LogType_enum.list && listType !== LogListType_enum.checkbox)}
 					<ListItems
-						bind:items={listItems}
+						bind:items={$log.listItems}
 						bind:listType
 						{isEditing}
 						onEnterKeydown={onTextareaEnterKeydown}
 						{onDeleteItem}
-						{logType}
+						logType={$log.type}
 					/>
 				{/if}
 			</div>
 			<BottomOptions
 				bind:listType
-				bind:listItems
-				bind:checkboxItems
 				incrementDecrementProps={{
-					min: incrementDecrementPropValues[logType].min,
-					max: incrementDecrementPropValues[logType].max,
+					min: incrementDecrementPropValues[$log.type].min,
+					max: incrementDecrementPropValues[$log.type].max,
 					onIncrement,
 					onDecrement
 				}}
-				incrementDecrementValue={logType === LogType_enum.time ? time : rating}
-				{date}
+				incrementDecrementValue={$log.type === LogType_enum.time ? $log.time : $log.rating}
 				isEditing={$isEditing}
 				{onAccept}
 				{onAddItem}
-				{onEdit}
 				{onDelete}
-				{lastUpdated}
-				{logType}
+				{log}
 			/>
 		</div>
 	</div>

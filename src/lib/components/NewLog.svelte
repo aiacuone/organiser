@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { v4 as uuidv4 } from 'uuid';
 	import { page } from '$app/stores';
-	import { getMappedCheckboxItems, getMappedListItems, getMappedQuestions } from '$lib/utils';
 	import Log from './Logs/Log.svelte';
-	import type { LogType_enum } from '$lib/types';
+	import type { LogType_enum, Log_int } from '$lib/types';
 
 	export let type: LogType_enum;
 
@@ -13,20 +12,19 @@
 	date.setMonth(parseInt(month) - 1);
 	date.setDate(parseInt(day));
 
-	const defaultValues = {
+	const initialLog: Log_int = {
 		id: uuidv4(),
 		title: '',
 		reference: '',
 		time: 0,
 		rating: 2 as 1 | 2 | 3,
-		inputAutoFocus: true,
-		question: '',
 		date,
-		editOnMount: true,
-		listItems: getMappedListItems(['']),
-		checkboxItems: getMappedCheckboxItems([{ text: '', isChecked: false }]),
-		questions: getMappedQuestions([{ question: '' }])
+		listItems: [''],
+		checkboxItems: [{ text: '', isChecked: false }],
+		questions: [{ question: '', answer: '' }],
+		space: $page.params.space,
+		type: type
 	};
 </script>
 
-<Log logType={type} {...defaultValues} />
+<Log {initialLog} editOnMount />

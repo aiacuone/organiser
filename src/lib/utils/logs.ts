@@ -2,65 +2,49 @@ import { icons } from '$lib/general/icons';
 import {
 	LogType_enum,
 	type CheckboxItem_int,
-	type Log_enum,
-	type Log_int,
 	type QuestionItem_int,
 	type MappedCheckboxItem,
 	type MappedListItem,
-	type MappedQuestionItem
+	type MappedQuestionItem,
+	Log_enum,
+	type MappedLog_int,
+	type Log_int
 } from '$lib/types';
 
-export const getHaveValuesChanged = ({
-	values,
-	originalValues
-}: {
-	values: Partial<Log_int>;
-	originalValues: Partial<Log_int>;
-}) => {
-	return Object.keys(values).some(
-		(key) => values[key as Log_enum] !== originalValues[key as Log_enum]
-	);
-};
-
-export const arraysHaveSameValues = (arr1: string[], arr2: string[]): boolean => {
-	if (arr1.length !== arr2.length) {
-		return false;
-	}
-
-	const sortedArr1 = arr1.slice().sort();
-	const sortedArr2 = arr2.slice().sort();
-
-	for (let i = 0; i < sortedArr1.length; i++) {
-		if (sortedArr1[i] !== sortedArr2[i]) {
-			return false;
-		}
-	}
-
-	return true;
-};
-
-export const getMappedListItems = (items: string[]): MappedListItem[] =>
+export const getMappedListItems = (items: string[] = []): MappedListItem[] =>
 	items.map((item, index) => ({ id: index, item }));
 
-export const getListItemsFromMappedListItems = (mappedListItems: MappedListItem[]): string[] =>
+export const getListItemsFromMappedListItems = (mappedListItems: MappedListItem[] = []): string[] =>
 	mappedListItems.map(({ item }) => item);
 
-export const getMappedCheckboxItems = (items: CheckboxItem_int[]): MappedCheckboxItem[] =>
+export const getMappedCheckboxItems = (items: CheckboxItem_int[] = []): MappedCheckboxItem[] =>
 	items.map((item, index) => ({ id: index, ...item }));
 
 export const getCheckboxItemsFromMappedCheckboxItems = (
-	mappedCheckboxItems: MappedCheckboxItem[]
+	mappedCheckboxItems: MappedCheckboxItem[] = []
 ): CheckboxItem_int[] => mappedCheckboxItems.map(({ text, isChecked }) => ({ text, isChecked }));
 
-export const getMappedQuestions = (items: QuestionItem_int[]): MappedQuestionItem[] =>
+export const getMappedQuestions = (items: QuestionItem_int[] = []): MappedQuestionItem[] =>
 	items.map((question, index) => ({ id: index, ...question }));
 
 export const getQuestionsFromMappedQuestions = (
-	mappedQuestions: MappedQuestionItem[]
+	mappedQuestions: MappedQuestionItem[] = []
 ): QuestionItem_int[] => {
 	return mappedQuestions.map(({ question, answer }) => {
 		return { question, answer };
 	});
+};
+
+export const getCheckboxItemsFromMappedListItems = (
+	listItems: MappedListItem[] = []
+): MappedCheckboxItem[] => {
+	return listItems.map(({ item, id }) => ({ id, text: item, isChecked: false }));
+};
+
+export const getListItemsFromMappedCheckboxItems = (
+	checkboxItems: MappedCheckboxItem[] = []
+): MappedListItem[] => {
+	return checkboxItems.map(({ text, id }) => ({ id, item: text }));
 };
 
 export const logIcons: Record<LogType_enum, string> = {
@@ -71,14 +55,33 @@ export const logIcons: Record<LogType_enum, string> = {
 	[LogType_enum.list]: icons.list
 };
 
-export const getCheckboxItemsFromMappedListItems = (
-	listItems: MappedListItem[]
-): MappedCheckboxItem[] => {
-	return listItems.map(({ item, id }) => ({ id, text: item, isChecked: false }));
+export const getMappedLog = (log: Log_int): MappedLog_int => {
+	return {
+		...log,
+		inputAutoFocus: false,
+		editOnMount: false,
+		[Log_enum.title]: log[Log_enum.title] ?? '',
+		[Log_enum.reference]: log[Log_enum.reference] ?? '',
+		[Log_enum.time]: log[Log_enum.time] ?? 2,
+		[Log_enum.listItems]: getMappedListItems(log[Log_enum.listItems]),
+		[Log_enum.checkboxItems]: getMappedCheckboxItems(log[Log_enum.checkboxItems]),
+		[Log_enum.questions]: getMappedQuestions(log[Log_enum.questions]),
+		[Log_enum.rating]: log[Log_enum.rating] as 1 | 2 | 3
+	};
 };
 
-export const getListItemsFromMappedCheckboxItems = (
-	checkboxItems: MappedCheckboxItem[]
-): MappedListItem[] => {
-	return checkboxItems.map(({ text, id }) => ({ id, item: text }));
+export const getLogFromMappedLog = (mappedLog: MappedLog_int): Log_int => {
+	const keysToOmit = ['inputAutoFocus', 'editOnMount'];
+	const filteredMappedLog = Object.fromEntries(
+		Object.entries(mappedLog).filter(([key]) => !keysToOmit.includes(key))
+	);
+
+	return {
+		...filteredMappedLog,
+		[Log_enum.listItems]: getListItemsFromMappedListItems(mappedLog[Log_enum.listItems]),
+		[Log_enum.checkboxItems]: getCheckboxItemsFromMappedCheckboxItems(
+			mappedLog[Log_enum.checkboxItems]
+		),
+		[Log_enum.questions]: getQuestionsFromMappedQuestions(mappedLog[Log_enum.questions])
+	} as Log_int;
 };

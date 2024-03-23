@@ -23,8 +23,6 @@
 	let input: HTMLInputElement;
 	let isInputFocused: boolean = false;
 
-	const onEditLog: (() => void) | undefined = getContext('onEditLog');
-
 	onMount(() => {
 		if (autofocus) {
 			input.focus();
@@ -52,16 +50,9 @@
 
 	$: _isDropdownOpen = isInputFocused && !value && autofillValues.length > 0;
 	$: _isDropdownOpen, ($isDropdownOpen = _isDropdownOpen);
-
-	const onClick = () => {
-		onEditLog && onEditLog();
-		onFocus();
-	};
 </script>
 
 <div use:clickOutside on:click_outside={onClickOutside} class="relative">
-	<!-- Needed to use this button because when the input is disabled, it won't trigger the onClick event -->
-	<button on:click={onClick} class="w-full h-full absolute {isDisabled ? 'flex' : 'hidden'}" />
 	<input
 		type="text"
 		bind:value
