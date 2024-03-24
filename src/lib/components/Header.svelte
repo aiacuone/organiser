@@ -19,6 +19,8 @@
 	import { derived } from 'svelte/store';
 	import { logIcons } from '$lib/utils';
 	import { page } from '$app/stores';
+	import LogitLogoSimple from '$lib/svg/logit-logo-simple.svelte';
+	import LogitLogo from '$lib/svg/logit-logo.svelte';
 
 	export let space: string;
 	export let spaces: string[];
@@ -172,9 +174,9 @@
 <header class="center py-2 px-3 bg-gray-200">
 	<div class="flex-1 max-w-screen-lg hstack">
 		<div class="flex-1">
-			<Button _class="bg-white bg-opacity-80 capitalize" onClick={onOpen}
-				>{replaceAllHyphensWithSpaces(space)}</Button
-			>
+			<button on:click={onOpen}>
+				<LogitLogoSimple height="30px" />
+			</button>
 		</div>
 		<div class="flex-1 hstack justify-end gap-5">
 			{#each Object.entries(headerButtons) as [type, { icon, onClick }]}
@@ -199,6 +201,7 @@
 
 <Dialog bind:onOpen onClose={onDialogClose} bind:dialog>
 	<div class="stack gap-3">
+		<LogitLogo height="30px" />
 		<div class="stack gap-4 self-center">
 			{#each $pillButtons as pillButton}
 				<div class="hstack gap-2 items-center relative">
