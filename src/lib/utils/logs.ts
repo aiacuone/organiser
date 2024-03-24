@@ -68,7 +68,8 @@ export const getMappedLog = (log: Log_int): MappedLog_int => {
 		[Log_enum.checkboxItems]: getMappedCheckboxItems(log[Log_enum.checkboxItems]),
 		[Log_enum.questions]: getMappedQuestions(log[Log_enum.questions]),
 		[Log_enum.rating]: log[Log_enum.rating] as 1 | 2 | 3,
-		[Log_enum.listType]: log.listType ?? LogListType_enum.ordered
+		[Log_enum.listType]: log.listType ?? LogListType_enum.ordered,
+		[Log_enum.space]: log.space.toLowerCase()
 	};
 };
 

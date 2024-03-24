@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import Button from '$lib/components/Button.svelte';
 	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
-	import Logs from '$lib/components/Logs/Logs.svelte';
+	import Log from '$lib/components/Logs/Log.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import { icons } from '$lib/general/icons';
 	import { viewport } from '$lib/hooks';
@@ -214,7 +214,9 @@
 				Error
 			{:else if $filteredLogsQuery.data}
 				{#each $filteredLogsQuery.data.pages as page}
-					<Logs logs={page.data.logs} />
+					{#each page.data.logs as log}
+						<Log initialLog={log} />
+					{/each}
 				{/each}
 				<div class="center text-gray-300">
 					{#if $filteredLogsQuery.isFetching}

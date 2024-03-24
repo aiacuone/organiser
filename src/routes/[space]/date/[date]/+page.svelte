@@ -23,7 +23,7 @@
 	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
 	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
 	import { browser } from '$app/environment';
-	import Logs from '$lib/components/Logs/Logs.svelte';
+	import Log from '$lib/components/Logs/Log.svelte';
 
 	interface PageData extends SpaceData_int {
 		date: string;
@@ -291,7 +291,9 @@
 			{:else if $logs.isError}
 				Error
 			{:else if $filteredLogs}
-				<Logs logs={$filteredLogs} />
+				{#each $filteredLogs as log}
+					<Log initialLog={log} />
+				{/each}
 			{/if}
 		</div>
 		<div class="stack gap-2">

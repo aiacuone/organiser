@@ -87,10 +87,7 @@
 	let onFocusAnswerInput: () => void;
 	const _onFocusAnswerInput = () => {
 		onEditLog();
-		//this is a hack to make sure the answer input is focused
-		setTimeout(() => {
-			onFocusAnswerInput();
-		}, 0);
+		addToEndOfRaceCondition(onFocusAnswerInput);
 	};
 
 	const getHaveValuesChanged = () => {
