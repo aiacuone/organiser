@@ -7,9 +7,12 @@
 	import type { Readable } from 'svelte/motion';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
+	import {
+		areAnyQuestionsNotCapitalised,
+		capitalizeFirstLetterOfMappedQuestions
+	} from '$lib/utils';
 
 	export let questions: MappedQuestionItem[];
-	export let isDisabled: boolean;
 	export let onFocusAnswerInput: () => void;
 	export let id: string;
 	export const onReset: () => void = () => {
@@ -32,6 +35,12 @@
 	const onAnswerChange = (index: number, value: string) => {
 		questions[index].answer = value;
 	};
+
+	$: {
+		if (areAnyQuestionsNotCapitalised(questions)) {
+			questions = capitalizeFirstLetterOfMappedQuestions(questions);
+		}
+	}
 </script>
 
 <ul
@@ -55,13 +64,7 @@
 			<div class="stack gap-1 w-full">
 				<div class="hstack text-sm gap-1">
 					<p class="text-neutral-400">Question:</p>
-					<Textarea
-						bind:value={questions[index].question}
-						className=""
-						{isDisabled}
-						_class="flex-1"
-						autofocus
-					/>
+					<Textarea bind:value={questions[index].question} className="" _class="flex-1" autofocus />
 				</div>
 				{#if questions[index].answer || isAnswering === index}
 					<div class="text-sm gap-1 flex-1 flex">
@@ -70,7 +73,6 @@
 							bind:value={questions[index].answer}
 							_class="flex-1"
 							onChange={(e) => onAnswerChange(index, e.target?.value)}
-							{isDisabled}
 							bind:onFocus={onFocusAnswerInput}
 						/>
 					</div>

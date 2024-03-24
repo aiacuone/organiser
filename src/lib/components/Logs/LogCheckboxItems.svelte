@@ -4,8 +4,12 @@
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
-	import type { BaseMappedListItem_int, CheckboxItem_int, MappedCheckboxItem } from '$lib/types';
+	import type { MappedCheckboxItem } from '$lib/types';
 	import { dndzone } from 'svelte-dnd-action';
+	import {
+		areAnyCheckboxItemsNotCapitalised,
+		capitalizeFirstLetterOfMappedCheckboxItems
+	} from '$lib/utils';
 
 	export let checkboxes: MappedCheckboxItem[];
 	export let isEditing: Readable<boolean>;
@@ -17,6 +21,12 @@
 	const onCheckboxesChange = () => {
 		onEdit();
 	};
+
+	$: {
+		if (areAnyCheckboxItemsNotCapitalised(checkboxes)) {
+			checkboxes = capitalizeFirstLetterOfMappedCheckboxItems(checkboxes);
+		}
+	}
 </script>
 
 <ul
@@ -47,7 +57,6 @@
 						<Textarea
 							className="flex-1 w-full"
 							bind:value={checkboxes[index].text}
-							isDisabled={!$isEditing}
 							{onEnterKeydown}
 							autofocus={index > 0}
 						/>

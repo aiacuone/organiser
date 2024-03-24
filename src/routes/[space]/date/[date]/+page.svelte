@@ -231,8 +231,6 @@
 			<div class="hstack center gap-2 flex-wrap">
 				<div class="hstack gap-2 center">
 					<div class="center hstack gap-1 flex-wrap">
-						<p class="capitalize text-opacity-40">{data.space}</p>
-						<p>-</p>
 						<p>
 							{$selectedDayString?.sliced ?? getDayFromHyphenatedString(data.date)?.slice(0, 3)}
 						</p>

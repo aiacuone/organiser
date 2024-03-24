@@ -174,8 +174,11 @@
 <header class="center py-2 px-3 bg-gray-200">
 	<div class="flex-1 max-w-screen-lg hstack">
 		<div class="flex-1">
-			<button on:click={onOpen}>
-				<LogitLogoSimple height="30px" />
+			<LogitLogoSimple height="30px" />
+		</div>
+		<div class="flex-1 center">
+			<button on:click={onOpen} class="capitalize">
+				{space}
 			</button>
 		</div>
 		<div class="flex-1 hstack justify-end gap-5">
