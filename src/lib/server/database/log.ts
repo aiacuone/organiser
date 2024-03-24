@@ -5,7 +5,7 @@ export const getLogs = async ({
 	space,
 	date,
 	isChecked,
-	hasAnswer,
+	isAnswered,
 	limit = '10',
 	skip,
 	type,
@@ -15,7 +15,7 @@ export const getLogs = async ({
 	space?: string;
 	date?: string | Date;
 	isChecked?: 'true' | 'false';
-	hasAnswer?: 'true' | 'false';
+	isAnswered?: 'true' | 'false';
 	limit?: string;
 	skip?: string;
 	search?: string;
@@ -121,8 +121,8 @@ export const getLogs = async ({
 		});
 	}
 
-	if (hasAnswer) {
-		const parsedBoolean = JSON.parse(hasAnswer);
+	if (isAnswered) {
+		const parsedBoolean = JSON.parse(isAnswered);
 		baseQuery.push({
 			$match: {
 				$or: [
