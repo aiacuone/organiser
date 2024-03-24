@@ -113,3 +113,12 @@ export const capitalizeFirstLetterOfMappedQuestions = (questions: MappedQuestion
 		question: capitalizeFirstLetter(question.question),
 		answer: capitalizeFirstLetter(question.answer)
 	}));
+
+export const areAnyCheckboxItemsNotCapitalised = (checkboxItems: MappedCheckboxItem[]) =>
+	checkboxItems.some((item) => item.text && item.text[0] !== item.text[0].toUpperCase());
+
+export const capitalizeFirstLetterOfMappedCheckboxItems = (checkboxItems: MappedCheckboxItem[]) =>
+	checkboxItems.map((item) => ({
+		...item,
+		text: capitalizeFirstLetter(item.text)
+	}));
