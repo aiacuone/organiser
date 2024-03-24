@@ -1,3 +1,5 @@
+import type { ListItem_int, MappedListItem } from '$lib/types';
+
 export const getHyphenatedStringFromDate = (date: Date) => {
 	const _date = new Date(date);
 	return _date.toISOString().split('T')[0].replace(/-/g, '-').split('-').reverse().join('-');
@@ -39,3 +41,19 @@ export const camelCaseToCapitalized = (inputString: string): string => {
 	const spacedString = inputString.replace(/([A-Z])/g, ' $1');
 	return spacedString.charAt(0).toUpperCase() + spacedString.slice(1).trim();
 };
+
+export const areAnyListItemsNotCapitalised = (items: ListItem_int[]) =>
+	items.some((item) => item.item && item.item[0] !== item.item[0].toUpperCase());
+
+export const capitalizeFirstLetter = (sentence: string) => {
+	if (!sentence || sentence.length === 0) {
+		return sentence;
+	}
+	return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+};
+
+export const capitalizeFirstLetterOfMappedListItems = (items: MappedListItem[]) =>
+	items.map((item) => ({
+		...item,
+		item: capitalizeFirstLetter(item.item)
+	}));

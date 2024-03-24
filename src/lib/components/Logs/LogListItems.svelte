@@ -6,6 +6,10 @@
 	import { icons } from '$lib/general/icons';
 	import { dndzone } from 'svelte-dnd-action';
 	import { LogType_enum, LogListType_enum, type MappedListItem } from '$lib/types';
+	import {
+		areAnyListItemsNotCapitalised,
+		capitalizeFirstLetterOfMappedListItems
+	} from '$lib/utils';
 
 	export let items: MappedListItem[];
 	export let isEditing: Readable<boolean>;
@@ -30,6 +34,13 @@
 		[LogType_enum.time]: 'bg-gray-50',
 		[LogType_enum.list]: 'bg-gray-100'
 	};
+	$: items, console.log({ items });
+
+	$: {
+		if (items.length > 0 && areAnyListItemsNotCapitalised(items)) {
+			items = capitalizeFirstLetterOfMappedListItems(items);
+		}
+	}
 </script>
 
 <ul

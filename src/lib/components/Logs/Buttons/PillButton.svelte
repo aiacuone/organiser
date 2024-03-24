@@ -18,12 +18,12 @@
 
 <div
 	bind:clientHeight={containerHeight}
-	class="pill-button hstack shadow-md min-h-[30px] rounded-r-md rounded-l-md text-sm center relative {_class}"
+	class="pill-button hstack shadow-md min-h-[30px] rounded-r-[4px] rounded-l-[4px] text-sm center relative {_class}"
 >
 	{#each buttons as { label, onClick, icon, _class, notification }, index}
 		<button
-			class="center {index === 0 ? 'rounded-l-md' : ''} {index === buttons.length - 1
-				? 'rounded-r-md'
+			class="center {index === 0 ? 'rounded-l-[4px]' : ''} {index === buttons.length - 1
+				? 'rounded-r-[4px]'
 				: ''} gap-2 px-2 {_class} {capitalizeLabels ? 'capitalize' : ''} relative"
 			style={`height: ${containerHeight}px;`}
 			on:click={onClick}
