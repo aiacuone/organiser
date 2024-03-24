@@ -57,7 +57,6 @@
 						<Textarea
 							className="flex-1 w-full"
 							bind:value={checkboxes[index].text}
-							isDisabled={!$isEditing}
 							{onEnterKeydown}
 							autofocus={index > 0}
 						/>
