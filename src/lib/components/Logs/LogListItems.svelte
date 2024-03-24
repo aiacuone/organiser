@@ -34,10 +34,9 @@
 		[LogType_enum.time]: 'bg-gray-50',
 		[LogType_enum.list]: 'bg-gray-100'
 	};
-	$: items, console.log({ items });
 
 	$: {
-		if (items.length > 0 && areAnyListItemsNotCapitalised(items)) {
+		if (areAnyListItemsNotCapitalised(items)) {
 			items = capitalizeFirstLetterOfMappedListItems(items);
 		}
 	}
