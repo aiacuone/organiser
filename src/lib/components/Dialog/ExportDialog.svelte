@@ -34,7 +34,7 @@
 	export let hasNextLogsPage: boolean | undefined = undefined;
 	export let getNextLogsPage: (() => void) | undefined = undefined;
 
-	let defaultLogKeyValueFilter: Record<Log_enum, boolean> = {
+	let defaultLogKeyValueFilter: Partial<Record<Log_enum, boolean>> = {
 		id: false,
 		date: true,
 		title: true,
@@ -49,17 +49,13 @@
 		questions: true
 	};
 
-	let logKeyValueFilter: Record<Log_enum, boolean> = { ...defaultLogKeyValueFilter };
+	let logKeyValueFilter = { ...defaultLogKeyValueFilter };
 
-	const defaultTypeFilterData: Record<LogType_enum, boolean> = {
-		[LogType_enum.time]: true,
-		[LogType_enum.important]: true,
-		[LogType_enum.todo]: true,
-		[LogType_enum.question]: true,
-		[LogType_enum.list]: true
-	};
+	const defaultTypeFilterData = Object.fromEntries(
+		Object.values(LogType_enum).map((type) => [type, true])
+	) as Partial<Record<LogType_enum, boolean>>;
 
-	let typeFilter: Record<LogType_enum, boolean> = { ...defaultTypeFilterData };
+	let typeFilter = { ...defaultTypeFilterData };
 
 	const defaultPreferences: Record<string, boolean> = {
 		showKeys: true
