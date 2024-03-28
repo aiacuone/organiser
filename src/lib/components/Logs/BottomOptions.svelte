@@ -49,8 +49,10 @@
 
 		if (nextIndexListType === LogListType_enum.checkbox) {
 			$log.checkboxItems = getCheckboxItemsFromMappedListItems($log.listItems);
+			$log.listItems = [];
 		} else if (currentIndexListType === LogListType_enum.checkbox) {
 			$log.listItems = getListItemsFromMappedCheckboxItems($log.checkboxItems);
+			$log.checkboxItems = [];
 		}
 	};
 
