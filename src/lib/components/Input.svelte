@@ -58,7 +58,17 @@
 	const _onFocus = () => {
 		isInputFocused = true;
 	};
+
+	$: _isDropdownOpen = isInputFocused && filteredAutofillValues.length > 0;
+	$: _isDropdownOpen, ($isDropdownOpen = _isDropdownOpen);
+	$: filteredAutofillValues = autofillValues.filter(
+		(autofillValue) => autofillValue && autofillValue.includes(value)
+	) as string[];
+
 	const onKeydown = (e) => {
+		if (e.key === 'Backspace') {
+			_onFocus();
+		}
 		if (e.key === 'ArrowUp') {
 			const newIndex =
 				$selectedAutofill.selected === undefined ? 0 : $selectedAutofill.selected - 1;
@@ -70,15 +80,16 @@
 			onSelectAutofill(newIndex);
 		}
 		if (e.key === 'Enter') {
-			onEnterKeydown();
+			const isAutofillValueBeingSelected =
+				$selectedAutofill !== undefined && $selectedAutofill.selected !== undefined;
+
+			if (isAutofillValueBeingSelected) {
+				onClickAutofill(filteredAutofillValues[$selectedAutofill.selected as number]);
+			} else {
+				onEnterKeydown();
+			}
 		}
 	};
-
-	$: _isDropdownOpen = isInputFocused && autofillValues.length > 0;
-	$: _isDropdownOpen, ($isDropdownOpen = _isDropdownOpen);
-	$: filteredAutofillValues = autofillValues.filter(
-		(autofillValue) => autofillValue && autofillValue.includes(value)
-	);
 </script>
 
 <div use:clickOutside on:click_outside={onClickOutside} class="relative">
