@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { isDropdownOpen } from '$lib/stores';
 	import { clickOutside } from '$lib/utils/clickAway';
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
 
 	export let value: string = '';
 	export let placeholder: string | undefined = undefined;
@@ -18,6 +19,20 @@
 	export let onEnterKeydown: () => void = () => {};
 	export const onFocus: () => void = () => {
 		input && input.focus();
+	};
+
+	const selectedAutofill: Writable<{ isUsingArrows: boolean; selected: number | undefined }> =
+		writable({
+			isUsingArrows: false,
+			selected: undefined
+		});
+
+	const onResetAutofill = () => {
+		$selectedAutofill = { isUsingArrows: false, selected: undefined };
+	};
+
+	const onSelectAutofill = (index: number | undefined) => {
+		$selectedAutofill = { isUsingArrows: true, selected: index };
 	};
 
 	let input: HTMLInputElement;
@@ -37,19 +52,33 @@
 
 	const onClickOutside = () => {
 		isInputFocused = false;
+		onResetAutofill();
 	};
 
 	const _onFocus = () => {
 		isInputFocused = true;
 	};
 	const onKeydown = (e) => {
+		if (e.key === 'ArrowUp') {
+			const newIndex =
+				$selectedAutofill.selected === undefined ? 0 : $selectedAutofill.selected - 1;
+			onSelectAutofill(newIndex);
+		}
+		if (e.key === 'ArrowDown') {
+			const newIndex =
+				$selectedAutofill.selected === undefined ? 0 : $selectedAutofill.selected + 1;
+			onSelectAutofill(newIndex);
+		}
 		if (e.key === 'Enter') {
 			onEnterKeydown();
 		}
 	};
 
-	$: _isDropdownOpen = isInputFocused && !value && autofillValues.length > 0;
+	$: _isDropdownOpen = isInputFocused && autofillValues.length > 0;
 	$: _isDropdownOpen, ($isDropdownOpen = _isDropdownOpen);
+	$: filteredAutofillValues = autofillValues.filter(
+		(autofillValue) => autofillValue && autofillValue.includes(value)
+	);
 </script>
 
 <div use:clickOutside on:click_outside={onClickOutside} class="relative">
@@ -65,11 +94,19 @@
 	/>
 	{#if _isDropdownOpen}
 		<div class="relative z-50">
-			<div class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full">
-				{#each autofillValues as autofillValue}
+			<div
+				class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full max-h-[200px] overflow-y-scroll hide-scrollbar"
+			>
+				{#each filteredAutofillValues as autofillValue, index}
 					<button
-						class="text-xs text-neutral-400 cursor-pointer hover:bg-gray-100 px-4 py-2 z-99 flex justify-start"
+						class="text-xs text-neutral-400 cursor-pointer {!$selectedAutofill.isUsingArrows &&
+							'hover:bg-gray-100'} px-4 py-2 z-99 flex justify-start {$selectedAutofill.selected ===
+						index
+							? 'bg-gray-100'
+							: ''}"
 						on:click={() => autofillValue && onClickAutofill(autofillValue)}
+						on:mouseover={() => ($selectedAutofill.selected = index)}
+						on:focus={() => ($selectedAutofill.selected = index)}
 					>
 						{autofillValue}
 					</button>
