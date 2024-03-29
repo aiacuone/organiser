@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { isDropdownOpen } from '$lib/stores';
 	import { clickOutside } from '$lib/utils/clickAway';
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
+	import type { Readable } from 'svelte/motion';
 	import { writable, type Writable } from 'svelte/store';
 
 	export let value: string = '';
@@ -20,6 +21,8 @@
 	export const onFocus: () => void = () => {
 		input && input.focus();
 	};
+
+	const isEditing: Readable<boolean> = getContext('isEditing');
 
 	const selectedAutofill: Writable<{ isUsingArrows: boolean; selected: number }> = writable({
 		isUsingArrows: false,
@@ -50,8 +53,10 @@
 	};
 
 	const onClickOutside = () => {
-		isInputFocused = false;
-		onResetAutofill();
+		if ($isEditing && isInputFocused) {
+			isInputFocused = false;
+			onResetAutofill();
+		}
 	};
 
 	const _onFocus = () => {
@@ -61,7 +66,7 @@
 	let slicedAutofillValues: string[] = [];
 
 	$: _isDropdownOpen = isInputFocused && filteredAutofillValues.length > 0;
-	$: _isDropdownOpen, ($isDropdownOpen = _isDropdownOpen);
+	$: _isDropdownOpen, $isEditing && ($isDropdownOpen = _isDropdownOpen);
 	$: filteredAutofillValues = autofillValues.filter(
 		(autofillValue) => autofillValue && autofillValue.includes(value)
 	) as string[];
@@ -131,28 +136,26 @@
 		on:input={onChange}
 		on:keydown={onKeydown}
 	/>
-	{#if _isDropdownOpen}
-		<div class="relative z-50">
-			<div
-				class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full"
-				on:wheel={onAutofillWheeldown}
-			>
-				{#each slicedAutofillValues as autofillValue, index}
-					<button
-						class="text-xs text-neutral-400 cursor-pointer {!$selectedAutofill.isUsingArrows &&
-							'hover:bg-gray-100'} px-4 py-2 z-99 flex justify-start {$selectedAutofill.selected ===
-							index ||
-						($selectedAutofill.selected > 9 && index === 9)
-							? 'bg-gray-100'
-							: ''}"
-						on:click={() => autofillValue && onClickAutofill(autofillValue)}
-						on:mouseover={() => ($selectedAutofill.selected = index)}
-						on:focus={() => ($selectedAutofill.selected = index)}
-					>
-						{autofillValue}
-					</button>
-				{/each}
-			</div>
+	<div class="relative z-50 {_isDropdownOpen ? 'flex' : 'hidden'}">
+		<div
+			class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full"
+			on:wheel={onAutofillWheeldown}
+		>
+			{#each slicedAutofillValues as autofillValue, index}
+				<button
+					class="text-xs text-neutral-400 cursor-pointer {!$selectedAutofill.isUsingArrows &&
+						'hover:bg-gray-100'} px-4 py-2 z-99 flex justify-start {$selectedAutofill.selected ===
+						index ||
+					($selectedAutofill.selected > 9 && index === 9)
+						? 'bg-gray-100'
+						: ''}"
+					on:click={() => autofillValue && onClickAutofill(autofillValue)}
+					on:mouseover={() => ($selectedAutofill.selected = index)}
+					on:focus={() => ($selectedAutofill.selected = index)}
+				>
+					{autofillValue}
+				</button>
+			{/each}
 		</div>
-	{/if}
+	</div>
 </div>

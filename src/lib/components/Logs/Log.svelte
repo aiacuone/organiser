@@ -51,6 +51,7 @@
 		[currentlyEditing],
 		([$currentlyEditing]) => $currentlyEditing === $log.id
 	);
+	setContext('isEditing', isEditing);
 
 	const updateLogMutation = useMutation(updateLog, {
 		onSuccess: () => {
@@ -298,28 +299,26 @@
 >
 	<div class={containerClasses[$log.type][0]}>
 		<div class="stack {containerClasses[$log.type][1]}">
-			{#if $log.title || $log.reference || $isEditing}
-				<div class="stack gap-1">
-					{#if !$isEditing && !$log.title}{''}{:else}
-						<Input
-							bind:value={$log.title}
-							autofocus={inputAutoFocus}
-							placeholder="Title"
-							autofillValues={$titles}
-							isDisabled={!$isEditing}
-							onAutoFill={onTitleAutoFill}
-						/>
-					{/if}
-					{#if $isEditing || $log.reference}
-						<Input
-							bind:value={$log.reference}
-							bind:changeInputValue={changeReferenceInputValue}
-							placeholder="Reference"
-							isDisabled={!$isEditing}
-						/>
-					{/if}
+			<div class={$log.title || $log.reference || $isEditing ? 'flex' : 'hidden'}>
+				<div class="stack gap-1 w-full">
+					<Input
+						bind:value={$log.title}
+						autofocus={inputAutoFocus}
+						placeholder="Title"
+						autofillValues={$titles}
+						isDisabled={!$isEditing}
+						onAutoFill={onTitleAutoFill}
+						_class={!$isEditing && !$log.title ? 'hidden' : 'flex'}
+					/>
+					<Input
+						bind:value={$log.reference}
+						bind:changeInputValue={changeReferenceInputValue}
+						placeholder="Reference"
+						isDisabled={!$isEditing}
+						_class={!$isEditing && !$log.reference ? 'hidden' : 'flex'}
+					/>
 				</div>
-			{/if}
+			</div>
 			<div class="hstack center gap-2">
 				{#if $log.type === LogType_enum.todo || ($log.type === LogType_enum.list && $log.listType === LogListType_enum.checkbox)}
 					<div class="flex-1">
