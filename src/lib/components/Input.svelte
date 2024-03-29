@@ -21,17 +21,16 @@
 		input && input.focus();
 	};
 
-	const selectedAutofill: Writable<{ isUsingArrows: boolean; selected: number | undefined }> =
-		writable({
-			isUsingArrows: false,
-			selected: undefined
-		});
+	const selectedAutofill: Writable<{ isUsingArrows: boolean; selected: number }> = writable({
+		isUsingArrows: false,
+		selected: -1
+	});
 
 	const onResetAutofill = () => {
-		$selectedAutofill = { isUsingArrows: false, selected: undefined };
+		$selectedAutofill = { isUsingArrows: false, selected: -1 };
 	};
 
-	const onSelectAutofill = (index: number | undefined) => {
+	const onSelectAutofill = (index: number) => {
 		$selectedAutofill = { isUsingArrows: true, selected: index };
 	};
 
@@ -64,20 +63,33 @@
 	$: filteredAutofillValues = autofillValues.filter(
 		(autofillValue) => autofillValue && autofillValue.includes(value)
 	) as string[];
+	$: value, onResetAutofill();
+
+	$: getSlicedFilteredAutofillValues = (): string[] => {
+		if ($selectedAutofill.selected <= 9) {
+			return filteredAutofillValues.slice(0, 10);
+		} else if ($selectedAutofill.selected > 9) {
+			return filteredAutofillValues.slice(
+				$selectedAutofill.selected + 1 - 10,
+				$selectedAutofill.selected + 1
+			);
+		}
+		return [];
+	};
 
 	const onKeydown = (e) => {
 		if (e.key === 'Backspace') {
 			_onFocus();
 		}
 		if (e.key === 'ArrowUp') {
-			const newIndex =
-				$selectedAutofill.selected === undefined ? 0 : $selectedAutofill.selected - 1;
-			onSelectAutofill(newIndex);
+			if ($selectedAutofill.selected > 0) {
+				onSelectAutofill($selectedAutofill.selected - 1);
+			}
 		}
 		if (e.key === 'ArrowDown') {
-			const newIndex =
-				$selectedAutofill.selected === undefined ? 0 : $selectedAutofill.selected + 1;
-			onSelectAutofill(newIndex);
+			if ($selectedAutofill.selected < filteredAutofillValues.length - 1) {
+				onSelectAutofill($selectedAutofill.selected + 1);
+			}
 		}
 		if (e.key === 'Enter') {
 			const isAutofillValueBeingSelected =
@@ -105,14 +117,13 @@
 	/>
 	{#if _isDropdownOpen}
 		<div class="relative z-50">
-			<div
-				class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full max-h-[200px] overflow-y-scroll hide-scrollbar"
-			>
-				{#each filteredAutofillValues as autofillValue, index}
+			<div class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full">
+				{#each getSlicedFilteredAutofillValues() as autofillValue, index}
 					<button
 						class="text-xs text-neutral-400 cursor-pointer {!$selectedAutofill.isUsingArrows &&
 							'hover:bg-gray-100'} px-4 py-2 z-99 flex justify-start {$selectedAutofill.selected ===
-						index
+							index ||
+						($selectedAutofill.selected > 9 && index === 9)
 							? 'bg-gray-100'
 							: ''}"
 						on:click={() => autofillValue && onClickAutofill(autofillValue)}

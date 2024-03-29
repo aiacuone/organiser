@@ -335,7 +335,6 @@
 					<LogQuestionItems
 						bind:questions={$log.questions}
 						onFocusAnswerInput={_onFocusAnswerInput}
-						isDisabled={!$isEditing}
 						{isEditing}
 						onDeleteQuestion={onDeleteItem}
 						id={$log.id}
