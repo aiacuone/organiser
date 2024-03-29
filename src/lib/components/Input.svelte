@@ -58,24 +58,24 @@
 		isInputFocused = true;
 	};
 
+	let slicedAutofillValues: string[] = [];
+
 	$: _isDropdownOpen = isInputFocused && filteredAutofillValues.length > 0;
 	$: _isDropdownOpen, ($isDropdownOpen = _isDropdownOpen);
 	$: filteredAutofillValues = autofillValues.filter(
 		(autofillValue) => autofillValue && autofillValue.includes(value)
 	) as string[];
 	$: value, onResetAutofill();
-
-	$: getSlicedFilteredAutofillValues = (): string[] => {
+	$: {
 		if ($selectedAutofill.selected <= 9) {
-			return filteredAutofillValues.slice(0, 10);
+			slicedAutofillValues = filteredAutofillValues.slice(0, 10);
 		} else if ($selectedAutofill.selected > 9) {
-			return filteredAutofillValues.slice(
+			slicedAutofillValues = filteredAutofillValues.slice(
 				$selectedAutofill.selected + 1 - 10,
 				$selectedAutofill.selected + 1
 			);
 		}
-		return [];
-	};
+	}
 
 	const onKeydown = (e) => {
 		if (e.key === 'Backspace') {
@@ -102,6 +102,22 @@
 			}
 		}
 	};
+
+	const onAutofillWheeldown = (e) => {
+		const isWheelUp = e.deltaY < 0;
+		const indexOfFirstItem = filteredAutofillValues.indexOf(slicedAutofillValues[0]);
+
+		if (isWheelUp) {
+			if (indexOfFirstItem === 0) return;
+			const result = filteredAutofillValues.slice(indexOfFirstItem - 1, indexOfFirstItem - 1 + 10);
+			slicedAutofillValues = result;
+		} else {
+			const areThereAnyMoreItems = filteredAutofillValues.length > indexOfFirstItem + 10 + 1;
+			if (!areThereAnyMoreItems) return;
+			const result = filteredAutofillValues.slice(indexOfFirstItem + 1, indexOfFirstItem + 1 + 10);
+			slicedAutofillValues = result;
+		}
+	};
 </script>
 
 <div use:clickOutside on:click_outside={onClickOutside} class="relative">
@@ -117,8 +133,11 @@
 	/>
 	{#if _isDropdownOpen}
 		<div class="relative z-50">
-			<div class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full">
-				{#each getSlicedFilteredAutofillValues() as autofillValue, index}
+			<div
+				class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full"
+				on:wheel={onAutofillWheeldown}
+			>
+				{#each slicedAutofillValues as autofillValue, index}
 					<button
 						class="text-xs text-neutral-400 cursor-pointer {!$selectedAutofill.isUsingArrows &&
 							'hover:bg-gray-100'} px-4 py-2 z-99 flex justify-start {$selectedAutofill.selected ===
