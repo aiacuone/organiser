@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 	import { getDateFromHyphenatedString, getDayFromHyphenatedString } from '$lib/utils';
 	import Button from '$lib/components/Button.svelte';
-	import { darkMode } from '$lib/stores';
+	import { darkMode, isDropdownOpen } from '$lib/stores';
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
 	import NewLog from '$lib/components/NewLog.svelte';
@@ -273,7 +273,9 @@
 			</div>
 		</div>
 		<div
-			class="stack gap-6 overflow-y-scroll hide-scrollbar flex-1"
+			class="stack gap-6 hide-scrollbar flex-1 {$isDropdownOpen
+				? 'overflow-y-hidden'
+				: 'overflow-y-scroll'}"
 			style="max-height:{notesContainerHeight}px"
 			bind:this={notesContainer}
 		>

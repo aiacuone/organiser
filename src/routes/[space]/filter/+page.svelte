@@ -7,7 +7,7 @@
 	import Search from '$lib/components/Search.svelte';
 	import { icons } from '$lib/general/icons';
 	import { viewport } from '$lib/hooks';
-	import { searchValue } from '$lib/stores';
+	import { searchValue, isDropdownOpen } from '$lib/stores';
 	import { allLogs, searchableInputs } from '$lib/types';
 	import { arraysAreEqual } from '$lib/utils/arrays';
 	import {
@@ -203,7 +203,9 @@
 	</div>
 	<div class="center">
 		<div
-			class="stack gap-6 overflow-y-scroll hide-scrollbar flex-1 max-w-screen-lg"
+			class="stack gap-6 hide-scrollbar flex-1 max-w-screen-lg {$isDropdownOpen
+				? 'overflow-y-hidden'
+				: 'overflow-y-scroll'}"
 			style={`max-height:${logContainerHeight}px`}
 		>
 			{#if $filteredLogsQuery.isLoading}
