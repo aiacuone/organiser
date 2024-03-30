@@ -15,11 +15,10 @@ export const loginWithPopup = async (client: Auth0Client, options: Auth0ClientOp
 	popupOpen.set(true);
 	try {
 		await client.loginWithPopup(options);
-
-		user.set(await client.getUser());
+		const _user = await client.getUser();
+		_user && user.set(_user);
 		isAuthenticated.set(true);
 	} catch (e) {
-		// eslint-disable-next-line
 		console.error(e);
 	} finally {
 		popupOpen.set(false);

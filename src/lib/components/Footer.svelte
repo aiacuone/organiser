@@ -31,7 +31,8 @@
 		auth0Client = await createClient();
 
 		isAuthenticated.set(await auth0Client.isAuthenticated());
-		user.set(await auth0Client.getUser());
+		const _user = await auth0Client.getUser();
+		_user && user.set(_user);
 	});
 
 	const login = () => {
@@ -63,12 +64,12 @@
 			</div>
 		{/if}
 		<div class="flex justify-end flex-1">
-			{#if $isAuthenticated}
+			{#if $isAuthenticated && $user.given_name && $user.family_name}
 				<button
 					on:click={onClickAvatar}
 					class="rounded-full bg-neutral-500 h-[30px] w-[30px] center text-white"
 				>
-					AI
+					{`${$user.given_name[0]}${$user.family_name[0]}`}
 				</button>
 			{:else}
 				<button on:click={login} class="rounded-lg bg-neutral-500 h-[30px] px-2 center text-white"
