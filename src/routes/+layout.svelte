@@ -2,16 +2,12 @@
 	import '../app.css';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
 	import type { SpaceData_int } from '$lib/types/logs';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
-	import Button from '$lib/components/Button.svelte';
-	import Icon from '@iconify/svelte';
-	import { icons } from '$lib/general/icons';
 	import { selectedDate } from '$lib/stores/dates';
 	import Header from '$lib/components/Header.svelte';
-	import { searchValue } from '$lib/stores';
 	import { Toaster } from 'svelte-french-toast';
+	import Footer from '$lib/components/Footer.svelte';
 
 	export let data: SpaceData_int;
 
@@ -91,20 +87,6 @@
 		return _date;
 	};
 
-	const footerButtons = [
-		{
-			icon: icons.date,
-			onClick: () => goto(`/${$page.params.space}`)
-		},
-		{
-			icon: icons.search,
-			onClick: () => {
-				goto(`/${$page.params.space}/filter`);
-				$searchValue = '';
-			}
-		}
-	];
-
 	const queryClient = new QueryClient();
 </script>
 
@@ -115,22 +97,7 @@
 			<div class="flex justify-end" />
 			<slot />
 		</main>
-		<footer class="py-2 bg-gray-300 px-3 center">
-			<div class="hstack max-w-screen-lg flex-1">
-				<div class="hstack center capitalize gap-5">
-					{#each footerButtons as footerButton}
-						<Button _class="bg-white bg-opacity-80" onClick={footerButton.onClick}>
-							<Icon icon={footerButton.icon} />
-						</Button>
-					{/each}
-				</div>
-				<div class="flex justify-end flex-1">
-					<div class="rounded-full bg-neutral-500 h-[30px] w-[30px] center">
-						<p class="text-white">AI</p>
-					</div>
-				</div>
-			</div>
-		</footer>
+		<Footer />
 	</div>
 </QueryClientProvider>
 
