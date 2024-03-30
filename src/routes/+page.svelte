@@ -3,12 +3,13 @@
 	import type { SpaceData_int } from '$lib/types';
 	import { getHyphenatedStringFromDate, replaceAllSpacesWithHyphens } from '$lib/utils/strings';
 	import { onMount } from 'svelte';
+	import { isAuthenticated } from '$lib/stores';
 
 	export let data: SpaceData_int;
 
 	onMount(() => {
 		const space = data.space || data.spaces[0];
 		const date = getHyphenatedStringFromDate(new Date());
-		goto(`/${replaceAllSpacesWithHyphens(space)}/date/${date}`);
+		if ($isAuthenticated) goto(`/${replaceAllSpacesWithHyphens(space)}/date/${date}`);
 	});
 </script>

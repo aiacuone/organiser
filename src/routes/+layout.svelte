@@ -8,6 +8,11 @@
 	import Header from '$lib/components/Header.svelte';
 	import { Toaster } from 'svelte-french-toast';
 	import Footer from '$lib/components/Footer.svelte';
+	import { isAuthenticated } from '$lib/stores';
+	import Button from '$lib/components/Button.svelte';
+	import { createClient, loginWithPopup } from '$lib/services';
+	import { authConfig } from '$lib/config';
+	import LogitLogo from '$lib/svg/logit-logo.svelte';
 
 	export let data: SpaceData_int;
 
@@ -88,14 +93,26 @@
 	};
 
 	const queryClient = new QueryClient();
+
+	const onLogin = async () => {
+		const client = await createClient();
+		loginWithPopup(client, { domain: authConfig.domain, clientId: authConfig.clientId });
+	};
 </script>
 
 <QueryClientProvider client={queryClient}>
 	<div class="stack" style={'height:100dvh'}>
 		<Header space={data.space} spaces={data.spaces} {initialLogNotifications} />
 		<main class="flex-1 p-1 flex flex-col overflow-hidden">
+			{#if $isAuthenticated}
+				<slot />
+			{:else}
+				<div class="w-full h-full stack center gap-3">
+					<div class="hstack center gap-1 text-xl">Welcome to <LogitLogo height="35px" /></div>
+					<Button onClick={onLogin}>Login</Button>
+				</div>
+			{/if}
 			<div class="flex justify-end" />
-			<slot />
 		</main>
 		<Footer />
 	</div>

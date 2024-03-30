@@ -21,6 +21,7 @@
 	import { page } from '$app/stores';
 	import LogitLogoSimple from '$lib/svg/logit-logo-simple.svelte';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
+	import { isAuthenticated } from '$lib/stores';
 
 	export let space: string;
 	export let spaces: string[];
@@ -176,29 +177,31 @@
 		<div class="flex-1">
 			<LogitLogoSimple height="30px" />
 		</div>
-		<div class="flex-1 center">
-			<button on:click={onOpen} class="capitalize">
-				{space}
-			</button>
-		</div>
-		<div class="flex-1 hstack justify-end gap-5">
-			{#each Object.entries(headerButtons) as [type, { icon, onClick }]}
-				{@const spaceNotifications = $allLogsNotificationsQuery.data?.find(
-					({ space: _space }) => _space === space
-				)}
-				{@const notificationsCount = spaceNotifications?.[type]}
-				<button on:click={() => onClick(!!notificationsCount)} class="relative">
-					<Icon {icon} class="text-gray-500" height="20px" />
-					{#if notificationsCount}
-						<div
-							class="absolute top-0 -right-2 rounded-full bg-blue-400 text-[10px] w-[15px] h-[15px] text-white"
-						>
-							{notificationsCount}
-						</div>
-					{/if}
+		{#if $isAuthenticated}
+			<div class="flex-1 center">
+				<button on:click={onOpen} class="capitalize">
+					{space}
 				</button>
-			{/each}
-		</div>
+			</div>
+			<div class="flex-1 hstack justify-end gap-5">
+				{#each Object.entries(headerButtons) as [type, { icon, onClick }]}
+					{@const spaceNotifications = $allLogsNotificationsQuery.data?.find(
+						({ space: _space }) => _space === space
+					)}
+					{@const notificationsCount = spaceNotifications?.[type]}
+					<button on:click={() => onClick(!!notificationsCount)} class="relative">
+						<Icon {icon} class="text-gray-500" height="20px" />
+						{#if notificationsCount}
+							<div
+								class="absolute top-0 -right-2 rounded-full bg-blue-400 text-[10px] w-[15px] h-[15px] text-white"
+							>
+								{notificationsCount}
+							</div>
+						{/if}
+					</button>
+				{/each}
+			</div>
+		{/if}
 	</div>
 </header>
 
