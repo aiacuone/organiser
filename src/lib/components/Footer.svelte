@@ -36,7 +36,7 @@
 	});
 
 	const login = () => {
-		loginWithPopup(auth0Client, { domain: authConfig.domain, clientId: authConfig.clientId });
+		loginWithPopup(auth0Client, authConfig);
 	};
 
 	const _logout = () => {

@@ -3,8 +3,9 @@
 	import Button from '$lib/components/Button.svelte';
 	import Dialog from '$lib/components/Dialog/Dialog.svelte';
 	import Input from '$lib/components/Input.svelte';
+	import { axios } from '$lib/general';
 	import { useMutation } from '@sveltestack/svelte-query';
-	import axios from 'axios';
+
 	import { getContext } from 'svelte';
 	import toast from 'svelte-french-toast';
 

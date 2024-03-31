@@ -13,7 +13,6 @@
 	import Input from './Input.svelte';
 	import { useQuery } from '@sveltestack/svelte-query';
 	import { selectedDate } from '$lib/stores/dates';
-	import axios from 'axios';
 	import { onMount } from 'svelte';
 	import PillButton from './Logs/Buttons/PillButton.svelte';
 	import { derived } from 'svelte/store';
@@ -22,6 +21,7 @@
 	import LogitLogoSimple from '$lib/svg/logit-logo-simple.svelte';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
 	import { isAuthenticated } from '$lib/stores';
+	import { axios } from '$lib/general';
 
 	export let space: string;
 	export let spaces: string[];
