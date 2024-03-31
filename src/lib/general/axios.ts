@@ -14,11 +14,12 @@ export const axios = _axios.create({
 axios.interceptors.request.use(async (config) => {
 	const getAccessToken = async () => {
 		const client = await createClient();
-		const token = await client.getTokenSilently();
-		return token;
+		const response = await client.getIdTokenClaims();
+		return response?.__raw;
 	};
 
 	const token = await getAccessToken();
+
 	return {
 		...config,
 		headers: {

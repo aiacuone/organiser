@@ -1,4 +1,10 @@
-import { checkAccessTokenMiddleware, deleteLog, getLogs, updateLog } from '$lib';
+import {
+	checkAccessTokenMiddleware,
+	deleteLog,
+	getAndCheckCollectionFromToken,
+	getLogs,
+	updateLog
+} from '$lib';
 
 export async function PATCH({ request }) {
 	const data = await request.json();
@@ -18,6 +24,9 @@ export const DELETE = async ({ request }) => {
 
 export const GET = async ({ request, url: { searchParams } }) =>
 	checkAccessTokenMiddleware(request, async () => {
+		const collection = await getAndCheckCollectionFromToken(request);
+		console.log({ collection });
+
 		const objectSearchParams = Object.fromEntries(searchParams.entries());
 		const json = objectSearchParams['json'];
 

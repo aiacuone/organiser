@@ -10,3 +10,7 @@ export const checkAccessTokenMiddleware = async (
 
 	return callback();
 };
+
+export const getSubstringToken = (token: string): string => {
+	return token.substring(7);
+};
