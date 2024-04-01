@@ -12,6 +12,7 @@
 	import { createClient, loginWithPopup } from '$lib/clientServices';
 	import { authConfig } from '$lib/config';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
+	import AddSpace from '$lib/components/AddSpace.svelte';
 
 	const getDateFromHyphenatedString = (dateString: string) => {
 		const [day, month, year] = dateString.split('-').map(Number);
@@ -93,13 +94,20 @@
 		const client = await createClient();
 		loginWithPopup(client, { domain: authConfig.domain, clientId: authConfig.clientId });
 	};
+
+	$: space = $page.params.space;
 </script>
 
 <QueryClientProvider client={queryClient}>
 	<div class="stack" style={'height:100dvh'}>
-		<Header space={$page.params.space} />
+		<Header {space} />
 		<main class="flex-1 p-1 flex flex-col overflow-hidden">
-			{#if $isAuthenticated}
+			{#if $isAuthenticated && !space}
+				<div class="h-full w-full center stack gap-2">
+					Add a new space
+					<AddSpace />
+				</div>
+			{:else if $isAuthenticated}
 				<slot />
 			{:else}
 				<div class="w-full h-full stack center gap-3">

@@ -3,7 +3,6 @@
 	import Icon from '@iconify/svelte';
 	import Button from './Button.svelte';
 	import Dialog from './Dialog/Dialog.svelte';
-	import Input from './Input.svelte';
 	import { useQuery } from '@sveltestack/svelte-query';
 	import { onMount } from 'svelte';
 	import PillButton from './Logs/Buttons/PillButton.svelte';
@@ -16,12 +15,12 @@
 		icons,
 		isAuthenticated,
 		logIcons,
-		selectedDate,
 		getHyphenatedStringFromDate,
 		replaceAllHyphensWithSpaces,
 		replaceAllSpacesWithHyphens
 	} from '$lib';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
+	import AddSpace from './AddSpace.svelte';
 
 	export let space: string | undefined;
 
@@ -29,7 +28,6 @@
 	let isAddingNewSpace: boolean = false;
 	let onOpen: () => void;
 	let dialog: HTMLDialogElement;
-	let addInputValue: string;
 
 	const onDialogClose = () => {
 		isAddingNewSpace = false;
@@ -106,15 +104,7 @@
 		}
 	};
 	const onAddSpace = () => {
-		goto(
-			`/${replaceAllSpacesWithHyphens(
-				addInputValue.toLowerCase()
-			)}/date/${getHyphenatedStringFromDate(new Date())}`
-		);
-
-		addInputValue = '';
 		onDialogClose();
-		$selectedDate = new Date();
 	};
 
 	const pillButtons = derived(allLogsNotificationsQuery, ($allLogsNotificationsQuery) => {
@@ -182,22 +172,25 @@
 				</button>
 			</div>
 			<div class="flex-1 hstack justify-end gap-5">
-				{#each Object.entries(headerButtons) as [type, { icon, onClick }]}
-					{@const spaceNotifications = $allLogsNotificationsQuery.data?.find(
-						({ space: _space }) => _space === space
-					)}
-					{@const notificationsCount = spaceNotifications?.[type]}
-					<button on:click={() => onClick(!!notificationsCount)} class="relative">
-						<Icon {icon} class="text-gray-500" height="20px" />
-						{#if notificationsCount}
-							<div
-								class="absolute top-0 -right-2 rounded-full bg-blue-400 text-[10px] w-[15px] h-[15px] text-white"
-							>
-								{notificationsCount}
-							</div>
-						{/if}
-					</button>
-				{/each}
+				{#if $allLogsNotificationsQuery.data}
+					{#each Object.entries(headerButtons) as [type, { icon, onClick }]}
+						{@const spaceNotifications = $allLogsNotificationsQuery.data?.find(
+							({ space: _space }) => _space === space
+						)}
+						{@const notificationsCount = spaceNotifications?.[type]}
+
+						<button on:click={() => onClick(!!notificationsCount)} class="relative">
+							<Icon {icon} class="text-gray-500" height="20px" />
+							{#if notificationsCount}
+								<div
+									class="absolute top-0 -right-2 rounded-full bg-blue-400 text-[10px] w-[15px] h-[15px] text-white"
+								>
+									{notificationsCount}
+								</div>
+							{/if}
+						</button>
+					{/each}
+				{/if}
 			</div>
 		{/if}
 	</div>
@@ -215,12 +208,7 @@
 		</div>
 		<div class="min-h-[50px] center">
 			{#if isAddingNewSpace}
-				<div class="hstack gap-2">
-					<Input _class="border border-gray-100 px-2" autofocus bind:value={addInputValue} />
-					<button class="bg-gray-50 px-2 py-1" on:click={(e) => onAddSpace(e)}>
-						<Icon icon={icons.enter} />
-					</button>
-				</div>
+				<AddSpace {onAddSpace} />
 			{:else}
 				<Button onClick={() => (isAddingNewSpace = true)}>Add</Button>
 			{/if}
