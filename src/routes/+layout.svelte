@@ -2,7 +2,6 @@
 	import '../app.css';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import type { SpaceData_int } from '$lib/types/logs';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { selectedDate } from '$lib/stores/dates';
 	import Header from '$lib/components/Header.svelte';
@@ -10,13 +9,9 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import { isAuthenticated } from '$lib/stores';
 	import Button from '$lib/components/Button.svelte';
-	import { createClient, loginWithPopup } from '$lib/services';
+	import { createClient, loginWithPopup } from '$lib/clientServices';
 	import { authConfig } from '$lib/config';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
-
-	export let data: SpaceData_int;
-
-	const { initialLogNotifications } = data;
 
 	const getDateFromHyphenatedString = (dateString: string) => {
 		const [day, month, year] = dateString.split('-').map(Number);
@@ -102,7 +97,7 @@
 
 <QueryClientProvider client={queryClient}>
 	<div class="stack" style={'height:100dvh'}>
-		<Header space={data.space} spaces={data.spaces} {initialLogNotifications} />
+		<Header space={$page.params.space} />
 		<main class="flex-1 p-1 flex flex-col overflow-hidden">
 			{#if $isAuthenticated}
 				<slot />

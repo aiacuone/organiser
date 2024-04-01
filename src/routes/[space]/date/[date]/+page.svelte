@@ -9,7 +9,7 @@
 	import Icon from '@iconify/svelte';
 	import NewLog from '$lib/components/NewLog.svelte';
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
-	import { getLogs, getTitlesAndReferences } from '$lib/api/logsLocalApi';
+	import { getLogsClient, getTitlesAndReferencesClient } from '$lib/api/logsLocalApi';
 	import { goto } from '$app/navigation';
 	import { titlesAndReferences } from '$lib/stores';
 	import { selectedDate, selectedDayString, selectedHyphenatedDateString } from '$lib/stores/dates';
@@ -52,7 +52,7 @@
 		() => {
 			return (
 				$selectedHyphenatedDateString &&
-				getLogs({
+				getLogsClient({
 					space: replaceAllSpacesWithHyphens(data.space),
 					date: $selectedDate
 				})
@@ -68,7 +68,7 @@
 	);
 
 	const titlesAndReferencesQuery = useQuery('titlesAndReferences', () =>
-		getTitlesAndReferences(replaceAllSpacesWithHyphens(data.space))
+		getTitlesAndReferencesClient(replaceAllSpacesWithHyphens(data.space))
 	);
 
 	const invalidateLogsAndTitlesAndReferences = async () => {

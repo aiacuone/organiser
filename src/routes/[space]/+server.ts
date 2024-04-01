@@ -1,9 +1,16 @@
-import { deleteSpace } from '$lib';
+import {
+	checkAccessTokenMiddleware,
+	deleteSpace,
+	getAndCheckCollectionFromToken
+} from '$lib/server/index.js';
 
-export const DELETE = async ({ params }) => {
-	const { space } = params;
+export const DELETE = async ({ request, params }) =>
+	checkAccessTokenMiddleware(request, async () => {
+		const collection = await getAndCheckCollectionFromToken(request);
 
-	await deleteSpace(space);
+		const { space } = params;
 
-	return new Response(JSON.stringify({ message: 'Space deleted' }), { status: 200 });
-};
+		await deleteSpace(space, collection);
+
+		return new Response(JSON.stringify({ message: 'Space deleted' }), { status: 200 });
+	});

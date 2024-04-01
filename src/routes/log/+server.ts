@@ -4,7 +4,7 @@ import {
 	getAndCheckCollectionFromToken,
 	getLogs,
 	updateLog
-} from '$lib';
+} from '$lib/server';
 
 export const PATCH = async ({ request }) =>
 	checkAccessTokenMiddleware(request, async () => {

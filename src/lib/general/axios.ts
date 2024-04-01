@@ -1,6 +1,6 @@
 import _axios from 'axios';
 import { PUBLIC_BASE_URL } from '$env/static/public';
-import { createClient } from '$lib/services';
+import { createClient } from '$lib/clientServices';
 
 export const axios = _axios.create({
 	baseURL: PUBLIC_BASE_URL,

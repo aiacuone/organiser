@@ -1,11 +1,18 @@
-import { getAllLogNotifications } from '$lib';
+import {
+	checkAccessTokenMiddleware,
+	getAllLogNotifications,
+	getAndCheckCollectionFromToken
+} from '$lib/server/index.js';
 
-export const GET = async ({ url: { searchParams } }) => {
-	const result = new URLSearchParams(searchParams).entries();
+export const GET = async ({ request, url: { searchParams } }) =>
+	checkAccessTokenMiddleware(request, async () => {
+		const collection = await getAndCheckCollectionFromToken(request);
 
-	const spaces = Array.from(result, (x) => x[1]);
+		const result = new URLSearchParams(searchParams).entries();
 
-	const allLogNotifications = await getAllLogNotifications(spaces);
+		const spaces = Array.from(result, (x) => x[1]);
 
-	return new Response(JSON.stringify(allLogNotifications), { status: 200 });
-};
+		const allLogNotifications = await getAllLogNotifications(spaces, collection);
+
+		return new Response(JSON.stringify(allLogNotifications), { status: 200 });
+	});

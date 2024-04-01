@@ -1,6 +1,5 @@
 import { LogType_enum, Log_enum } from '$lib/types';
 import type { Collection } from 'mongodb';
-import { collection } from './common';
 
 export const getLogs = async (
 	{
@@ -213,7 +212,7 @@ export const deleteLog = async (id: string, collection: Collection) => {
 	await collection.deleteOne({ id });
 };
 
-export const getTitlesAndReferences = async (space: string) => {
+export const getTitlesAndReferences = async (space: string, collection: Collection) => {
 	const result = await collection
 		.aggregate([
 			{ $match: { space } },
@@ -239,7 +238,7 @@ export const getTitlesAndReferences = async (space: string) => {
 	return result;
 };
 
-export const getAllLogNotifications = async (spaces: string[]) => {
+export const getAllLogNotifications = async (spaces: string[], collection: Collection) => {
 	const facet = spaces.reduce(
 		(acc, space) => ({
 			...acc,
@@ -302,30 +301,34 @@ export const getAllLogNotifications = async (spaces: string[]) => {
 		{}
 	);
 
-	const counts = await collection
-		.aggregate([
-			{
-				$facet: facet
-			}
-		])
-		.toArray();
+	const counts =
+		Object.entries(facet).length > 0 &&
+		(await collection
+			.aggregate([
+				{
+					$facet: facet
+				}
+			])
+			.toArray());
 
-	const mappedCounts = Object.entries(counts[0])
-		.map(([key, countArray]) => {
-			const count = countArray[0]?.count ?? 0;
-			const [space, type] = key.split('/');
-			return {
-				space,
-				type,
-				count
-			};
-		})
-		.reduce((result, { space, type, count }) => {
-			const indexOfExistingSpace = result.findIndex((group) => group.space === space);
-			result[indexOfExistingSpace] = { ...result[indexOfExistingSpace], [type]: count ?? 0 };
+	const mappedCounts =
+		counts &&
+		Object.entries(counts[0])
+			.map(([key, countArray]) => {
+				const count = countArray[0]?.count ?? 0;
+				const [space, type] = key.split('/');
+				return {
+					space,
+					type,
+					count
+				};
+			})
+			.reduce((result, { space, type, count }) => {
+				const indexOfExistingSpace = result.findIndex((group) => group.space === space);
+				result[indexOfExistingSpace] = { ...result[indexOfExistingSpace], [type]: count ?? 0 };
 
-			return result;
-		}, spaces.map((space) => ({ space })) as Array<{ space: string; type: string; count: number }>);
+				return result;
+			}, spaces.map((space) => ({ space })) as Array<{ space: string; type: string; count: number }>);
 
-	return mappedCounts;
+	return mappedCounts ?? 0;
 };

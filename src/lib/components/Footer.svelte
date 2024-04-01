@@ -5,7 +5,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { searchValue } from '$lib/stores';
-	import { createClient, loginWithPopup, logout } from '$lib/services';
+	import { createClient, loginWithPopup, logout } from '$lib/clientServices';
 	import { onMount } from 'svelte';
 	import { isAuthenticated, user } from '$lib/stores/auth';
 	import type { Auth0Client } from '@auth0/auth0-spa-js';

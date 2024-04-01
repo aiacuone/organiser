@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
+	import { deleteLogClient, updateLogClient } from '$lib/api/logsLocalApi';
 	import { clickOutside } from '$lib/utils/clickAway';
 	import { useMutation } from '@sveltestack/svelte-query';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
@@ -15,13 +15,13 @@
 	export let showDialog = true;
 	export let editOnMount = false;
 
-	export const updateLogMutation = useMutation(updateLog, {
+	export const updateLogMutation = useMutation(updateLogClient, {
 		onSuccess: () => {
 			invalidateLogs();
 		}
 	});
 
-	export const deleteLogMutation = useMutation(deleteLog, {
+	export const deleteLogMutation = useMutation(deleteLogClient, {
 		onSuccess: () => {
 			invalidateLogs();
 		}

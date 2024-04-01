@@ -1,15 +1,21 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import type { SpaceData_int } from '$lib/types';
 	import { getHyphenatedStringFromDate, replaceAllSpacesWithHyphens } from '$lib/utils/strings';
 	import { onMount } from 'svelte';
 	import { isAuthenticated } from '$lib/stores';
+	import { axios } from '$lib';
+	import { page } from '$app/stores';
 
-	export let data: SpaceData_int;
+	const urlSpace = $page.params.space;
 
-	onMount(() => {
-		const space = data.space || data.spaces[0];
-		const date = getHyphenatedStringFromDate(new Date());
-		if ($isAuthenticated) goto(`/${replaceAllSpacesWithHyphens(space)}/date/${date}`);
+	onMount(async () => {
+		const spaces = await axios.get('/spaces').then((response) => response.data);
+		const areThereAnySpaces = spaces.length > 0;
+
+		if ($isAuthenticated && areThereAnySpaces) {
+			const date = getHyphenatedStringFromDate(new Date());
+			const space = urlSpace || spaces[0];
+			goto(`/${replaceAllSpacesWithHyphens(space)}/date/${date}`);
+		}
 	});
 </script>
