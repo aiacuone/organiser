@@ -12,16 +12,19 @@ export const axios = _axios.create({
 });
 
 axios.interceptors.request.use(async (config) => {
-	const localStorageToken = localStorage.getItem('token');
-	const doesStorageTokenExist = localStorageToken !== 'undefined';
+	const sessionStorageToken = sessionStorage.getItem('token');
+	const doesSessionTokenExist = sessionStorageToken !== null;
 
-	let token = doesStorageTokenExist && JSON.parse(localStorageToken as string);
+	let token;
 
-	if (!doesStorageTokenExist) {
+	if (doesSessionTokenExist) {
+		token = JSON.parse(sessionStorageToken as string);
+	} else {
 		const client = await createClient();
 		const response = await client.getIdTokenClaims();
 		const _token = response?.__raw;
-		localStorage.setItem('token', JSON.stringify(_token));
+
+		sessionStorage.setItem('token', JSON.stringify(_token));
 		token = _token;
 	}
 
