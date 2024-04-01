@@ -6,27 +6,28 @@ import {
 	updateLog
 } from '$lib';
 
-export async function PATCH({ request }) {
-	const data = await request.json();
+export const PATCH = async ({ request }) =>
+	checkAccessTokenMiddleware(request, async () => {
+		const collection = await getAndCheckCollectionFromToken(request);
+		const data = await request.json();
+		await updateLog(data, collection);
 
-	await updateLog(data);
+		return new Response(JSON.stringify(''), { status: 200 });
+	});
 
-	return new Response(JSON.stringify(''), { status: 200 });
-}
+export const DELETE = async ({ request }) =>
+	checkAccessTokenMiddleware(request, async () => {
+		const collection = await getAndCheckCollectionFromToken(request);
+		const { id } = await request.json();
 
-export const DELETE = async ({ request }) => {
-	const { id } = await request.json();
+		await deleteLog(id, collection);
 
-	await deleteLog(id);
-
-	return new Response(JSON.stringify(''), { status: 200 });
-};
+		return new Response(JSON.stringify(''), { status: 200 });
+	});
 
 export const GET = async ({ request, url: { searchParams } }) =>
 	checkAccessTokenMiddleware(request, async () => {
 		const collection = await getAndCheckCollectionFromToken(request);
-		console.log({ collection });
-
 		const objectSearchParams = Object.fromEntries(searchParams.entries());
 		const json = objectSearchParams['json'];
 
@@ -58,9 +59,9 @@ export const GET = async ({ request, url: { searchParams } }) =>
 
 			const params = { ...objectSearchParams, ...reducedJsonParams };
 
-			({ logs, total } = await getLogs(params));
+			({ logs, total } = await getLogs(params, collection));
 		} else {
-			({ logs, total } = await getLogs(objectSearchParams));
+			({ logs, total } = await getLogs(objectSearchParams, collection));
 		}
 
 		return new Response(JSON.stringify({ logs, total }), { status: 200 });

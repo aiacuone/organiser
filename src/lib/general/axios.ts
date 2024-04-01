@@ -12,13 +12,18 @@ export const axios = _axios.create({
 });
 
 axios.interceptors.request.use(async (config) => {
-	const getAccessToken = async () => {
+	const localStorageToken = localStorage.getItem('token');
+	const doesStorageTokenExist = localStorageToken !== 'undefined';
+
+	let token = doesStorageTokenExist && JSON.parse(localStorageToken as string);
+
+	if (!doesStorageTokenExist) {
 		const client = await createClient();
 		const response = await client.getIdTokenClaims();
-		return response?.__raw;
-	};
-
-	const token = await getAccessToken();
+		const _token = response?.__raw;
+		localStorage.setItem('token', JSON.stringify(_token));
+		token = _token;
+	}
 
 	return {
 		...config,

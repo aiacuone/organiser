@@ -30,7 +30,6 @@
 		space: string;
 		titles: string[];
 		references: string[];
-		initialLogs: { logs: Log_int[]; total: number };
 	}
 
 	export let data: PageData;
@@ -64,9 +63,7 @@
 				if (browser) {
 					goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
 				}
-			},
-			// this currently does not work properly because because its conflicts with deleting a space. If we want this to work, we need to find a way to refetch the logs when a space is deleted
-			initialData: data.initialLogs
+			}
 		}
 	);
 

@@ -1,27 +1,31 @@
 import { LogType_enum, Log_enum } from '$lib/types';
+import type { Collection } from 'mongodb';
 import { collection } from './common';
 
-export const getLogs = async ({
-	space,
-	date,
-	isChecked,
-	isAnswered,
-	limit = '10',
-	skip,
-	type,
-	search,
-	searchType
-}: {
-	space?: string;
-	date?: string | Date;
-	isChecked?: 'true' | 'false';
-	isAnswered?: 'true' | 'false';
-	limit?: string;
-	skip?: string;
-	search?: string;
-	searchType?: string[];
-	type?: string[];
-}) => {
+export const getLogs = async (
+	{
+		space,
+		date,
+		isChecked,
+		isAnswered,
+		limit = '10',
+		skip,
+		type,
+		search,
+		searchType
+	}: {
+		space?: string;
+		date?: string | Date;
+		isChecked?: 'true' | 'false';
+		isAnswered?: 'true' | 'false';
+		limit?: string;
+		skip?: string;
+		search?: string;
+		searchType?: string[];
+		type?: string[];
+	},
+	collection: Collection
+) => {
 	const baseQuery: Array<any> = [{ $project: { _id: 0 } }, { $sort: { date: -1 } }];
 
 	if (space) {
@@ -178,20 +182,23 @@ export const getLogs = async ({
 	return { logs, total };
 };
 
-export const updateLog = async (values: {
-	id: string;
-	date: Date;
-	title?: string;
-	reference?: string;
-	time?: number;
-	importance?: number;
-	priority?: number;
-	type: LogType_enum;
-	space: string;
-	lastUpdated: Date;
-	question?: string;
-	answer?: string;
-}) => {
+export const updateLog = async (
+	values: {
+		id: string;
+		date: Date;
+		title?: string;
+		reference?: string;
+		time?: number;
+		importance?: number;
+		priority?: number;
+		type: LogType_enum;
+		space: string;
+		lastUpdated: Date;
+		question?: string;
+		answer?: string;
+	},
+	collection: Collection
+) => {
 	const { date, lastUpdated, ...rest } = values;
 	await collection.updateOne(
 		{ id: values.id },
@@ -202,7 +209,7 @@ export const updateLog = async (values: {
 	);
 };
 
-export const deleteLog = async (id: string) => {
+export const deleteLog = async (id: string, collection: Collection) => {
 	await collection.deleteOne({ id });
 };
 
