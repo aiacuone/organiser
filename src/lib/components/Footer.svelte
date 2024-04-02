@@ -28,11 +28,11 @@
 
 	let auth0Client: Auth0Client;
 	onMount(async () => {
-		auth0Client = await createClient();
-
-		isAuthenticated.set(await auth0Client.isAuthenticated());
-		const _user = await auth0Client.getUser();
-		_user && user.set(_user);
+		try {
+			auth0Client = await createClient();
+		} catch (error) {
+			console.log('There was an error logging in', { error });
+		}
 	});
 
 	const login = () => {

@@ -7,7 +7,7 @@
 	import Header from '$lib/components/Header.svelte';
 	import { Toaster } from 'svelte-french-toast';
 	import Footer from '$lib/components/Footer.svelte';
-	import { isAuthenticated } from '$lib/stores';
+	import { isAuthLoading, isAuthenticated, user } from '$lib/stores';
 	import Button from '$lib/components/Button.svelte';
 	import { createClient, loginWithPopup } from '$lib/clientServices';
 	import { authConfig } from '$lib/config';
@@ -19,6 +19,19 @@
 
 		return new Date(Date.UTC(year, month - 1, day));
 	};
+
+	onMount(async () => {
+		try {
+			const auth0Client = await createClient();
+
+			isAuthenticated.set(await auth0Client.isAuthenticated());
+			const _user = await auth0Client.getUser();
+			_user && user.set(_user);
+		} catch (error) {
+			console.log('There was an error logging in', { error });
+		}
+		$isAuthLoading = false;
+	});
 
 	onMount(() => {
 		if ($page.params.date) {
@@ -102,7 +115,9 @@
 	<div class="stack" style={'height:100dvh'}>
 		<Header {space} />
 		<main class="flex-1 p-1 flex flex-col overflow-hidden">
-			{#if $isAuthenticated && !space}
+			{#if $isAuthLoading}
+				<div class="w-full h-full center">Loading...</div>
+			{:else if $isAuthenticated && !space}
 				<div class="h-full w-full center stack gap-2">
 					Add a new space
 					<AddSpace />
