@@ -13,5 +13,3 @@ export const getCollection = async (collectionName: string) => {
 
 	return collection;
 };
-
-export const collection = await getCollection('aiacuone');

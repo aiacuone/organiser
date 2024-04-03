@@ -4,7 +4,9 @@ import { Auth0Client, createAuth0Client } from '@auth0/auth0-spa-js';
 export const createClient = async () => {
 	const auth0Client = await createAuth0Client({
 		domain: authConfig.domain,
-		clientId: authConfig.clientId
+		clientId: authConfig.clientId,
+		useRefreshTokens: true,
+		cacheLocation: 'localstorage'
 	});
 
 	return auth0Client;
