@@ -13,7 +13,7 @@ export const axios = _axios.create({
 
 axios.interceptors.request.use(async (config) => {
 	const sessionStorageToken = sessionStorage.getItem('token');
-	const doesSessionTokenExist = sessionStorageToken !== null;
+	const doesSessionTokenExist = sessionStorageToken !== null && sessionStorageToken !== 'undefined';
 
 	let token;
 

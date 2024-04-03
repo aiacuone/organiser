@@ -12,12 +12,27 @@
 	import { createClient, loginWithRedirect } from '$lib/clientServices';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
 	import AddSpace from '$lib/components/AddSpace.svelte';
+	import { axios, getHyphenatedStringFromDate, replaceAllSpacesWithHyphens } from '$lib';
+	import { goto } from '$app/navigation';
 
 	const getDateFromHyphenatedString = (dateString: string) => {
 		const [day, month, year] = dateString.split('-').map(Number);
 
 		return new Date(Date.UTC(year, month - 1, day));
 	};
+
+	const urlSpace = $page.params.space;
+
+	onMount(async () => {
+		const spaces = await axios.get('/spaces').then((response) => response.data);
+		const areThereAnySpaces = spaces.length > 0;
+
+		if ($isAuthenticated && areThereAnySpaces) {
+			const date = getHyphenatedStringFromDate(new Date());
+			const space = urlSpace || spaces[0];
+			goto(`/${replaceAllSpacesWithHyphens(space)}/date/${date}`);
+		}
+	});
 
 	onMount(() => {
 		if ($page.params.date) {
