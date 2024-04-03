@@ -9,8 +9,7 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import { isAuthLoading, isAuthenticated, user } from '$lib/stores';
 	import Button from '$lib/components/Button.svelte';
-	import { createClient, loginWithPopup } from '$lib/clientServices';
-	import { authConfig } from '$lib/config';
+	import { createClient, loginWithRedirect } from '$lib/clientServices';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
 	import AddSpace from '$lib/components/AddSpace.svelte';
 
@@ -19,19 +18,6 @@
 
 		return new Date(Date.UTC(year, month - 1, day));
 	};
-
-	onMount(async () => {
-		try {
-			const auth0Client = await createClient();
-
-			isAuthenticated.set(await auth0Client.isAuthenticated());
-			const _user = await auth0Client.getUser();
-			_user && user.set(_user);
-		} catch (error) {
-			console.log('There was an error logging in', { error });
-		}
-		$isAuthLoading = false;
-	});
 
 	onMount(() => {
 		if ($page.params.date) {
@@ -105,7 +91,7 @@
 
 	const onLogin = async () => {
 		const client = await createClient();
-		loginWithPopup(client, { domain: authConfig.domain, clientId: authConfig.clientId });
+		loginWithRedirect(client);
 	};
 
 	$: space = $page.params.space;

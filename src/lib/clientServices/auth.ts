@@ -1,6 +1,5 @@
 import { authConfig } from '$lib/config';
-import { isAuthenticated, popupOpen, user } from '$lib/stores/auth';
-import { Auth0Client, createAuth0Client, type Auth0ClientOptions } from '@auth0/auth0-spa-js';
+import { Auth0Client, createAuth0Client } from '@auth0/auth0-spa-js';
 
 export const createClient = async () => {
 	const auth0Client = await createAuth0Client({
@@ -11,17 +10,15 @@ export const createClient = async () => {
 	return auth0Client;
 };
 
-export const loginWithPopup = async (client: Auth0Client, options: Auth0ClientOptions) => {
-	popupOpen.set(true);
+export const loginWithRedirect = async (client: Auth0Client) => {
 	try {
-		await client.loginWithPopup(options);
-		const _user = await client.getUser();
-		_user && user.set(_user);
-		isAuthenticated.set(true);
+		await client.loginWithRedirect({
+			authorizationParams: {
+				redirect_uri: 'http://localhost:5173/'
+			}
+		});
 	} catch (e) {
 		console.error(e);
-	} finally {
-		popupOpen.set(false);
 	}
 };
 
