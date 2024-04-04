@@ -16,7 +16,7 @@ export const loginWithRedirect = async (client: Auth0Client) => {
 	try {
 		await client.loginWithRedirect({
 			authorizationParams: {
-				redirect_uri: 'http://localhost:5173/'
+				redirect_uri: window.location.origin
 			}
 		});
 	} catch (e) {
