@@ -4,8 +4,9 @@ import { getCollection, getDatabase } from '../database';
 import type { Collection, Document } from 'mongodb';
 
 export const getAndCheckCollectionFromToken = async (
-	request: Request
-): Promise<Collection<Document>> => {
+	request: Request,
+	callback: (collection: Collection<Document>) => Promise<Response>
+): Promise<Response> => {
 	const token = request.headers.get('authorization');
 	const substringToken = getSubstringToken(token as string);
 	const decodedToken = jwt.decode(substringToken);
@@ -16,12 +17,16 @@ export const getAndCheckCollectionFromToken = async (
 	const collections = await db.listCollections().toArray();
 	const doesCollectionExist = collections.some((collection) => collection.name === userSocialId);
 
+	if (!userSocialId) {
+		return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+	}
+
 	if (!doesCollectionExist) {
 		await db.createCollection(userSocialId);
 		const newCollection = await getCollection(userSocialId);
 
-		return newCollection;
+		return await callback(newCollection);
 	}
 
-	return collection;
+	return await callback(collection);
 };

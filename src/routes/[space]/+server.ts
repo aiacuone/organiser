@@ -5,12 +5,12 @@ import {
 } from '$lib/server/index.js';
 
 export const DELETE = async ({ request, params }) =>
-	checkAccessTokenMiddleware(request, async () => {
-		const collection = await getAndCheckCollectionFromToken(request);
+	checkAccessTokenMiddleware(request, async () =>
+		getAndCheckCollectionFromToken(request, async (collection) => {
+			const { space } = params;
 
-		const { space } = params;
+			await deleteSpace(space, collection);
 
-		await deleteSpace(space, collection);
-
-		return new Response(JSON.stringify({ message: 'Space deleted' }), { status: 200 });
-	});
+			return new Response(JSON.stringify({ message: 'Space deleted' }), { status: 200 });
+		})
+	);

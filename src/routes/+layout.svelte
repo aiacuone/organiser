@@ -7,7 +7,7 @@
 	import Header from '$lib/components/Header.svelte';
 	import { Toaster } from 'svelte-french-toast';
 	import Footer from '$lib/components/Footer.svelte';
-	import { isAuthLoading, isAuthenticated, user } from '$lib/stores';
+	import { isAuthLoading, isAuthenticated } from '$lib/stores';
 	import Button from '$lib/components/Button.svelte';
 	import { createClient, loginWithRedirect } from '$lib/clientServices';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
@@ -23,16 +23,21 @@
 
 	const urlSpace = $page.params.space;
 
-	onMount(async () => {
-		const spaces = await axios.get('/spaces').then((response) => response.data);
-		const areThereAnySpaces = spaces.length > 0;
+	$: {
+		const getSpaces = async () => {
+			const spaces = await axios.get('/spaces').then((response) => response.data);
+			const areThereAnySpaces = spaces.length > 0;
+			if (areThereAnySpaces) {
+				const date = getHyphenatedStringFromDate(new Date());
+				const space = urlSpace || spaces[0];
+				goto(`/${replaceAllSpacesWithHyphens(space)}/date/${date}`);
+			}
+		};
 
-		if ($isAuthenticated && areThereAnySpaces) {
-			const date = getHyphenatedStringFromDate(new Date());
-			const space = urlSpace || spaces[0];
-			goto(`/${replaceAllSpacesWithHyphens(space)}/date/${date}`);
+		if ($isAuthenticated) {
+			void getSpaces();
 		}
-	});
+	}
 
 	onMount(() => {
 		if ($page.params.date) {
