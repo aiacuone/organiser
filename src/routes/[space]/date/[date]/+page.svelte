@@ -1,28 +1,35 @@
 <script lang="ts">
-	import { LogType_enum, type SpaceData_int, type Log_int } from '$lib/types/logs';
 	import { onMount, setContext } from 'svelte';
 	import { page } from '$app/stores';
-	import { getDateFromHyphenatedString, getDayFromHyphenatedString } from '$lib/utils';
 	import Button from '$lib/components/Button.svelte';
-	import { darkMode, isDropdownOpen } from '$lib/stores';
-	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
 	import NewLog from '$lib/components/NewLog.svelte';
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
-	import { getLogs, getTitlesAndReferences } from '$lib/api/logsLocalApi';
 	import { goto } from '$app/navigation';
-	import { titlesAndReferences } from '$lib/stores';
-	import { selectedDate, selectedDayString, selectedHyphenatedDateString } from '$lib/stores/dates';
-	import {
-		getCapitalizedWords,
-		getHyphenatedStringFromDate,
-		replaceAllSpacesWithHyphens
-	} from '$lib/utils/strings';
 	import Search from '$lib/components/Search.svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
 	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
 	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
 	import { browser } from '$app/environment';
+	import {
+		getLogsClient,
+		getTitlesAndReferencesClient,
+		LogType_enum,
+		replaceAllSpacesWithHyphens,
+		selectedDate,
+		selectedHyphenatedDateString,
+		titlesAndReferences,
+		type Log_int,
+		icons,
+		getDateFromHyphenatedString,
+		selectedDayString,
+		type SpaceData_int,
+		isDropdownOpen,
+		getCapitalizedWords,
+		darkMode,
+		getHyphenatedStringFromDate,
+		getDayFromHyphenatedString
+	} from '$lib';
 	import Log from '$lib/components/Logs/Log.svelte';
 
 	interface PageData extends SpaceData_int {
@@ -30,7 +37,6 @@
 		space: string;
 		titles: string[];
 		references: string[];
-		initialLogs: { logs: Log_int[]; total: number };
 	}
 
 	export let data: PageData;
@@ -53,7 +59,7 @@
 		() => {
 			return (
 				$selectedHyphenatedDateString &&
-				getLogs({
+				getLogsClient({
 					space: replaceAllSpacesWithHyphens(data.space),
 					date: $selectedDate
 				})
@@ -64,14 +70,12 @@
 				if (browser) {
 					goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
 				}
-			},
-			// this currently does not work properly because because its conflicts with deleting a space. If we want this to work, we need to find a way to refetch the logs when a space is deleted
-			initialData: data.initialLogs
+			}
 		}
 	);
 
 	const titlesAndReferencesQuery = useQuery('titlesAndReferences', () =>
-		getTitlesAndReferences(replaceAllSpacesWithHyphens(data.space))
+		getTitlesAndReferencesClient(replaceAllSpacesWithHyphens(data.space))
 	);
 
 	const invalidateLogsAndTitlesAndReferences = async () => {

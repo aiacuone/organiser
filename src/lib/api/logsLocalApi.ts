@@ -3,15 +3,15 @@ import type { Log_int } from '$lib/types';
 
 const resource = 'log';
 
-export const updateLog = async (values: Log_int) => {
+export const updateLogClient = async (values: Log_int) => {
 	await axios.patch(`/${resource}`, values);
 };
 
-export const deleteLog = async (id: string) => {
+export const deleteLogClient = async (id: string) => {
 	await axios.delete(`/${resource}`, { data: { id } });
 };
 
-export const getDateLogs = async ({
+export const getDateLogsClient = async ({
 	space,
 	date,
 	params
@@ -24,7 +24,7 @@ export const getDateLogs = async ({
 	return data;
 };
 
-export const getLogs = async (params: {
+export const getLogsClient = async (params: {
 	space?: string;
 	search?: string;
 	date?: Date;
@@ -34,7 +34,7 @@ export const getLogs = async (params: {
 	return data;
 };
 
-export const getTitlesAndReferences = async (space: string) => {
+export const getTitlesAndReferencesClient = async (space: string) => {
 	const { data } = await axios.get(`/${resource}/${space}/titlesAndReferences`);
 	return data;
 };

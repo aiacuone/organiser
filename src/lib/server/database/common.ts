@@ -1,5 +1,5 @@
 import { MONGO_URL } from '$env/static/private';
-import { MongoClient } from 'mongodb';
+import { Collection, MongoClient } from 'mongodb';
 
 export const getDatabase = async () => {
 	const client = await MongoClient.connect(MONGO_URL);
@@ -7,11 +7,10 @@ export const getDatabase = async () => {
 	return database;
 };
 
-export const getCollection = async (collectionName: string) => {
+export const dbCollections: Record<string, Collection> = {};
+
+export const setCollection = async (collectionName: string) => {
 	const db = await getDatabase();
 	const collection = db.collection(collectionName);
-
-	return collection;
+	dbCollections[collectionName] = collection;
 };
-
-export const collection = await getCollection('aiacuone');

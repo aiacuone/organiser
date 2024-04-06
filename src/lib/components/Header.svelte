@@ -1,56 +1,47 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { icons } from '$lib/general/icons';
-	import { LogType_enum } from '$lib/types';
-	import {
-		getHyphenatedStringFromDate,
-		replaceAllHyphensWithSpaces,
-		replaceAllSpacesWithHyphens
-	} from '$lib/utils/strings';
 	import Icon from '@iconify/svelte';
 	import Button from './Button.svelte';
 	import Dialog from './Dialog/Dialog.svelte';
-	import Input from './Input.svelte';
 	import { useQuery } from '@sveltestack/svelte-query';
-	import { selectedDate } from '$lib/stores/dates';
-	import axios from 'axios';
-	import { onMount } from 'svelte';
 	import PillButton from './Logs/Buttons/PillButton.svelte';
 	import { derived } from 'svelte/store';
-	import { logIcons } from '$lib/utils';
 	import { page } from '$app/stores';
 	import LogitLogoSimple from '$lib/svg/logit-logo-simple.svelte';
+	import {
+		LogType_enum,
+		axios,
+		icons,
+		isAuthenticated,
+		logIcons,
+		getHyphenatedStringFromDate,
+		replaceAllHyphensWithSpaces,
+		replaceAllSpacesWithHyphens
+	} from '$lib';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
+	import AddSpace from './AddSpace.svelte';
 
-	export let space: string;
-	export let spaces: string[];
-	export let initialLogNotifications;
+	export let space: string | undefined;
 
-	let hasPageLoaded = false;
 	let isAddingNewSpace: boolean = false;
 	let onOpen: () => void;
 	let dialog: HTMLDialogElement;
-	let addInputValue: string;
 
 	const onDialogClose = () => {
 		isAddingNewSpace = false;
 		dialog.close();
 	};
 
-	onMount(() => {
-		hasPageLoaded = true;
-	});
-
 	const spacesQuery = useQuery(
 		`spaces`,
 		async () => {
+			if (!$isAuthenticated) return;
 			return await axios
 				.get(`/spaces`)
 				.then(({ data }) => data)
 				.catch((err) => console.log(err));
 		},
 		{
-			initialData: spaces,
 			refetchOnMount: false
 		}
 	);
@@ -58,13 +49,13 @@
 	const allLogsNotificationsQuery = useQuery(
 		`allLogNotifications`,
 		async () => {
+			if (!$isAuthenticated) return;
 			return await axios
 				.get(`/log/notifications`, { params: { spaces: $spacesQuery.data } })
 				.then(({ data }) => data)
 				.catch((err) => console.log(err));
 		},
 		{
-			initialData: initialLogNotifications,
 			refetchOnMount: false
 		}
 	);
@@ -107,15 +98,7 @@
 		}
 	};
 	const onAddSpace = () => {
-		goto(
-			`/${replaceAllSpacesWithHyphens(
-				addInputValue.toLowerCase()
-			)}/date/${getHyphenatedStringFromDate(new Date())}`
-		);
-
-		addInputValue = '';
 		onDialogClose();
-		$selectedDate = new Date();
 	};
 
 	const pillButtons = derived(allLogsNotificationsQuery, ($allLogsNotificationsQuery) => {
@@ -176,29 +159,34 @@
 		<div class="flex-1">
 			<LogitLogoSimple height="30px" />
 		</div>
-		<div class="flex-1 center">
-			<button on:click={onOpen} class="capitalize">
-				{space}
-			</button>
-		</div>
-		<div class="flex-1 hstack justify-end gap-5">
-			{#each Object.entries(headerButtons) as [type, { icon, onClick }]}
-				{@const spaceNotifications = $allLogsNotificationsQuery.data?.find(
-					({ space: _space }) => _space === space
-				)}
-				{@const notificationsCount = spaceNotifications?.[type]}
-				<button on:click={() => onClick(!!notificationsCount)} class="relative">
-					<Icon {icon} class="text-gray-500" height="20px" />
-					{#if notificationsCount}
-						<div
-							class="absolute top-0 -right-2 rounded-full bg-blue-400 text-[10px] w-[15px] h-[15px] text-white"
-						>
-							{notificationsCount}
-						</div>
-					{/if}
+		{#if $isAuthenticated && space}
+			<div class="flex-1 center">
+				<button on:click={onOpen} class="capitalize">
+					{space}
 				</button>
-			{/each}
-		</div>
+			</div>
+			<div class="flex-1 hstack justify-end gap-5">
+				{#if $allLogsNotificationsQuery.data}
+					{#each Object.entries(headerButtons) as [type, { icon, onClick }]}
+						{@const spaceNotifications = $allLogsNotificationsQuery.data?.find(
+							({ space: _space }) => _space === space
+						)}
+						{@const notificationsCount = spaceNotifications?.[type]}
+
+						<button on:click={() => onClick(!!notificationsCount)} class="relative">
+							<Icon {icon} class="text-gray-500" height="20px" />
+							{#if notificationsCount}
+								<div
+									class="absolute top-0 -right-2 rounded-full bg-blue-400 text-[10px] w-[15px] h-[15px] text-white"
+								>
+									{notificationsCount}
+								</div>
+							{/if}
+						</button>
+					{/each}
+				{/if}
+			</div>
+		{/if}
 	</div>
 </header>
 
@@ -214,12 +202,7 @@
 		</div>
 		<div class="min-h-[50px] center">
 			{#if isAddingNewSpace}
-				<div class="hstack gap-2">
-					<Input _class="border border-gray-100 px-2" autofocus bind:value={addInputValue} />
-					<button class="bg-gray-50 px-2 py-1" on:click={(e) => onAddSpace(e)}>
-						<Icon icon={icons.enter} />
-					</button>
-				</div>
+				<AddSpace {onAddSpace} />
 			{:else}
 				<Button onClick={() => (isAddingNewSpace = true)}>Add</Button>
 			{/if}

@@ -1,27 +1,30 @@
 import { LogType_enum, Log_enum } from '$lib/types';
-import { collection } from './common';
+import type { Collection } from 'mongodb';
 
-export const getLogs = async ({
-	space,
-	date,
-	isChecked,
-	isAnswered,
-	limit = '10',
-	skip,
-	type,
-	search,
-	searchType
-}: {
-	space?: string;
-	date?: string | Date;
-	isChecked?: 'true' | 'false';
-	isAnswered?: 'true' | 'false';
-	limit?: string;
-	skip?: string;
-	search?: string;
-	searchType?: string[];
-	type?: string[];
-}) => {
+export const getLogs = async (
+	{
+		space,
+		date,
+		isChecked,
+		isAnswered,
+		limit = '10',
+		skip,
+		type,
+		search,
+		searchType
+	}: {
+		space?: string;
+		date?: string | Date;
+		isChecked?: 'true' | 'false';
+		isAnswered?: 'true' | 'false';
+		limit?: string;
+		skip?: string;
+		search?: string;
+		searchType?: string[];
+		type?: string[];
+	},
+	collection: Collection
+) => {
 	const baseQuery: Array<any> = [{ $project: { _id: 0 } }, { $sort: { date: -1 } }];
 
 	if (space) {
@@ -178,20 +181,23 @@ export const getLogs = async ({
 	return { logs, total };
 };
 
-export const updateLog = async (values: {
-	id: string;
-	date: Date;
-	title?: string;
-	reference?: string;
-	time?: number;
-	importance?: number;
-	priority?: number;
-	type: LogType_enum;
-	space: string;
-	lastUpdated: Date;
-	question?: string;
-	answer?: string;
-}) => {
+export const updateLog = async (
+	values: {
+		id: string;
+		date: Date;
+		title?: string;
+		reference?: string;
+		time?: number;
+		importance?: number;
+		priority?: number;
+		type: LogType_enum;
+		space: string;
+		lastUpdated: Date;
+		question?: string;
+		answer?: string;
+	},
+	collection: Collection
+) => {
 	const { date, lastUpdated, ...rest } = values;
 	await collection.updateOne(
 		{ id: values.id },
@@ -202,11 +208,11 @@ export const updateLog = async (values: {
 	);
 };
 
-export const deleteLog = async (id: string) => {
+export const deleteLog = async (id: string, collection: Collection) => {
 	await collection.deleteOne({ id });
 };
 
-export const getTitlesAndReferences = async (space: string) => {
+export const getTitlesAndReferences = async (space: string, collection: Collection) => {
 	const result = await collection
 		.aggregate([
 			{ $match: { space } },
@@ -232,7 +238,7 @@ export const getTitlesAndReferences = async (space: string) => {
 	return result;
 };
 
-export const getAllLogNotifications = async (spaces: string[]) => {
+export const getAllLogNotifications = async (spaces: string[], collection: Collection) => {
 	const facet = spaces.reduce(
 		(acc, space) => ({
 			...acc,
@@ -295,30 +301,34 @@ export const getAllLogNotifications = async (spaces: string[]) => {
 		{}
 	);
 
-	const counts = await collection
-		.aggregate([
-			{
-				$facet: facet
-			}
-		])
-		.toArray();
+	const counts =
+		Object.entries(facet).length > 0 &&
+		(await collection
+			.aggregate([
+				{
+					$facet: facet
+				}
+			])
+			.toArray());
 
-	const mappedCounts = Object.entries(counts[0])
-		.map(([key, countArray]) => {
-			const count = countArray[0]?.count ?? 0;
-			const [space, type] = key.split('/');
-			return {
-				space,
-				type,
-				count
-			};
-		})
-		.reduce((result, { space, type, count }) => {
-			const indexOfExistingSpace = result.findIndex((group) => group.space === space);
-			result[indexOfExistingSpace] = { ...result[indexOfExistingSpace], [type]: count ?? 0 };
+	const mappedCounts =
+		counts &&
+		Object.entries(counts[0])
+			.map(([key, countArray]) => {
+				const count = countArray[0]?.count ?? 0;
+				const [space, type] = key.split('/');
+				return {
+					space,
+					type,
+					count
+				};
+			})
+			.reduce((result, { space, type, count }) => {
+				const indexOfExistingSpace = result.findIndex((group) => group.space === space);
+				result[indexOfExistingSpace] = { ...result[indexOfExistingSpace], [type]: count ?? 0 };
 
-			return result;
-		}, spaces.map((space) => ({ space })) as Array<{ space: string; type: string; count: number }>);
+				return result;
+			}, spaces.map((space) => ({ space })) as Array<{ space: string; type: string; count: number }>);
 
-	return mappedCounts;
+	return mappedCounts ?? 0;
 };

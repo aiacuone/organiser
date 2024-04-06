@@ -18,9 +18,9 @@
 	} from '$lib/utils/strings';
 	import Icon from '@iconify/svelte';
 	import { useInfiniteQuery, useQueryClient } from '@sveltestack/svelte-query';
-	import axios from 'axios';
 	import { onMount } from 'svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
+	import { axios } from '$lib/general';
 
 	const queryClient = useQueryClient();
 

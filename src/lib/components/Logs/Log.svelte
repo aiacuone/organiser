@@ -12,7 +12,7 @@
 	} from '$lib/utils';
 	import { page } from '$app/stores';
 	import { getContext, onMount, setContext } from 'svelte';
-	import { deleteLog, updateLog } from '$lib/api/logsLocalApi';
+	import { deleteLogClient, updateLogClient } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
 	import { derived, writable, type Writable } from 'svelte/store';
 	import { isDropdownOpen } from '$lib/stores';
@@ -53,13 +53,13 @@
 	);
 	setContext('isEditing', isEditing);
 
-	const updateLogMutation = useMutation(updateLog, {
+	const updateLogMutation = useMutation(updateLogClient, {
 		onSuccess: () => {
 			invalidateLogs();
 		}
 	});
 
-	const deleteLogMutation = useMutation(deleteLog, {
+	const deleteLogMutation = useMutation(deleteLogClient, {
 		onSuccess: () => {
 			invalidateLogs();
 		}

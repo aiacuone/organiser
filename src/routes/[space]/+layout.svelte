@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { useQueryClient } from '@sveltestack/svelte-query';
 	import { setContext } from 'svelte';
+	import { isAuthenticated } from '$lib';
 
 	const queryClient = useQueryClient();
 
@@ -13,6 +14,11 @@
 	};
 
 	setContext('invalidateLogs', invalidateLogs);
+
+	$: {
+		// This will invalidate the logs after login
+		if ($isAuthenticated) void invalidateLogs();
+	}
 </script>
 
 <slot />

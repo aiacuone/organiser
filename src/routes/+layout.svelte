@@ -2,26 +2,42 @@
 	import '../app.css';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-	import type { SpaceData_int } from '$lib/types/logs';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
-	import Button from '$lib/components/Button.svelte';
-	import Icon from '@iconify/svelte';
-	import { icons } from '$lib/general/icons';
 	import { selectedDate } from '$lib/stores/dates';
 	import Header from '$lib/components/Header.svelte';
-	import { searchValue } from '$lib/stores';
 	import { Toaster } from 'svelte-french-toast';
-
-	export let data: SpaceData_int;
-
-	const { initialLogNotifications } = data;
+	import Footer from '$lib/components/Footer.svelte';
+	import { isAuthLoading, isAuthenticated } from '$lib/stores';
+	import Button from '$lib/components/Button.svelte';
+	import { createClient, loginWithRedirect } from '$lib/clientServices';
+	import LogitLogo from '$lib/svg/logit-logo.svelte';
+	import AddSpace from '$lib/components/AddSpace.svelte';
+	import { axios, getHyphenatedStringFromDate, replaceAllSpacesWithHyphens } from '$lib';
+	import { goto } from '$app/navigation';
 
 	const getDateFromHyphenatedString = (dateString: string) => {
 		const [day, month, year] = dateString.split('-').map(Number);
 
 		return new Date(Date.UTC(year, month - 1, day));
 	};
+
+	const urlSpace = $page.params.space;
+
+	$: {
+		const getSpaces = async () => {
+			const spaces = await axios.get('/spaces').then((response) => response.data);
+			const areThereAnySpaces = spaces.length > 0;
+			if (areThereAnySpaces) {
+				const date = getHyphenatedStringFromDate(new Date());
+				const space = urlSpace || spaces[0];
+				goto(`/${replaceAllSpacesWithHyphens(space)}/date/${date}`);
+			}
+		};
+
+		if ($isAuthenticated) {
+			void getSpaces();
+		}
+	}
 
 	onMount(() => {
 		if ($page.params.date) {
@@ -91,46 +107,38 @@
 		return _date;
 	};
 
-	const footerButtons = [
-		{
-			icon: icons.date,
-			onClick: () => goto(`/${$page.params.space}`)
-		},
-		{
-			icon: icons.search,
-			onClick: () => {
-				goto(`/${$page.params.space}/filter`);
-				$searchValue = '';
-			}
-		}
-	];
-
 	const queryClient = new QueryClient();
+
+	const onLogin = async () => {
+		const client = await createClient();
+		loginWithRedirect(client);
+	};
+
+	$: space = $page.params.space;
 </script>
 
 <QueryClientProvider client={queryClient}>
 	<div class="stack" style={'height:100dvh'}>
-		<Header space={data.space} spaces={data.spaces} {initialLogNotifications} />
+		<Header {space} />
 		<main class="flex-1 p-1 flex flex-col overflow-hidden">
+			{#if $isAuthLoading}
+				<div class="w-full h-full center">Loading...</div>
+			{:else if $isAuthenticated && !space}
+				<div class="h-full w-full center stack gap-2">
+					Add a new space
+					<AddSpace />
+				</div>
+			{:else if $isAuthenticated}
+				<slot />
+			{:else}
+				<div class="w-full h-full stack center gap-3">
+					<div class="hstack center gap-1 text-xl">Welcome to <LogitLogo height="35px" /></div>
+					<Button onClick={onLogin}>Login</Button>
+				</div>
+			{/if}
 			<div class="flex justify-end" />
-			<slot />
 		</main>
-		<footer class="py-2 bg-gray-300 px-3 center">
-			<div class="hstack max-w-screen-lg flex-1">
-				<div class="hstack center capitalize gap-5">
-					{#each footerButtons as footerButton}
-						<Button _class="bg-white bg-opacity-80" onClick={footerButton.onClick}>
-							<Icon icon={footerButton.icon} />
-						</Button>
-					{/each}
-				</div>
-				<div class="flex justify-end flex-1">
-					<div class="rounded-full bg-neutral-500 h-[30px] w-[30px] center">
-						<p class="text-white">AI</p>
-					</div>
-				</div>
-			</div>
-		</footer>
+		<Footer />
 	</div>
 </QueryClientProvider>
 
