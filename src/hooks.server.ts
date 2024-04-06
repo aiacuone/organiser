@@ -32,7 +32,6 @@ export const handle: Handle = async ({ resolve, event }) => {
 	});
 
 	if (!token) {
-		console.log('Request made with no token');
 		event.request = requestWithNoBody;
 		return resolve(event);
 	}
@@ -42,7 +41,6 @@ export const handle: Handle = async ({ resolve, event }) => {
 	if (!doesCollectionExist) {
 		console.log('New collection created for user');
 		await setCollection(userSocialId);
-		event.request = requestWithNoBody;
 		return resolve(event);
 	}
 
