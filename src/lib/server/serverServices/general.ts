@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { getSubstringToken } from './auth';
-import { dbCollection } from '../database';
 import type { Collection, Document } from 'mongodb';
+import { dbCollections } from '../database';
 
 export const getAndCheckCollectionFromToken = async (
 	request: Request,
@@ -12,8 +12,9 @@ export const getAndCheckCollectionFromToken = async (
 	const decodedToken = jwt.decode(substringToken);
 	const userSocialId = decodedToken?.sub as string;
 
-	if (!userSocialId) {
+	if (!userSocialId)
 		return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-	}
-	return await callback(dbCollection);
+
+	const collection = dbCollections[userSocialId];
+	return await callback(collection);
 };

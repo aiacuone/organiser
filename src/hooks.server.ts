@@ -2,12 +2,7 @@ import type { Handle } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import { PUBLIC_AUTH0_DOMAIN, PUBLIC_AUTH0_CLIENT_ID } from '$env/static/public';
 import { createAuth0Client } from '@auth0/auth0-spa-js';
-import {
-	currentUserSocialId,
-	dbCollection,
-	setCollection,
-	setCurrentUserSocialId
-} from '$lib/server';
+import { dbCollections, setCollection } from '$lib/server';
 
 export const authConfig = {
 	domain: PUBLIC_AUTH0_DOMAIN,
@@ -42,25 +37,13 @@ export const handle: Handle = async ({ resolve, event }) => {
 		return resolve(event);
 	}
 
-	if (!dbCollection) {
-		if (!userSocialId) {
-			console.log('Request made with no collection name');
-			event.request = requestWithNoBody;
-			resolve(event);
-		}
-		console.log('Request made with no collection');
-		setCurrentUserSocialId(userSocialId);
-		setCollection(userSocialId);
+	const doesCollectionExist = !!dbCollections[userSocialId];
+
+	if (!doesCollectionExist) {
+		console.log('New collection created for user');
+		await setCollection(userSocialId);
 		event.request = requestWithNoBody;
 		return resolve(event);
-	}
-
-	const isANewUser = currentUserSocialId !== userSocialId;
-
-	if (isANewUser) {
-		console.log('Request made with a new user');
-		setCurrentUserSocialId(userSocialId);
-		setCollection(userSocialId);
 	}
 
 	// Apply CORS header for API routes
