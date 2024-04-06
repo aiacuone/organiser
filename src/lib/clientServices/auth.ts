@@ -6,7 +6,10 @@ export const createClient = async () => {
 		domain: authConfig.domain,
 		clientId: authConfig.clientId,
 		useRefreshTokens: true,
-		cacheLocation: 'localstorage'
+		cacheLocation: 'localstorage',
+		authorizationParams: {
+			redirect_uri: window.location.origin
+		}
 	});
 
 	return auth0Client;
