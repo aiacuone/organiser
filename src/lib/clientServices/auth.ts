@@ -6,10 +6,7 @@ export const createClient = async () => {
 		domain: authConfig.domain,
 		clientId: authConfig.clientId,
 		useRefreshTokens: true,
-		cacheLocation: 'localstorage',
-		authorizationParams: {
-			redirect_uri: window.location.origin
-		}
+		cacheLocation: 'localstorage'
 	});
 
 	return auth0Client;
@@ -28,5 +25,9 @@ export const loginWithRedirect = async (client: Auth0Client) => {
 };
 
 export const logout = (client: Auth0Client) => {
-	return client.logout();
+	return client.logout({
+		logoutParams: {
+			returnTo: window.location.origin
+		}
+	});
 };
