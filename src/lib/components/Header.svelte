@@ -4,7 +4,6 @@
 	import Button from './Button.svelte';
 	import Dialog from './Dialog/Dialog.svelte';
 	import { useQuery } from '@sveltestack/svelte-query';
-	import { onMount } from 'svelte';
 	import PillButton from './Logs/Buttons/PillButton.svelte';
 	import { derived } from 'svelte/store';
 	import { page } from '$app/stores';
@@ -24,7 +23,6 @@
 
 	export let space: string | undefined;
 
-	let hasPageLoaded = false;
 	let isAddingNewSpace: boolean = false;
 	let onOpen: () => void;
 	let dialog: HTMLDialogElement;
@@ -33,10 +31,6 @@
 		isAddingNewSpace = false;
 		dialog.close();
 	};
-
-	onMount(() => {
-		hasPageLoaded = true;
-	});
 
 	const spacesQuery = useQuery(
 		`spaces`,

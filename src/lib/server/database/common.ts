@@ -7,9 +7,17 @@ export const getDatabase = async () => {
 	return database;
 };
 
-export let dbCollection: Collection;
+export let currentUserSocialId: string | null;
 
-export const setCollection = async (_collectionName: string) => {
+export const setCurrentUserSocialId = (socialId: string | null) => {
+	currentUserSocialId = socialId;
+};
+
+export let dbCollection: Collection | null;
+
+export const setCollection = async (_collectionName: string | null) => {
+	if (!_collectionName) return (dbCollection = null);
+
 	const db = await getDatabase();
 	const _dbCollection = db.collection(_collectionName);
 	dbCollection = _dbCollection;
