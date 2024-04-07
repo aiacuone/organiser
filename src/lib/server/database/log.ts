@@ -311,24 +311,26 @@ export const getAllLogNotifications = async (spaces: string[], collection: Colle
 			])
 			.toArray());
 
-	const mappedCounts =
-		counts &&
-		Object.entries(counts[0])
-			.map(([key, countArray]) => {
-				const count = countArray[0]?.count ?? 0;
-				const [space, type] = key.split('/');
-				return {
-					space,
-					type,
-					count
-				};
-			})
-			.reduce((result, { space, type, count }) => {
-				const indexOfExistingSpace = result.findIndex((group) => group.space === space);
-				result[indexOfExistingSpace] = { ...result[indexOfExistingSpace], [type]: count ?? 0 };
+	const mappedCounts = counts
+		? Object.entries(counts[0])
+				.map(([key, countArray]) => {
+					const count = countArray[0]?.count ?? 0;
+					const [space, type] = key.split('/');
+					return {
+						space,
+						type,
+						count
+					};
+				})
+				.reduce((result, { space, type, count }) => {
+					const indexOfExistingSpace = result.findIndex((group) => group.space === space);
+					result[indexOfExistingSpace] = { ...result[indexOfExistingSpace], [type]: count ?? 0 };
 
-				return result;
-			}, spaces.map((space) => ({ space })) as Array<{ space: string; type: string; count: number }>);
+					return result;
+				}, spaces.map((space) => ({ space })) as Array<{ space: string; type: string; count: number }>)
+		: [];
 
-	return mappedCounts ?? 0;
+	const result = mappedCounts ?? 0;
+
+	return result;
 };

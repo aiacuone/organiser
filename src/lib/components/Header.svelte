@@ -3,7 +3,7 @@
 	import Icon from '@iconify/svelte';
 	import Button from './Button.svelte';
 	import Dialog from './Dialog/Dialog.svelte';
-	import { useQuery } from '@sveltestack/svelte-query';
+	import { useQuery, type QueryKey, type UseQueryStoreResult } from '@sveltestack/svelte-query';
 	import PillButton from './Logs/Buttons/PillButton.svelte';
 	import { derived } from 'svelte/store';
 	import { page } from '$app/stores';
@@ -46,7 +46,16 @@
 		}
 	);
 
-	const allLogsNotificationsQuery = useQuery(
+	const allLogsNotificationsQuery: UseQueryStoreResult<
+		QueryKey,
+		any,
+		{
+			space: string;
+			todo: number;
+			question: number;
+		}[],
+		any
+	> = useQuery(
 		`allLogNotifications`,
 		async () => {
 			if (!$isAuthenticated) return;
@@ -101,57 +110,68 @@
 		onDialogClose();
 	};
 
-	const pillButtons = derived(allLogsNotificationsQuery, ($allLogsNotificationsQuery) => {
-		if (!$allLogsNotificationsQuery?.data) return [];
+	const pillButtons = derived(
+		[allLogsNotificationsQuery, page],
+		([$allLogsNotificationsQuery, $page]) => {
+			if (!$allLogsNotificationsQuery?.data) return [];
 
-		return $allLogsNotificationsQuery.data.map(({ space, todo, question }) => {
-			const result = [
-				{
-					label: replaceAllHyphensWithSpaces(space),
+			const doesSpaceExistInDb = $allLogsNotificationsQuery.data.some(
+				({ space }) => space === $page.params.space
+			);
+
+			const pillButtonsWithNewSpace = doesSpaceExistInDb
+				? $allLogsNotificationsQuery.data
+				: [...$allLogsNotificationsQuery.data, { space: $page.params.space, todo: 0, question: 0 }];
+
+			return pillButtonsWithNewSpace.map(({ space, todo, question }) => {
+				const result = [
+					{
+						label: replaceAllHyphensWithSpaces(space),
+						onClick: () => {
+							goto(
+								`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(
+									new Date()
+								)}`
+							);
+							onDialogClose();
+						},
+						notification: 0
+					}
+				];
+
+				if (todo)
+					result.push({
+						notification: todo,
+						onClick: () => {
+							onDialogClose();
+							goto(`/${space}/filter?type=todo&isChecked=false`);
+						},
+						icon: icons.todo
+					});
+
+				if (question)
+					result.push({
+						notification: question,
+						onClick: () => {
+							onDialogClose();
+							goto(`/${space}/filter?type=question&isAnswered=false`);
+						},
+						icon: icons.question
+					});
+
+				result.push({
+					icon: icons.moreVertical,
 					onClick: () => {
-						goto(
-							`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(
-								new Date()
-							)}`
-						);
+						goto(`/${space}/overview`);
 						onDialogClose();
 					},
 					notification: 0
-				}
-			];
-
-			if (todo)
-				result.push({
-					notification: todo,
-					onClick: () => {
-						onDialogClose();
-						goto(`/${space}/filter?type=todo&isChecked=false`);
-					},
-					icon: icons.todo
 				});
 
-			if (question)
-				result.push({
-					notification: question,
-					onClick: () => {
-						onDialogClose();
-						goto(`/${space}/filter?type=question&isAnswered=false`);
-					},
-					icon: icons.question
-				});
-
-			result.push({
-				icon: icons.moreVertical,
-				onClick: () => {
-					goto(`/${space}/overview`);
-					onDialogClose();
-				},
-				notification: 0
+				return result;
 			});
-
-			return result;
-		});
-	});
+		}
+	);
 </script>
 
 <header class="center py-2 px-3 bg-gray-200">
