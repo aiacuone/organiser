@@ -7,24 +7,21 @@
 	export let _class = '';
 	export let onEnterKeydown: () => void = () => {};
 	export let onChange: ChangeEventHandler<HTMLTextAreaElement> = () => {};
-
-	let textarea: HTMLTextAreaElement;
-	export const onFocus = () => {
-		textarea.focus();
-	};
+	export let textarea: HTMLElement | undefined = undefined;
+	export let onFocus: (() => void) | undefined = undefined;
 	const resize = () => {
 		if (!textarea) return;
 		textarea.style.height = '20px';
 		if (textarea.scrollHeight > 20) textarea.style.height = textarea.scrollHeight + 'px';
 	};
 
-	const onEditLog: (() => void) | undefined = getContext('onEditLog');
-
 	afterUpdate(() => {
 		resize();
 	});
 
 	onMount(() => {
+		if (!textarea) return;
+
 		autofocus && textarea.focus();
 
 		const keydown = (e: KeyboardEvent) => {
@@ -38,9 +35,14 @@
 		textarea.addEventListener('keydown', keydown);
 
 		return () => {
+			if (!textarea) return;
 			textarea.removeEventListener('keydown', keydown);
 		};
 	});
+
+	const _onFocus = () => {
+		onFocus && onFocus();
+	};
 </script>
 
 <div class="w-full relative">
@@ -50,6 +52,7 @@
 		bind:this={textarea}
 		on:input={resize}
 		on:change={onChange}
+		on:focus={_onFocus}
 	/>
 </div>
 

@@ -123,6 +123,8 @@
 		addToEndOfRaceCondition(onStopEditing);
 	};
 
+	const focusElements: Writable<HTMLElement[]> = writable([]);
+
 	const onAddItem = () => {
 		onEditLog();
 
@@ -159,6 +161,8 @@
 			}
 		};
 		addItemTypeMethods[$log.type]();
+
+		$focusElements = [...$focusElements, $focusElements[$focusElements.length - 1]];
 	};
 
 	const onDeleteItem = (index: number) => {
@@ -185,6 +189,7 @@
 			}
 		};
 		removeItemTypeMethods[$log.type]();
+		$focusElements = $focusElements.filter((_, i) => i !== index + 2);
 	};
 
 	const onResetChange = () => {
@@ -288,14 +293,40 @@
 		if ($currentlyEditing) return;
 		onEditLog();
 	};
+
+	const onContainerKeypress = (e: KeyboardEvent) => {
+		if (!$isEditing) return;
+
+		const indexOfFocusedElement = $focusElements.indexOf(e.target as HTMLElement);
+		let indexOfNewFocusedElement: number = -1;
+
+		if (e.key === 'ArrowUp') {
+			if (indexOfFocusedElement === 0) {
+				indexOfNewFocusedElement = $focusElements.length - 1;
+			} else {
+				indexOfNewFocusedElement = indexOfFocusedElement - 1;
+			}
+		}
+
+		if (e.key === 'ArrowDown') {
+			if (indexOfFocusedElement === $focusElements.length - 1) {
+				indexOfNewFocusedElement = 0;
+			} else {
+				indexOfNewFocusedElement = indexOfFocusedElement + 1;
+			}
+		}
+
+		$focusElements[indexOfNewFocusedElement].focus();
+	};
 </script>
 
 <button
-	bind:this={container}
 	use:clickOutside
 	on:click_outside={onClickOutside}
 	class=""
 	on:click={onClickLog}
+	on:keydown={onContainerKeypress}
+	bind:this={container}
 >
 	<div class={containerClasses[$log.type][0]}>
 		<div class="stack {containerClasses[$log.type][1]}">
@@ -309,6 +340,7 @@
 						isDisabled={!$isEditing}
 						onAutoFill={onTitleAutoFill}
 						_class={!$isEditing && !$log.title ? 'hidden' : 'flex'}
+						bind:input={$focusElements[0]}
 					/>
 					<Input
 						bind:value={$log.reference}
@@ -316,6 +348,7 @@
 						placeholder="Reference"
 						isDisabled={!$isEditing}
 						_class={!$isEditing && !$log.reference ? 'hidden' : 'flex'}
+						bind:input={$focusElements[1]}
 					/>
 				</div>
 			</div>
@@ -328,6 +361,7 @@
 							onEnterKeydown={onTextareaEnterKeydown}
 							onDeleteBullet={onDeleteItem}
 							{onEdit}
+							{focusElements}
 						/>
 					</div>
 				{:else if $log.type === LogType_enum.question}
@@ -337,6 +371,7 @@
 						{isEditing}
 						onDeleteQuestion={onDeleteItem}
 						id={$log.id}
+						{focusElements}
 					/>
 				{:else if $log.type === LogType_enum.important || $log.type === LogType_enum.time || ($log.type === LogType_enum.list && $log.listType !== LogListType_enum.checkbox)}
 					<ListItems
@@ -346,6 +381,7 @@
 						onEnterKeydown={onTextareaEnterKeydown}
 						{onDeleteItem}
 						logType={$log.type}
+						{focusElements}
 					/>
 				{/if}
 			</div>

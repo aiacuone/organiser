@@ -11,6 +11,7 @@
 		areAnyQuestionsNotCapitalised,
 		capitalizeFirstLetterOfMappedQuestions
 	} from '$lib/utils';
+	import type { Writable } from 'svelte/store';
 
 	export let questions: MappedQuestionItem[];
 	export let onFocusAnswerInput: () => void;
@@ -20,6 +21,7 @@
 	};
 	export let isEditing: Readable<boolean>;
 	export let onDeleteQuestion: (index: number) => void;
+	export let focusElements: Writable<HTMLElement[]>;
 
 	let isAnswering: undefined | number = undefined;
 
@@ -64,7 +66,13 @@
 			<div class="stack gap-1 w-full">
 				<div class="hstack text-sm gap-1">
 					<p class="text-neutral-400">Question:</p>
-					<Textarea bind:value={questions[index].question} className="" _class="flex-1" autofocus />
+					<Textarea
+						bind:textarea={$focusElements[index + 2]}
+						bind:value={questions[index].question}
+						className=""
+						_class="flex-1"
+						autofocus
+					/>
 				</div>
 				{#if questions[index].answer || isAnswering === index}
 					<div class="text-sm gap-1 flex-1 flex">

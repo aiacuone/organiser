@@ -1,6 +1,6 @@
 <!-- todo: combine this with LogListItems when svelte 5 is released -->
 <script lang="ts">
-	import type { Readable } from 'svelte/store';
+	import type { Readable, Writable } from 'svelte/store';
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
@@ -17,6 +17,7 @@
 	export let onDeleteItem: (index: number) => void;
 	export let logType: LogType_enum;
 	export let listType: LogListType_enum;
+	export let focusElements: Writable<HTMLElement[]>;
 
 	const bulletType: Record<
 		LogListType_enum,
@@ -67,6 +68,7 @@
 							bind:value={items[index].item}
 							{onEnterKeydown}
 							autofocus={index > 0}
+							bind:textarea={$focusElements[index + 2]}
 						/>
 					</div>
 					<div class="min-w-[40px] hidden sm:flex align-center relative">
