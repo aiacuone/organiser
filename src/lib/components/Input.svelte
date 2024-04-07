@@ -97,6 +97,7 @@
 			}
 		}
 		if (e.key === 'Enter') {
+			e.preventDefault();
 			const isAutofillValueBeingSelected =
 				$selectedAutofill !== undefined &&
 				$selectedAutofill.selected !== undefined &&
