@@ -18,9 +18,7 @@
 	export let _class: string | undefined = undefined;
 	export let onChange: (event: Event) => void = () => {};
 	export let onEnterKeydown: () => void = () => {};
-	export const onFocus: () => void = () => {
-		input && input.focus();
-	};
+	export let onFocus: (() => void) | undefined = undefined;
 	export let input: HTMLElement | undefined = undefined;
 
 	const isEditing: Readable<boolean> = getContext('isEditing');
@@ -42,7 +40,7 @@
 
 	onMount(() => {
 		if (autofocus) {
-			input.focus();
+			input && input.focus();
 		}
 	});
 
@@ -61,6 +59,7 @@
 
 	const _onFocus = () => {
 		isInputFocused = true;
+		onFocus && onFocus();
 	};
 
 	let slicedAutofillValues: string[] = [];

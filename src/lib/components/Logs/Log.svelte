@@ -189,7 +189,7 @@
 			}
 		};
 		removeItemTypeMethods[$log.type]();
-		$focusElements = $focusElements.filter((_, i) => i !== index);
+		$focusElements = $focusElements.filter((_, i) => i !== index + 2);
 	};
 
 	const onResetChange = () => {
@@ -296,24 +296,27 @@
 
 	const onContainerKeypress = (e: KeyboardEvent) => {
 		if (!$isEditing) return;
-		const focusedElement = document.activeElement;
-		const indexOfFocusedElement = $focusElements.indexOf(focusedElement as HTMLElement);
+
+		const indexOfFocusedElement = $focusElements.indexOf(e.target as HTMLElement);
+		let indexOfNewFocusedElement: number = -1;
 
 		if (e.key === 'ArrowUp') {
 			if (indexOfFocusedElement === 0) {
-				$focusElements[$focusElements.length - 1].focus();
+				indexOfNewFocusedElement = $focusElements.length - 1;
 			} else {
-				$focusElements[indexOfFocusedElement - 1].focus();
+				indexOfNewFocusedElement = indexOfFocusedElement - 1;
 			}
 		}
 
 		if (e.key === 'ArrowDown') {
 			if (indexOfFocusedElement === $focusElements.length - 1) {
-				$focusElements[0].focus();
+				indexOfNewFocusedElement = 0;
 			} else {
-				$focusElements[indexOfFocusedElement + 1].focus();
+				indexOfNewFocusedElement = indexOfFocusedElement + 1;
 			}
 		}
+
+		$focusElements[indexOfNewFocusedElement].focus();
 	};
 </script>
 

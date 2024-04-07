@@ -1,6 +1,6 @@
 <!-- todo: combine this with LogCheckboxItems when svelte 5 is released -->
 <script lang="ts">
-	import type { Readable } from 'svelte/store';
+	import type { Readable, Writable } from 'svelte/store';
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
@@ -10,13 +10,12 @@
 		areAnyCheckboxItemsNotCapitalised,
 		capitalizeFirstLetterOfMappedCheckboxItems
 	} from '$lib/utils';
-	import { onMount } from 'svelte';
 
 	export let checkboxes: MappedCheckboxItem[];
 	export let isEditing: Readable<boolean>;
 	export let onEnterKeydown: () => void;
 	export let onDeleteBullet: (index: number) => void;
-	export let focusElements: HTMLElement[] = [];
+	export let focusElements: Writable<HTMLElement[]>;
 
 	export let onEdit: () => void;
 
@@ -29,12 +28,6 @@
 			checkboxes = capitalizeFirstLetterOfMappedCheckboxItems(checkboxes);
 		}
 	}
-
-	const textareaElements: HTMLElement[] = [];
-
-	onMount(() => {
-		focusElements = [...focusElements, ...textareaElements];
-	});
 </script>
 
 <ul
@@ -63,9 +56,9 @@
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="flex-1">
 						<Textarea
-							bind:textarea={textareaElements[index]}
-							className="flex-1 w-full"
+							bind:textarea={$focusElements[index + 2]}
 							bind:value={checkboxes[index].text}
+							className="flex-1 w-full"
 							{onEnterKeydown}
 							autofocus={index > 0}
 						/>

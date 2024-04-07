@@ -8,9 +8,7 @@
 	export let onEnterKeydown: () => void = () => {};
 	export let onChange: ChangeEventHandler<HTMLTextAreaElement> = () => {};
 	export let textarea: HTMLElement | undefined = undefined;
-	export const onFocus = () => {
-		textarea && textarea.focus();
-	};
+	export let onFocus: (() => void) | undefined = undefined;
 	const resize = () => {
 		if (!textarea) return;
 		textarea.style.height = '20px';
@@ -41,6 +39,10 @@
 			textarea.removeEventListener('keydown', keydown);
 		};
 	});
+
+	const _onFocus = () => {
+		onFocus && onFocus();
+	};
 </script>
 
 <div class="w-full relative">
@@ -50,6 +52,7 @@
 		bind:this={textarea}
 		on:input={resize}
 		on:change={onChange}
+		on:focus={_onFocus}
 	/>
 </div>
 
