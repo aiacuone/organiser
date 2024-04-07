@@ -98,7 +98,9 @@
 		}
 		if (e.key === 'Enter') {
 			const isAutofillValueBeingSelected =
-				$selectedAutofill !== undefined && $selectedAutofill.selected !== undefined;
+				$selectedAutofill !== undefined &&
+				$selectedAutofill.selected !== undefined &&
+				_isDropdownOpen;
 
 			if (isAutofillValueBeingSelected) {
 				onClickAutofill(filteredAutofillValues[$selectedAutofill.selected as number]);

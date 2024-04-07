@@ -24,7 +24,12 @@
 </script>
 
 <div class="hstack gap-2">
-	<Input _class="border border-gray-100 px-2" autofocus bind:value={addInputValue} />
+	<Input
+		_class="border border-gray-100 px-2"
+		autofocus
+		bind:value={addInputValue}
+		onEnterKeydown={_onAddSpace}
+	/>
 	<button class="bg-gray-50 px-2 py-1" on:click={(e) => _onAddSpace(e)}>
 		<Icon icon={icons.enter} />
 	</button>
