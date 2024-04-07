@@ -21,6 +21,7 @@
 	export const onFocus: () => void = () => {
 		input && input.focus();
 	};
+	export let input: HTMLElement | undefined = undefined;
 
 	const isEditing: Readable<boolean> = getContext('isEditing');
 
@@ -37,7 +38,6 @@
 		$selectedAutofill = { isUsingArrows: true, selected: index };
 	};
 
-	let input: HTMLInputElement;
 	let isInputFocused: boolean = false;
 
 	onMount(() => {

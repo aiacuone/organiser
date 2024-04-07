@@ -288,16 +288,40 @@
 		if ($currentlyEditing) return;
 		onEditLog();
 	};
+
+	const focusElements: HTMLElement[] = [];
+
+	const onContainerKeypress = (e: KeyboardEvent) => {
+		if (!$isEditing) return;
+		const focusedElement = document.activeElement;
+		const indexOfFocusedElement = focusElements.indexOf(focusedElement as HTMLElement);
+
+		if (e.key === 'ArrowUp') {
+			if (indexOfFocusedElement === 0) {
+				focusElements[focusElements.length - 1].focus();
+			} else {
+				focusElements[indexOfFocusedElement - 1].focus();
+			}
+		}
+
+		if (e.key === 'ArrowDown') {
+			if (indexOfFocusedElement === focusElements.length - 1) {
+				focusElements[0].focus();
+			} else {
+				focusElements[indexOfFocusedElement + 1].focus();
+			}
+		}
+	};
 </script>
 
 <button
-	bind:this={container}
 	use:clickOutside
 	on:click_outside={onClickOutside}
 	class=""
 	on:click={onClickLog}
+	on:keydown={onContainerKeypress}
 >
-	<div class={containerClasses[$log.type][0]}>
+	<div class={containerClasses[$log.type][0]} bind:this={container}>
 		<div class="stack {containerClasses[$log.type][1]}">
 			<div class={$log.title || $log.reference || $isEditing ? 'flex' : 'hidden'}>
 				<div class="stack gap-1 w-full">
@@ -309,6 +333,7 @@
 						isDisabled={!$isEditing}
 						onAutoFill={onTitleAutoFill}
 						_class={!$isEditing && !$log.title ? 'hidden' : 'flex'}
+						bind:input={focusElements[0]}
 					/>
 					<Input
 						bind:value={$log.reference}
@@ -316,6 +341,7 @@
 						placeholder="Reference"
 						isDisabled={!$isEditing}
 						_class={!$isEditing && !$log.reference ? 'hidden' : 'flex'}
+						bind:input={focusElements[1]}
 					/>
 				</div>
 			</div>
@@ -328,6 +354,7 @@
 							onEnterKeydown={onTextareaEnterKeydown}
 							onDeleteBullet={onDeleteItem}
 							{onEdit}
+							bind:container={focusElements[2]}
 						/>
 					</div>
 				{:else if $log.type === LogType_enum.question}
@@ -337,6 +364,7 @@
 						{isEditing}
 						onDeleteQuestion={onDeleteItem}
 						id={$log.id}
+						bind:container={focusElements[2]}
 					/>
 				{:else if $log.type === LogType_enum.important || $log.type === LogType_enum.time || ($log.type === LogType_enum.list && $log.listType !== LogListType_enum.checkbox)}
 					<ListItems
@@ -346,6 +374,7 @@
 						onEnterKeydown={onTextareaEnterKeydown}
 						{onDeleteItem}
 						logType={$log.type}
+						bind:container={focusElements[2]}
 					/>
 				{/if}
 			</div>

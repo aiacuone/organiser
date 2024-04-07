@@ -17,6 +17,7 @@
 	export let onDeleteItem: (index: number) => void;
 	export let logType: LogType_enum;
 	export let listType: LogListType_enum;
+	export let container: HTMLElement | undefined = undefined;
 
 	const bulletType: Record<
 		LogListType_enum,
@@ -53,6 +54,7 @@
 	}}
 	on:consider={(e) => (items = e.detail.items)}
 	on:finalize={(e) => (items = e.detail.items)}
+	bind:this={container}
 >
 	{#each items as item, index (item.id)}
 		<li class="{index % 2 === 0 ? 'bg-transparent' : checkeredColor[logType]} relative">

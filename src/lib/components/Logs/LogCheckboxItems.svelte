@@ -15,6 +15,7 @@
 	export let isEditing: Readable<boolean>;
 	export let onEnterKeydown: () => void;
 	export let onDeleteBullet: (index: number) => void;
+	export let container: HTMLElement | undefined = undefined;
 
 	export let onEdit: () => void;
 
@@ -39,6 +40,7 @@
 	}}
 	on:consider={(e) => (checkboxes = e.detail.items)}
 	on:finalize={(e) => (checkboxes = e.detail.items)}
+	bind:this={container}
 >
 	{#each checkboxes as item, index (item.id)}
 		<li class="relative {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'}">

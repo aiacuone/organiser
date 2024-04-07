@@ -20,6 +20,7 @@
 	};
 	export let isEditing: Readable<boolean>;
 	export let onDeleteQuestion: (index: number) => void;
+	export let container: HTMLElement | undefined = undefined;
 
 	let isAnswering: undefined | number = undefined;
 
@@ -53,6 +54,7 @@
 	}}
 	on:consider={(e) => (questions = e.detail.items)}
 	on:finalize={(e) => (questions = e.detail.items)}
+	bind:this={container}
 >
 	{#each questions as item, index (item.id)}
 		<li
