@@ -7,10 +7,9 @@
 	export let _class = '';
 	export let onEnterKeydown: () => void = () => {};
 	export let onChange: ChangeEventHandler<HTMLTextAreaElement> = () => {};
-
-	let textarea: HTMLTextAreaElement;
+	export let textarea: HTMLElement | undefined = undefined;
 	export const onFocus = () => {
-		textarea.focus();
+		textarea && textarea.focus();
 	};
 	const resize = () => {
 		if (!textarea) return;
@@ -18,13 +17,13 @@
 		if (textarea.scrollHeight > 20) textarea.style.height = textarea.scrollHeight + 'px';
 	};
 
-	const onEditLog: (() => void) | undefined = getContext('onEditLog');
-
 	afterUpdate(() => {
 		resize();
 	});
 
 	onMount(() => {
+		if (!textarea) return;
+
 		autofocus && textarea.focus();
 
 		const keydown = (e: KeyboardEvent) => {
@@ -38,6 +37,7 @@
 		textarea.addEventListener('keydown', keydown);
 
 		return () => {
+			if (!textarea) return;
 			textarea.removeEventListener('keydown', keydown);
 		};
 	});

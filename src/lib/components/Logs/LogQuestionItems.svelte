@@ -11,6 +11,7 @@
 		areAnyQuestionsNotCapitalised,
 		capitalizeFirstLetterOfMappedQuestions
 	} from '$lib/utils';
+	import { onMount } from 'svelte';
 
 	export let questions: MappedQuestionItem[];
 	export let onFocusAnswerInput: () => void;
@@ -20,7 +21,7 @@
 	};
 	export let isEditing: Readable<boolean>;
 	export let onDeleteQuestion: (index: number) => void;
-	export let container: HTMLElement | undefined = undefined;
+	export let focusElements: HTMLElement[] = [];
 
 	let isAnswering: undefined | number = undefined;
 
@@ -42,6 +43,12 @@
 			questions = capitalizeFirstLetterOfMappedQuestions(questions);
 		}
 	}
+
+	const questionElements: HTMLElement[] = [];
+
+	onMount(() => {
+		focusElements = [...focusElements, ...questionElements];
+	});
 </script>
 
 <ul
@@ -54,7 +61,6 @@
 	}}
 	on:consider={(e) => (questions = e.detail.items)}
 	on:finalize={(e) => (questions = e.detail.items)}
-	bind:this={container}
 >
 	{#each questions as item, index (item.id)}
 		<li
@@ -66,7 +72,13 @@
 			<div class="stack gap-1 w-full">
 				<div class="hstack text-sm gap-1">
 					<p class="text-neutral-400">Question:</p>
-					<Textarea bind:value={questions[index].question} className="" _class="flex-1" autofocus />
+					<Textarea
+						bind:textarea={questionElements[index]}
+						bind:value={questions[index].question}
+						className=""
+						_class="flex-1"
+						autofocus
+					/>
 				</div>
 				{#if questions[index].answer || isAnswering === index}
 					<div class="text-sm gap-1 flex-1 flex">

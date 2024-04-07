@@ -10,12 +10,13 @@
 		areAnyCheckboxItemsNotCapitalised,
 		capitalizeFirstLetterOfMappedCheckboxItems
 	} from '$lib/utils';
+	import { onMount } from 'svelte';
 
 	export let checkboxes: MappedCheckboxItem[];
 	export let isEditing: Readable<boolean>;
 	export let onEnterKeydown: () => void;
 	export let onDeleteBullet: (index: number) => void;
-	export let container: HTMLElement | undefined = undefined;
+	export let focusElements: HTMLElement[] = [];
 
 	export let onEdit: () => void;
 
@@ -28,6 +29,12 @@
 			checkboxes = capitalizeFirstLetterOfMappedCheckboxItems(checkboxes);
 		}
 	}
+
+	const textareaElements: HTMLElement[] = [];
+
+	onMount(() => {
+		focusElements = [...focusElements, ...textareaElements];
+	});
 </script>
 
 <ul
@@ -40,7 +47,6 @@
 	}}
 	on:consider={(e) => (checkboxes = e.detail.items)}
 	on:finalize={(e) => (checkboxes = e.detail.items)}
-	bind:this={container}
 >
 	{#each checkboxes as item, index (item.id)}
 		<li class="relative {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'}">
@@ -57,6 +63,7 @@
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="flex-1">
 						<Textarea
+							bind:textarea={textareaElements[index]}
 							className="flex-1 w-full"
 							bind:value={checkboxes[index].text}
 							{onEnterKeydown}
