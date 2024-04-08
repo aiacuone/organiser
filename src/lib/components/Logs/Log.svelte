@@ -16,7 +16,7 @@
 	import { deleteLogClient, updateLogClient } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
 	import { derived, writable, type Writable } from 'svelte/store';
-	import { isDropdownOpen } from '$lib/stores';
+	import { isADropdownOpen, onCloseDropdown } from '$lib/stores';
 	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import Input from '../Input.svelte';
@@ -206,9 +206,6 @@
 
 	onMount(() => {
 		const keydown = (e: KeyboardEvent) => {
-			if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
-				onAccept();
-			}
 			if (e.ctrlKey && e.shiftKey && e.key === '.') {
 				onAddItem();
 			}
@@ -233,7 +230,7 @@
 	const onClickOutside = () => {
 		if ($isEditing) {
 			const haveValuesChanged = getHaveValuesChanged();
-			if (haveValuesChanged && !isOpen && !$isDropdownOpen) {
+			if (haveValuesChanged && !isOpen && !$isADropdownOpen) {
 				onOpen();
 			} else {
 				onStopEditing();
@@ -297,7 +294,7 @@
 
 	const onContainerKeydown = (e: KeyboardEvent) => {
 		if (!$isEditing) return;
-		isDropdownOpen.set(false);
+		onCloseDropdown();
 
 		const indexOfFocusedElement = $focusElements.indexOf(e.target as HTMLElement);
 		let indexOfNewFocusedElement: number = -1;
@@ -321,6 +318,9 @@
 				// Requires old style function due to referring to 'this'
 				e.preventDefault();
 				this.ArrowDown();
+			},
+			Enter: () => {
+				onAccept();
 			}
 		});
 
