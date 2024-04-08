@@ -23,3 +23,6 @@ export const addToEndOfRaceCondition = (callback: () => void) => {
 		callback();
 	}, 0);
 };
+
+export const onKeydown = (event: KeyboardEvent, keyData: Record<string, () => void>) =>
+	event.key in keyData && keyData[event.key]();

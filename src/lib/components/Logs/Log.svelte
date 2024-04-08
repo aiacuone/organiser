@@ -8,7 +8,8 @@
 		getListItemsFromMappedListItems,
 		getLogFromMappedLog,
 		getMappedLog,
-		addToEndOfRaceCondition
+		addToEndOfRaceCondition,
+		onKeydown
 	} from '$lib/utils';
 	import { page } from '$app/stores';
 	import { getContext, onMount, setContext } from 'svelte';
@@ -294,27 +295,34 @@
 		onEditLog();
 	};
 
-	const onContainerKeypress = (e: KeyboardEvent) => {
+	const onContainerKeydown = (e: KeyboardEvent) => {
 		if (!$isEditing) return;
+		isDropdownOpen.set(false);
 
 		const indexOfFocusedElement = $focusElements.indexOf(e.target as HTMLElement);
 		let indexOfNewFocusedElement: number = -1;
 
-		if (e.key === 'ArrowUp') {
-			if (indexOfFocusedElement === 0) {
-				indexOfNewFocusedElement = $focusElements.length - 1;
-			} else {
-				indexOfNewFocusedElement = indexOfFocusedElement - 1;
+		onKeydown(e, {
+			ArrowUp: () => {
+				if (indexOfFocusedElement === 0) {
+					indexOfNewFocusedElement = $focusElements.length - 1;
+				} else {
+					indexOfNewFocusedElement = indexOfFocusedElement - 1;
+				}
+			},
+			ArrowDown: () => {
+				if (indexOfFocusedElement === $focusElements.length - 1) {
+					indexOfNewFocusedElement = 0;
+				} else {
+					indexOfNewFocusedElement = indexOfFocusedElement + 1;
+				}
+			},
+			Tab: function () {
+				// Requires old style function due to referring to 'this'
+				e.preventDefault();
+				this.ArrowDown();
 			}
-		}
-
-		if (e.key === 'ArrowDown') {
-			if (indexOfFocusedElement === $focusElements.length - 1) {
-				indexOfNewFocusedElement = 0;
-			} else {
-				indexOfNewFocusedElement = indexOfFocusedElement + 1;
-			}
-		}
+		});
 
 		$focusElements[indexOfNewFocusedElement].focus();
 	};
@@ -325,7 +333,7 @@
 	on:click_outside={onClickOutside}
 	class=""
 	on:click={onClickLog}
-	on:keydown={onContainerKeypress}
+	on:keydown={onContainerKeydown}
 	bind:this={container}
 >
 	<div class={containerClasses[$log.type][0]}>

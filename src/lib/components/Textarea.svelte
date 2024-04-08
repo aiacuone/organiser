@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { afterUpdate, getContext, onMount } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
 	import type { ChangeEventHandler } from 'svelte/elements';
 	export let value: string | string[];
 	export let className = '';

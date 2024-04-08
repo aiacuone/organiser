@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { isDropdownOpen } from '$lib/stores';
+	import { whichDropdownIsOpen } from '$lib/stores';
+	import { onKeydown } from '$lib/utils';
 	import { clickOutside } from '$lib/utils/clickAway';
 	import { getContext, onMount } from 'svelte';
 	import type { Readable } from 'svelte/motion';
-	import { writable, type Writable } from 'svelte/store';
+	import { derived, writable, type Writable } from 'svelte/store';
 
 	export let value: string = '';
 	export let placeholder: string | undefined = undefined;
@@ -64,8 +65,6 @@
 
 	let slicedAutofillValues: string[] = [];
 
-	$: _isDropdownOpen = isInputFocused && filteredAutofillValues.length > 0;
-	$: _isDropdownOpen, $isEditing && ($isDropdownOpen = _isDropdownOpen);
 	$: filteredAutofillValues = autofillValues.filter(
 		(autofillValue) => autofillValue && autofillValue.includes(value)
 	) as string[];
@@ -81,33 +80,42 @@
 		}
 	}
 
-	const onKeydown = (e) => {
-		if (e.key === 'Backspace') {
-			_onFocus();
-		}
-		if (e.key === 'ArrowUp') {
-			if ($selectedAutofill.selected > 0) {
-				onSelectAutofill($selectedAutofill.selected - 1);
-			}
-		}
-		if (e.key === 'ArrowDown') {
-			if ($selectedAutofill.selected < filteredAutofillValues.length - 1) {
-				onSelectAutofill($selectedAutofill.selected + 1);
-			}
-		}
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			const isAutofillValueBeingSelected =
-				$selectedAutofill !== undefined &&
-				$selectedAutofill.selected !== undefined &&
-				_isDropdownOpen;
+	$: {
+		$whichDropdownIsOpen = isInputFocused && filteredAutofillValues.length > 0 ? input : undefined;
+	}
 
-			if (isAutofillValueBeingSelected) {
-				onClickAutofill(filteredAutofillValues[$selectedAutofill.selected as number]);
-			} else {
-				onEnterKeydown();
+	const isDropdownOpen = derived(
+		[whichDropdownIsOpen],
+		([$whichDropdownIsOpen]) => $whichDropdownIsOpen === input
+	);
+
+	const _onKeydown = (e) => {
+		onKeydown(e, {
+			onEnter: onEnterKeydown,
+			onArrowUp: () => {
+				if ($selectedAutofill.selected > 0) {
+					onSelectAutofill($selectedAutofill.selected - 1);
+				}
+			},
+			onArrowDown: () => {
+				if ($selectedAutofill.selected < filteredAutofillValues.length - 1) {
+					onSelectAutofill($selectedAutofill.selected + 1);
+				}
+			},
+			onBackspace: _onFocus,
+			Enter: () => {
+				const isAutofillValueBeingSelected =
+					$selectedAutofill !== undefined &&
+					$selectedAutofill.selected !== undefined &&
+					isDropdownOpen;
+
+				if (isAutofillValueBeingSelected) {
+					onClickAutofill(filteredAutofillValues[$selectedAutofill.selected as number]);
+				} else {
+					onEnterKeydown();
+				}
 			}
-		}
+		});
 	};
 
 	const onAutofillWheeldown = (e) => {
@@ -136,9 +144,9 @@
 		bind:this={input}
 		on:focus={_onFocus}
 		on:input={onChange}
-		on:keydown={onKeydown}
+		on:keydown={_onKeydown}
 	/>
-	<div class="relative z-50 {_isDropdownOpen ? 'flex' : 'hidden'}">
+	<div class="relative z-50 {$isEditing && $isDropdownOpen ? 'flex' : 'hidden'}">
 		<div
 			class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full"
 			on:wheel={onAutofillWheeldown}
