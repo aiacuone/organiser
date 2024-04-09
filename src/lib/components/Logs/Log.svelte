@@ -16,7 +16,7 @@
 	import { deleteLogClient, updateLogClient } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
 	import { derived, writable, type Writable } from 'svelte/store';
-	import { isADropdownOpen, onCloseDropdown } from '$lib/stores';
+	import { isAnInputFocused, unfocusInput, whichInputIsFocused } from '$lib/stores';
 	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import Input from '../Input.svelte';
@@ -230,7 +230,7 @@
 	const onClickOutside = () => {
 		if ($isEditing) {
 			const haveValuesChanged = getHaveValuesChanged();
-			if (haveValuesChanged && !isOpen && !$isADropdownOpen) {
+			if (haveValuesChanged && !isOpen && !$whichInputIsFocused) {
 				onOpen();
 			} else {
 				onStopEditing();
@@ -293,8 +293,8 @@
 	};
 
 	const onContainerKeydown = (e: KeyboardEvent) => {
-		if (!$isEditing) return;
-		onCloseDropdown();
+		if (!$isEditing || $isAnInputFocused) return;
+		unfocusInput();
 
 		const indexOfFocusedElement = $focusElements.indexOf(e.target as HTMLElement);
 		let indexOfNewFocusedElement: number = -1;
@@ -349,6 +349,7 @@
 						onAutoFill={onTitleAutoFill}
 						_class={!$isEditing && !$log.title ? 'hidden' : 'flex'}
 						bind:input={$focusElements[0]}
+						isEditing={$isEditing}
 					/>
 					<Input
 						bind:value={$log.reference}
@@ -357,6 +358,7 @@
 						isDisabled={!$isEditing}
 						_class={!$isEditing && !$log.reference ? 'hidden' : 'flex'}
 						bind:input={$focusElements[1]}
+						isEditing={$isEditing}
 					/>
 				</div>
 			</div>

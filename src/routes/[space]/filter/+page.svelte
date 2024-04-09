@@ -7,7 +7,7 @@
 	import Search from '$lib/components/Search.svelte';
 	import { icons } from '$lib/general/icons';
 	import { viewport } from '$lib/hooks';
-	import { searchValue, isADropdownOpen } from '$lib/stores';
+	import { searchValue, whichInputIsFocused } from '$lib/stores';
 	import { allLogs, searchableInputs } from '$lib/types';
 	import { arraysAreEqual } from '$lib/utils/arrays';
 	import {
@@ -203,7 +203,7 @@
 	</div>
 	<div class="center">
 		<div
-			class="stack gap-6 hide-scrollbar flex-1 max-w-screen-lg {$isADropdownOpen
+			class="stack gap-6 hide-scrollbar flex-1 max-w-screen-lg {!!$whichInputIsFocused
 				? 'overflow-y-hidden'
 				: 'overflow-y-scroll'}"
 			style={`max-height:${logContainerHeight}px`}

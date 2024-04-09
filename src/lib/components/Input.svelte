@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { whichDropdownIsOpen } from '$lib/stores';
-	import { onKeydown } from '$lib/utils';
+	import { unfocusInput, whichInputIsFocused } from '$lib/stores';
+	import { addToEndOfRaceCondition, onKeydown } from '$lib/utils';
 	import { clickOutside } from '$lib/utils/clickAway';
-	import { getContext, onMount } from 'svelte';
-	import type { Readable } from 'svelte/motion';
+	import { onMount } from 'svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
 
 	export let value: string = '';
@@ -21,8 +20,16 @@
 	export let onEnterKeydown: () => void = () => {};
 	export let onFocus: (() => void) | undefined = undefined;
 	export let input: HTMLElement | undefined = undefined;
+	export let isEditing: boolean = false;
 
-	const isEditing: Readable<boolean> = getContext('isEditing');
+	const isInputFocused = derived(
+		whichInputIsFocused,
+		($whichInputIsFocused) => input === $whichInputIsFocused
+	);
+	const isAutofillOpen = derived(
+		[isInputFocused],
+		([$isInputFocused]) => isEditing && $isInputFocused && filteredAutofillValues.length > 0
+	);
 
 	const selectedAutofill: Writable<{ isUsingArrows: boolean; selected: number }> = writable({
 		isUsingArrows: false,
@@ -37,8 +44,6 @@
 		$selectedAutofill = { isUsingArrows: true, selected: index };
 	};
 
-	let isInputFocused: boolean = false;
-
 	onMount(() => {
 		if (autofocus) {
 			input && input.focus();
@@ -47,19 +52,19 @@
 
 	const onClickAutofill = (_value: string) => {
 		value = _value;
-		isInputFocused = false;
+		unfocusInput();
 		onAutoFill && onAutoFill(_value);
 	};
 
 	const onClickOutside = () => {
-		if ($isEditing && isInputFocused) {
-			isInputFocused = false;
+		if (isEditing && $isInputFocused) {
+			unfocusInput();
 			onResetAutofill();
 		}
 	};
 
 	const _onFocus = () => {
-		isInputFocused = true;
+		addToEndOfRaceCondition(() => ($whichInputIsFocused = input));
 		onFocus && onFocus();
 	};
 
@@ -80,15 +85,6 @@
 		}
 	}
 
-	$: {
-		$whichDropdownIsOpen = isInputFocused && filteredAutofillValues.length > 0 ? input : undefined;
-	}
-
-	const isDropdownOpen = derived(
-		[whichDropdownIsOpen],
-		([$whichDropdownIsOpen]) => $whichDropdownIsOpen === input
-	);
-
 	const _onKeydown = (e) => {
 		onKeydown(e, {
 			onEnter: onEnterKeydown,
@@ -107,7 +103,7 @@
 				const isAutofillValueBeingSelected =
 					$selectedAutofill !== undefined &&
 					$selectedAutofill.selected !== undefined &&
-					isDropdownOpen;
+					$isAutofillOpen;
 
 				if (isAutofillValueBeingSelected) {
 					onClickAutofill(filteredAutofillValues[$selectedAutofill.selected as number]);
@@ -136,17 +132,18 @@
 </script>
 
 <div use:clickOutside on:click_outside={onClickOutside} class="relative">
+	<!-- cannot add on:focus to input because it is causing focusing issues -->
 	<input
 		type="text"
 		bind:value
 		class="placeholder-gray-300 w-full bg-transparent text-sm outline-none {_class}"
 		placeholder={isDisabled ? '' : placeholder}
 		bind:this={input}
-		on:focus={_onFocus}
 		on:input={onChange}
 		on:keydown={_onKeydown}
+		on:click={_onFocus}
 	/>
-	<div class="relative z-50 {$isEditing && $isDropdownOpen ? 'flex' : 'hidden'}">
+	<div class="relative z-50 {isEditing && $isAutofillOpen ? 'flex' : 'hidden'}">
 		<div
 			class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full"
 			on:wheel={onAutofillWheeldown}

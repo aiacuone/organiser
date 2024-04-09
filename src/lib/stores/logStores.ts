@@ -1,13 +1,12 @@
-import type { Readable } from 'svelte/motion';
 import { derived, writable, type Writable } from 'svelte/store';
 
 export const currentlyEditing: Writable<null | string> = writable(null);
 
-export const whichDropdownIsOpen: Writable<undefined | HTMLElement> = writable(undefined);
+export const whichInputIsFocused: Writable<undefined | HTMLElement> = writable(undefined);
 
-export const isADropdownOpen: Readable<boolean> = derived(
-	whichDropdownIsOpen,
-	($whichDropdownIsOpen) => !!$whichDropdownIsOpen
+export const isAnInputFocused = derived(
+	whichInputIsFocused,
+	($whichInputIsFocused) => $whichInputIsFocused !== undefined
 );
 
-export const onCloseDropdown = () => whichDropdownIsOpen.set(undefined);
+export const unfocusInput = () => whichInputIsFocused.set(undefined);

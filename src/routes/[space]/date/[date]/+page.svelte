@@ -24,7 +24,7 @@
 		getDateFromHyphenatedString,
 		selectedDayString,
 		type SpaceData_int,
-		isADropdownOpen,
+		whichInputIsFocused,
 		getCapitalizedWords,
 		darkMode,
 		getHyphenatedStringFromDate,
@@ -277,7 +277,7 @@
 			</div>
 		</div>
 		<div
-			class="stack gap-6 hide-scrollbar flex-1 {$isADropdownOpen
+			class="stack gap-6 hide-scrollbar flex-1 {!!$whichInputIsFocused
 				? 'overflow-y-hidden'
 				: 'overflow-y-scroll'}"
 			style="max-height:{notesContainerHeight}px"
