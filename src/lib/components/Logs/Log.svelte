@@ -16,7 +16,12 @@
 	import { deleteLogClient, updateLogClient } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
 	import { derived, writable, type Writable } from 'svelte/store';
-	import { isAnInputFocused, unfocusInput, whichInputIsFocused } from '$lib/stores';
+	import {
+		isAnAutofillOpen,
+		isAnInputFocused,
+		unfocusInput,
+		whichInputIsFocused
+	} from '$lib/stores';
 	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import Input from '../Input.svelte';
@@ -293,7 +298,7 @@
 	};
 
 	const onContainerKeydown = (e: KeyboardEvent) => {
-		if (!$isEditing || $isAnInputFocused) return;
+		if (!$isEditing || $isAnAutofillOpen) return;
 		unfocusInput();
 
 		const indexOfFocusedElement = $focusElements.indexOf(e.target as HTMLElement);

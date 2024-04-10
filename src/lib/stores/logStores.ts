@@ -10,3 +10,12 @@ export const isAnInputFocused = derived(
 );
 
 export const unfocusInput = () => whichInputIsFocused.set(undefined);
+
+export const whichAutofillIsOpen: Writable<undefined | HTMLElement> = writable(undefined);
+
+export const isAnAutofillOpen = derived(
+	whichAutofillIsOpen,
+	($whichAutofillIsOpen) => $whichAutofillIsOpen !== undefined
+);
+
+export const closeAutofill = () => whichAutofillIsOpen.set(undefined);

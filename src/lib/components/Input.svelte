@@ -1,5 +1,11 @@
 <script lang="ts">
-	import { unfocusInput, whichInputIsFocused } from '$lib/stores';
+	import {
+		unfocusInput,
+		whichInputIsFocused,
+		whichAutofillIsOpen,
+		closeAutofill,
+		isAnAutofillOpen
+	} from '$lib/stores';
 	import { addToEndOfRaceCondition, onKeydown } from '$lib/utils';
 	import { clickOutside } from '$lib/utils/clickAway';
 	import { onMount } from 'svelte';
@@ -30,6 +36,11 @@
 		[isInputFocused],
 		([$isInputFocused]) => isEditing && $isInputFocused && filteredAutofillValues.length > 0
 	);
+
+	$: {
+		if ($isAutofillOpen) $whichAutofillIsOpen = input;
+		else $whichAutofillIsOpen = undefined;
+	}
 
 	const selectedAutofill: Writable<{ isUsingArrows: boolean; selected: number }> = writable({
 		isUsingArrows: false,
@@ -88,11 +99,13 @@
 	const _onKeydown = (e) => {
 		onKeydown(e, {
 			ArrowUp: () => {
+				e.preventDefault();
 				if ($selectedAutofill.selected > 0) {
 					onSelectAutofill($selectedAutofill.selected - 1);
 				}
 			},
 			ArrowDown: () => {
+				e.preventDefault();
 				if ($selectedAutofill.selected < filteredAutofillValues.length - 1) {
 					onSelectAutofill($selectedAutofill.selected + 1);
 				}
@@ -112,6 +125,7 @@
 			},
 			Escape: () => {
 				unfocusInput();
+				$isAnAutofillOpen && closeAutofill();
 			}
 		});
 	};
