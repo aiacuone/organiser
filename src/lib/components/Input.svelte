@@ -87,18 +87,17 @@
 
 	const _onKeydown = (e) => {
 		onKeydown(e, {
-			onEnter: onEnterKeydown,
-			onArrowUp: () => {
+			ArrowUp: () => {
 				if ($selectedAutofill.selected > 0) {
 					onSelectAutofill($selectedAutofill.selected - 1);
 				}
 			},
-			onArrowDown: () => {
+			ArrowDown: () => {
 				if ($selectedAutofill.selected < filteredAutofillValues.length - 1) {
 					onSelectAutofill($selectedAutofill.selected + 1);
 				}
 			},
-			onBackspace: _onFocus,
+			Backspace: _onFocus,
 			Enter: () => {
 				const isAutofillValueBeingSelected =
 					$selectedAutofill !== undefined &&
@@ -110,6 +109,9 @@
 				} else {
 					onEnterKeydown();
 				}
+			},
+			Escape: () => {
+				unfocusInput();
 			}
 		});
 	};

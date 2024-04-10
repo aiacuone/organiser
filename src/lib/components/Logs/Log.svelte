@@ -324,7 +324,7 @@
 			}
 		});
 
-		$focusElements[indexOfNewFocusedElement].focus();
+		indexOfNewFocusedElement > -1 && $focusElements[indexOfNewFocusedElement].focus();
 	};
 </script>
 
