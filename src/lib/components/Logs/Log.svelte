@@ -329,7 +329,10 @@
 			}
 		});
 
-		indexOfNewFocusedElement > -1 && $focusElements[indexOfNewFocusedElement].focus();
+		if (indexOfNewFocusedElement > -1) {
+			$focusElements[indexOfNewFocusedElement].focus();
+			whichInputIsFocused.set($focusElements[indexOfNewFocusedElement]);
+		}
 	};
 </script>
 
