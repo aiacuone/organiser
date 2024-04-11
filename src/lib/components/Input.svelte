@@ -1,15 +1,15 @@
 <script lang="ts">
 	import {
-		unfocusInput,
-		whichInputIsFocused,
 		whichAutofillIsOpen,
 		closeAutofill,
-		isAnAutofillOpen
+		isAnAutofillOpen,
+		unfocusStoreInput,
+		whichInputIsFocused
 	} from '$lib/stores';
-	import { addToEndOfRaceCondition, onKeydown } from '$lib/utils';
+	import { onKeydown } from '$lib/utils';
 	import { clickOutside } from '$lib/utils/clickAway';
 	import { onMount } from 'svelte';
-	import { derived, writable, type Writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 
 	export let value: string = '';
 	export let placeholder: string | undefined = undefined;
@@ -28,19 +28,27 @@
 	export let input: HTMLElement | undefined = undefined;
 	export let isEditing: boolean = false;
 
-	const isInputFocused = derived(
-		whichInputIsFocused,
-		($whichInputIsFocused) => input === $whichInputIsFocused
-	);
-	const isAutofillOpen = derived(
-		[isInputFocused],
-		([$isInputFocused]) => isEditing && $isInputFocused && filteredAutofillValues.length > 0
-	);
+	let isInputFocused = false;
+	$: isAutofillOpen = isEditing && isInputFocused && autofillValues.length > 0;
 
 	$: {
-		if ($isAutofillOpen) $whichAutofillIsOpen = input;
-		else $whichAutofillIsOpen = undefined;
+		if (isAutofillOpen) $whichAutofillIsOpen = input;
 	}
+
+	$: {
+		if ($whichInputIsFocused === input) {
+			isInputFocused = true;
+		} else {
+			isInputFocused = false;
+		}
+	}
+
+	const unfocusInput = () => {
+		// todo Svelte 5: Check if this is fixed with svelte 5
+		//Unfortunately I needed to have 2 sources of truth, 1 in the component and 1 in the store. The reason for this is because on the first click of the app, if the item was an input, the item wouldnt focus. This may be fixed in svelte 5?
+		isInputFocused = false;
+		unfocusStoreInput();
+	};
 
 	const selectedAutofill: Writable<{ isUsingArrows: boolean; selected: number }> = writable({
 		isUsingArrows: false,
@@ -59,6 +67,9 @@
 		if (autofocus) {
 			input && input.focus();
 		}
+		return () => {
+			unfocusInput();
+		};
 	});
 
 	const onClickAutofill = (_value: string) => {
@@ -68,14 +79,14 @@
 	};
 
 	const onClickOutside = () => {
-		if (isEditing && $isInputFocused) {
+		if (isEditing && isInputFocused) {
 			unfocusInput();
 			onResetAutofill();
 		}
 	};
 
 	const _onFocus = () => {
-		addToEndOfRaceCondition(() => ($whichInputIsFocused = input));
+		isInputFocused = true;
 		onFocus && onFocus();
 	};
 
@@ -115,7 +126,7 @@
 				const isAutofillValueBeingSelected =
 					$selectedAutofill !== undefined &&
 					$selectedAutofill.selected !== undefined &&
-					$isAutofillOpen;
+					isAutofillOpen;
 
 				if (isAutofillValueBeingSelected) {
 					onClickAutofill(filteredAutofillValues[$selectedAutofill.selected as number]);
@@ -159,7 +170,7 @@
 		on:keydown={_onKeydown}
 		on:click={_onFocus}
 	/>
-	<div class="relative z-50 {isEditing && $isAutofillOpen ? 'flex' : 'hidden'}">
+	<div class="relative z-50 {isEditing && isAutofillOpen ? 'flex' : 'hidden'}">
 		<div
 			class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full"
 			on:wheel={onAutofillWheeldown}
