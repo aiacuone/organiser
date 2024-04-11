@@ -8,14 +8,15 @@
 		getListItemsFromMappedListItems,
 		getLogFromMappedLog,
 		getMappedLog,
-		addToEndOfRaceCondition
+		addToEndOfRaceCondition,
+		onKeydown
 	} from '$lib/utils';
 	import { page } from '$app/stores';
 	import { getContext, onMount, setContext } from 'svelte';
 	import { deleteLogClient, updateLogClient } from '$lib/api/logsLocalApi';
 	import toast from 'svelte-french-toast';
 	import { derived, writable, type Writable } from 'svelte/store';
-	import { isDropdownOpen } from '$lib/stores';
+	import { isAnAutofillOpen, unfocusStoreInput, whichInputIsFocused } from '$lib/stores';
 	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import Input from '../Input.svelte';
@@ -232,7 +233,7 @@
 	const onClickOutside = () => {
 		if ($isEditing) {
 			const haveValuesChanged = getHaveValuesChanged();
-			if (haveValuesChanged && !isOpen && !$isDropdownOpen) {
+			if (haveValuesChanged && !isOpen && !$whichInputIsFocused) {
 				onOpen();
 			} else {
 				onStopEditing();
@@ -294,29 +295,43 @@
 		onEditLog();
 	};
 
-	const onContainerKeypress = (e: KeyboardEvent) => {
-		if (!$isEditing) return;
+	const onContainerKeydown = (e: KeyboardEvent) => {
+		if (!$isEditing || $isAnAutofillOpen) return;
+
+		unfocusStoreInput();
 
 		const indexOfFocusedElement = $focusElements.indexOf(e.target as HTMLElement);
 		let indexOfNewFocusedElement: number = -1;
 
-		if (e.key === 'ArrowUp') {
-			if (indexOfFocusedElement === 0) {
-				indexOfNewFocusedElement = $focusElements.length - 1;
-			} else {
-				indexOfNewFocusedElement = indexOfFocusedElement - 1;
+		onKeydown(e, {
+			ArrowUp: () => {
+				if (indexOfFocusedElement === 0) {
+					indexOfNewFocusedElement = $focusElements.length - 1;
+				} else {
+					indexOfNewFocusedElement = indexOfFocusedElement - 1;
+				}
+			},
+			ArrowDown: () => {
+				if (indexOfFocusedElement === $focusElements.length - 1) {
+					indexOfNewFocusedElement = 0;
+				} else {
+					indexOfNewFocusedElement = indexOfFocusedElement + 1;
+				}
+			},
+			Tab: function () {
+				// Requires old style function due to referring to 'this'
+				e.preventDefault();
+				this.ArrowDown();
+			},
+			Enter: () => {
+				onAccept();
 			}
-		}
+		});
 
-		if (e.key === 'ArrowDown') {
-			if (indexOfFocusedElement === $focusElements.length - 1) {
-				indexOfNewFocusedElement = 0;
-			} else {
-				indexOfNewFocusedElement = indexOfFocusedElement + 1;
-			}
+		if (indexOfNewFocusedElement > -1) {
+			$focusElements[indexOfNewFocusedElement].focus();
+			whichInputIsFocused.set($focusElements[indexOfNewFocusedElement]);
 		}
-
-		$focusElements[indexOfNewFocusedElement].focus();
 	};
 </script>
 
@@ -325,7 +340,7 @@
 	on:click_outside={onClickOutside}
 	class=""
 	on:click={onClickLog}
-	on:keydown={onContainerKeypress}
+	on:keydown={onContainerKeydown}
 	bind:this={container}
 >
 	<div class={containerClasses[$log.type][0]}>
@@ -341,6 +356,7 @@
 						onAutoFill={onTitleAutoFill}
 						_class={!$isEditing && !$log.title ? 'hidden' : 'flex'}
 						bind:input={$focusElements[0]}
+						isEditing={$isEditing}
 					/>
 					<Input
 						bind:value={$log.reference}
@@ -349,6 +365,7 @@
 						isDisabled={!$isEditing}
 						_class={!$isEditing && !$log.reference ? 'hidden' : 'flex'}
 						bind:input={$focusElements[1]}
+						isEditing={$isEditing}
 					/>
 				</div>
 			</div>

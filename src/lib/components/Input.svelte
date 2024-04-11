@@ -1,8 +1,14 @@
 <script lang="ts">
-	import { isDropdownOpen } from '$lib/stores';
+	import {
+		whichAutofillIsOpen,
+		closeAutofill,
+		isAnAutofillOpen,
+		unfocusStoreInput,
+		whichInputIsFocused
+	} from '$lib/stores';
+	import { onKeydown } from '$lib/utils';
 	import { clickOutside } from '$lib/utils/clickAway';
-	import { getContext, onMount } from 'svelte';
-	import type { Readable } from 'svelte/motion';
+	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 
 	export let value: string = '';
@@ -20,8 +26,29 @@
 	export let onEnterKeydown: () => void = () => {};
 	export let onFocus: (() => void) | undefined = undefined;
 	export let input: HTMLElement | undefined = undefined;
+	export let isEditing: boolean = false;
 
-	const isEditing: Readable<boolean> = getContext('isEditing');
+	let isInputFocused = false;
+	$: isAutofillOpen = isEditing && isInputFocused && autofillValues.length > 0;
+
+	$: {
+		if (isAutofillOpen) $whichAutofillIsOpen = input;
+	}
+
+	$: {
+		if ($whichInputIsFocused === input) {
+			isInputFocused = true;
+		} else {
+			isInputFocused = false;
+		}
+	}
+
+	const unfocusInput = () => {
+		// todo Svelte 5: Check if this is fixed with svelte 5
+		//Unfortunately I needed to have 2 sources of truth, 1 in the component and 1 in the store. The reason for this is because on the first click of the app, if the item was an input, the item wouldnt focus. This may be fixed in svelte 5?
+		isInputFocused = false;
+		unfocusStoreInput();
+	};
 
 	const selectedAutofill: Writable<{ isUsingArrows: boolean; selected: number }> = writable({
 		isUsingArrows: false,
@@ -36,23 +63,24 @@
 		$selectedAutofill = { isUsingArrows: true, selected: index };
 	};
 
-	let isInputFocused: boolean = false;
-
 	onMount(() => {
 		if (autofocus) {
 			input && input.focus();
 		}
+		return () => {
+			unfocusInput();
+		};
 	});
 
 	const onClickAutofill = (_value: string) => {
 		value = _value;
-		isInputFocused = false;
+		unfocusInput();
 		onAutoFill && onAutoFill(_value);
 	};
 
 	const onClickOutside = () => {
-		if ($isEditing && isInputFocused) {
-			isInputFocused = false;
+		if (isEditing && isInputFocused) {
+			unfocusInput();
 			onResetAutofill();
 		}
 	};
@@ -64,8 +92,6 @@
 
 	let slicedAutofillValues: string[] = [];
 
-	$: _isDropdownOpen = isInputFocused && filteredAutofillValues.length > 0;
-	$: _isDropdownOpen, $isEditing && ($isDropdownOpen = _isDropdownOpen);
 	$: filteredAutofillValues = autofillValues.filter(
 		(autofillValue) => autofillValue && autofillValue.includes(value)
 	) as string[];
@@ -81,33 +107,38 @@
 		}
 	}
 
-	const onKeydown = (e) => {
-		if (e.key === 'Backspace') {
-			_onFocus();
-		}
-		if (e.key === 'ArrowUp') {
-			if ($selectedAutofill.selected > 0) {
-				onSelectAutofill($selectedAutofill.selected - 1);
-			}
-		}
-		if (e.key === 'ArrowDown') {
-			if ($selectedAutofill.selected < filteredAutofillValues.length - 1) {
-				onSelectAutofill($selectedAutofill.selected + 1);
-			}
-		}
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			const isAutofillValueBeingSelected =
-				$selectedAutofill !== undefined &&
-				$selectedAutofill.selected !== undefined &&
-				_isDropdownOpen;
+	const _onKeydown = (e) => {
+		onKeydown(e, {
+			ArrowUp: () => {
+				e.preventDefault();
+				if ($selectedAutofill.selected > 0) {
+					onSelectAutofill($selectedAutofill.selected - 1);
+				}
+			},
+			ArrowDown: () => {
+				e.preventDefault();
+				if ($selectedAutofill.selected < filteredAutofillValues.length - 1) {
+					onSelectAutofill($selectedAutofill.selected + 1);
+				}
+			},
+			Backspace: _onFocus,
+			Enter: () => {
+				const isAutofillValueBeingSelected =
+					$selectedAutofill !== undefined &&
+					$selectedAutofill.selected !== undefined &&
+					isAutofillOpen;
 
-			if (isAutofillValueBeingSelected) {
-				onClickAutofill(filteredAutofillValues[$selectedAutofill.selected as number]);
-			} else {
-				onEnterKeydown();
+				if (isAutofillValueBeingSelected) {
+					onClickAutofill(filteredAutofillValues[$selectedAutofill.selected as number]);
+				} else {
+					onEnterKeydown();
+				}
+			},
+			Escape: () => {
+				unfocusInput();
+				$isAnAutofillOpen && closeAutofill();
 			}
-		}
+		});
 	};
 
 	const onAutofillWheeldown = (e) => {
@@ -128,17 +159,18 @@
 </script>
 
 <div use:clickOutside on:click_outside={onClickOutside} class="relative">
+	<!-- cannot add on:focus to input because it is causing focusing issues -->
 	<input
 		type="text"
 		bind:value
 		class="placeholder-gray-300 w-full bg-transparent text-sm outline-none {_class}"
 		placeholder={isDisabled ? '' : placeholder}
 		bind:this={input}
-		on:focus={_onFocus}
 		on:input={onChange}
-		on:keydown={onKeydown}
+		on:keydown={_onKeydown}
+		on:click={_onFocus}
 	/>
-	<div class="relative z-50 {_isDropdownOpen ? 'flex' : 'hidden'}">
+	<div class="relative z-50 {isEditing && isAutofillOpen ? 'flex' : 'hidden'}">
 		<div
 			class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full"
 			on:wheel={onAutofillWheeldown}

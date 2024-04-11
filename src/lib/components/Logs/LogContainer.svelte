@@ -6,7 +6,7 @@
 	import { currentlyEditing, titlesAndReferences } from '$lib/stores';
 	import { getContext, onMount } from 'svelte';
 	import { derived } from 'svelte/store';
-	import { isDropdownOpen } from '$lib/stores';
+	import { whichInputIsFocused } from '$lib/stores';
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 
@@ -61,7 +61,7 @@
 	let onOpen: () => void;
 
 	const onClickOutside = () => {
-		$isEditing && showDialog && !$isDropdownOpen && onOpen();
+		$isEditing && showDialog && !$whichInputIsFocused && onOpen();
 	};
 
 	let container: HTMLDivElement;
