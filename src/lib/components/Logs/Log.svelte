@@ -291,7 +291,6 @@
 		if ($currentlyEditing) return;
 		onEditLog();
 	};
-	$: $isAnAutofillOpen, console.log({ $isAnAutofillOpen });
 
 	const onContainerKeydown = (e: KeyboardEvent) => {
 		if (!$isEditing || $isAnAutofillOpen) return;
