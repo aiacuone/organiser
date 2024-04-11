@@ -206,6 +206,9 @@
 
 	onMount(() => {
 		const keydown = (e: KeyboardEvent) => {
+			if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
+				onAccept();
+			}
 			if (e.ctrlKey && e.shiftKey && e.key === '.') {
 				onAddItem();
 			}
