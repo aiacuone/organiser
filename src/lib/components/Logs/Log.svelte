@@ -24,7 +24,7 @@
 	import ListItems from './LogListItems.svelte';
 	import CheckboxItems from './LogCheckboxItems.svelte';
 	import LogQuestionItems from './LogQuestionItems.svelte';
-	import { useMutation } from '@sveltestack/svelte-query';
+	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import isEqual from 'lodash.isequal';
 
 	export let initialLog: Log_int;
@@ -55,18 +55,50 @@
 	setContext('isEditing', isEditing);
 
 	const updateLogMutation = useMutation(updateLogClient, {
-		onSuccess: () => {
-			invalidateLogs();
+		onMutate: async (newLog) => {
+			// await queryClient.cancelQueries('logs');
+			const previousLogs = queryClient.getQueryData('logs');
+			queryClient.setQueryData('logs', ({ logs: previousLogs }) => {
+				return [...previousLogs, newLog];
+			});
+			return { previousLogs };
+		},
+		onError: (err, newTodo, context) => {
+			queryClient.setQueryData('logs', context?.previousLogs);
+		},
+		// Always refetch after error or success:
+		onSettled: () => {
+			queryClient.invalidateQueries('logs');
 		}
+		// onSuccess: () => {
+		// 	invalidateLogs();
+		// }
 	});
+	const queryClient = useQueryClient();
 
 	const deleteLogMutation = useMutation(deleteLogClient, {
-		onSuccess: () => {
-			invalidateLogs();
+		onMutate: async (logId) => {
+			// await queryClient.cancelQueries('logs');
+			const previousLogs = queryClient.getQueryData('logs');
+			queryClient.setQueryData('logs', ({ logs: previousLogs }) => {
+				return previousLogs.filter((log) => log.id !== logId);
+			});
+			return { previousLogs };
+		},
+		onError: (err, newTodo, context) => {
+			queryClient.setQueryData('logs', context?.previousLogs);
+		},
+		// Always refetch after error or success:
+		onSettled: () => {
+			queryClient.invalidateQueries('logs');
 		}
+		// onSuccess: () => {
+		// 	invalidateLogs();
+		// }
 	});
 
 	const onDelete = () => {
+		console.log('onDelete');
 		$deleteLogMutation.mutate($log.id);
 		addToEndOfRaceCondition(onStopEditing);
 	};
