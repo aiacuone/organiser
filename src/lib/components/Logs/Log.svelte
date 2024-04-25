@@ -44,7 +44,6 @@
 		$currentlyEditing = null;
 	};
 
-	const invalidateLogs: () => void = getContext('invalidateLogs');
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 	setContext('onEditLog', onEditLog);
 
@@ -54,51 +53,53 @@
 	);
 	setContext('isEditing', isEditing);
 
+	const queryClient = useQueryClient();
+
 	const updateLogMutation = useMutation(updateLogClient, {
 		onMutate: async (newLog) => {
-			// await queryClient.cancelQueries('logs');
+			await queryClient.cancelQueries('logs');
 			const previousLogs = queryClient.getQueryData('logs');
 			queryClient.setQueryData('logs', ({ logs: previousLogs }) => {
-				return [...previousLogs, newLog];
+				const updatedLogs = [...previousLogs, newLog];
+
+				return {
+					logs: updatedLogs,
+					count: updatedLogs.length
+				};
 			});
 			return { previousLogs };
 		},
-		onError: (err, newTodo, context) => {
+		onError: (error, newTodo, context) => {
+			console.error('There was an error updating log', error);
 			queryClient.setQueryData('logs', context?.previousLogs);
 		},
-		// Always refetch after error or success:
 		onSettled: () => {
 			queryClient.invalidateQueries('logs');
 		}
-		// onSuccess: () => {
-		// 	invalidateLogs();
-		// }
 	});
-	const queryClient = useQueryClient();
 
 	const deleteLogMutation = useMutation(deleteLogClient, {
 		onMutate: async (logId) => {
-			// await queryClient.cancelQueries('logs');
 			const previousLogs = queryClient.getQueryData('logs');
 			queryClient.setQueryData('logs', ({ logs: previousLogs }) => {
-				return previousLogs.filter((log) => log.id !== logId);
+				const updatedLogs = previousLogs.filter((log) => log.id !== logId);
+				return {
+					logs: updatedLogs,
+					count: updatedLogs.length
+				};
 			});
 			return { previousLogs };
 		},
 		onError: (err, newTodo, context) => {
+			console.error('There was an error deleting log', err);
 			queryClient.setQueryData('logs', context?.previousLogs);
 		},
-		// Always refetch after error or success:
 		onSettled: () => {
 			queryClient.invalidateQueries('logs');
 		}
-		// onSuccess: () => {
-		// 	invalidateLogs();
-		// }
 	});
 
 	const onDelete = () => {
-		console.log('onDelete');
 		$deleteLogMutation.mutate($log.id);
 		addToEndOfRaceCondition(onStopEditing);
 	};
