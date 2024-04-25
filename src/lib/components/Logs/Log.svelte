@@ -75,6 +75,7 @@
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries('logs');
+			queryClient.invalidateQueries('allLogNotifications');
 		}
 	});
 
@@ -96,6 +97,7 @@
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries('logs');
+			queryClient.invalidateQueries('allLogNotifications');
 		}
 	});
 
