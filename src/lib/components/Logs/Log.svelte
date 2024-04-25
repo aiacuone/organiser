@@ -67,6 +67,7 @@
 					count: updatedLogs.length
 				};
 			});
+
 			return { previousLogs };
 		},
 		onError: (error, newTodo, context) => {
@@ -81,6 +82,7 @@
 
 	const deleteLogMutation = useMutation(deleteLogClient, {
 		onMutate: async (logId) => {
+			await queryClient.cancelQueries('logs');
 			const previousLogs = queryClient.getQueryData('logs');
 			queryClient.setQueryData('logs', ({ logs: previousLogs }) => {
 				const updatedLogs = previousLogs.filter((log) => log.id !== logId);
@@ -89,6 +91,7 @@
 					count: updatedLogs.length
 				};
 			});
+
 			return { previousLogs };
 		},
 		onError: (err, newTodo, context) => {
