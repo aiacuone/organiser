@@ -24,7 +24,7 @@
 	import ListItems from './LogListItems.svelte';
 	import CheckboxItems from './LogCheckboxItems.svelte';
 	import LogQuestionItems from './LogQuestionItems.svelte';
-	import { useMutation } from '@sveltestack/svelte-query';
+	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import isEqual from 'lodash.isequal';
 
 	export let initialLog: Log_int;
@@ -44,7 +44,6 @@
 		$currentlyEditing = null;
 	};
 
-	const invalidateLogs: () => void = getContext('invalidateLogs');
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 	setContext('onEditLog', onEditLog);
 
@@ -54,15 +53,54 @@
 	);
 	setContext('isEditing', isEditing);
 
+	const queryClient = useQueryClient();
+
 	const updateLogMutation = useMutation(updateLogClient, {
-		onSuccess: () => {
-			invalidateLogs();
+		onMutate: async (newLog) => {
+			await queryClient.cancelQueries('logs');
+			const previousLogs = queryClient.getQueryData('logs');
+			queryClient.setQueryData('logs', ({ logs: previousLogs }) => {
+				const updatedLogs = [...previousLogs, newLog];
+
+				return {
+					logs: updatedLogs,
+					count: updatedLogs.length
+				};
+			});
+
+			return { previousLogs };
+		},
+		onError: (error, newTodo, context) => {
+			console.error('There was an error updating log', error);
+			queryClient.setQueryData('logs', context?.previousLogs);
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries('logs');
+			queryClient.invalidateQueries('allLogNotifications');
 		}
 	});
 
 	const deleteLogMutation = useMutation(deleteLogClient, {
-		onSuccess: () => {
-			invalidateLogs();
+		onMutate: async (logId) => {
+			await queryClient.cancelQueries('logs');
+			const previousLogs = queryClient.getQueryData('logs');
+			queryClient.setQueryData('logs', ({ logs: previousLogs }) => {
+				const updatedLogs = previousLogs.filter((log) => log.id !== logId);
+				return {
+					logs: updatedLogs,
+					count: updatedLogs.length
+				};
+			});
+
+			return { previousLogs };
+		},
+		onError: (err, newTodo, context) => {
+			console.error('There was an error deleting log', err);
+			queryClient.setQueryData('logs', context?.previousLogs);
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries('logs');
+			queryClient.invalidateQueries('allLogNotifications');
 		}
 	});
 
