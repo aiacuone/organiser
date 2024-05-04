@@ -32,14 +32,16 @@
 	} from '$lib';
 	import Log from '$lib/components/Logs/Log.svelte';
 
-	interface PageData extends SpaceData_int {
-		date: string;
-		space: string;
-		titles: string[];
-		references: string[];
+	interface PageDataProps extends SpaceData_int {
+		data: {
+			date: string;
+			space: string;
+			titles: string[];
+			references: string[];
+		};
 	}
 
-	export let data: PageData;
+	const { data }: PageDataProps = $props();
 
 	const queryClient = useQueryClient();
 
@@ -83,15 +85,26 @@
 		queryClient.invalidateQueries('titlesAndReferences');
 	};
 
-	$: $selectedDate, debounce(invalidateLogsAndTitlesAndReferences);
-	$: $page.params.space, invalidateLogsAndTitlesAndReferences();
-	$: $titlesAndReferencesQuery, ($titlesAndReferences = $titlesAndReferencesQuery.data);
+	$effect(() => {
+		$selectedDate && debounce(invalidateLogsAndTitlesAndReferences);
+	});
+	// $: $selectedDate, debounce(invalidateLogsAndTitlesAndReferences);
 
-	$: headerContainer = 0;
-	$: parentContainerHeight = 0;
-	$: logButtonsContainerHeight = 0;
-	$: notesContainerHeight =
-		parentContainerHeight - headerContainer - logButtonsContainerHeight - 55;
+	$effect(() => {
+		$page.params.space && invalidateLogsAndTitlesAndReferences();
+	});
+	// $: $page.params.space, invalidateLogsAndTitlesAndReferences();
+	$effect(() => {
+		$titlesAndReferencesQuery && ($titlesAndReferences = $titlesAndReferencesQuery.data);
+	});
+	// $: $titlesAndReferencesQuery, ($titlesAndReferences = $titlesAndReferencesQuery.data);
+
+	let headerContainer = $state(0);
+	let parentContainerHeight = $state(0);
+	let logButtonsContainerHeight = $state(0);
+	let notesContainerHeight = $derived(
+		parentContainerHeight - headerContainer - logButtonsContainerHeight - 55
+	);
 
 	let exportedNotesModal: HTMLDialogElement;
 
@@ -119,17 +132,18 @@
 		navigator.clipboard.write([clipboardItem]);
 	};
 
-	$: modalContainerHeight = 0;
-	$: modalCheckboxContainerHeight = 0;
-	$: modalButtonContainerHeight = 0;
-	$: modalMainContentHeight =
-		modalContainerHeight - modalCheckboxContainerHeight - modalButtonContainerHeight - 20;
+	let modalContainerHeight = $state(0);
+	let modalCheckboxContainerHeight = $state(0);
+	let modalButtonContainerHeight = $state(0);
+	let modalMainContentHeight = $derived(
+		modalContainerHeight - modalCheckboxContainerHeight - modalButtonContainerHeight - 20
+	);
 
-	let notesContainer: HTMLDivElement;
-	let newLogType: LogType_enum | undefined;
+	let notesContainer: HTMLDivElement | undefined = $state();
+	let newLogType: LogType_enum | undefined = $state();
 
 	const onNoteButtonClick = (logType: LogType_enum) => {
-		notesContainer.scrollTo(0, 0);
+		notesContainer?.scrollTo(0, 0);
 		newLogType = logType;
 	};
 
@@ -178,8 +192,8 @@
 		$selectedDate = getDateFromHyphenatedString(e.target.value.split('-').reverse().join('-'));
 	};
 
-	let searchValue: string;
-	let onSearchFocus: () => void;
+	let searchValue: string = $state('');
+	let onSearchFocus: () => void = $state(() => {});
 
 	const onSearch = () => {
 		goto(`/${$page.params.space}/filter?search=${searchValue}`);
@@ -225,8 +239,8 @@
 		$filters = [];
 	};
 
-	let onOpenExport: () => void;
-	let onCloseExport: () => void;
+	let onOpenExport: () => void = $state(() => {});
+	let onCloseExport: () => void = $state(() => {});
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -240,7 +254,7 @@
 						</p>
 						<p class="capitalize">{$selectedHyphenatedDateString ?? data.date}</p>
 					</div>
-					<input type="date" on:change={onDateChange} class="w-[20px]" />
+					<input type="date" onchange={onDateChange} class="w-[20px]" />
 				</div>
 				<Search
 					bind:onFocus={onSearchFocus}
@@ -289,7 +303,7 @@
 			{#if $logs.isLoading}
 				<div style="max-height:{notesContainerHeight}px" class="stack gap-6">
 					{#each Array(5) as _}
-						<div class="bg-neutral-100 rounded-sm h-[120px] w-full" />
+						<div class="bg-neutral-100 rounded-sm h-[120px] w-full"></div>
 					{/each}
 				</div>
 			{:else if $logs.isError}
@@ -311,7 +325,7 @@
 						? 'bg-opacity-80'
 						: 'bg-opacity-40'}"
 					onClick={onGotoTodaysDate}
-					><div class=" rounded-md border-2 w-[18px] h-[18px] border-gray-400" /></Button
+					><div class=" rounded-md border-2 w-[18px] h-[18px] border-gray-400"></div></Button
 				>
 				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickNextDay}>
 					<Icon icon={icons.right} height="20px" class="text-gray-400" />
@@ -346,7 +360,7 @@
 			class="stack gap-10 center h-full overflow-y-scroll hide-scrollbar"
 			style="height:{modalMainContentHeight}px"
 		>
-			<div class="stack gap-2 sm:gap-4" bind:this={notesModalTextArea} />
+			<div class="stack gap-2 sm:gap-4" bind:this={notesModalTextArea}></div>
 		</div>
 		<div class="flex flex-wrap gap-4 center" bind:clientHeight={modalButtonContainerHeight}>
 			<Button onClick={copy} className="text-black">Copy</Button>
