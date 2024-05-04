@@ -62,9 +62,9 @@
 		onOpenAvatarMenu();
 	};
 
-	let onOpenAvatarMenu: () => void;
-	let onCloseAvatarMenu: () => void;
-	let dialog: HTMLDialogElement;
+	let onOpenAvatarMenu: () => void = $state(() => {});
+	let onCloseAvatarMenu: () => void = $state(() => {});
+	let dialog: HTMLDialogElement | undefined = $state(undefined);
 </script>
 
 <footer class="py-2 bg-gray-300 px-3 center min-h-[50px]">
@@ -82,13 +82,13 @@
 			{#if !$isAuthLoading}
 				{#if $isAuthenticated && $user.given_name && $user.family_name}
 					<button
-						on:click={onClickAvatar}
+						onclick={onClickAvatar}
 						class="rounded-full bg-neutral-500 h-[30px] w-[30px] center text-white"
 					>
 						{`${$user.given_name[0]}${$user.family_name[0]}`}
 					</button>
 				{:else}
-					<button on:click={login} class="rounded-lg bg-neutral-500 h-[30px] px-2 center text-white"
+					<button onclick={login} class="rounded-lg bg-neutral-500 h-[30px] px-2 center text-white"
 						>Login</button
 					>
 				{/if}
