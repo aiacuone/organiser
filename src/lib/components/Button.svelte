@@ -1,15 +1,15 @@
 <script lang="ts">
 	interface ButtonProps extends SvelteAllProps {
-		onClick: (e: any) => void;
-		isDisabled: boolean;
-		className: string;
-		_class: string;
-		height: string;
+		onClick?: (e: any) => void;
+		isDisabled?: boolean;
+		className?: string;
+		_class?: string;
+		height?: string;
 	}
 
 	const {
 		onClick,
-		isDisabled,
+		isDisabled = false,
 		className,
 		_class,
 		height = '28px',
