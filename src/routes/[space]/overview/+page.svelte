@@ -8,11 +8,17 @@
 
 	import { getContext } from 'svelte';
 
-	export let data;
-	let dialog: HTMLDialogElement;
+	interface OverviewPageProps {
+		data: {
+			space: string;
+		};
+	}
 
-	let onOpen: () => void;
-	let onClose: () => void;
+	const { data }: OverviewPageProps = $props();
+	let dialog: HTMLDialogElement | undefined = $state();
+
+	let onOpen: () => void = $state(() => {});
+	let onClose: () => void = $state(() => {});
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 
@@ -35,7 +41,7 @@
 		}
 	};
 
-	let inputValue: string;
+	let inputValue: string = $state('');
 </script>
 
 <div class="center">
