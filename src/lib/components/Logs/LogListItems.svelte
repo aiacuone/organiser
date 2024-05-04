@@ -4,7 +4,6 @@
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
-	import { dndzone } from 'svelte-dnd-action';
 	import { LogType_enum, LogListType_enum, type MappedListItem } from '$lib/types';
 	import {
 		areAnyListItemsNotCapitalised,
@@ -43,18 +42,7 @@
 	}
 </script>
 
-<ul
-	class="ml-8 stack w-full"
-	style={`list-style-type:${bulletType[listType]}`}
-	use:dndzone={{
-		items,
-		flipDurationMs: 300,
-		dropTargetStyle: {},
-		dragDisabled: !$isEditing
-	}}
-	on:consider={(e) => (items = e.detail.items)}
-	on:finalize={(e) => (items = e.detail.items)}
->
+<ul class="ml-8 stack w-full" style={`list-style-type:${bulletType[listType]}`}>
 	{#each items as item, index (item.id)}
 		<li class="{index % 2 === 0 ? 'bg-transparent' : checkeredColor[logType]} relative">
 			{#if $isEditing && items.length > 1}

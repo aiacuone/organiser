@@ -14,7 +14,6 @@
 	import { page } from '$app/stores';
 	import { getContext, onMount, setContext } from 'svelte';
 	import { deleteLogClient, updateLogClient } from '$lib/api/logsLocalApi';
-	import toast from 'svelte-french-toast';
 	import { derived, writable, type Writable } from 'svelte/store';
 	import { isAnAutofillOpen, unfocusStoreInput, whichInputIsFocused } from '$lib/stores';
 	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
@@ -154,7 +153,7 @@
 		try {
 			await $updateLogMutation.mutate(updatedLog);
 		} catch (error) {
-			toast.error('Issue updating state');
+			console.error('Issue updating state');
 		}
 
 		onResetNewLogType && onResetNewLogType();

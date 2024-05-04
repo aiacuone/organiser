@@ -5,7 +5,6 @@
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { selectedDate } from '$lib/stores/dates';
 	import Header from '$lib/components/Header.svelte';
-	import { Toaster } from 'svelte-french-toast';
 	import Footer from '$lib/components/Footer.svelte';
 	import { isAuthLoading, isAuthenticated } from '$lib/stores';
 	import Button from '$lib/components/Button.svelte';
@@ -141,5 +140,3 @@
 		<Footer />
 	</div>
 </QueryClientProvider>
-
-<Toaster />

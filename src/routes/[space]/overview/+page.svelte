@@ -7,7 +7,6 @@
 	import { useMutation } from '@sveltestack/svelte-query';
 
 	import { getContext } from 'svelte';
-	import toast from 'svelte-french-toast';
 
 	export let data;
 	let dialog: HTMLDialogElement;
@@ -30,10 +29,9 @@
 		try {
 			await $deleteSpaceMutation.mutate(data.space);
 			onClose();
-			toast.success('Space deleted');
 			goto('/');
 		} catch (error) {
-			toast.error('Error deleting space');
+			console.error('Error deleting space');
 		}
 	};
 

@@ -5,7 +5,6 @@
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
 	import type { MappedCheckboxItem } from '$lib/types';
-	import { dndzone } from 'svelte-dnd-action';
 	import {
 		areAnyCheckboxItemsNotCapitalised,
 		capitalizeFirstLetterOfMappedCheckboxItems
@@ -30,17 +29,7 @@
 	}
 </script>
 
-<ul
-	class="ml-3 stack flex-1"
-	use:dndzone={{
-		items: checkboxes,
-		flipDurationMs: 300,
-		dropTargetStyle: {},
-		dragDisabled: !$isEditing
-	}}
-	on:consider={(e) => (checkboxes = e.detail.items)}
-	on:finalize={(e) => (checkboxes = e.detail.items)}
->
+<ul class="ml-3 stack flex-1">
 	{#each checkboxes as item, index (item.id)}
 		<li class="relative {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'}">
 			{#if $isEditing && checkboxes.length > 1}

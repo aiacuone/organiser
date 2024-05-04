@@ -3,7 +3,6 @@
 	import type { MappedQuestionItem } from '$lib/types';
 	import Button from '../Button.svelte';
 	import Textarea from '../Textarea.svelte';
-	import { dndzone } from 'svelte-dnd-action';
 	import type { Readable } from 'svelte/motion';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
@@ -45,17 +44,7 @@
 	}
 </script>
 
-<ul
-	class="ml-2 stack flex-1 gap-3"
-	use:dndzone={{
-		items: questions,
-		flipDurationMs: 300,
-		dropTargetStyle: {},
-		dragDisabled: !$isEditing
-	}}
-	on:consider={(e) => (questions = e.detail.items)}
-	on:finalize={(e) => (questions = e.detail.items)}
->
+<ul class="ml-2 stack flex-1 gap-3">
 	{#each questions as item, index (item.id)}
 		<li
 			class="hstack {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'} px-2 py-1 rounded relative"
