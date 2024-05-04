@@ -21,15 +21,20 @@
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
 	import AddSpace from './AddSpace.svelte';
 
-	export let space: string | undefined;
+	interface HeaderProps extends SvelteAllProps {
+		space: string | undefined;
+		onOpen: () => void;
+	}
 
-	let isAddingNewSpace: boolean = false;
-	let onOpen: () => void;
-	let dialog: HTMLDialogElement;
+	const { space }: HeaderProps = $props();
+
+	let isAddingNewSpace: boolean = $state(false);
+	let onOpen: () => void = $state(() => {});
+	let dialog: HTMLDialogElement | undefined = $state(undefined);
 
 	const onDialogClose = () => {
 		isAddingNewSpace = false;
-		dialog.close();
+		dialog?.close();
 	};
 
 	const spacesQuery = useQuery(
@@ -181,7 +186,7 @@
 		</div>
 		{#if $isAuthenticated && space}
 			<div class="flex-1 center">
-				<button on:click={onOpen} class="capitalize">
+				<button onclick={onOpen} class="capitalize">
 					{space}
 				</button>
 			</div>
@@ -193,7 +198,7 @@
 						)}
 						{@const notificationsCount = spaceNotifications?.[type]}
 
-						<button on:click={() => onClick(!!notificationsCount)} class="relative">
+						<button onclick={() => onClick(!!notificationsCount)} class="relative">
 							<Icon {icon} class="text-gray-500" height="20px" />
 							{#if notificationsCount}
 								<div
