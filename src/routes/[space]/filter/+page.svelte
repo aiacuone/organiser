@@ -6,7 +6,7 @@
 	import Log from '$lib/components/Logs/Log.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import { icons } from '$lib/general/icons';
-	import { viewport } from '$lib/hooks';
+	// import { viewport } from '$lib/hooks'; todo:svelte 5
 	import { searchValue, whichInputIsFocused } from '$lib/stores';
 	import { allLogs, searchableInputs } from '$lib/types';
 	import { arraysAreEqual } from '$lib/utils/arrays';
@@ -47,8 +47,8 @@
 		$searchValue = '';
 	};
 
-	let hasPageLoaded = false;
-	let onSearchInputFocus: () => void;
+	let hasPageLoaded = $state(false);
+	let onSearchInputFocus: () => void = $state(() => {});
 
 	onMount(() => {
 		hasPageLoaded = true;
@@ -60,7 +60,7 @@
 		}
 	});
 
-	let timer;
+	let timer: any = $state(undefined);
 
 	const debounce = (fn: () => any, delay = 500) => {
 		const timeout = () => {
@@ -72,8 +72,9 @@
 		timeout();
 	};
 
-	$: $filters,
+	$effect(() => {
 		hasPageLoaded &&
+			$filters &&
 			debounce(() => {
 				const url = $filtersValues.string
 					? `${$page.url.pathname}?${$filtersValues.string}`
@@ -81,6 +82,7 @@
 
 				goto(url, { keepFocus: true });
 			});
+	});
 
 	const fetchFilteredLogs = async ({ pageParam: skip = 0 }) => {
 		const result = await axios.get(`/log`, {
@@ -108,11 +110,15 @@
 		$filters = searchParamsStringToEntriesArray($page.url.searchParams);
 		queryClient.invalidateQueries('filteredLogs');
 	};
-	$: $page.url, updatedStateAndInvalidate();
 
-	let headerContainerHeight: number;
-	let parentContainerHeight: number;
-	$: logContainerHeight = parentContainerHeight - headerContainerHeight - 20;
+	$effect(() => {
+		$page.url && updatedStateAndInvalidate();
+	});
+
+	let headerContainerHeight: number = $state(0);
+	let parentContainerHeight: number = $state(0);
+
+	let logContainerHeight: number = $derived(parentContainerHeight - headerContainerHeight - 20);
 
 	onMount(() => {
 		const onKeydown = (e) => {
@@ -153,8 +159,8 @@
 			$filters = $filters.filter((filter) => filter[0] !== 'search');
 		}
 	};
-	let onCloseExport: () => void;
-	let onOpenExport: () => void;
+	let onCloseExport: () => void = $state(() => {});
+	let onOpenExport: () => void = $state(() => {});
 </script>
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
@@ -174,7 +180,7 @@
 							{camelCaseToLower(key)}
 							<input
 								type="checkbox"
-								on:change={() => onFilterChange(['searchType', key])}
+								onchange={() => onFilterChange(['searchType', key])}
 								checked={$filters.some((filterArray) =>
 									arraysAreEqual(filterArray, ['searchType', key])
 								)}
@@ -193,7 +199,7 @@
 						{camelCaseToLower(key)}
 						<input
 							type="checkbox"
-							on:change={() => onFilterChange(['type', key])}
+							onchange={() => onFilterChange(['type', key])}
 							checked={$filters.some((filterArray) => arraysAreEqual(filterArray, ['type', key]))}
 						/>
 					</label>
@@ -210,7 +216,7 @@
 		>
 			{#if $filteredLogsQuery.isLoading}
 				{#each Array(5) as _}
-					<div class="bg-neutral-100 rounded-sm h-[120px] w-full" />
+					<div class="bg-neutral-100 rounded-sm h-[120px] w-full"></div>
 				{/each}
 			{:else if $filteredLogsQuery.isError}
 				Error
@@ -224,7 +230,8 @@
 					{#if $filteredLogsQuery.isFetching}
 						Loading more...
 					{:else if $filteredLogsQuery.hasNextPage}
-						<div use:viewport on:enterViewport={onGetNextPage} class="h-10 w-full" />
+						<!-- todo:svelte 5 -->
+						<!-- <div use:viewport on:enterViewport={onGetNextPage} class="h-10 w-full" /> -->
 					{:else}
 						{$filteredLogsQuery.data.pages[0].data.total} Results
 					{/if}
