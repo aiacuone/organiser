@@ -6,7 +6,11 @@
 	import { replaceAllSpacesWithHyphens } from '$lib/utils/strings';
 	import { onMount } from 'svelte';
 
-	export let data: SpaceData_int;
+	interface DatePageProps extends SvelteAllProps {
+		data: SpaceData_int;
+	}
+
+	const { data }: DatePageProps = $props();
 
 	onMount(() => {
 		const space = data.space ?? data.spaces[0];
