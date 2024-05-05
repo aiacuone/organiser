@@ -6,9 +6,13 @@
 	import { goto } from '$app/navigation';
 	import { getHyphenatedStringFromDate, replaceAllSpacesWithHyphens } from '$lib/utils';
 
-	export let onAddSpace: (() => void) | undefined = undefined;
+	interface AddSpaceProps {
+		onAddSpace?: () => void;
+	}
 
-	let addInputValue: string;
+	const { onAddSpace }: AddSpaceProps = $props();
+
+	let addInputValue: string = $state('');
 
 	const _onAddSpace = () => {
 		goto(
@@ -30,7 +34,7 @@
 		bind:value={addInputValue}
 		onEnterKeydown={_onAddSpace}
 	/>
-	<button class="bg-gray-50 px-2 py-1" on:click={(e) => _onAddSpace(e)}>
+	<button class="bg-gray-50 px-2 py-1" onclick={_onAddSpace}>
 		<Icon icon={icons.enter} />
 	</button>
 </div>
