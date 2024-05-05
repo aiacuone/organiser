@@ -1,29 +1,38 @@
 <script lang="ts">
-	import { clickOutside } from '$lib/utils/clickAway';
+	interface DialogProps extends SvelteAllProps {
+		overlayClickClose?: boolean;
+		dialog?: HTMLDialogElement;
+		preventClose?: boolean;
+		onOpen?: () => void;
+		onClose: () => void;
+		isOpen: boolean;
+		_class?: string;
+	}
 
-	export let overlayClickClose: boolean = true;
-	export let dialog: HTMLDialogElement | undefined = undefined;
-	export let preventClose: boolean = false;
-	export let isOpen: boolean = false;
-	export const onOpen = () => {
-		isOpen = true;
-		dialog?.showModal();
-	};
-	export let onClose = () => {
-		isOpen = false;
-		if (preventClose) return;
-		if (dialog && dialog.open && overlayClickClose) {
-			dialog?.close();
+	const { preventClose, isOpen, _class, children, onClose }: DialogProps = $props();
+
+	let dialog: HTMLDialogElement | undefined;
+
+	$effect(() => {
+		if (isOpen) {
+			dialog?.showModal();
+		} else {
+			if (!preventClose) dialog?.close();
+		}
+	});
+
+	const onkeydown = (e: KeyboardEvent) => {
+		e.preventDefault();
+		if (e.key === 'Escape') {
+			onClose();
 		}
 	};
-	const onClickOutside = () => {
-		onClose();
-	};
-	export let _class: string = '';
 </script>
 
+<svelte:window on:keydown={onkeydown} />
+
 <dialog bind:this={dialog} class="p-4 shadow-md rounded-sm w-full max-w-[500px] {_class}">
-	<div class="w-full h-full center" use:clickOutside on:click_outside={onClickOutside}>
-		<slot />
+	<div class="w-full h-full center">
+		{@render children()}
 	</div>
 </dialog>

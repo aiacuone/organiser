@@ -7,6 +7,7 @@
 	import { getContext, onMount } from 'svelte';
 	import { derived } from 'svelte/store';
 	import { whichInputIsFocused } from '$lib/stores';
+	import { useDisclosure } from '$lib/hooks';
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 
@@ -58,10 +59,14 @@
 	export let onControlShitAndEnterKeydown: () => void = () => {};
 	export let onControlShitAndDotKeydown: () => void = () => {};
 
-	let onOpen: () => void;
+	const {
+		onOpen: openResetModal,
+		onClose: onCloseResetModal,
+		isOpen: isOpenResetModal
+	} = useDisclosure();
 
 	const onClickOutside = () => {
-		$isEditing && showDialog && !$whichInputIsFocused && onOpen();
+		$isEditing && showDialog && !$whichInputIsFocused && openResetModal();
 	};
 
 	let container: HTMLDivElement;
@@ -88,6 +93,9 @@
 	<slot />
 </div>
 
-<ConfirmationDialog onConfirm={onConfirmReset} bind:onOpen
-	>Did you want to reset your changes?</ConfirmationDialog
+<ConfirmationDialog
+	onConfirm={onConfirmReset}
+	onClose={onCloseResetModal}
+	isOpen={$isOpenResetModal}
+	onOpen={openResetModal}>Did you want to reset your changes?</ConfirmationDialog
 >

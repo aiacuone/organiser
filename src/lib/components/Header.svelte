@@ -16,26 +16,24 @@
 		logIcons,
 		getHyphenatedStringFromDate,
 		replaceAllHyphensWithSpaces,
-		replaceAllSpacesWithHyphens
+		replaceAllSpacesWithHyphens,
+		useDisclosure
 	} from '$lib';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
 	import AddSpace from './AddSpace.svelte';
 
 	interface HeaderProps extends SvelteAllProps {
 		space: string | undefined;
-		onOpen: () => void;
 	}
 
 	const { space }: HeaderProps = $props();
-
 	let isAddingNewSpace: boolean = $state(false);
-	let onOpen: () => void = $state(() => {});
-	let dialog: HTMLDialogElement | undefined = $state(undefined);
 
-	const onDialogClose = () => {
-		isAddingNewSpace = false;
-		dialog?.close();
-	};
+	const {
+		isOpen: isSpaceDialogOpen,
+		onOpen: openSpaceDialog,
+		onClose: closeSpaceDialog
+	} = useDisclosure();
 
 	const spacesQuery = useQuery(
 		`spaces`,
@@ -112,7 +110,7 @@
 		}
 	};
 	const onAddSpace = () => {
-		onDialogClose();
+		closeSpaceDialog();
 	};
 
 	const pillButtons = derived(
@@ -138,7 +136,7 @@
 									new Date()
 								)}`
 							);
-							onDialogClose();
+							closeSpaceDialog();
 						},
 						notification: 0
 					}
@@ -148,7 +146,7 @@
 					result.push({
 						notification: todo,
 						onClick: () => {
-							onDialogClose();
+							closeSpaceDialog();
 							goto(`/${space}/filter?type=todo&isChecked=false`);
 						},
 						icon: icons.todo
@@ -158,7 +156,7 @@
 					result.push({
 						notification: question,
 						onClick: () => {
-							onDialogClose();
+							closeSpaceDialog();
 							goto(`/${space}/filter?type=question&isAnswered=false`);
 						},
 						icon: icons.question
@@ -168,7 +166,7 @@
 					icon: icons.moreVertical,
 					onClick: () => {
 						goto(`/${space}/overview`);
-						onDialogClose();
+						closeSpaceDialog();
 					},
 					notification: 0
 				});
@@ -177,6 +175,11 @@
 			});
 		}
 	);
+
+	const _openSpaceDialog = () => {
+		openSpaceDialog();
+		isAddingNewSpace = false;
+	};
 </script>
 
 <header class="center py-2 px-3 bg-gray-200">
@@ -186,7 +189,7 @@
 		</div>
 		{#if $isAuthenticated && space}
 			<div class="flex-1 center">
-				<button onclick={onOpen} class="capitalize">
+				<button onclick={_openSpaceDialog} class="capitalize">
 					{space}
 				</button>
 			</div>
@@ -215,7 +218,7 @@
 	</div>
 </header>
 
-<Dialog bind:onOpen onClose={onDialogClose} bind:dialog>
+<Dialog isOpen={$isSpaceDialogOpen} onClose={closeSpaceDialog}>
 	<div class="stack gap-3">
 		<LogitLogo height="30px" />
 		<div class="stack gap-4 self-center">

@@ -10,6 +10,7 @@
 	import { isAuthLoading, isAuthenticated, user } from '$lib/stores/auth';
 	import type { Auth0Client } from '@auth0/auth0-spa-js';
 	import Dialog from './Dialog/Dialog.svelte';
+	import { useDisclosure } from '$lib/hooks';
 
 	const footerButtons = [
 		{
@@ -58,13 +59,15 @@
 		logout(auth0Client);
 	};
 
+	const {
+		isOpen: isAvatarMenuOpen,
+		onOpen: onOpenAvatarMenu,
+		onClose: onCloseAvatarMenu
+	} = useDisclosure();
+
 	const onClickAvatar = () => {
 		onOpenAvatarMenu();
 	};
-
-	let onOpenAvatarMenu: () => void = $state(() => {});
-	let onCloseAvatarMenu: () => void = $state(() => {});
-	let dialog: HTMLDialogElement | undefined = $state(undefined);
 </script>
 
 <footer class="py-2 bg-gray-300 px-3 center min-h-[50px]">
@@ -97,6 +100,6 @@
 	</div>
 </footer>
 
-<Dialog bind:dialog bind:onClose={onCloseAvatarMenu} bind:onOpen={onOpenAvatarMenu}>
+<Dialog isOpen={$isAvatarMenuOpen} onClose={onCloseAvatarMenu}>
 	<Button onClick={_logout}>Logout</Button>
 </Dialog>

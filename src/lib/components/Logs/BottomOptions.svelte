@@ -12,6 +12,7 @@
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import LogButton from './Buttons/LogButton.svelte';
 	import type { Writable } from 'svelte/store';
+	import { useDisclosure } from '$lib/hooks';
 
 	export let onDelete: () => void;
 	export let onAccept: () => void;
@@ -29,7 +30,7 @@
 	export let showIncrementDecrement: boolean = true;
 	export let log: Writable<MappedLog_int>;
 
-	let onOpenDelete: () => void;
+	const { onOpen: onOpenDelete, onClose: onCloseDelete, isOpen: isOpenDelete } = useDisclosure();
 
 	$: dateValues = getDayMonthYearFromDate($log.date);
 	$: lastUpdatedDateValues = $log.lastUpdated && getDayMonthYearFromDate($log.lastUpdated);
@@ -115,6 +116,9 @@
 	</div>
 </div>
 
-<ConfirmationDialog bind:onOpen={onOpenDelete} onConfirm={onConfirmDelete}
-	>Are you sure you want to delete?</ConfirmationDialog
+<ConfirmationDialog
+	onOpen={onOpenDelete}
+	onConfirm={onConfirmDelete}
+	onClose={onCloseDelete}
+	isOpen={$isOpenDelete}>Are you sure you want to delete?</ConfirmationDialog
 >

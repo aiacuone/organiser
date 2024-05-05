@@ -25,6 +25,7 @@
 	import LogQuestionItems from './LogQuestionItems.svelte';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import isEqual from 'lodash.isequal';
+	import { useDisclosure } from '$lib/hooks';
 
 	export let initialLog: Log_int;
 	const log: Writable<MappedLog_int> = writable(getMappedLog(initialLog));
@@ -264,6 +265,11 @@
 		}
 	});
 
+	const {
+		onOpen: onOpenConfirmationDialog,
+		isOpen: isConfirmationDialogOpen,
+		onClose: onCloseConfirmationModal
+	} = useDisclosure();
 	let onOpen: () => void;
 	let isOpen: boolean;
 
@@ -457,6 +463,11 @@
 	</div>
 </button>
 
-<ConfirmationDialog onConfirm={onResetChange} bind:onOpen
-	>Did you want to reset your changes?</ConfirmationDialog
+<ConfirmationDialog
+	onConfirm={onResetChange}
+	onOpen={onOpenConfirmationDialog}
+	isOpen={$isConfirmationDialogOpen}
+	onClose={onCloseConfirmationModal}
+>
+	Did you want to reset your changes?</ConfirmationDialog
 >
