@@ -10,13 +10,25 @@
 		capitalizeFirstLetterOfMappedListItems
 	} from '$lib/utils';
 
-	export let items: MappedListItem[];
-	export let isEditing: Readable<boolean>;
-	export let onEnterKeydown: () => void;
-	export let onDeleteItem: (index: number) => void;
-	export let logType: LogType_enum;
-	export let listType: LogListType_enum;
-	export let focusElements: Writable<HTMLElement[]>;
+	interface LogListItemsProps {
+		items: MappedListItem[];
+		isEditing: Readable<boolean>;
+		onEnterKeydown: () => void;
+		onDeleteItem: (index: number) => void;
+		logType: LogType_enum;
+		listType: LogListType_enum;
+		focusElements: Writable<HTMLElement[]>;
+	}
+
+	let {
+		items,
+		isEditing,
+		onEnterKeydown,
+		onDeleteItem,
+		logType,
+		listType,
+		focusElements
+	}: LogListItemsProps = $props();
 
 	const bulletType: Record<
 		LogListType_enum,
@@ -35,11 +47,11 @@
 		[LogType_enum.list]: 'bg-gray-100'
 	};
 
-	$: {
+	$effect(() => {
 		if (areAnyListItemsNotCapitalised(items)) {
 			items = capitalizeFirstLetterOfMappedListItems(items);
 		}
-	}
+	});
 </script>
 
 <ul class="ml-8 stack w-full" style={`list-style-type:${bulletType[listType]}`}>
@@ -61,7 +73,7 @@
 					</div>
 					<div class="min-w-[40px] hidden sm:flex align-center relative">
 						{#if $isEditing}
-							<button class=" absolute top-0" on:click={() => onDeleteItem(index)}>
+							<button class=" absolute top-0" onclick={() => onDeleteItem(index)}>
 								<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 							</button>
 						{/if}
@@ -69,7 +81,7 @@
 				</div>
 				<div class="mt-1 flex sm:hidden">
 					{#if $isEditing}
-						<button class="flex sm:hidden" on:click={() => onDeleteItem(index)}>
+						<button class="flex sm:hidden" onclick={() => onDeleteItem(index)}>
 							<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 						</button>
 					{/if}
