@@ -50,6 +50,11 @@
 			questions = capitalizeFirstLetterOfMappedQuestions(questions);
 		}
 	});
+
+	const onTextareaChange = (e: Event, index: number) => {
+		const target = e.target as HTMLTextAreaElement;
+		onAnswerChange(index, target?.value);
+	};
 </script>
 
 <ul class="ml-2 stack flex-1 gap-3">
@@ -77,7 +82,7 @@
 						<Textarea
 							bind:value={questions[index].answer}
 							_class="flex-1"
-							onChange={(e:Event) => onAnswerChange(index, e.target?.value)}
+							onChange={(e) => onTextareaChange(e, index)}
 							bind:onFocus={onFocusAnswerInput}
 						/>
 					</div>

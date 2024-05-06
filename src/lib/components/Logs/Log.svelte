@@ -27,12 +27,19 @@
 	import isEqual from 'lodash.isequal';
 	import { useDisclosure } from '$lib/hooks';
 
-	export let initialLog: Log_int;
-	const log: Writable<MappedLog_int> = writable(getMappedLog(initialLog));
-	$: initialLog, ($log = getMappedLog(initialLog));
+	interface LogProps {
+		initialLog: Log_int;
+		editOnMount: boolean;
+		inputAutoFocus: boolean;
+	}
 
-	export let editOnMount: boolean = false;
-	export let inputAutoFocus: boolean = false;
+	let { initialLog, editOnMount, inputAutoFocus }: LogProps = $props();
+
+	const log: Writable<MappedLog_int> = writable(getMappedLog(initialLog));
+
+	$effect(() => {
+		$log = getMappedLog(initialLog);
+	});
 
 	let container: HTMLButtonElement;
 
@@ -116,7 +123,7 @@
 		}
 	};
 
-	let changeReferenceInputValue: ((value: string | undefined) => void) | undefined = undefined;
+	let changeReferenceInputValue: ((value: string | undefined) => void) | undefined = $state();
 
 	const onTitleAutoFill = (_title: string) => {
 		const correspondingReference = $titlesAndReferences.find((t) => t.title === _title)?.reference;
@@ -378,14 +385,16 @@
 	};
 </script>
 
-<button
+<button onclick={onClickLog} onkeydown={onContainerKeydown} bind:this={container}>
+	<!-- todo:svelte 5 -->
+	<!-- <button
 	use:clickOutside
 	on:click_outside={onClickOutside}
 	class=""
-	on:click={onClickLog}
-	on:keydown={onContainerKeydown}
+	onclick={onClickLog}
+	onkeydown={onContainerKeydown}
 	bind:this={container}
->
+> -->
 	<div class={containerClasses[$log.type][0]}>
 		<div class="stack {containerClasses[$log.type][1]}">
 			<div class={$log.title || $log.reference || $isEditing ? 'flex' : 'hidden'}>
