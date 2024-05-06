@@ -1,21 +1,36 @@
 <script lang="ts">
-	import { afterUpdate, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import type { ChangeEventHandler } from 'svelte/elements';
-	export let value: string | string[];
-	export let className = '';
-	export let autofocus = false;
-	export let _class = '';
-	export let onEnterKeydown: () => void = () => {};
-	export let onChange: ChangeEventHandler<HTMLTextAreaElement> = () => {};
-	export let textarea: HTMLElement | undefined = undefined;
-	export let onFocus: (() => void) | undefined = undefined;
+
+	interface TextareaProps {
+		value: string | string[];
+		className?: string;
+		autofocus?: boolean;
+		_class?: string;
+		onEnterKeydown?: () => void;
+		onChange?: ChangeEventHandler<HTMLTextAreaElement>;
+		onFocus?: () => void;
+		textarea?: HTMLElement;
+	}
+
+	let {
+		className,
+		autofocus,
+		_class,
+		onEnterKeydown,
+		onChange,
+		value = $bindable(),
+		onFocus = $bindable(),
+		textarea = $bindable()
+	}: TextareaProps = $props();
+
 	const resize = () => {
 		if (!textarea) return;
 		textarea.style.height = '20px';
 		if (textarea.scrollHeight > 20) textarea.style.height = textarea.scrollHeight + 'px';
 	};
 
-	afterUpdate(() => {
+	$effect(() => {
 		resize();
 	});
 
@@ -28,7 +43,7 @@
 			if (e.key === 'Enter') {
 				if (e.metaKey || e.ctrlKey || e.altKey) return;
 				e.preventDefault();
-				onEnterKeydown();
+				onEnterKeydown && onEnterKeydown();
 			}
 		};
 
@@ -50,10 +65,10 @@
 		bind:value
 		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"
 		bind:this={textarea}
-		on:input={resize}
-		on:change={onChange}
-		on:focus={_onFocus}
-	/>
+		oninput={resize}
+		onchange={onChange}
+		onfocus={_onFocus}
+	></textarea>
 </div>
 
 <svelte:window on:resize={resize} />
