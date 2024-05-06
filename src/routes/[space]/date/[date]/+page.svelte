@@ -32,6 +32,7 @@
 		useDisclosure
 	} from '$lib';
 	import Log from '$lib/components/Logs/Log.svelte';
+	import type { ChangeEventHandler } from 'svelte/elements';
 
 	interface PageDataProps extends SpaceData_int {
 		data: {
@@ -189,8 +190,8 @@
 
 	setContext('onResetNewLogType', onResetNewLogType);
 
-	const onDateChange = (e: InputEvent) => {
-		const target = e.target as HTMLInputElement;
+	const onDateChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+		const target = event.target as HTMLInputElement;
 		$selectedDate = getDateFromHyphenatedString(target.value.split('-').reverse().join('-'));
 	};
 

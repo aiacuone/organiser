@@ -2,15 +2,16 @@
 	import Icon from '@iconify/svelte';
 
 	interface Button {
-		label: string;
 		onClick: () => void;
-		icon: string;
-		_class: string;
-		notification: number;
+		icon?: string;
+		_class?: string;
+		label?: string;
+		notification?: number;
 	}
+
 	interface PillButtonProps extends SvelteAllProps {
 		buttons: Button[];
-		capitalizeLabels: boolean;
+		capitalizeLabels?: boolean;
 		_class: string;
 	}
 
