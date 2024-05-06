@@ -2,11 +2,15 @@
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
 
-	export let value: number;
-	export let min: number;
-	export let max: number;
-	export let onIncrement: () => void;
-	export let onDecrement: () => void;
+	interface incrementDecrementProps {
+		value: number;
+		min: number;
+		max: number;
+		onIncrement: () => void;
+		onDecrement: () => void;
+	}
+
+	let { value, min, max, onIncrement, onDecrement }: incrementDecrementProps = $props();
 
 	const _onIncrement = () => {
 		if (value < max) {
@@ -23,7 +27,7 @@
 
 <div class="hstack h-[30px]">
 	<button
-		on:click={_onDecrement}
+		onclick={_onDecrement}
 		class="center h-full border-l-2 border-t-2 border-b-2 rounded-l-lg border-gray-100 px-1"
 	>
 		<Icon icon={icons.left} height="15px" class="text-gray-300" />
@@ -32,7 +36,7 @@
 		{value}
 	</p>
 	<button
-		on:click={_onIncrement}
+		onclick={_onIncrement}
 		class="center h-full border-r-2 border-t-2 border-b-2 rounded-r-lg border-gray-100 px-1"
 	>
 		<Icon icon={icons.right} height="15px" class="text-gray-300" />

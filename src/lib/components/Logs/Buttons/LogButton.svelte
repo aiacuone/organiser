@@ -1,11 +1,15 @@
 <script lang="ts">
-	export let _class = '';
-	export let onClick: (() => void) | undefined = undefined;
+	interface LogButtonProps extends SvelteAllProps {
+		_class: string;
+		onClick: () => void;
+	}
+
+	let { _class, onClick, children }: LogButtonProps = $props();
 </script>
 
 <button
-	on:click={onClick}
+	onclick={onClick}
 	class="border-2 px-2 border-gray-100 rounded-md flex h-[30px] center {_class}"
 >
-	<slot />
+	{@render children()}
 </button>

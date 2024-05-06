@@ -1,13 +1,23 @@
 <script lang="ts">
 	import { logEnumNames, type Log_int, LogType_enum, Log_enum } from '$lib/types';
 
-	export let logs: Log_int[];
-	export let logKeyValueFilter: Record<Log_enum, boolean>;
-	export let logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number;
-	export let typeFilter: Record<LogType_enum, boolean>;
-	export let showKeys: boolean;
+	interface ExportDialogLogsProps {
+		logs: Log_int[];
+		logKeyValueFilter: Record<Log_enum, boolean>;
+		logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number;
+		typeFilter: Record<LogType_enum, boolean>;
+		showKeys: boolean;
+	}
 
-	$: logFilter = ([key, value]: [Log_enum, any]) => {
+	let {
+		logs,
+		logKeyValueFilter,
+		logKeyValueSortFunction,
+		typeFilter,
+		showKeys
+	}: ExportDialogLogsProps = $props();
+
+	const logFilter = $derived(([key, value]: [Log_enum, any]) => {
 		if (key === Log_enum.listItems) return value.length > 0;
 		if (key === Log_enum.questions)
 			return value.some(
@@ -15,7 +25,7 @@
 			);
 		if (key === Log_enum.checkboxItems) return value.some(({ text }: { text: string }) => text);
 		return logKeyValueFilter[key] && value;
-	};
+	});
 </script>
 
 {#each logs.filter(({ type }) => typeFilter[type]) as log}
