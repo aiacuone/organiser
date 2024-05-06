@@ -10,23 +10,33 @@
 		capitalizeFirstLetterOfMappedCheckboxItems
 	} from '$lib/utils';
 
-	export let checkboxes: MappedCheckboxItem[];
-	export let isEditing: Readable<boolean>;
-	export let onEnterKeydown: () => void;
-	export let onDeleteBullet: (index: number) => void;
-	export let focusElements: Writable<HTMLElement[]>;
+	interface LogCheckboxItemsProps {
+		checkboxes: MappedCheckboxItem[];
+		isEditing: Readable<boolean>;
+		onEnterKeydown: () => void;
+		onDeleteBullet: (index: number) => void;
+		focusElements: Writable<HTMLElement[]>;
+		onEdit: () => void;
+	}
 
-	export let onEdit: () => void;
+	let {
+		checkboxes,
+		isEditing,
+		onEnterKeydown,
+		onDeleteBullet,
+		focusElements,
+		onEdit
+	}: LogCheckboxItemsProps = $props();
 
 	const onCheckboxesChange = () => {
 		onEdit();
 	};
 
-	$: {
+	$effect(() => {
 		if (areAnyCheckboxItemsNotCapitalised(checkboxes)) {
 			checkboxes = capitalizeFirstLetterOfMappedCheckboxItems(checkboxes);
 		}
-	}
+	});
 </script>
 
 <ul class="ml-3 stack flex-1">
@@ -39,7 +49,7 @@
 				<input
 					type="checkbox"
 					class="mr-[7px]"
-					on:change={onCheckboxesChange}
+					onchange={onCheckboxesChange}
 					bind:checked={checkboxes[index].isChecked}
 				/>
 				<div class="flex gap-2 min-h-[20px] flex-1">
@@ -54,7 +64,7 @@
 					</div>
 					<div class="min-w-[40px] hidden sm:flex align-center relative">
 						{#if $isEditing}
-							<button class=" absolute top-0" on:click={() => onDeleteBullet(index)}>
+							<button class=" absolute top-0" onclick={() => onDeleteBullet(index)}>
 								<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 							</button>
 						{/if}
@@ -62,7 +72,7 @@
 				</div>
 				<div class="mt-1 flex sm:hidden">
 					{#if $isEditing}
-						<button class="flex sm:hidden" on:click={() => onDeleteBullet(index)}>
+						<button class="flex sm:hidden" onclick={() => onDeleteBullet(index)}>
 							<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 						</button>
 					{/if}

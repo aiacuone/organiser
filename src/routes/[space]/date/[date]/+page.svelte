@@ -90,21 +90,19 @@
 	$effect(() => {
 		$selectedDate && debounce(invalidateLogsAndTitlesAndReferences);
 	});
-	// $: $selectedDate, debounce(invalidateLogsAndTitlesAndReferences);
 
 	$effect(() => {
 		$page.params.space && invalidateLogsAndTitlesAndReferences();
 	});
-	// $: $page.params.space, invalidateLogsAndTitlesAndReferences();
+
 	$effect(() => {
 		$titlesAndReferencesQuery && ($titlesAndReferences = $titlesAndReferencesQuery.data);
 	});
-	// $: $titlesAndReferencesQuery, ($titlesAndReferences = $titlesAndReferencesQuery.data);
 
 	let headerContainer = $state(0);
 	let parentContainerHeight = $state(0);
 	let logButtonsContainerHeight = $state(0);
-	let notesContainerHeight = $derived(
+	const notesContainerHeight = $derived(
 		parentContainerHeight - headerContainer - logButtonsContainerHeight - 55
 	);
 
