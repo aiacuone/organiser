@@ -16,7 +16,7 @@
 		getLocalStorage,
 		setLocalStorage
 	} from '$lib/utils';
-	import { viewport } from '$lib/hooks';
+	import { useDisclosure, viewport } from '$lib/hooks';
 	import type { InfiniteData } from '@sveltestack/svelte-query';
 	import type { AxiosResponse } from 'axios';
 	import ExportDialogLogs from './ExportDialogLogs.svelte';
@@ -24,15 +24,31 @@
 	import { icons } from '$lib/general/icons';
 	import { onMount } from 'svelte';
 
-	export let onOpen: () => void;
-	export let onClose: () => void;
-	export let isLoadingLogs: boolean;
-	export let isFetchingLogs: boolean;
-	export let isLogsError: boolean;
-	export let logsData: InfiniteData<AxiosResponse<any, any>> | undefined = undefined;
-	export let logs: Log_int[] | undefined = undefined;
-	export let hasNextLogsPage: boolean | undefined = undefined;
-	export let getNextLogsPage: (() => void) | undefined = undefined;
+	interface ExportDialogProps extends SvelteAllProps {
+		isOpen: boolean;
+		onOpen: () => void;
+		onClose: () => void;
+		isLoadingLogs: boolean;
+		isFetchingLogs: boolean;
+		isLogsError: boolean;
+		logsData?: InfiniteData<AxiosResponse<any, any>>;
+		logs?: Log_int[];
+		hasNextLogsPage?: boolean;
+		getNextLogsPage?: () => void;
+	}
+
+	let {
+		isOpen,
+		onOpen,
+		onClose,
+		isLoadingLogs,
+		isFetchingLogs,
+		isLogsError,
+		logsData,
+		logs,
+		hasNextLogsPage,
+		getNextLogsPage
+	}: ExportDialogProps = $props();
 
 	let defaultLogKeyValueFilter: Partial<Record<Log_enum, boolean>> = {
 		id: false,
@@ -49,7 +65,7 @@
 		questions: true
 	};
 
-	let logKeyValueFilter = { ...defaultLogKeyValueFilter };
+	let logKeyValueFilter = $state({ ...defaultLogKeyValueFilter });
 
 	const defaultTypeFilterData = Object.fromEntries(
 		Object.values(LogType_enum).map((type) => [type, true])
@@ -61,7 +77,7 @@
 		showKeys: true
 	};
 
-	let preferences = { ...defaultPreferences };
+	let preferences = $state({ ...defaultPreferences });
 
 	onMount(() => {
 		const [storageLogKeyValueFilter, storageTypeFilter, storagePreferences] = getLocalStorage([
@@ -100,16 +116,17 @@
 	};
 
 	let logsContainer: HTMLDivElement;
-	let containerHeight: number;
-	let headerHeight: number;
-	let buttonsContainerHeight: number;
-	let footerButtonsContainerHeight: number;
+	let containerHeight: number = $state(0);
+	let headerHeight: number = $state(0);
+	let buttonsContainerHeight: number = $state(0);
+	let footerButtonsContainerHeight: number = $state(0);
 
-	$: containerHeight,
+	$effect(() => {
 		containerHeight &&
 			(logsContainer.style.height = `${
 				containerHeight - headerHeight - buttonsContainerHeight - footerButtonsContainerHeight
 			}px`);
+	});
 
 	const onCopy = (index: number) => {
 		copyToClipboard(logsContainer.innerText);
@@ -152,10 +169,13 @@
 
 	const onUnselectAll = () => {
 		const makeAllFalse = (object: Record<string, boolean>) => {
-			return Object.entries(object).reduce((acc, [key]) => {
-				acc[key] = false;
-				return acc;
-			}, {} as Record<string, boolean>);
+			return Object.entries(object).reduce(
+				(acc, [key]) => {
+					acc[key] = false;
+					return acc;
+				},
+				{} as Record<string, boolean>
+			);
 		};
 		typeFilter = makeAllFalse({ ...typeFilter });
 		logKeyValueFilter = makeAllFalse({ ...logKeyValueFilter });
@@ -164,18 +184,24 @@
 
 	const onSelectAll = () => {
 		const makeAllTrue = (object: Record<string, boolean>) => {
-			return Object.entries(object).reduce((acc, [key]) => {
-				acc[key] = true;
-				return acc;
-			}, {} as Record<string, boolean>);
+			return Object.entries(object).reduce(
+				(acc, [key]) => {
+					acc[key] = true;
+					return acc;
+				},
+				{} as Record<string, boolean>
+			);
 		};
 		typeFilter = makeAllTrue({ ...typeFilter });
 		logKeyValueFilter = makeAllTrue({ ...logKeyValueFilter });
 		preferences = makeAllTrue({ ...preferences });
 	};
 
-	let onOpenDefaultSelection: () => void;
-	let onCloseDefaultSelection: () => void;
+	const {
+		isOpen: isDefaultSelectionOpen,
+		onOpen: onOpenDefaultSelection,
+		onClose: onCloseDefaultSelection
+	} = useDisclosure();
 
 	const selectButtons = [
 		{
@@ -230,9 +256,9 @@
 </script>
 
 <Dialog
-	bind:dialog
-	bind:onOpen
-	bind:onClose
+	{isOpen}
+	{onOpen}
+	{onClose}
 	_class="h-full w-full max-w-screen-lg"
 	preventClose={isDefaultSelectionDialogOpen}
 >
@@ -284,7 +310,7 @@
 		<div class="stack flex-1 overflow-y-scroll hide-scrollbar" bind:this={logsContainer}>
 			{#if isLoadingLogs}
 				{#each Array(5) as _}
-					<div class="bg-neutral-100 rounded-sm h-[120px] w-full" />
+					<div class="bg-neutral-100 rounded-sm h-[120px] w-full"></div>
 				{/each}
 			{:else if isLogsError}
 				Error
@@ -302,7 +328,7 @@
 					{#if isFetchingLogs}
 						Loading more...
 					{:else if hasNextLogsPage}
-						<div use:viewport on:enterViewport={getNextLogsPage} class="h-10 w-full" />
+						<div use:viewport onenterViewport={getNextLogsPage} class="h-10 w-full"></div>
 					{:else}
 						{logsData.pages[0].data.total} Results
 					{/if}
@@ -332,9 +358,9 @@
 </Dialog>
 
 <Dialog
-	bind:onOpen={onOpenDefaultSelection}
-	bind:onClose={onCloseDefaultSelection}
-	bind:isOpen={isDefaultSelectionDialogOpen}
+	onOpen={onOpenDefaultSelection}
+	onClose={onCloseDefaultSelection}
+	isOpen={$isDefaultSelectionOpen}
 >
 	<div class="stack gap-2">
 		<p>Are you sure you want to create a new default selection?</p>

@@ -28,7 +28,8 @@
 		getCapitalizedWords,
 		darkMode,
 		getHyphenatedStringFromDate,
-		getDayFromHyphenatedString
+		getDayFromHyphenatedString,
+		useDisclosure
 	} from '$lib';
 	import Log from '$lib/components/Logs/Log.svelte';
 
@@ -118,7 +119,7 @@
 		dividers: false
 	};
 
-	let showInNotesModalCheckboxes: Record<string, boolean> = { ...defaultModalCheckboxes };
+	let showInNotesModalCheckboxes: Record<string, boolean> = $state({ ...defaultModalCheckboxes });
 
 	const resetCheckboxes = () => {
 		showInNotesModalCheckboxes = { ...defaultModalCheckboxes };
@@ -188,8 +189,9 @@
 
 	setContext('onResetNewLogType', onResetNewLogType);
 
-	const onDateChange = (e) => {
-		$selectedDate = getDateFromHyphenatedString(e.target.value.split('-').reverse().join('-'));
+	const onDateChange = (e: InputEvent) => {
+		const target = e.target as HTMLInputElement;
+		$selectedDate = getDateFromHyphenatedString(target.value.split('-').reverse().join('-'));
 	};
 
 	let searchValue: string = $state('');
@@ -239,8 +241,11 @@
 		$filters = [];
 	};
 
-	let onOpenExport: () => void = $state(() => {});
-	let onCloseExport: () => void = $state(() => {});
+	const {
+		isOpen: isExportDialogOpen,
+		onOpen: openExportDialog,
+		onClose: onCloseExportDialog
+	} = useDisclosure();
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -263,7 +268,7 @@
 					onEnterKeydown={onSearch}
 					{onClickClear}
 				/>
-				<Button onClick={onOpenExport}>
+				<Button onClick={openExportDialog}>
 					<Icon icon={icons.export} height="20px" class="text-gray-400" />
 				</Button>
 			</div>
@@ -375,8 +380,9 @@
 
 {#if $filteredLogs && $filteredLogs.length}
 	<ExportDialog
-		bind:onClose={onCloseExport}
-		bind:onOpen={onOpenExport}
+		isOpen={$isExportDialogOpen}
+		onClose={onCloseExportDialog}
+		onOpen={openExportDialog}
 		logs={$filteredLogs}
 		isLoadingLogs={$logs.isLoading}
 		isLogsError={$logs.isError}

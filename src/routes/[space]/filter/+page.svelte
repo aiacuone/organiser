@@ -21,6 +21,7 @@
 	import { onMount } from 'svelte';
 	import { derived, writable, type Writable } from 'svelte/store';
 	import { axios } from '$lib/general';
+	import { useDisclosure } from '$lib';
 
 	const queryClient = useQueryClient();
 
@@ -118,7 +119,7 @@
 	let headerContainerHeight: number = $state(0);
 	let parentContainerHeight: number = $state(0);
 
-	let logContainerHeight: number = $derived(parentContainerHeight - headerContainerHeight - 20);
+	const logContainerHeight: number = $derived(parentContainerHeight - headerContainerHeight - 20);
 
 	onMount(() => {
 		const onKeydown = (e) => {
@@ -159,8 +160,12 @@
 			$filters = $filters.filter((filter) => filter[0] !== 'search');
 		}
 	};
-	let onCloseExport: () => void = $state(() => {});
-	let onOpenExport: () => void = $state(() => {});
+
+	const {
+		isOpen: isExportDialogOpen,
+		onOpen: openExportDialog,
+		onClose: closeExportDialog
+	} = useDisclosure();
 </script>
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
@@ -189,7 +194,7 @@
 						</label>
 					{/each}
 				</div>
-				<Button onClick={onOpenExport}>
+				<Button onClick={openExportDialog}>
 					<Icon icon={icons.export} height="20px" class="text-gray-400" />
 				</Button>
 			</div>
@@ -242,8 +247,9 @@
 </div>
 
 <ExportDialog
-	bind:onClose={onCloseExport}
-	bind:onOpen={onOpenExport}
+	isOpen={$isExportDialogOpen}
+	onOpen={openExportDialog}
+	onClose={closeExportDialog}
 	logsData={$filteredLogsQuery.data}
 	isLoadingLogs={$filteredLogsQuery.isLoading}
 	isLogsError={$filteredLogsQuery.isError}
