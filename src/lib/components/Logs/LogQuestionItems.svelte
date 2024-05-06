@@ -12,17 +12,25 @@
 	} from '$lib/utils';
 	import type { Writable } from 'svelte/store';
 
-	export let questions: MappedQuestionItem[];
-	export let onFocusAnswerInput: () => void;
-	export let id: string;
-	export const onReset: () => void = () => {
-		isAnswering = undefined;
-	};
-	export let isEditing: Readable<boolean>;
-	export let onDeleteQuestion: (index: number) => void;
-	export let focusElements: Writable<HTMLElement[]>;
+	interface LogQuestionItemsProps {
+		questions: MappedQuestionItem[];
+		onFocusAnswerInput: () => void;
+		id: string;
+		isEditing: Readable<boolean>;
+		onDeleteQuestion: (index: number) => void;
+		focusElements: Writable<HTMLElement[]>;
+	}
 
-	let isAnswering: undefined | number = undefined;
+	let {
+		questions,
+		onFocusAnswerInput,
+		id,
+		isEditing,
+		onDeleteQuestion,
+		focusElements
+	}: LogQuestionItemsProps = $props();
+
+	let isAnswering: undefined | number = $state();
 
 	const _onFocusAnswerInput = (index: number) => {
 		$currentlyEditing = id;
@@ -37,11 +45,11 @@
 		questions[index].answer = value;
 	};
 
-	$: {
+	$effect(() => {
 		if (areAnyQuestionsNotCapitalised(questions)) {
 			questions = capitalizeFirstLetterOfMappedQuestions(questions);
 		}
-	}
+	});
 </script>
 
 <ul class="ml-2 stack flex-1 gap-3">
@@ -69,7 +77,7 @@
 						<Textarea
 							bind:value={questions[index].answer}
 							_class="flex-1"
-							onChange={(e) => onAnswerChange(index, e.target?.value)}
+							onChange={(e:Event) => onAnswerChange(index, e.target?.value)}
 							bind:onFocus={onFocusAnswerInput}
 						/>
 					</div>
@@ -85,7 +93,7 @@
 			</div>
 			<div class="center">
 				{#if $isEditing}
-					<button class="flex" on:click={() => onDeleteQuestion(index)}>
+					<button class="flex" onclick={() => onDeleteQuestion(index)}>
 						<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 					</button>
 				{/if}

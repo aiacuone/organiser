@@ -85,7 +85,7 @@
 			await queryClient.cancelQueries('logs');
 			const previousLogs = queryClient.getQueryData('logs');
 			queryClient.setQueryData('logs', ({ logs: previousLogs }) => {
-				const updatedLogs = previousLogs.filter((log) => log.id !== logId);
+				const updatedLogs = previousLogs.filter((log: Log_int) => log.id !== logId);
 				return {
 					logs: updatedLogs,
 					count: updatedLogs.length
@@ -416,7 +416,7 @@
 				{#if $log.type === LogType_enum.todo || ($log.type === LogType_enum.list && $log.listType === LogListType_enum.checkbox)}
 					<div class="flex-1">
 						<CheckboxItems
-							bind:checkboxes={$log.checkboxItems}
+							checkboxes={$log.checkboxItems}
 							{isEditing}
 							onEnterKeydown={onTextareaEnterKeydown}
 							onDeleteBullet={onDeleteItem}
@@ -426,7 +426,7 @@
 					</div>
 				{:else if $log.type === LogType_enum.question}
 					<LogQuestionItems
-						bind:questions={$log.questions}
+						questions={$log.questions}
 						onFocusAnswerInput={_onFocusAnswerInput}
 						{isEditing}
 						onDeleteQuestion={onDeleteItem}
@@ -435,8 +435,8 @@
 					/>
 				{:else if $log.type === LogType_enum.important || $log.type === LogType_enum.time || ($log.type === LogType_enum.list && $log.listType !== LogListType_enum.checkbox)}
 					<ListItems
-						bind:items={$log.listItems}
-						bind:listType={$log.listType}
+						items={$log.listItems}
+						listType={$log.listType}
 						{isEditing}
 						onEnterKeydown={onTextareaEnterKeydown}
 						{onDeleteItem}
