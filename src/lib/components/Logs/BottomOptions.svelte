@@ -14,26 +14,39 @@
 	import type { Writable } from 'svelte/store';
 	import { useDisclosure } from '$lib/hooks';
 
-	export let onDelete: () => void;
-	export let onAccept: () => void;
-	export let onAddItem: () => void;
-	export let incrementDecrementProps:
-		| {
-				onIncrement: () => void;
-				onDecrement: () => void;
-				max: number;
-				min: number;
-		  }
-		| undefined = undefined;
-	export let isEditing: boolean;
-	export let incrementDecrementValue: number | undefined = undefined;
-	export let showIncrementDecrement: boolean = true;
-	export let log: Writable<MappedLog_int>;
+	interface BottomOptionsProps {
+		log: Writable<MappedLog_int>;
+		onDelete: () => void;
+		onAccept: () => void;
+		onAddItem: () => void;
+		incrementDecrementProps: {
+			onIncrement: () => void;
+			onDecrement: () => void;
+			max: number;
+			min: number;
+		};
+		isEditing: boolean;
+		incrementDecrementValue: number;
+		showIncrementDecrement?: boolean;
+	}
+
+	let {
+		log,
+		onDelete,
+		onAccept,
+		onAddItem,
+		incrementDecrementProps,
+		isEditing,
+		incrementDecrementValue,
+		showIncrementDecrement = true
+	}: BottomOptionsProps = $props();
 
 	const { onOpen: onOpenDelete, onClose: onCloseDelete, isOpen: isOpenDelete } = useDisclosure();
 
-	$: dateValues = getDayMonthYearFromDate($log.date);
-	$: lastUpdatedDateValues = $log.lastUpdated && getDayMonthYearFromDate($log.lastUpdated);
+	const dateValues = $derived(getDayMonthYearFromDate($log.date));
+	const lastUpdatedDateValues = $derived(
+		$log.lastUpdated && getDayMonthYearFromDate($log.lastUpdated)
+	);
 
 	const onConfirmDelete: () => void = () => {
 		onDelete();
@@ -63,7 +76,7 @@
 		[LogListType_enum.checkbox]: icons.checkboxList
 	};
 
-	$: buttons = [
+	const buttons = $derived([
 		{
 			icon: icons.delete,
 			onClick: onOpenDelete,
@@ -83,7 +96,7 @@
 			onClick: onChangeList,
 			isHidden: !isEditing || $log.type !== LogType_enum.list
 		}
-	];
+	]);
 </script>
 
 <div class="w-full hstack">
