@@ -6,11 +6,11 @@
 	import { goto } from '$app/navigation';
 	import { getHyphenatedStringFromDate, replaceAllSpacesWithHyphens } from '$lib/utils';
 
-	interface AddSpaceProps {
+	interface Props {
 		onAddSpace?: () => void;
 	}
 
-	const { onAddSpace }: AddSpaceProps = $props();
+	const { onAddSpace }: Props = $props();
 
 	let addInputValue: string = $state('');
 

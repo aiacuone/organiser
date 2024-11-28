@@ -10,7 +10,7 @@
 		capitalizeFirstLetterOfMappedListItems
 	} from '$lib/utils';
 
-	interface LogListItemsProps {
+	interface Props {
 		items: MappedListItem[];
 		isEditing: Readable<boolean>;
 		onEnterKeydown: () => void;
@@ -20,15 +20,8 @@
 		focusElements: Writable<HTMLElement[]>;
 	}
 
-	let {
-		items,
-		isEditing,
-		onEnterKeydown,
-		onDeleteItem,
-		logType,
-		listType,
-		focusElements
-	}: LogListItemsProps = $props();
+	let { items, isEditing, onEnterKeydown, onDeleteItem, logType, listType, focusElements }: Props =
+		$props();
 
 	const bulletType: Record<
 		LogListType_enum,

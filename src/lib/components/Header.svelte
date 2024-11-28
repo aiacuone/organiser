@@ -22,11 +22,11 @@
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
 	import AddSpace from './AddSpace.svelte';
 
-	interface HeaderProps extends SvelteAllProps {
+	interface Props extends SvelteAllProps {
 		space: string | undefined;
 	}
 
-	const { space }: HeaderProps = $props();
+	const { space }: Props = $props();
 	let isAddingNewSpace: boolean = $state(false);
 
 	const {

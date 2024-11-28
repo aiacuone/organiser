@@ -4,11 +4,11 @@
 	import Log from './Logs/Log.svelte';
 	import type { LogType_enum, Log_int } from '$lib/types';
 
-	interface NewLogProps extends SvelteAllProps {
+	interface Props extends SvelteAllProps {
 		type: LogType_enum;
 	}
 
-	const { type }: NewLogProps = $props();
+	const { type }: Props = $props();
 
 	const [day, month] = $page.params.date.split('-');
 

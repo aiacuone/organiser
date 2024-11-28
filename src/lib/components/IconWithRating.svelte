@@ -2,14 +2,14 @@
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
 
-	interface IconWithRatingProps {
+	interface Props {
 		rating: number;
 		icon: string;
 		ratingSize: number | string;
 		iconSize: string;
 	}
 
-	const { rating, icon, ratingSize = 5, iconSize = '30px' }: IconWithRatingProps = $props();
+	const { rating, icon, ratingSize = 5, iconSize = '30px' }: Props = $props();
 </script>
 
 <div class="relative">

@@ -1,5 +1,5 @@
 <script lang="ts">
-	interface DialogProps extends SvelteAllProps {
+	interface Props extends SvelteAllProps {
 		overlayClickClose?: boolean;
 		dialog?: HTMLDialogElement;
 		preventClose?: boolean;
@@ -9,7 +9,7 @@
 		_class?: string;
 	}
 
-	const { preventClose, isOpen, _class, children, onClose }: DialogProps = $props();
+	const { preventClose, isOpen, _class, children, onClose }: Props = $props();
 
 	let dialog: HTMLDialogElement | undefined;
 

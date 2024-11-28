@@ -14,7 +14,7 @@
 	import type { Writable } from 'svelte/store';
 	import { useDisclosure } from '$lib/hooks';
 
-	interface BottomOptionsProps {
+	interface Props {
 		log: Writable<MappedLog_int>;
 		onDelete: () => void;
 		onAccept: () => void;
@@ -39,7 +39,7 @@
 		isEditing,
 		incrementDecrementValue,
 		showIncrementDecrement = true
-	}: BottomOptionsProps = $props();
+	}: Props = $props();
 
 	const { onOpen: onOpenDelete, onClose: onCloseDelete, isOpen: isOpenDelete } = useDisclosure();
 

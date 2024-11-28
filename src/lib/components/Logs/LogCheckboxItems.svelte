@@ -10,7 +10,7 @@
 		capitalizeFirstLetterOfMappedCheckboxItems
 	} from '$lib/utils';
 
-	interface LogCheckboxItemsProps {
+	interface Props {
 		checkboxes: MappedCheckboxItem[];
 		isEditing: Readable<boolean>;
 		onEnterKeydown: () => void;
@@ -19,14 +19,8 @@
 		onEdit: () => void;
 	}
 
-	let {
-		checkboxes,
-		isEditing,
-		onEnterKeydown,
-		onDeleteBullet,
-		focusElements,
-		onEdit
-	}: LogCheckboxItemsProps = $props();
+	let { checkboxes, isEditing, onEnterKeydown, onDeleteBullet, focusElements, onEdit }: Props =
+		$props();
 
 	const onCheckboxesChange = () => {
 		onEdit();

@@ -1,10 +1,10 @@
 <script lang="ts">
-	interface LogButtonProps extends SvelteAllProps {
+	interface Props extends SvelteAllProps {
 		_class: string;
 		onClick: () => void;
 	}
 
-	let { _class, onClick, children }: LogButtonProps = $props();
+	let { _class, onClick, children }: Props = $props();
 </script>
 
 <button

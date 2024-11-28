@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { ChangeEventHandler } from 'svelte/elements';
 
-	interface TextareaProps {
+	interface Props {
 		value: string | string[];
 		className?: string;
 		autofocus?: boolean;
@@ -22,7 +22,7 @@
 		value = $bindable(),
 		onFocus = $bindable(),
 		textarea = $bindable()
-	}: TextareaProps = $props();
+	}: Props = $props();
 
 	const resize = () => {
 		if (!textarea) return;

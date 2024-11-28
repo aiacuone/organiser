@@ -24,7 +24,7 @@
 	import { icons } from '$lib/general/icons';
 	import { onMount } from 'svelte';
 
-	interface ExportDialogProps extends SvelteAllProps {
+	interface Props extends SvelteAllProps {
 		isOpen: boolean;
 		onOpen: () => void;
 		onClose: () => void;
@@ -48,7 +48,7 @@
 		logs,
 		hasNextLogsPage,
 		getNextLogsPage
-	}: ExportDialogProps = $props();
+	}: Props = $props();
 
 	let defaultLogKeyValueFilter: Partial<Record<Log_enum, boolean>> = {
 		id: false,

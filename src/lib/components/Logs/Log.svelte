@@ -27,13 +27,13 @@
 	import isEqual from 'lodash.isequal';
 	import { useDisclosure } from '$lib/hooks';
 
-	interface LogProps {
+	interface Props {
 		initialLog: Log_int;
 		editOnMount: boolean;
 		inputAutoFocus: boolean;
 	}
 
-	let { initialLog, editOnMount, inputAutoFocus }: LogProps = $props();
+	let { initialLog, editOnMount, inputAutoFocus }: Props = $props();
 
 	const log: Writable<MappedLog_int> = writable(getMappedLog(initialLog));
 

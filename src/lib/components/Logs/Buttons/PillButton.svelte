@@ -9,14 +9,14 @@
 		notification?: number;
 	}
 
-	interface PillButtonProps extends SvelteAllProps {
+	interface Props extends SvelteAllProps {
 		buttons: Button[];
 		capitalizeLabels?: boolean;
 		_class: string;
 	}
 
 	// NOTE: this component is to be refactored once Svelte 5.0 releases. Use snippets to pass in buttons and their handlers
-	const { buttons, capitalizeLabels, _class }: PillButtonProps = $props();
+	const { buttons, capitalizeLabels, _class }: Props = $props();
 
 	let containerHeight: number = $state(0);
 </script>

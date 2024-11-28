@@ -2,7 +2,7 @@
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
 
-	interface incrementDecrementProps {
+	interface Props {
 		value: number;
 		min: number;
 		max: number;
@@ -10,7 +10,7 @@
 		onDecrement: () => void;
 	}
 
-	let { value, min, max, onIncrement, onDecrement }: incrementDecrementProps = $props();
+	let { value, min, max, onIncrement, onDecrement }: Props = $props();
 
 	const _onIncrement = () => {
 		if (value < max) {

@@ -2,14 +2,14 @@
 	import Button from './Button.svelte';
 	import Dialog from './Dialog/Dialog.svelte';
 
-	interface ConfirmationDialogProps extends SvelteAllProps {
+	interface Props extends SvelteAllProps {
 		onOpen: () => void;
 		onConfirm: () => void;
 		isOpen: boolean;
 		onClose: () => void;
 	}
 
-	const { onConfirm, isOpen, onClose, children }: ConfirmationDialogProps = $props();
+	const { onConfirm, isOpen, onClose, children }: Props = $props();
 
 	const _onConfirm: (() => void) | undefined = () => {
 		onClose();

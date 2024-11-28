@@ -1,5 +1,5 @@
 <script lang="ts">
-	interface ButtonProps extends SvelteAllProps {
+	interface Props extends SvelteAllProps {
 		onClick?: (e: any) => void;
 		isDisabled?: boolean;
 		className?: string;
@@ -14,7 +14,7 @@
 		_class,
 		height = '28px',
 		children
-	}: ButtonProps = $props();
+	}: Props = $props();
 </script>
 
 <button

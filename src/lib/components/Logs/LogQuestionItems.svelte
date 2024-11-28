@@ -12,7 +12,7 @@
 	} from '$lib/utils';
 	import type { Writable } from 'svelte/store';
 
-	interface LogQuestionItemsProps {
+	interface Props {
 		questions: MappedQuestionItem[];
 		onFocusAnswerInput: () => void;
 		id: string;
@@ -21,14 +21,8 @@
 		focusElements: Writable<HTMLElement[]>;
 	}
 
-	let {
-		questions,
-		onFocusAnswerInput,
-		id,
-		isEditing,
-		onDeleteQuestion,
-		focusElements
-	}: LogQuestionItemsProps = $props();
+	let { questions, onFocusAnswerInput, id, isEditing, onDeleteQuestion, focusElements }: Props =
+		$props();
 
 	let isAnswering: undefined | number = $state();
 
