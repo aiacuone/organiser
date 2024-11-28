@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { logEnumNames, type Log_int, LogType_enum, Log_enum } from '$lib/types';
 
-	interface ExportDialogLogsProps {
+	interface Props {
 		logs: Log_int[];
 		logKeyValueFilter: Record<Log_enum, boolean>;
 		logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number;
@@ -9,13 +9,7 @@
 		showKeys: boolean;
 	}
 
-	let {
-		logs,
-		logKeyValueFilter,
-		logKeyValueSortFunction,
-		typeFilter,
-		showKeys
-	}: ExportDialogLogsProps = $props();
+	let { logs, logKeyValueFilter, logKeyValueSortFunction, typeFilter, showKeys }: Props = $props();
 
 	const logFilter = $derived(([key, value]: [Log_enum, any]) => {
 		if (key === Log_enum.listItems) return value.length > 0;

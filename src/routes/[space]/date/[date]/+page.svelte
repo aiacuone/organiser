@@ -34,7 +34,7 @@
 	import Log from '$lib/components/Logs/Log.svelte';
 	import type { ChangeEventHandler } from 'svelte/elements';
 
-	interface PageDataProps extends SpaceData_int {
+	interface Props extends SpaceData_int {
 		data: {
 			date: string;
 			space: string;
@@ -43,7 +43,7 @@
 		};
 	}
 
-	const { data }: PageDataProps = $props();
+	const { data }: Props = $props();
 
 	const queryClient = useQueryClient();
 
