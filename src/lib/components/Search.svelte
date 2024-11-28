@@ -4,22 +4,32 @@
 	import { icons } from '$lib/general/icons';
 	import Button from './Button.svelte';
 
-	export let value: string;
-	export let onChange: (e: Event) => void = () => {};
-	export let onClickClear: () => void = () => {};
-	export let onClickEnter: () => void = () => {};
-	export let showEnter: boolean = true;
-	export let onEnterKeydown: () => void = () => {};
-	export let onFocus: (() => void) | undefined = undefined;
+	interface Props {
+		value?: string;
+		onChange?: (e: Event) => void;
+		onClickClear?: () => void;
+		onClickEnter?: () => void;
+		showEnter?: boolean;
+		onEnterKeydown?: () => void;
+		onFocus?: (() => void) | undefined;
+	}
+
+	let { value, onClickClear, onClickEnter, showEnter, onEnterKeydown }: Props = $props();
+
+	const onchange = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		const newValue = target.value;
+		value = newValue;
+	};
 </script>
 
 <div class="hstack">
 	<div class="hstack center gap-1 px-2 border border-gray-100 rounded-md">
 		<Icon icon={icons.search} class="text-gray-500" />
-		<Input bind:onFocus _class="outline-none" bind:value {onChange} bind:onEnterKeydown />
+		<Input _class="outline-none" bind:value onChange={onchange} bind:onEnterKeydown />
 	</div>
 	{#if showEnter}
-		<button class="w-[30px] center" on:click={onClickEnter}>
+		<button class="w-[30px] center" onclick={onClickEnter}>
 			<Icon icon={icons.enter} class="text-gray-400" />
 		</button>
 	{/if}

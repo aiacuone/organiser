@@ -22,8 +22,8 @@
 	});
 
 	const onkeydown = (e: KeyboardEvent) => {
-		e.preventDefault();
 		if (e.key === 'Escape') {
+			e.preventDefault();
 			onClose();
 		}
 	};

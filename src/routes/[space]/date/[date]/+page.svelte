@@ -194,7 +194,6 @@
 	};
 
 	let searchValue: string = $state('');
-	let onSearchFocus: () => void = $state(() => {});
 
 	const onSearch = () => {
 		goto(`/${$page.params.space}/filter?search=${searchValue}`);
@@ -204,7 +203,6 @@
 		const keydown = (e: KeyboardEvent) => {
 			if (e.shiftKey && e.ctrlKey && e.key === 'S') {
 				e.preventDefault();
-				onSearchFocus();
 			}
 		};
 		document.addEventListener('keydown', keydown);
@@ -261,8 +259,7 @@
 					<input type="date" onchange={onDateChange} class="w-[20px]" />
 				</div>
 				<Search
-					bind:onFocus={onSearchFocus}
-					bind:value={searchValue}
+					value={searchValue}
 					onClickEnter={onSearch}
 					onEnterKeydown={onSearch}
 					{onClickClear}
