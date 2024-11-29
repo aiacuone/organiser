@@ -7,7 +7,7 @@
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import { goto } from '$app/navigation';
 	import Search from '$lib/components/Search.svelte';
-	import { derived, writable, type Writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
 	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
 	import { browser } from '$app/environment';
@@ -149,10 +149,11 @@
 
 	const filters: Writable<Array<LogType_enum>> = writable([]);
 
-	const filteredLogs = derived([logs, filters], ([$logs, $filters]) => {
-		if ($filters.length === 0) return $logs.data?.logs;
-		return $logs.data?.logs.filter((log: Log_int) => $filters.includes(log.type));
-	});
+	const filteredLogs = $derived(
+		$filters.length === 0
+			? $logs.data?.logs
+			: $logs.data?.logs.filter((log: Log_int) => $filters.includes(log.type))
+	);
 
 	const noteButtons: Record<LogType_enum, { label: string; icon: string; type: LogType_enum }> = {
 		[LogType_enum.time]: {
@@ -243,6 +244,11 @@
 		onOpen: openExportDialog,
 		onClose: onCloseExportDialog
 	} = useDisclosure();
+
+	const onSearchChange = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		searchValue = target.value;
+	};
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
@@ -263,6 +269,7 @@
 					onClickEnter={onSearch}
 					onEnterKeydown={onSearch}
 					{onClickClear}
+					onchange={onSearchChange}
 				/>
 				<Button onClick={openExportDialog}>
 					<Icon icon={icons.export} height="20px" class="text-gray-400" />
@@ -309,8 +316,8 @@
 				</div>
 			{:else if $logs.isError}
 				Error
-			{:else if $filteredLogs}
-				{#each $filteredLogs as log}
+			{:else if filteredLogs}
+				{#each filteredLogs as log}
 					<Log initialLog={log} />
 				{/each}
 			{/if}
@@ -374,12 +381,12 @@
 	<title>{getCapitalizedWords(data.space)} - Organiser</title>
 </svelte:head>
 
-{#if $filteredLogs && $filteredLogs.length}
+{#if filteredLogs && filteredLogs.length}
 	<ExportDialog
 		isOpen={$isExportDialogOpen}
 		onClose={onCloseExportDialog}
 		onOpen={openExportDialog}
-		logs={$filteredLogs}
+		logs={filteredLogs}
 		isLoadingLogs={$logs.isLoading}
 		isLogsError={$logs.isError}
 		isFetchingLogs={$logs.isFetching}

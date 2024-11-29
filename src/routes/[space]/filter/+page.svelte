@@ -6,7 +6,6 @@
 	import Log from '$lib/components/Logs/Log.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import { icons } from '$lib/general/icons';
-	// import { viewport } from '$lib/hooks'; todo:svelte 5
 	import { searchValue, whichInputIsFocused } from '$lib/stores';
 	import { allLogs, searchableInputs } from '$lib/types';
 	import { arraysAreEqual } from '$lib/utils/arrays';
@@ -19,44 +18,45 @@
 	import Icon from '@iconify/svelte';
 	import { useInfiniteQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import { onMount } from 'svelte';
-	import { derived, writable, type Writable } from 'svelte/store';
 	import { axios } from '$lib/general';
 	import { useDisclosure } from '$lib';
 
 	const queryClient = useQueryClient();
+	const _searchParams = $derived(new URLSearchParams($page.url.searchParams));
 
-	const searchParams = derived(page, ($page) => {
-		const searchParams = new URLSearchParams($page.url.searchParams);
-
-		const string = searchParams.toString();
-
-		const array = searchParamsStringToEntriesArray(searchParams);
-
-		return { string, array };
+	let searchParams = $derived({
+		string: _searchParams.toString(),
+		array: searchParamsStringToEntriesArray(_searchParams)
 	});
 
-	const filters: Writable<Array<Array<string>>> = writable($searchParams.array);
+	let filters = $derived(searchParams.array);
 
-	const filtersValues = derived(filters, ($filters) => {
-		const string = entriesArrayToSearchParamsString($filters as Array<[string, string]>);
-		return { string };
-	});
+	const onClearFilters = () => goto(`/${$page.params.space}/filter`);
+
+	const onAddFilter = (filter: [string, string]) =>
+		goto(`/${$page.params.space}/filter?${entriesArrayToSearchParamsString([...filters, filter])}`);
+
+	const onRemoveFilter = (filter: [string, string]) =>
+		goto(
+			`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters.filter((f) => !arraysAreEqual(f, filter)))}`
+		);
+
+	const setFilters = (filters: [string, string][]) =>
+		goto(`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters)}`);
 
 	const onClickClear = () => {
-		$filters = [];
+		onClearFilters();
 		queryClient.invalidateQueries('filteredLogs');
 		$searchValue = '';
 	};
 
 	let hasPageLoaded = $state(false);
-	let onSearchInputFocus: () => void = $state(() => {});
 
 	onMount(() => {
 		hasPageLoaded = true;
 		const hasSearchQuery = $page.url.searchParams.has('search');
 
 		if (hasSearchQuery) {
-			onSearchInputFocus();
 			$searchValue = $page.url.searchParams.get('search') ?? '';
 		}
 	});
@@ -73,24 +73,32 @@
 		timeout();
 	};
 
-	$effect(() => {
-		hasPageLoaded &&
-			$filters &&
-			debounce(() => {
-				const url = $filtersValues.string
-					? `${$page.url.pathname}?${$filtersValues.string}`
-					: `${$page.url.pathname}`;
+	// I dont know what this is for. It may have something to do with the filter page being loaded with a search query. I think come back to this once you have a better understanding of the codebase.
 
-				goto(url, { keepFocus: true });
-			});
-	});
+	// let filtersValues = $derived({
+	// 	string: (() => {
+	// 		const string = entriesArrayToSearchParamsString(filters as Array<[string, string]>);
+	// 		return { string };
+	// 	})()
+	// });
+
+	// $effect(() => {
+	// hasPageLoaded &&
+	// 	filters &&
+	// 	debounce(() => {
+	// 		const url = filtersValues.string
+	// 			? `${$page.url.pathname}?${filtersValues.string}`
+	// 			: `${$page.url.pathname}`;
+	// 		goto(url, { keepFocus: true });
+	// 	});
+	// });
 
 	const fetchFilteredLogs = async ({ pageParam: skip = 0 }) => {
 		const result = await axios.get(`/log`, {
 			params: {
 				space: replaceAllSpacesWithHyphens($page.params.space),
 				skip,
-				json: JSON.stringify($searchParams.array)
+				json: JSON.stringify(searchParams.array)
 			}
 		});
 
@@ -107,12 +115,12 @@
 		}
 	});
 
-	const updatedStateAndInvalidate = () => {
-		$filters = searchParamsStringToEntriesArray($page.url.searchParams);
-		queryClient.invalidateQueries('filteredLogs');
-	};
-
 	$effect(() => {
+		const updatedStateAndInvalidate = () => {
+			setFilters(searchParams.array);
+			queryClient.invalidateQueries('filteredLogs');
+		};
+
 		$page.url && updatedStateAndInvalidate();
 	});
 
@@ -122,15 +130,13 @@
 	const logContainerHeight: number = $derived(parentContainerHeight - headerContainerHeight - 20);
 
 	onMount(() => {
-		const onKeydown = (e) => {
-			if (e.key === 'Escape') {
-				goto(`/${$page.params.space}`);
-			}
+		const onKeydown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') goto(`/${$page.params.space}`);
 		};
+
 		document.addEventListener('keydown', onKeydown);
-		return () => {
-			document.removeEventListener('keydown', onKeydown);
-		};
+
+		return () => document.removeEventListener('keydown', onKeydown);
 	});
 
 	const onGetNextPage = () => {
@@ -140,25 +146,27 @@
 	};
 
 	const onFilterChange = (filterValue: string[]) => {
-		const hasExistingValue = $filters.some((filter) => arraysAreEqual(filter, filterValue));
+		const hasMatchingFilter = filters.some((filter) => arraysAreEqual(filter, filterValue));
 
-		if (hasExistingValue) {
-			$filters = $filters.filter((filter) => !arraysAreEqual(filter, filterValue));
+		if (hasMatchingFilter) {
+			onRemoveFilter(filterValue as [string, string]);
 		} else {
-			$filters = [...$filters, filterValue];
+			onAddFilter(filterValue as [string, string]);
 		}
 	};
 
 	const onSearch = () => {
-		if ($filters.some((filter) => filter[0] === 'search')) {
-			$filters = $filters.filter((filter) => filter[0] !== 'search');
-		}
+		const removeAllSearchFilters = () =>
+			goto(
+				`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters.filter((filter) => filter[0] !== 'search'))}`
+			);
 
-		if ($searchValue) {
-			$filters = [...$filters, ['search', $searchValue]];
-		} else {
-			$filters = $filters.filter((filter) => filter[0] !== 'search');
-		}
+		const isThereAnExistingSearchFilter = filters.some((filter) => filter[0] === 'search');
+
+		if (isThereAnExistingSearchFilter) removeAllSearchFilters();
+
+		if ($searchValue) onAddFilter(['search', $searchValue]);
+		else removeAllSearchFilters();
 	};
 
 	const {
@@ -166,19 +174,21 @@
 		onOpen: openExportDialog,
 		onClose: closeExportDialog
 	} = useDisclosure();
+
+	const onSearchChange = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		const newValue = target.value;
+		$searchValue = newValue;
+
+		debounce(() => onSearch());
+	};
 </script>
 
 <div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
 	<div class="center stack gap-2" bind:clientHeight={headerContainerHeight}>
 		<div class="hstack gap-3 flex-wrap center">
 			<div class="hstack gap-3 border border-gray-100 py-1 px-2 rounded-md flex-wrap center">
-				<Search
-					bind:value={$searchValue}
-					onChange={(e) => debounce(() => onSearch())}
-					{onClickClear}
-					showEnter={false}
-					bind:onFocus={onSearchInputFocus}
-				/>
+				<Search value={$searchValue} onChange={onSearchChange} {onClickClear} showEnter={false} />
 				<div class="hstack gap-2 {$searchValue ? 'opacity-100' : 'opacity-20'}">
 					{#each searchableInputs as key}
 						<label class="capitalize text-xs center gap-1 hstack gap-[2px]">
@@ -186,7 +196,7 @@
 							<input
 								type="checkbox"
 								onchange={() => onFilterChange(['searchType', key])}
-								checked={$filters.some((filterArray) =>
+								checked={filters.some((filterArray) =>
 									arraysAreEqual(filterArray, ['searchType', key])
 								)}
 								disabled={!$searchValue}
@@ -205,7 +215,7 @@
 						<input
 							type="checkbox"
 							onchange={() => onFilterChange(['type', key])}
-							checked={$filters.some((filterArray) => arraysAreEqual(filterArray, ['type', key]))}
+							checked={filters.some((filterArray) => arraysAreEqual(filterArray, ['type', key]))}
 						/>
 					</label>
 				{/each}
@@ -246,6 +256,8 @@
 	</div>
 </div>
 
+<!-- {@debug searchParams} -->
+<!-- {@debug filtersValues} -->
 <ExportDialog
 	isOpen={$isExportDialogOpen}
 	onOpen={openExportDialog}

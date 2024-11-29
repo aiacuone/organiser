@@ -168,30 +168,18 @@
 	};
 
 	const onUnselectAll = () => {
-		const makeAllFalse = (object: Record<string, boolean>) => {
-			return Object.entries(object).reduce(
-				(acc, [key]) => {
-					acc[key] = false;
-					return acc;
-				},
-				{} as Record<string, boolean>
-			);
-		};
+		const makeAllFalse = (object: Record<string, boolean>) =>
+			Object.keys(object).reduce((acc, key) => ({ ...acc, [key]: false }), {});
+
 		typeFilter = makeAllFalse({ ...typeFilter });
 		logKeyValueFilter = makeAllFalse({ ...logKeyValueFilter });
 		preferences = makeAllFalse({ ...preferences });
 	};
 
 	const onSelectAll = () => {
-		const makeAllTrue = (object: Record<string, boolean>) => {
-			return Object.entries(object).reduce(
-				(acc, [key]) => {
-					acc[key] = true;
-					return acc;
-				},
-				{} as Record<string, boolean>
-			);
-		};
+		const makeAllTrue = (object: Record<string, boolean>) =>
+			Object.keys(object).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+
 		typeFilter = makeAllTrue({ ...typeFilter });
 		logKeyValueFilter = makeAllTrue({ ...logKeyValueFilter });
 		preferences = makeAllTrue({ ...preferences });

@@ -76,7 +76,7 @@
 		[LogListType_enum.checkbox]: icons.checkboxList
 	};
 
-	const buttons = $derived([
+	let buttons = $derived([
 		{
 			icon: icons.delete,
 			onClick: onOpenDelete,

@@ -6,7 +6,7 @@
 
 	interface Props {
 		value?: string;
-		onChange?: (e: Event) => void;
+		onchange?: (e: Event) => void;
 		onClickClear?: () => void;
 		onClickEnter?: () => void;
 		showEnter?: boolean;
@@ -14,13 +14,7 @@
 		onFocus?: (() => void) | undefined;
 	}
 
-	let { value, onClickClear, onClickEnter, showEnter, onEnterKeydown }: Props = $props();
-
-	const onchange = (e: Event) => {
-		const target = e.target as HTMLInputElement;
-		const newValue = target.value;
-		value = newValue;
-	};
+	let { value, onClickClear, onClickEnter, showEnter, onEnterKeydown, onchange }: Props = $props();
 </script>
 
 <div class="hstack">
