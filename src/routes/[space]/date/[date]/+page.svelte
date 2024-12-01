@@ -7,7 +7,6 @@
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import { goto } from '$app/navigation';
 	import Search from '$lib/components/Search.svelte';
-	import { writable, type Writable } from 'svelte/store';
 	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
 	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
 	import { browser } from '$app/environment';
@@ -141,18 +140,19 @@
 
 	let notesContainer: HTMLDivElement | undefined = $state();
 	let newLogType: LogType_enum | undefined = $state();
+	let isThereANewLog = $derived(!!newLogType);
 
 	const onNoteButtonClick = (logType: LogType_enum) => {
 		notesContainer?.scrollTo(0, 0);
 		newLogType = logType;
 	};
 
-	const filters: Writable<Array<LogType_enum>> = writable([]);
+	let filters: LogType_enum[] = $state([]);
 
 	const filteredLogs = $derived(
-		$filters.length === 0
+		filters.length === 0
 			? $logs.data?.logs
-			: $logs.data?.logs.filter((log: Log_int) => $filters.includes(log.type))
+			: $logs.data?.logs.filter((log: Log_int) => filters.includes(log.type))
 	);
 
 	const noteButtons: Record<LogType_enum, { label: string; icon: string; type: LogType_enum }> = {
@@ -232,11 +232,11 @@
 
 	const onGotoTodaysDate = () => {
 		$selectedDate = new Date();
-		$filters = [];
+		filters = [];
 	};
 
 	const onClickClear = () => {
-		$filters = [];
+		filters = [];
 	};
 
 	const {
@@ -288,10 +288,10 @@
 							},
 							{
 								onclick: () =>
-									$filters.includes(type)
-										? ($filters = $filters.filter((filter) => filter !== type))
-										: ($filters = [...$filters, type]),
-								_class: `w-2/6 ${$filters.includes(type) ? 'bg-neutral-100' : 'bg-white'}`
+									filters.includes(type)
+										? (filters = filters.filter((filter) => filter !== type))
+										: (filters = [...filters, type]),
+								_class: `w-2/6 ${filters.includes(type) ? 'bg-neutral-100' : 'bg-white'}`
 							}
 						]}
 					/>
@@ -305,7 +305,7 @@
 			style="max-height:{notesContainerHeight}px"
 			bind:this={notesContainer}
 		>
-			{#if !!newLogType}
+			{#if isThereANewLog}
 				<NewLog type={newLogType} />
 			{/if}
 			{#if $logs.isLoading}

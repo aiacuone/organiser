@@ -1,6 +1,6 @@
 <!-- todo: combine this with LogListItems when svelte 5 is released -->
 <script lang="ts">
-	import type { Readable, Writable } from 'svelte/store';
+	import type { Readable } from 'svelte/store';
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
@@ -12,12 +12,12 @@
 
 	interface Props {
 		items: MappedListItem[];
-		isEditing: Readable<boolean>;
+		isEditing: boolean;
 		onEnterKeydown: () => void;
 		onDeleteItem: (index: number) => void;
 		logType: LogType_enum;
 		listType: LogListType_enum;
-		focusElements: Writable<HTMLElement[]>;
+		focusElements: HTMLElement[];
 	}
 
 	let {
@@ -27,7 +27,7 @@
 		onDeleteItem,
 		logType,
 		listType,
-		focusElements
+		focusElements = $bindable([])
 	}: Props = $props();
 
 	const bulletType: Record<
@@ -57,7 +57,7 @@
 <ul class="ml-8 stack w-full" style={`list-style-type:${bulletType[listType]}`}>
 	{#each items as item, index (item.id)}
 		<li class="{index % 2 === 0 ? 'bg-transparent' : checkeredColor[logType]} relative">
-			{#if $isEditing && items.length > 1}
+			{#if isEditing && items.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-9 top-1" />
 			{/if}
 			<div class="hstack">
@@ -69,11 +69,11 @@
 							onchange={(e:Event) => (items[index].item = (e.target as HTMLInputElement).value)}
 							{onEnterKeydown}
 							autofocus={index > 0}
-							bind:textarea={$focusElements[index + 2]}
+							bind:textarea={focusElements[index + 2]}
 						/>
 					</div>
 					<div class="min-w-[40px] hidden sm:flex align-center relative">
-						{#if $isEditing}
+						{#if isEditing}
 							<button class=" absolute top-0" onclick={() => onDeleteItem(index)}>
 								<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 							</button>
@@ -81,7 +81,7 @@
 					</div>
 				</div>
 				<div class="mt-1 flex sm:hidden">
-					{#if $isEditing}
+					{#if isEditing}
 						<button class="flex sm:hidden" onclick={() => onDeleteItem(index)}>
 							<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 						</button>

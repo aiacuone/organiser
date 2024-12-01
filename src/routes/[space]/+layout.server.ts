@@ -1,6 +1,6 @@
 import { replaceAllHyphensWithSpaces } from '$lib/utils/strings';
 
-export const load = async (req: Request, res: Response) => {
+export const load = async (req: Request) => {
 	return {
 		space: replaceAllHyphensWithSpaces(req.url.pathname.split('/')[1])
 	};

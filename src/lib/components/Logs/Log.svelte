@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LogType_enum, LogListType_enum, type MappedLog_int, type Log_int } from '$lib/types';
+	import { LogType_enum, LogListType_enum, type Log_int } from '$lib/types';
 	import {
 		clickOutside,
 		debounce,
@@ -14,7 +14,6 @@
 	import { page } from '$app/stores';
 	import { getContext, onMount, setContext } from 'svelte';
 	import { deleteLogClient, updateLogClient } from '$lib/api/logsLocalApi';
-	import { derived, writable, type Writable } from 'svelte/store';
 	import { isAnAutofillOpen, unfocusStoreInput, whichInputIsFocused } from '$lib/stores';
 	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
@@ -54,10 +53,8 @@
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 	setContext('onEditLog', onEditLog);
 
-	const isEditing = derived(
-		[currentlyEditing],
-		([$currentlyEditing]) => $currentlyEditing === log.id
-	);
+	let isEditing = $derived($currentlyEditing === log.id);
+
 	setContext('isEditing', isEditing);
 
 	const queryClient = useQueryClient();
@@ -169,7 +166,7 @@
 		addToEndOfRaceCondition(onStopEditing);
 	};
 
-	const focusElements: Writable<HTMLElement[]> = writable([]);
+	let focusElements: HTMLElement[] = $state([]);
 
 	const onAddItem = () => {
 		onEditLog();
@@ -204,7 +201,7 @@
 		};
 		addItemTypeMethods[log.type]();
 
-		$focusElements = [...$focusElements, $focusElements[$focusElements.length - 1]];
+		focusElements = [...focusElements, focusElements[focusElements.length - 1]];
 	};
 
 	const onDeleteItem = (index: number) => {
@@ -231,7 +228,7 @@
 			}
 		};
 		removeItemTypeMethods[log.type]();
-		$focusElements = $focusElements.filter((_, i) => i !== index + 2);
+		focusElements = focusElements.filter((_, i) => i !== index + 2);
 	};
 
 	const onResetChange = () => {
@@ -275,7 +272,7 @@
 	let isOpen: boolean;
 
 	const onClickOutside = () => {
-		if ($isEditing) {
+		if (isEditing) {
 			const haveValuesChanged = getHaveValuesChanged();
 			if (haveValuesChanged && !isOpen && !$whichInputIsFocused) {
 				onOpen();
@@ -297,7 +294,7 @@
 		if (log.type === LogType_enum.time) {
 			log.time = log.time + 0.5;
 
-			if (!$isEditing) {
+			if (!isEditing) {
 				debounce(() =>
 					$updateLogMutation.mutate({
 						...log,
@@ -313,7 +310,7 @@
 	const onDecrement = () => {
 		if (log.type === LogType_enum.time) {
 			log.time = log.time - 0.5;
-			if (!$isEditing) {
+			if (!isEditing) {
 				debounce(() =>
 					$updateLogMutation.mutate({
 						...log,
@@ -340,23 +337,23 @@
 	};
 
 	const onContainerKeydown = (e: KeyboardEvent) => {
-		if (!$isEditing || $isAnAutofillOpen) return;
+		if (!isEditing || $isAnAutofillOpen) return;
 
 		unfocusStoreInput();
 
-		const indexOfFocusedElement = $focusElements.indexOf(e.target as HTMLElement);
+		const indexOfFocusedElement = focusElements.indexOf(e.target as HTMLElement);
 		let indexOfNewFocusedElement: number = -1;
 
 		onKeydown(e, {
 			ArrowUp: () => {
 				if (indexOfFocusedElement === 0) {
-					indexOfNewFocusedElement = $focusElements.length - 1;
+					indexOfNewFocusedElement = focusElements.length - 1;
 				} else {
 					indexOfNewFocusedElement = indexOfFocusedElement - 1;
 				}
 			},
 			ArrowDown: () => {
-				if (indexOfFocusedElement === $focusElements.length - 1) {
+				if (indexOfFocusedElement === focusElements.length - 1) {
 					indexOfNewFocusedElement = 0;
 				} else {
 					indexOfNewFocusedElement = indexOfFocusedElement + 1;
@@ -373,8 +370,8 @@
 		});
 
 		if (indexOfNewFocusedElement > -1) {
-			$focusElements[indexOfNewFocusedElement].focus();
-			whichInputIsFocused.set($focusElements[indexOfNewFocusedElement]);
+			focusElements[indexOfNewFocusedElement].focus();
+			whichInputIsFocused.set(focusElements[indexOfNewFocusedElement]);
 		}
 	};
 </script>
@@ -391,27 +388,27 @@
 > -->
 	<div class={containerClasses[log.type][0]}>
 		<div class="stack {containerClasses[log.type][1]}">
-			<div class={log.title || log.reference || $isEditing ? 'flex' : 'hidden'}>
+			<div class={log.title || log.reference || isEditing ? 'flex' : 'hidden'}>
 				<div class="stack gap-1 w-full">
 					<Input
 						bind:value={log.title}
 						autofocus={inputAutoFocus}
 						placeholder="Title"
 						autofillValues={$titles}
-						isDisabled={!$isEditing}
+						isDisabled={!isEditing}
 						onAutoFill={onTitleAutoFill}
-						_class={!$isEditing && !log.title ? 'hidden' : 'flex'}
-						bind:input={$focusElements[0]}
-						isEditing={$isEditing}
+						_class={!isEditing && !log.title ? 'hidden' : 'flex'}
+						bind:input={focusElements[0]}
+						{isEditing}
 					/>
 					<Input
 						bind:value={log.reference}
 						bind:changeInputValue={changeReferenceInputValue}
 						placeholder="Reference"
-						isDisabled={!$isEditing}
-						_class={!$isEditing && !log.reference ? 'hidden' : 'flex'}
-						bind:input={$focusElements[1]}
-						isEditing={$isEditing}
+						isDisabled={!isEditing}
+						_class={!isEditing && !log.reference ? 'hidden' : 'flex'}
+						bind:input={focusElements[1]}
+						{isEditing}
 					/>
 				</div>
 			</div>
@@ -424,7 +421,7 @@
 							onEnterKeydown={onTextareaEnterKeydown}
 							onDeleteBullet={onDeleteItem}
 							{onEdit}
-							{focusElements}
+							bind:focusElements
 						/>
 					</div>
 				{:else if log.type === LogType_enum.question}
@@ -434,7 +431,7 @@
 						{isEditing}
 						onDeleteQuestion={onDeleteItem}
 						id={log.id}
-						{focusElements}
+						bind:focusElements
 					/>
 				{:else if log.type === LogType_enum.important || log.type === LogType_enum.time || (log.type === LogType_enum.list && log.listType !== LogListType_enum.checkbox)}
 					<ListItems
@@ -444,7 +441,7 @@
 						onEnterKeydown={onTextareaEnterKeydown}
 						{onDeleteItem}
 						logType={log.type}
-						{focusElements}
+						bind:focusElements
 					/>
 				{/if}
 			</div>
@@ -457,7 +454,7 @@
 					onDecrement
 				}}
 				incrementDecrementValue={log.type === LogType_enum.time ? log.time : log.rating}
-				isEditing={$isEditing}
+				{isEditing}
 				{onAccept}
 				{onAddItem}
 				{onDelete}

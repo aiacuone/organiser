@@ -10,15 +10,14 @@
 		areAnyQuestionsNotCapitalised,
 		capitalizeFirstLetterOfMappedQuestions
 	} from '$lib/utils';
-	import type { Writable } from 'svelte/store';
 
 	interface Props {
 		questions: MappedQuestionItem[];
 		onFocusAnswerInput: () => void;
 		id: string;
-		isEditing: Readable<boolean>;
+		isEditing: boolean;
 		onDeleteQuestion: (index: number) => void;
-		focusElements: Writable<HTMLElement[]>;
+		focusElements: HTMLElement[];
 	}
 
 	let {
@@ -27,7 +26,7 @@
 		id,
 		isEditing,
 		onDeleteQuestion,
-		focusElements
+		focusElements = $bindable([])
 	}: Props = $props();
 
 	let isAnswering: undefined | number = $state();
@@ -62,14 +61,14 @@
 		<li
 			class="hstack {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'} px-2 py-1 rounded relative"
 		>
-			{#if $isEditing && questions.length > 1}
+			{#if isEditing && questions.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-4 top-6" />
 			{/if}
 			<div class="stack gap-1 w-full">
 				<div class="hstack text-sm gap-1">
 					<p class="text-neutral-400">Question:</p>
 					<Textarea
-						bind:textarea={$focusElements[index + 2]}
+						bind:textarea={focusElements[index + 2]}
 						bind:value={questions[index].question}
 						onchange={(e:Event) => (questions[index].question = (e.target as HTMLInputElement).value)}
 						className=""
@@ -98,7 +97,7 @@
 				{/if}
 			</div>
 			<div class="center">
-				{#if $isEditing}
+				{#if isEditing}
 					<button class="flex" onclick={() => onDeleteQuestion(index)}>
 						<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 					</button>

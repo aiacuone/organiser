@@ -1,6 +1,6 @@
 <!-- todo: combine this with LogCheckboxItems when svelte 5 is released -->
 <script lang="ts">
-	import type { Readable, Writable } from 'svelte/store';
+	import type { Readable } from 'svelte/store';
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
@@ -12,10 +12,10 @@
 
 	interface Props {
 		checkboxes: MappedCheckboxItem[];
-		isEditing: Readable<boolean>;
+		isEditing: boolean;
 		onEnterKeydown: () => void;
 		onDeleteBullet: (index: number) => void;
-		focusElements: Writable<HTMLElement[]>;
+		focusElements: HTMLElement[];
 		onEdit: () => void;
 	}
 
@@ -24,7 +24,7 @@
 		isEditing,
 		onEnterKeydown,
 		onDeleteBullet,
-		focusElements,
+		focusElements = $bindable([]),
 		onEdit
 	}: Props = $props();
 
@@ -42,7 +42,7 @@
 <ul class="ml-3 stack flex-1">
 	{#each checkboxes as item, index (item.id)}
 		<li class="relative {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'}">
-			{#if $isEditing && checkboxes.length > 1}
+			{#if isEditing && checkboxes.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-[16px] top-1" />
 			{/if}
 			<div class="hstack">
@@ -55,7 +55,7 @@
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="flex-1">
 						<Textarea
-							bind:textarea={$focusElements[index + 2]}
+							bind:textarea={focusElements[index + 2]}
 							bind:value={checkboxes[index].text}
 							onchange={(e:Event) => (checkboxes[index].text = (e.target as HTMLInputElement).value)}
 							className="flex-1 w-full"
@@ -64,7 +64,7 @@
 						/>
 					</div>
 					<div class="min-w-[40px] hidden sm:flex align-center relative">
-						{#if $isEditing}
+						{#if isEditing}
 							<button class=" absolute top-0" onclick={() => onDeleteBullet(index)}>
 								<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 							</button>
@@ -72,7 +72,7 @@
 					</div>
 				</div>
 				<div class="mt-1 flex sm:hidden">
-					{#if $isEditing}
+					{#if isEditing}
 						<button class="flex sm:hidden" onclick={() => onDeleteBullet(index)}>
 							<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 						</button>
