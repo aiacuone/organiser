@@ -21,8 +21,8 @@
 	<div class="flex flex-col sm:flex-row gap-3 items-center">
 		{@render children()}
 		<div class="hstack gap-3">
-			<Button onClick={_onConfirm}>Yes</Button>
-			<Button onClick={onClose}>No</Button>
+			<Button onclick={_onConfirm}>Yes</Button>
+			<Button onclick={onClose}>No</Button>
 		</div>
 	</div>
 </Dialog>

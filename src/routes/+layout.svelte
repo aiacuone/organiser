@@ -132,7 +132,7 @@
 			{:else}
 				<div class="w-full h-full stack center gap-3">
 					<div class="hstack center gap-1 text-xl">Welcome to <LogitLogo height="35px" /></div>
-					<Button onClick={onLogin}>Login</Button>
+					<Button onclick={onLogin}>Login</Button>
 				</div>
 			{/if}
 			<div class="flex justify-end" />

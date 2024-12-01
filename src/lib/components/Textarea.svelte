@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { ChangeEventHandler } from 'svelte/elements';
 
 	interface Props {
 		value: string | string[];
@@ -8,7 +7,7 @@
 		autofocus?: boolean;
 		_class?: string;
 		onEnterKeydown?: () => void;
-		onChange?: ChangeEventHandler<HTMLTextAreaElement>;
+		onchange: (e: Event) => void;
 		onFocus?: () => void;
 		textarea?: HTMLElement;
 	}
@@ -18,8 +17,8 @@
 		autofocus,
 		_class,
 		onEnterKeydown,
-		onChange,
-		value = $bindable(),
+		onchange: _onchange,
+		value = $bindable(''),
 		onFocus = $bindable(),
 		textarea = $bindable()
 	}: Props = $props();
@@ -28,6 +27,11 @@
 		if (!textarea) return;
 		textarea.style.height = '20px';
 		if (textarea.scrollHeight > 20) textarea.style.height = textarea.scrollHeight + 'px';
+	};
+
+	const onchange = (e: Event) => {
+		_onchange(e);
+		resize();
 	};
 
 	$effect(() => {
@@ -65,10 +69,9 @@
 		bind:value
 		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"
 		bind:this={textarea}
-		oninput={resize}
-		onchange={onChange}
+		oninput={onchange}
 		onfocus={_onFocus}
 	></textarea>
 </div>
 
-<svelte:window on:resize={resize} />
+<svelte:window onresize={resize} />

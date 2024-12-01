@@ -271,7 +271,7 @@
 					{onClickClear}
 					onchange={onSearchChange}
 				/>
-				<Button onClick={openExportDialog}>
+				<Button onclick={openExportDialog}>
 					<Icon icon={icons.export} height="20px" class="text-gray-400" />
 				</Button>
 			</div>
@@ -282,12 +282,12 @@
 						_class="w-[90px]"
 						buttons={[
 							{
-								onClick: () => onNoteButtonClick(type),
+								onclick: () => onNoteButtonClick(type),
 								icon,
 								_class: 'w-4/6'
 							},
 							{
-								onClick: () =>
+								onclick: () =>
 									$filters.includes(type)
 										? ($filters = $filters.filter((filter) => filter !== type))
 										: ($filters = [...$filters, type]),
@@ -324,7 +324,7 @@
 		</div>
 		<div class="stack gap-2">
 			<div class="hstack center capitalize gap-5">
-				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickPreviousDay}>
+				<Button _class="bg-white bg-opacity-80 w-[50px] center" onclick={onClickPreviousDay}>
 					<Icon icon={icons.left} height="20px" class="text-gray-400" />
 				</Button>
 				<Button
@@ -332,10 +332,10 @@
 					$selectedHyphenatedDateString
 						? 'bg-opacity-80'
 						: 'bg-opacity-40'}"
-					onClick={onGotoTodaysDate}
+					onclick={onGotoTodaysDate}
 					><div class=" rounded-md border-2 w-[18px] h-[18px] border-gray-400"></div></Button
 				>
-				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickNextDay}>
+				<Button _class="bg-white bg-opacity-80 w-[50px] center" onclick={onClickNextDay}>
 					<Icon icon={icons.right} height="20px" class="text-gray-400" />
 				</Button>
 			</div>
@@ -362,7 +362,7 @@
 					</label>
 				{/each}
 			</div>
-			<Button className="text-black text-xs self-end" onClick={resetCheckboxes}>Reset</Button>
+			<Button className="text-black text-xs self-end" onclick={resetCheckboxes}>Reset</Button>
 		</div>
 		<div
 			class="stack gap-10 center h-full overflow-y-scroll hide-scrollbar"
@@ -371,8 +371,8 @@
 			<div class="stack gap-2 sm:gap-4" bind:this={notesModalTextArea}></div>
 		</div>
 		<div class="flex flex-wrap gap-4 center" bind:clientHeight={modalButtonContainerHeight}>
-			<Button onClick={copy} className="text-black">Copy</Button>
-			<Button onClick={() => exportedNotesModal.close()} className="text-black">Close</Button>
+			<Button onclick={copy} className="text-black">Copy</Button>
+			<Button onclick={() => exportedNotesModal.close()} className="text-black">Close</Button>
 		</div>
 	</div>
 </dialog>

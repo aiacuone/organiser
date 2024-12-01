@@ -21,8 +21,14 @@
 		focusElements: Writable<HTMLElement[]>;
 	}
 
-	let { questions, onFocusAnswerInput, id, isEditing, onDeleteQuestion, focusElements }: Props =
-		$props();
+	let {
+		questions = $bindable([{ question: '', answer: '', id: 0 }]),
+		onFocusAnswerInput,
+		id,
+		isEditing,
+		onDeleteQuestion,
+		focusElements
+	}: Props = $props();
 
 	let isAnswering: undefined | number = $state();
 
@@ -65,6 +71,7 @@
 					<Textarea
 						bind:textarea={$focusElements[index + 2]}
 						bind:value={questions[index].question}
+						onchange={(e:Event) => (questions[index].question = (e.target as HTMLInputElement).value)}
 						className=""
 						_class="flex-1"
 						autofocus
@@ -76,7 +83,7 @@
 						<Textarea
 							bind:value={questions[index].answer}
 							_class="flex-1"
-							onChange={(e) => onTextareaChange(e, index)}
+							onchange={(e:Event) => onTextareaChange(e, index)}
 							bind:onFocus={onFocusAnswerInput}
 						/>
 					</div>
@@ -86,7 +93,7 @@
 						_class="self-start text-xs bg-white {questions[index].answer || isAnswering === index
 							? 'hidden'
 							: 'block'}"
-						onClick={() => _onFocusAnswerInput(index)}>Answer</Button
+						onclick={() => _onFocusAnswerInput(index)}>Answer</Button
 					>
 				{/if}
 			</div>

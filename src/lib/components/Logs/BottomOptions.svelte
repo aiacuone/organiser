@@ -11,11 +11,10 @@
 	import { icons } from '$lib/general/icons';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import LogButton from './Buttons/LogButton.svelte';
-	import type { Writable } from 'svelte/store';
 	import { useDisclosure } from '$lib/hooks';
 
 	interface Props {
-		log: Writable<MappedLog_int>;
+		log: MappedLog_int;
 		onDelete: () => void;
 		onAccept: () => void;
 		onAddItem: () => void;
@@ -31,7 +30,7 @@
 	}
 
 	let {
-		log,
+		log = $bindable(),
 		onDelete,
 		onAccept,
 		onAddItem,
@@ -43,9 +42,9 @@
 
 	const { onOpen: onOpenDelete, onClose: onCloseDelete, isOpen: isOpenDelete } = useDisclosure();
 
-	const dateValues = $derived(getDayMonthYearFromDate($log.date));
+	const dateValues = $derived(getDayMonthYearFromDate(log.date));
 	const lastUpdatedDateValues = $derived(
-		$log.lastUpdated && getDayMonthYearFromDate($log.lastUpdated)
+		log.lastUpdated && getDayMonthYearFromDate(log.lastUpdated)
 	);
 
 	const onConfirmDelete: () => void = () => {
@@ -53,20 +52,20 @@
 	};
 
 	const onChangeList = () => {
-		const indexOfListType = allLogListTypes.indexOf($log.listType);
+		const indexOfListType = allLogListTypes.indexOf(log.listType);
 		const nextIndex = indexOfListType + 1 > allLogListTypes.length - 1 ? 0 : indexOfListType + 1;
 
-		$log.listType = allLogListTypes[nextIndex];
+		log.listType = allLogListTypes[nextIndex];
 
 		const nextIndexListType = allLogListTypes[nextIndex];
 		const currentIndexListType = allLogListTypes[indexOfListType];
 
 		if (nextIndexListType === LogListType_enum.checkbox) {
-			$log.checkboxItems = getCheckboxItemsFromMappedListItems($log.listItems);
-			$log.listItems = [];
+			log.checkboxItems = getCheckboxItemsFromMappedListItems(log.listItems);
+			log.listItems = [];
 		} else if (currentIndexListType === LogListType_enum.checkbox) {
-			$log.listItems = getListItemsFromMappedCheckboxItems($log.checkboxItems);
-			$log.checkboxItems = [];
+			log.listItems = getListItemsFromMappedCheckboxItems(log.checkboxItems);
+			log.checkboxItems = [];
 		}
 	};
 
@@ -79,22 +78,22 @@
 	let buttons = $derived([
 		{
 			icon: icons.delete,
-			onClick: onOpenDelete,
+			onclick: onOpenDelete,
 			isHidden: !isEditing
 		},
 		{
 			icon: icons.tick,
-			onClick: onAccept,
+			onclick: onAccept,
 			isHidden: !isEditing
 		},
 		{
 			icon: icons.addList,
-			onClick: onAddItem
+			onclick: onAddItem
 		},
 		{
-			icon: listIcons[$log.listType],
-			onClick: onChangeList,
-			isHidden: !isEditing || $log.type !== LogType_enum.list
+			icon: listIcons[log.listType],
+			onclick: onChangeList,
+			isHidden: !isEditing || log.type !== LogType_enum.list
 		}
 	]);
 </script>
@@ -102,8 +101,8 @@
 <div class="w-full hstack">
 	<div class="flex flex-wrap place-items-center gap-2">
 		<Icon
-			icon={logIcons[$log.type]}
-			height={$log.type === LogType_enum.important ? '30px' : '25px'}
+			icon={logIcons[log.type]}
+			height={log.type === LogType_enum.important ? '30px' : '25px'}
 			class="text-gray-300"
 		/>
 		{#each buttons as { icon, isHidden, ...rest }}

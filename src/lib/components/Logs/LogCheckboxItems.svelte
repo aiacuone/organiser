@@ -19,8 +19,14 @@
 		onEdit: () => void;
 	}
 
-	let { checkboxes, isEditing, onEnterKeydown, onDeleteBullet, focusElements, onEdit }: Props =
-		$props();
+	let {
+		checkboxes = $bindable([]),
+		isEditing,
+		onEnterKeydown,
+		onDeleteBullet,
+		focusElements,
+		onEdit
+	}: Props = $props();
 
 	const onCheckboxesChange = () => {
 		onEdit();
@@ -51,6 +57,7 @@
 						<Textarea
 							bind:textarea={$focusElements[index + 2]}
 							bind:value={checkboxes[index].text}
+							onchange={(e:Event) => (checkboxes[index].text = (e.target as HTMLInputElement).value)}
 							className="flex-1 w-full"
 							{onEnterKeydown}
 							autofocus={index > 0}

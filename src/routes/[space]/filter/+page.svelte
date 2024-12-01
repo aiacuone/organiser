@@ -204,7 +204,7 @@
 						</label>
 					{/each}
 				</div>
-				<Button onClick={openExportDialog}>
+				<Button onclick={openExportDialog}>
 					<Icon icon={icons.export} height="20px" class="text-gray-400" />
 				</Button>
 			</div>

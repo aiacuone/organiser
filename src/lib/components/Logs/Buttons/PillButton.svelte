@@ -2,7 +2,7 @@
 	import Icon from '@iconify/svelte';
 
 	interface Button {
-		onClick: () => void;
+		onclick: () => void;
 		icon?: string;
 		_class?: string;
 		label?: string;
@@ -25,13 +25,13 @@
 	bind:clientHeight={containerHeight}
 	class="pill-button hstack shadow-md min-h-[30px] rounded-r-[4px] rounded-l-[4px] text-sm center relative {_class}"
 >
-	{#each buttons as { label, onClick, icon, _class, notification }, index}
+	{#each buttons as { label, onclick, icon, _class, notification }, index}
 		<button
 			class="center {index === 0 ? 'rounded-l-[4px]' : ''} {index === buttons.length - 1
 				? 'rounded-r-[4px]'
 				: ''} gap-2 px-2 {_class} {capitalizeLabels ? 'capitalize' : ''} relative"
 			style={`height: ${containerHeight}px;`}
-			onclick={onClick}
+			{onclick}
 		>
 			{#if icon}
 				<Icon {icon} class="text-gray-300" height="20px" />

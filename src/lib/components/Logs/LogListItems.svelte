@@ -20,8 +20,15 @@
 		focusElements: Writable<HTMLElement[]>;
 	}
 
-	let { items, isEditing, onEnterKeydown, onDeleteItem, logType, listType, focusElements }: Props =
-		$props();
+	let {
+		items = $bindable([]),
+		isEditing,
+		onEnterKeydown,
+		onDeleteItem,
+		logType,
+		listType,
+		focusElements
+	}: Props = $props();
 
 	const bulletType: Record<
 		LogListType_enum,
@@ -59,6 +66,7 @@
 						<Textarea
 							_class="w-full"
 							bind:value={items[index].item}
+							onchange={(e:Event) => (items[index].item = (e.target as HTMLInputElement).value)}
 							{onEnterKeydown}
 							autofocus={index > 0}
 							bind:textarea={$focusElements[index + 2]}

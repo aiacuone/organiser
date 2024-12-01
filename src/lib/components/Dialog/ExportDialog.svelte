@@ -194,47 +194,47 @@
 	const selectButtons = [
 		{
 			icon: icons.all,
-			onClick: onSelectAll
+			onclick: onSelectAll
 		},
 		{
 			icon: icons.cross,
-			onClick: onUnselectAll
+			onclick: onUnselectAll
 		},
 		{
 			icon: icons.reset,
-			onClick: onReset
+			onclick: onReset
 		},
 		{
 			icon: icons.save,
-			onClick: () => onOpenDefaultSelection()
+			onclick: () => onOpenDefaultSelection()
 		}
 	];
 
 	const confirmSaveDefaultButtons = [
 		{
 			icon: icons.tick,
-			onClick: () => onConfirmSetDefault()
+			onclick: () => onConfirmSetDefault()
 		},
 		{
 			icon: icons.cross,
-			onClick: () => onCloseDefaultSelection()
+			onclick: () => onCloseDefaultSelection()
 		}
 	];
 
 	const footerButtons = [
 		{
-			onClick: onCopy,
+			onclick: onCopy,
 			label: 'Copy',
 			isAnimating: false,
 			animatingText: 'Copied ✅'
 		},
 		{
-			onClick: onCsv,
+			onclick: onCsv,
 			label: 'CSV',
 			key: 'csv'
 		},
 		{
-			onClick: () => dialog.close(),
+			onclick: () => dialog.close(),
 			label: 'Close',
 			key: 'close'
 		}
@@ -287,8 +287,8 @@
 				{/each}
 			</div>
 			<div class="hstack gap-3 center">
-				{#each selectButtons as { icon, onClick }}
-					<Button {onClick}>
+				{#each selectButtons as { icon, onclick }}
+					<Button {onclick}>
 						<Icon {icon} class="text-gray-400" />
 					</Button>
 				{/each}
@@ -332,8 +332,8 @@
 			{/if}
 		</div>
 		<div class="hstack center gap-2" bind:clientHeight={footerButtonsContainerHeight}>
-			{#each footerButtons as { onClick, label }, index}
-				<Button onClick={() => onClick(index)}>
+			{#each footerButtons as { onclick, label }, index}
+				<Button onclick={() => onclick(index)}>
 					{#if footerButtons[index].isAnimating}
 						{footerButtons[index].animatingText}
 					{:else}
@@ -353,8 +353,8 @@
 	<div class="stack gap-2">
 		<p>Are you sure you want to create a new default selection?</p>
 		<div class="hstack gap-5 center">
-			{#each confirmSaveDefaultButtons as { icon, onClick }}
-				<Button {onClick}>
+			{#each confirmSaveDefaultButtons as { icon, onclick }}
+				<Button {onclick}>
 					<Icon {icon} class="text-gray-400" />
 				</Button>
 			{/each}

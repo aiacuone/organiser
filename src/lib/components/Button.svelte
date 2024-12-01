@@ -1,6 +1,6 @@
 <script lang="ts">
 	interface Props extends SvelteAllProps {
-		onClick?: (e: any) => void;
+		onclick?: (e: any) => void;
 		isDisabled?: boolean;
 		className?: string;
 		_class?: string;
@@ -8,7 +8,7 @@
 	}
 
 	const {
-		onClick,
+		onclick,
 		isDisabled = false,
 		className,
 		_class,
@@ -18,7 +18,7 @@
 </script>
 
 <button
-	onclick={onClick}
+	{onclick}
 	class=" text-sm shadow-md px-3 rounded {className} {_class} {isDisabled
 		? 'opacity-40'
 		: ''} {isDisabled ? 'cursor-not-allowed' : ''}"

@@ -75,7 +75,7 @@
 		{#if $isAuthenticated}
 			<div class="hstack center capitalize gap-5">
 				{#each footerButtons as footerButton}
-					<Button _class="bg-white bg-opacity-80" onClick={footerButton.onClick}>
+					<Button _class="bg-white bg-opacity-80" onclick={footerButton.onClick}>
 						<Icon icon={footerButton.icon} />
 					</Button>
 				{/each}
@@ -101,5 +101,5 @@
 </footer>
 
 <Dialog isOpen={$isAvatarMenuOpen} onClose={onCloseAvatarMenu}>
-	<Button onClick={_logout}>Logout</Button>
+	<Button onclick={_logout}>Logout</Button>
 </Dialog>

@@ -232,7 +232,7 @@
 			{#if isAddingNewSpace}
 				<AddSpace {onAddSpace} />
 			{:else}
-				<Button onClick={() => (isAddingNewSpace = true)}>Add</Button>
+				<Button onclick={() => (isAddingNewSpace = true)}>Add</Button>
 			{/if}
 		</div>
 	</div>
