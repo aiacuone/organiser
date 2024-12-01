@@ -52,7 +52,7 @@
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="flex-1">
 						<Textarea
-							bind:textarea={focusElements[index + 2]}
+							bind:textarea={focusElements[focusElements.length]}
 							bind:value={checkboxes[index].text}
 							onchange={(e:Event) => (checkboxes[index].text = (e.target as HTMLInputElement).value)}
 							className="flex-1 w-full"

@@ -65,7 +65,7 @@
 				<div class="hstack text-sm gap-1">
 					<p class="text-neutral-400">Question:</p>
 					<Textarea
-						bind:textarea={focusElements[index + 2]}
+						bind:textarea={focusElements[focusElements.length]}
 						bind:value={questions[index].question}
 						onchange={(e:Event) => (questions[index].question = (e.target as HTMLInputElement).value)}
 						className=""
