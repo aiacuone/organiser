@@ -46,7 +46,7 @@
 	});
 
 	onMount(() => {
-		const onKeydown = (e) => {
+		const onKeydown = (e: KeyboardEvent) => {
 			switch (true) {
 				case e.ctrlKey && e.shiftKey && e.code === 'Space':
 					onGotoTodaysDate();

@@ -23,6 +23,7 @@
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
 	import { onMount } from 'svelte';
+	import Log from '../Logs/Log.svelte';
 
 	interface Props extends SvelteAllProps {
 		isOpen: boolean;
@@ -50,7 +51,7 @@
 		getNextLogsPage
 	}: Props = $props();
 
-	let defaultLogKeyValueFilter: Partial<Record<Log_enum, boolean>> = {
+	let defaultLogKeyValueFilter: { [key: keyof Log]: boolean } = {
 		id: false,
 		date: true,
 		title: true,
@@ -71,7 +72,7 @@
 		Object.values(LogType_enum).map((type) => [type, true])
 	) as Partial<Record<LogType_enum, boolean>>;
 
-	let typeFilter = { ...defaultTypeFilterData };
+	let typeFilter = $state({ ...defaultTypeFilterData });
 
 	const defaultPreferences: Record<string, boolean> = {
 		showKeys: true
@@ -172,7 +173,7 @@
 			Object.keys(object).reduce((acc, key) => ({ ...acc, [key]: false }), {});
 
 		typeFilter = makeAllFalse({ ...typeFilter });
-		logKeyValueFilter = makeAllFalse({ ...logKeyValueFilter });
+		logKeyValueFilter = makeAllFalse({ ...logKeyValueFilter } as Record<Log_enum, boolean>);
 		preferences = makeAllFalse({ ...preferences });
 	};
 
@@ -181,7 +182,7 @@
 			Object.keys(object).reduce((acc, key) => ({ ...acc, [key]: true }), {});
 
 		typeFilter = makeAllTrue({ ...typeFilter });
-		logKeyValueFilter = makeAllTrue({ ...logKeyValueFilter });
+		logKeyValueFilter = makeAllTrue({ ...logKeyValueFilter } as Record<Log_enum, boolean>);
 		preferences = makeAllTrue({ ...preferences });
 	};
 
@@ -256,11 +257,11 @@
 			<!-- TODO: Svelte 5: use snippet for these, they are being repeated -->
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
 				{#each Object.keys(logKeyValueFilter).filter((key) => {
-					return ![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(key);
+					return ![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(key as keyof Log_int);
 				}) as key}
 					<div class="hstack gap-2">
 						<label>
-							{logEnumNames[key]}
+							{logEnumNames[key as Log_enum]}
 							<input type="checkbox" bind:checked={logKeyValueFilter[key]} />
 						</label>
 					</div>
@@ -270,8 +271,8 @@
 				{#each Object.keys(typeFilter) as key}
 					<div class="hstack gap-2">
 						<label class="capitalize">
-							{logTypeEnumNames[key]}
-							<input type="checkbox" bind:checked={typeFilter[key]} />
+							{logTypeEnumNames[key as LogType_enum]}
+							<input type="checkbox" bind:checked={typeFilter[key as LogType_enum]} />
 						</label>
 					</div>
 				{/each}
@@ -316,7 +317,8 @@
 					{#if isFetchingLogs}
 						Loading more...
 					{:else if hasNextLogsPage}
-						<div use:viewport onenterViewport={getNextLogsPage} class="h-10 w-full"></div>
+						<!-- todo: use different method to trigger next page svelte 5 -->
+						<!-- <div use:viewport onenterViewport={getNextLogsPage} class="h-10 w-full"></div> -->
 					{:else}
 						{logsData.pages[0].data.total} Results
 					{/if}

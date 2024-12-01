@@ -158,7 +158,7 @@
 		});
 	};
 
-	const onAutofillWheeldown = (e: Event) => {
+	const onAutofillWheeldown = (e: WheelEvent) => {
 		const isWheelUp = e.deltaY < 0;
 		const indexOfFirstItem = filteredAutofillValues.indexOf(slicedAutofillValues[0]);
 

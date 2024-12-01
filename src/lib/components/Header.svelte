@@ -17,7 +17,8 @@
 		getHyphenatedStringFromDate,
 		replaceAllHyphensWithSpaces,
 		replaceAllSpacesWithHyphens,
-		useDisclosure
+		useDisclosure,
+		type LogNotification_int
 	} from '$lib';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
 	import AddSpace from './AddSpace.svelte';
@@ -49,28 +50,20 @@
 		}
 	);
 
-	const allLogsNotificationsQuery: UseQueryStoreResult<
-		QueryKey,
-		any,
-		{
-			space: string;
-			todo: number;
-			question: number;
-		}[],
-		any
-	> = useQuery(
-		`allLogNotifications`,
-		async () => {
-			if (!$isAuthenticated) return;
-			return await axios
-				.get(`/log/notifications`, { params: { spaces: $spacesQuery.data } })
-				.then(({ data }) => data)
-				.catch((err) => console.log(err));
-		},
-		{
-			refetchOnMount: false
-		}
-	);
+	const allLogsNotificationsQuery: UseQueryStoreResult<QueryKey, any, LogNotification_int[], any> =
+		useQuery(
+			`allLogNotifications`,
+			async () => {
+				if (!$isAuthenticated) return;
+				return await axios
+					.get(`/log/notifications`, { params: { spaces: $spacesQuery.data } })
+					.then(({ data }) => data)
+					.catch((err) => console.log(err));
+			},
+			{
+				refetchOnMount: false
+			}
+		);
 
 	const gotoLogType = (type: LogType_enum, hasNotification: boolean = false) => {
 		let url = `/${$page.params.space}/filter?type=${type}`;
@@ -85,28 +78,28 @@
 		LogType_enum,
 		{
 			icon: string;
-			onClick: (hasNotification?: boolean) => void;
+			onclick: (hasNotification?: boolean) => void;
 		}
 	> = {
 		[LogType_enum.time]: {
 			icon: logIcons.time,
-			onClick: () => gotoLogType(LogType_enum.time)
+			onclick: () => gotoLogType(LogType_enum.time)
 		},
 		[LogType_enum.todo]: {
 			icon: logIcons.todo,
-			onClick: (hasNotification?: boolean) => gotoLogType(LogType_enum.todo, hasNotification)
+			onclick: (hasNotification?: boolean) => gotoLogType(LogType_enum.todo, hasNotification)
 		},
 		[LogType_enum.important]: {
 			icon: logIcons.important,
-			onClick: () => gotoLogType(LogType_enum.important)
+			onclick: () => gotoLogType(LogType_enum.important)
 		},
 		[LogType_enum.question]: {
 			icon: logIcons.question,
-			onClick: (hasNotification?: boolean) => gotoLogType(LogType_enum.question, hasNotification)
+			onclick: (hasNotification?: boolean) => gotoLogType(LogType_enum.question, hasNotification)
 		},
 		[LogType_enum.list]: {
 			icon: logIcons.list,
-			onClick: () => gotoLogType(LogType_enum.list)
+			onclick: () => gotoLogType(LogType_enum.list)
 		}
 	};
 	const onAddSpace = () => {
@@ -127,10 +120,15 @@
 				: [...$allLogsNotificationsQuery.data, { space: $page.params.space, todo: 0, question: 0 }];
 
 			return pillButtonsWithNewSpace.map(({ space, todo, question }) => {
-				const result = [
+				const result: {
+					label?: string;
+					onclick: () => void;
+					notification: number;
+					icon?: string;
+				}[] = [
 					{
 						label: replaceAllHyphensWithSpaces(space),
-						onClick: () => {
+						onclick: () => {
 							goto(
 								`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(
 									new Date()
@@ -145,7 +143,7 @@
 				if (todo)
 					result.push({
 						notification: todo,
-						onClick: () => {
+						onclick: () => {
 							closeSpaceDialog();
 							goto(`/${space}/filter?type=todo&isChecked=false`);
 						},
@@ -155,7 +153,7 @@
 				if (question)
 					result.push({
 						notification: question,
-						onClick: () => {
+						onclick: () => {
 							closeSpaceDialog();
 							goto(`/${space}/filter?type=question&isAnswered=false`);
 						},
@@ -164,7 +162,7 @@
 
 				result.push({
 					icon: icons.moreVertical,
-					onClick: () => {
+					onclick: () => {
 						goto(`/${space}/overview`);
 						closeSpaceDialog();
 					},
@@ -195,13 +193,13 @@
 			</div>
 			<div class="flex-1 hstack justify-end gap-5">
 				{#if $allLogsNotificationsQuery.data}
-					{#each Object.entries(headerButtons) as [type, { icon, onClick }]}
+					{#each Object.entries(headerButtons) as [type, { icon, onclick }]}
 						{@const spaceNotifications = $allLogsNotificationsQuery.data?.find(
 							({ space: _space }) => _space === space
 						)}
-						{@const notificationsCount = spaceNotifications?.[type]}
+						{@const notificationsCount = spaceNotifications?.[type as keyof LogNotification_int]}
 
-						<button onclick={() => onClick(!!notificationsCount)} class="relative">
+						<button onclick={() => onclick(!!notificationsCount)} class="relative">
 							<Icon {icon} class="text-gray-500" height="20px" />
 							{#if notificationsCount}
 								<div
