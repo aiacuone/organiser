@@ -14,15 +14,17 @@
 	import { axios, getHyphenatedStringFromDate, replaceAllSpacesWithHyphens } from '$lib';
 	import { goto } from '$app/navigation';
 
+	let { children } = $props();
+
 	const getDateFromHyphenatedString = (dateString: string) => {
 		const [day, month, year] = dateString.split('-').map(Number);
 
 		return new Date(Date.UTC(year, month - 1, day));
 	};
 
-	const urlSpace = $page.params.space;
+	let urlSpace = $derived($page.params.space);
 
-	$: {
+	$effect(() => {
 		const getSpaces = async () => {
 			const spaces = await axios.get('/spaces').then((response) => response.data);
 			const areThereAnySpaces = spaces.length > 0;
@@ -36,7 +38,7 @@
 		if ($isAuthenticated) {
 			void getSpaces();
 		}
-	}
+	});
 
 	onMount(() => {
 		if ($page.params.date) {
@@ -73,9 +75,8 @@
 		};
 
 		document.addEventListener('keydown', onKeydown);
-		return () => {
-			document.removeEventListener('keydown', onKeydown);
-		};
+
+		return () => document.removeEventListener('keydown', onKeydown);
 	});
 
 	const onClickPreviousDay = () => {
@@ -113,7 +114,7 @@
 		loginWithRedirect(client);
 	};
 
-	$: space = $page.params.space;
+	let space = $derived($page.params.space);
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -128,7 +129,7 @@
 					<AddSpace />
 				</div>
 			{:else if $isAuthenticated}
-				<slot />
+				{@render children()}
 			{:else}
 				<div class="w-full h-full stack center gap-3">
 					<div class="hstack center gap-1 text-xl">Welcome to <LogitLogo height="35px" /></div>

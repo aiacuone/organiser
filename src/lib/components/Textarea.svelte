@@ -72,8 +72,8 @@
 <div class="w-full relative">
 	<textarea
 		bind:value
-		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"
 		bind:this={textarea}
+		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"
 		oninput={onchange}
 		onfocus={_onFocus}
 		disabled={isDisabled}

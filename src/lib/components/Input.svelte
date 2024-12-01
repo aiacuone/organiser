@@ -181,11 +181,11 @@
 
 	<!-- cannot add on:focus to input because it is causing focusing issues -->
 	<input
-		type="text"
 		bind:value
+		bind:this={input}
+		type="text"
 		class="placeholder-gray-300 w-full bg-transparent text-sm outline-none {_class}"
 		placeholder={isDisabled ? '' : placeholder}
-		bind:this={input}
 		oninput={onchange}
 		onkeydown={_onKeydown}
 		onclick={_onFocus}

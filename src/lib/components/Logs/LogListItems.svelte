@@ -67,10 +67,10 @@
 						<Textarea
 							_class="w-full"
 							bind:value={items[index].item}
+							bind:textarea={focusElements[index + 2]}
 							onchange={(e:Event) => (items[index].item = (e.target as HTMLInputElement).value)}
 							{onEnterKeydown}
 							autofocus={index > 0}
-							bind:textarea={focusElements[index + 2]}
 							onclick={onEdit}
 						/>
 					</div>

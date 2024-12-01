@@ -380,22 +380,22 @@
 				<div class="stack gap-1 w-full">
 					<Input
 						bind:value={log.title}
+						bind:input={focusElements[0]}
 						autofocus={inputAutoFocus}
 						placeholder="Title"
 						autofillValues={$titles}
 						isDisabled={!isEditing}
 						onAutoFill={onTitleAutoFill}
 						_class={!isEditing && !log.title ? 'hidden' : 'flex'}
-						bind:input={focusElements[0]}
 						{isEditing}
 					/>
 					<Input
 						bind:value={log.reference}
 						bind:changeInputValue={changeReferenceInputValue}
+						bind:input={focusElements[1]}
 						placeholder="Reference"
 						isDisabled={!isEditing}
 						_class={!isEditing && !log.reference ? 'hidden' : 'flex'}
-						bind:input={focusElements[1]}
 						{isEditing}
 					/>
 				</div>
@@ -405,32 +405,32 @@
 					<div class="flex-1">
 						<CheckboxItems
 							bind:checkboxes={log.checkboxItems}
+							bind:focusElements
 							{isEditing}
 							onEnterKeydown={onTextareaEnterKeydown}
 							onDeleteBullet={onDeleteItem}
 							{onEdit}
-							bind:focusElements
 						/>
 					</div>
 				{:else if log.type === LogType_enum.question}
 					<LogQuestionItems
 						bind:questions={log.questions}
+						bind:focusElements
 						onFocusAnswerInput={_onFocusAnswerInput}
 						{isEditing}
 						onDeleteQuestion={onDeleteItem}
 						id={log.id}
-						bind:focusElements
 						{onEdit}
 					/>
 				{:else if log.type === LogType_enum.important || log.type === LogType_enum.time || (log.type === LogType_enum.list && log.listType !== LogListType_enum.checkbox)}
 					<ListItems
 						bind:items={log.listItems}
+						bind:focusElements
 						listType={log.listType}
 						{isEditing}
 						onEnterKeydown={onTextareaEnterKeydown}
 						{onDeleteItem}
 						logType={log.type}
-						bind:focusElements
 						{onEdit}
 					/>
 				{/if}

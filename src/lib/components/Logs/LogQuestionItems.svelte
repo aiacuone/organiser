@@ -78,9 +78,9 @@
 						<p class="text-neutral-400">Answer:</p>
 						<Textarea
 							bind:value={questions[index].answer}
+							bind:onFocus={onFocusAnswerInput}
 							_class="flex-1"
 							onchange={(e:Event) => onTextareaChange(e, index)}
-							bind:onFocus={onFocusAnswerInput}
 							onclick={onEdit}
 						/>
 					</div>

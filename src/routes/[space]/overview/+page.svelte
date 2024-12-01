@@ -60,8 +60,8 @@
 		<div class="stack gap-2">
 			<p>Please enter the name <b>{data.space}</b> of the space to delete</p>
 			<Input
-				placeholder={`Enter ${data.space} here to delete`}
 				bind:value={inputValue}
+				placeholder={`Enter ${data.space} here to delete`}
 				onchange={(e:Event)=>inputValue=(e.target as HTMLInputElement).value}
 			/>
 			<Button

@@ -237,9 +237,9 @@
 	const onSearchChange = (e: Event) => (searchValue = (e.target as HTMLTextAreaElement).value);
 </script>
 
-<div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
+<div bind:clientHeight={parentContainerHeight} class="flex-1 center stack overflow-hidden">
 	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full justify-center flex-1 py-1">
-		<div class="stack gap-2 center" bind:clientHeight={logButtonsContainerHeight}>
+		<div bind:clientHeight={logButtonsContainerHeight} class="stack gap-2 center">
 			<div class="hstack center gap-2 flex-wrap">
 				<div class="hstack gap-2 center">
 					<div class="center hstack gap-1 flex-wrap">
@@ -285,11 +285,11 @@
 			</div>
 		</div>
 		<div
+			bind:this={notesContainer}
 			class="stack gap-6 hide-scrollbar flex-1 {!!$whichInputIsFocused
 				? 'overflow-y-hidden'
 				: 'overflow-y-scroll'}"
 			style="max-height:{notesContainerHeight}px"
-			bind:this={notesContainer}
 		>
 			{#if isThereANewLog}
 				<NewLog type={newLogType} />
@@ -334,7 +334,7 @@
 	class="w-full max-w-[800px] p-5 sm:p-10 rounded-md h-screen sm:h-[auto]"
 	style={$darkMode.boolean ? $darkMode.darkStyles.string : $darkMode.lightStyles.string}
 >
-	<div class="stack justify-end h-full gap-4" bind:clientHeight={modalContainerHeight}>
+	<div bind:clientHeight={modalContainerHeight} class="stack justify-end h-full gap-4">
 		<div class="stack gap-2">
 			<div
 				class="hstack gap-3 justify-end align-center text-xs flex-wrap"
@@ -344,7 +344,7 @@
 				{#each Object.keys(showInNotesModalCheckboxes) as checkbox}
 					<label class="center gap-1 capitalize">
 						{checkbox}
-						<input type="checkbox" bind:checked={showInNotesModalCheckboxes[checkbox]} />
+						<input bind:checked={showInNotesModalCheckboxes[checkbox]} type="checkbox" />
 					</label>
 				{/each}
 			</div>
@@ -354,9 +354,9 @@
 			class="stack gap-10 center h-full overflow-y-scroll hide-scrollbar"
 			style="height:{modalMainContentHeight}px"
 		>
-			<div class="stack gap-2 sm:gap-4" bind:this={notesModalTextArea}></div>
+			<div bind:this={notesModalTextArea} class="stack gap-2 sm:gap-4"></div>
 		</div>
-		<div class="flex flex-wrap gap-4 center" bind:clientHeight={modalButtonContainerHeight}>
+		<div bind:clientHeight={modalButtonContainerHeight} class="flex flex-wrap gap-4 center">
 			<Button onclick={copy} className="text-black">Copy</Button>
 			<Button onclick={() => exportedNotesModal.close()} className="text-black">Close</Button>
 		</div>

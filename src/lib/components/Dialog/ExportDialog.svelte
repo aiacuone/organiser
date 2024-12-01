@@ -252,8 +252,8 @@
 	preventClose={isDefaultSelectionDialogOpen}
 >
 	<div bind:clientHeight={containerHeight} class="stack gap-3 w-full h-full text-sm">
-		<header class="text-center" bind:clientHeight={headerHeight}>Export/Copy</header>
-		<div class="stack gap-2" bind:clientHeight={buttonsContainerHeight}>
+		<header bind:clientHeight={headerHeight} class="text-center">Export/Copy</header>
+		<div bind:clientHeight={buttonsContainerHeight} class="stack gap-2">
 			<!-- TODO: Svelte 5: use snippet for these, they are being repeated -->
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
 				{#each Object.keys(logKeyValueFilter).filter((key) => {
@@ -262,7 +262,7 @@
 					<div class="hstack gap-2">
 						<label>
 							{logEnumNames[key as Log_enum]}
-							<input type="checkbox" bind:checked={logKeyValueFilter[key]} />
+							<input bind:checked={logKeyValueFilter[key]} type="checkbox" />
 						</label>
 					</div>
 				{/each}
@@ -272,7 +272,7 @@
 					<div class="hstack gap-2">
 						<label class="capitalize">
 							{logTypeEnumNames[key as LogType_enum]}
-							<input type="checkbox" bind:checked={typeFilter[key as LogType_enum]} />
+							<input bind:checked={typeFilter[key as LogType_enum]} type="checkbox" />
 						</label>
 					</div>
 				{/each}
@@ -282,7 +282,7 @@
 					<div class="hstack gap-2">
 						<label class="capitalize">
 							{camelCaseToCapitalized(key)}
-							<input type="checkbox" bind:checked={preferences[key]} />
+							<input bind:checked={preferences[key]} type="checkbox" />
 						</label>
 					</div>
 				{/each}
@@ -296,7 +296,7 @@
 			</div>
 		</div>
 
-		<div class="stack flex-1 overflow-y-scroll hide-scrollbar" bind:this={logsContainer}>
+		<div bind:this={logsContainer} class="stack flex-1 overflow-y-scroll hide-scrollbar">
 			{#if isLoadingLogs}
 				{#each Array(5) as _}
 					<div class="bg-neutral-100 rounded-sm h-[120px] w-full"></div>
@@ -333,7 +333,7 @@
 				/>
 			{/if}
 		</div>
-		<div class="hstack center gap-2" bind:clientHeight={footerButtonsContainerHeight}>
+		<div bind:clientHeight={footerButtonsContainerHeight} class="hstack center gap-2">
 			{#each footerButtons as { onclick, label }, index}
 				<Button onclick={() => onclick(index)}>
 					{#if footerButtons[index].isAnimating}

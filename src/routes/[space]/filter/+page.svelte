@@ -184,8 +184,8 @@
 	};
 </script>
 
-<div class="stack flex-1 gap-3" bind:clientHeight={parentContainerHeight}>
-	<div class="center stack gap-2" bind:clientHeight={headerContainerHeight}>
+<div bind:clientHeight={parentContainerHeight} class="stack flex-1 gap-3">
+	<div bind:clientHeight={headerContainerHeight} class="center stack gap-2">
 		<div class="hstack gap-3 flex-wrap center">
 			<div class="hstack gap-3 border border-gray-100 py-1 px-2 rounded-md flex-wrap center">
 				<Search value={$searchValue} onChange={onSearchChange} {onClickClear} showEnter={false} />

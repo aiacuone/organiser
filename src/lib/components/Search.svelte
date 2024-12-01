@@ -20,7 +20,7 @@
 <div class="hstack">
 	<div class="hstack center gap-1 px-2 border border-gray-100 rounded-md">
 		<Icon icon={icons.search} class="text-gray-500" />
-		<Input _class="outline-none" bind:value {onchange} bind:onEnterKeydown />
+		<Input bind:value bind:onEnterKeydown _class="outline-none" {onchange} />
 	</div>
 	{#if showEnter}
 		<button class="w-[30px] center" onclick={onClickEnter}>

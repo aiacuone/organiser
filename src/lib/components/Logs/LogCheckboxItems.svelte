@@ -44,10 +44,10 @@
 			{/if}
 			<div class="hstack">
 				<input
+					bind:checked={checkboxes[index].isChecked}
 					type="checkbox"
 					class="mr-[7px]"
 					onchange={onCheckboxesChange}
-					bind:checked={checkboxes[index].isChecked}
 				/>
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="flex-1">
