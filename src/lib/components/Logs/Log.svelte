@@ -36,9 +36,10 @@
 
 	let log = $state(getMappedLog(initialLog));
 
-	$effect(() => {
-		log = getMappedLog(initialLog);
-	});
+	// todo: Monitor this. I dont see the value in this. Potentially remove.
+	// $effect(() => {
+	// 	log = getMappedLog(initialLog);
+	// });
 
 	let container: HTMLButtonElement;
 
@@ -130,9 +131,11 @@
 		addToEndOfRaceCondition(onFocusAnswerInput);
 	};
 
-	const haveValuesChanged = (() => !isEqual(getLogFromMappedLog(log), initialLog))();
+	const getHaveValuesChanged = () => !isEqual(getLogFromMappedLog(log), initialLog);
 
 	const onAccept = async () => {
+		const haveValuesChanged = getHaveValuesChanged();
+
 		if (!haveValuesChanged) return onStopEditing();
 
 		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate(log.date)) {
@@ -263,6 +266,7 @@
 
 	const onClickOutside = () => {
 		if (isEditing) {
+			const haveValuesChanged = getHaveValuesChanged();
 			if (haveValuesChanged && !isOpen && !$whichInputIsFocused) {
 				onOpen();
 			} else {
@@ -320,11 +324,6 @@
 		[LogType_enum.list]: ['', 'p-2 gap-1 text-sm border border-neutral-200 rounded-lg']
 	};
 
-	const onClickLog = () => {
-		if ($currentlyEditing) return;
-		onEditLog();
-	};
-
 	const onContainerKeydown = (e: KeyboardEvent) => {
 		if (!isEditing || $isAnAutofillOpen) return;
 
@@ -365,7 +364,7 @@
 	};
 </script>
 
-<button onclick={onClickLog} onkeydown={onContainerKeydown} bind:this={container}>
+<button onkeydown={onContainerKeydown} bind:this={container}>
 	<!-- todo:svelte 5 -->
 	<!-- <button
 	use:clickOutside
@@ -421,6 +420,7 @@
 						onDeleteQuestion={onDeleteItem}
 						id={log.id}
 						bind:focusElements
+						{onEdit}
 					/>
 				{:else if log.type === LogType_enum.important || log.type === LogType_enum.time || (log.type === LogType_enum.list && log.listType !== LogListType_enum.checkbox)}
 					<ListItems
@@ -431,6 +431,7 @@
 						{onDeleteItem}
 						logType={log.type}
 						bind:focusElements
+						{onEdit}
 					/>
 				{/if}
 			</div>

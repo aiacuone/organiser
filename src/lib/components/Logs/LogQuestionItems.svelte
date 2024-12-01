@@ -17,6 +17,7 @@
 		isEditing: boolean;
 		onDeleteQuestion: (index: number) => void;
 		focusElements: HTMLElement[];
+		onEdit: () => void;
 	}
 
 	let {
@@ -25,7 +26,8 @@
 		id,
 		isEditing,
 		onDeleteQuestion,
-		focusElements = $bindable([])
+		focusElements = $bindable([]),
+		onEdit
 	}: Props = $props();
 
 	let isAnswering: undefined | number = $state();
@@ -79,6 +81,7 @@
 							_class="flex-1"
 							onchange={(e:Event) => onTextareaChange(e, index)}
 							bind:onFocus={onFocusAnswerInput}
+							onclick={onEdit}
 						/>
 					</div>
 				{/if}

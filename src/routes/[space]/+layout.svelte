@@ -3,6 +3,8 @@
 	import { setContext } from 'svelte';
 	import { isAuthenticated } from '$lib';
 
+	let { children } = $props();
+
 	const queryClient = useQueryClient();
 
 	const invalidateLogs = async () => {
@@ -15,10 +17,10 @@
 
 	setContext('invalidateLogs', invalidateLogs);
 
-	$: {
+	$effect(() => {
 		// This will invalidate the logs after login
 		if ($isAuthenticated) void invalidateLogs();
-	}
+	});
 </script>
 
-<slot />
+{@render children()}

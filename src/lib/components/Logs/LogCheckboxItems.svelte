@@ -58,6 +58,7 @@
 							className="flex-1 w-full"
 							{onEnterKeydown}
 							autofocus={index > 0}
+							onclick={onEdit}
 						/>
 					</div>
 					<div class="min-w-[40px] hidden sm:flex align-center relative">

@@ -29,7 +29,7 @@
 	};
 </script>
 
-<svelte:window on:keydown={onkeydown} />
+<svelte:window {onkeydown} />
 
 <dialog bind:this={dialog} class="p-4 shadow-md rounded-sm w-full max-w-[500px] {_class}">
 	<div class="w-full h-full center">

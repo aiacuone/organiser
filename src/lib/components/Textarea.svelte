@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 
 	interface Props {
 		value: string | string[];
@@ -10,6 +10,8 @@
 		onchange: (e: Event) => void;
 		onFocus?: () => void;
 		textarea?: HTMLElement;
+		isDisabled?: boolean;
+		onclick?: () => void;
 	}
 
 	let {
@@ -20,7 +22,9 @@
 		onchange: _onchange,
 		value = $bindable(''),
 		onFocus = $bindable(),
-		textarea = $bindable()
+		textarea = $bindable(),
+		isDisabled = false,
+		onclick
 	}: Props = $props();
 
 	const resize = () => {
@@ -34,8 +38,9 @@
 		resize();
 	};
 
-	$effect(() => {
-		resize();
+	$effect.pre(() => {
+		// This is the same as 'afterUpdate' in SvelteKit
+		tick().then(() => resize());
 	});
 
 	onMount(() => {
@@ -71,6 +76,8 @@
 		bind:this={textarea}
 		oninput={onchange}
 		onfocus={_onFocus}
+		disabled={isDisabled}
+		{onclick}
 	></textarea>
 </div>
 

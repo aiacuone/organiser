@@ -17,6 +17,7 @@
 		logType: LogType_enum;
 		listType: LogListType_enum;
 		focusElements: HTMLElement[];
+		onEdit: () => void;
 	}
 
 	let {
@@ -26,7 +27,8 @@
 		onDeleteItem,
 		logType,
 		listType,
-		focusElements = $bindable([])
+		focusElements = $bindable([]),
+		onEdit
 	}: Props = $props();
 
 	const bulletType: Record<
@@ -69,6 +71,7 @@
 							{onEnterKeydown}
 							autofocus={index > 0}
 							bind:textarea={focusElements[index + 2]}
+							onclick={onEdit}
 						/>
 					</div>
 					<div class="min-w-[40px] hidden sm:flex align-center relative">
