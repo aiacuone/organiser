@@ -59,21 +59,16 @@
 
 	const logs = useQuery(
 		'logs',
-		() => {
-			return (
-				$selectedHyphenatedDateString &&
-				getLogsClient({
-					space: replaceAllSpacesWithHyphens(data.space),
-					date: $selectedDate
-				})
-			);
-		},
+		() =>
+			$selectedHyphenatedDateString &&
+			getLogsClient({
+				space: replaceAllSpacesWithHyphens(data.space),
+				date: $selectedDate
+			}),
 		{
-			onSuccess: () => {
-				if (browser) {
-					goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
-				}
-			}
+			onSuccess: () =>
+				browser &&
+				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`)
 		}
 	);
 
@@ -119,9 +114,7 @@
 
 	let showInNotesModalCheckboxes: Record<string, boolean> = $state({ ...defaultModalCheckboxes });
 
-	const resetCheckboxes = () => {
-		showInNotesModalCheckboxes = { ...defaultModalCheckboxes };
-	};
+	const resetCheckboxes = () => (showInNotesModalCheckboxes = { ...defaultModalCheckboxes });
 
 	let notesModalTextArea: HTMLDivElement;
 	const copy = () => {
@@ -183,9 +176,7 @@
 		}
 	};
 
-	const onResetNewLogType = () => {
-		newLogType = undefined;
-	};
+	const onResetNewLogType = () => (newLogType = undefined);
 
 	setContext('onResetNewLogType', onResetNewLogType);
 
@@ -235,9 +226,7 @@
 		filters = [];
 	};
 
-	const onClickClear = () => {
-		filters = [];
-	};
+	const onClickClear = () => (filters = []);
 
 	const {
 		isOpen: isExportDialogOpen,
@@ -245,10 +234,7 @@
 		onClose: onCloseExportDialog
 	} = useDisclosure();
 
-	const onSearchChange = (e: Event) => {
-		const target = e.target as HTMLInputElement;
-		searchValue = target.value;
-	};
+	const onSearchChange = (e: Event) => (searchValue = (e.target as HTMLTextAreaElement).value);
 </script>
 
 <div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>

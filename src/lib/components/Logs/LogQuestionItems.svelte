@@ -3,7 +3,6 @@
 	import type { MappedQuestionItem } from '$lib/types';
 	import Button from '../Button.svelte';
 	import Textarea from '../Textarea.svelte';
-	import type { Readable } from 'svelte/motion';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
 	import {
@@ -40,9 +39,7 @@
 		}, 0);
 	};
 
-	const onAnswerChange = (index: number, value: string) => {
-		questions[index].answer = value;
-	};
+	const onAnswerChange = (index: number, value: string) => (questions[index].answer = value);
 
 	$effect(() => {
 		if (areAnyQuestionsNotCapitalised(questions)) {
@@ -50,10 +47,8 @@
 		}
 	});
 
-	const onTextareaChange = (e: Event, index: number) => {
-		const target = e.target as HTMLTextAreaElement;
-		onAnswerChange(index, target?.value);
-	};
+	const onTextareaChange = (e: Event, index: number) =>
+		onAnswerChange(index, (e.target as HTMLTextAreaElement).value);
 </script>
 
 <ul class="ml-2 stack flex-1 gap-3">

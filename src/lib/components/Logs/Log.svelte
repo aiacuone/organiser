@@ -42,13 +42,9 @@
 
 	let container: HTMLButtonElement;
 
-	const onEditLog = () => {
-		$currentlyEditing = log.id;
-	};
+	const onEditLog = () => ($currentlyEditing = log.id);
 
-	const onStopEditing = () => {
-		$currentlyEditing = null;
-	};
+	const onStopEditing = () => ($currentlyEditing = null);
 
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 	setContext('onEditLog', onEditLog);
@@ -134,15 +130,9 @@
 		addToEndOfRaceCondition(onFocusAnswerInput);
 	};
 
-	const getHaveValuesChanged = () => {
-		const haveValuesChanged = !isEqual(getLogFromMappedLog(log), initialLog);
-
-		return haveValuesChanged;
-	};
+	const haveValuesChanged = (() => !isEqual(getLogFromMappedLog(log), initialLog))();
 
 	const onAccept = async () => {
-		const haveValuesChanged = getHaveValuesChanged();
-
 		if (!haveValuesChanged) return onStopEditing();
 
 		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate(log.date)) {
@@ -273,7 +263,6 @@
 
 	const onClickOutside = () => {
 		if (isEditing) {
-			const haveValuesChanged = getHaveValuesChanged();
 			if (haveValuesChanged && !isOpen && !$whichInputIsFocused) {
 				onOpen();
 			} else {
