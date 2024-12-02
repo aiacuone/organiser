@@ -14,13 +14,12 @@
 		value: string;
 		placeholder?: string;
 		autofocus?: boolean;
-		autofillValues: (string | undefined)[];
+		autofillValues?: (string | undefined)[];
 		isDisabled?: boolean;
-		changeInputValue: (value: string | undefined) => void;
 		onAutoFill?: (value: string) => void;
 		_class?: string;
-		onchange: (event: Event) => void;
-		onEnterKeydown: () => void;
+		onchange?: (event: Event) => void;
+		onEnterKeydown?: () => void;
 		onFocus?: () => void;
 		input: HTMLElement;
 		isEditing: boolean;
@@ -33,7 +32,6 @@
 		autofocus,
 		autofillValues = [],
 		isDisabled,
-		changeInputValue = $bindable(),
 		onAutoFill,
 		_class,
 		onchange,
@@ -155,7 +153,7 @@
 				if (isAutofillValueBeingSelected) {
 					onClickAutofill(filteredAutofillValues[selectedAutofill.selected as number]);
 				} else {
-					onEnterKeydown();
+					onEnterKeydown && onEnterKeydown();
 				}
 			},
 			Escape: () => {

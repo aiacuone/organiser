@@ -29,7 +29,7 @@
 	interface Props {
 		initialLog: Log_int;
 		editOnMount: boolean;
-		inputAutoFocus: boolean;
+		inputAutoFocus?: boolean;
 	}
 
 	let { initialLog, editOnMount, inputAutoFocus }: Props = $props();
@@ -170,6 +170,7 @@
 			log.date = _date;
 		}
 
+		log.lastUpdated = new Date();
 		const updatedLog: Log_int = getLogFromMappedLog(log);
 
 		try {
@@ -230,6 +231,8 @@
 		addItemTypeMethods[log.type]();
 
 		focusElements = [...focusElements, focusElements[focusElements.length - 1]];
+
+		addToEndOfRaceCondition(() => focusElements[focusElements.length - 1].focus());
 	};
 
 	const onDeleteItem = (index: number) => {
@@ -409,7 +412,6 @@
 					/>
 					<Input
 						bind:value={log.reference}
-						bind:changeInputValue={changeReferenceInputValue}
 						bind:input={focusElements[1]}
 						placeholder="Reference"
 						isDisabled={!isEditing}
