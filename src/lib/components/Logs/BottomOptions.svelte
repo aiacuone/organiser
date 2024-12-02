@@ -23,9 +23,9 @@
 			onDecrement: () => void;
 			max: number;
 			min: number;
+			incrementDecrementValue: number;
 		};
 		isEditing: boolean;
-		incrementDecrementValue: number;
 		showIncrementDecrement?: boolean;
 		onEditLog: () => void;
 		onStopEditing: () => void;
@@ -38,7 +38,6 @@
 		onAddItem,
 		incrementDecrementProps,
 		isEditing,
-		incrementDecrementValue,
 		showIncrementDecrement = true,
 		onEditLog,
 		onStopEditing
@@ -125,8 +124,11 @@
 				</LogButton>
 			{/if}
 		{/each}
-		{#if isEditing || (incrementDecrementProps && showIncrementDecrement && incrementDecrementValue)}
-			<IncrementDecrement {...incrementDecrementProps} value={incrementDecrementValue} />
+		{#if isEditing || (incrementDecrementProps && showIncrementDecrement && incrementDecrementProps.incrementDecrementValue)}
+			<IncrementDecrement
+				{...incrementDecrementProps}
+				value={incrementDecrementProps.incrementDecrementValue}
+			/>
 		{/if}
 		<div class="stack">
 			<p class="text-xs text-gray-200 text-black">

@@ -186,6 +186,24 @@
 	const onAddItem = () => {
 		onEditLog();
 
+		const doesTheLastListItemHaveValue = (() => {
+			const lastListItem = log.listItems[log.listItems.length - 1].item;
+
+			const itemValueType: Record<LogType_enum, string | number> = {
+				[LogType_enum.todo]: log.checkboxItems[log.checkboxItems.length - 1].text,
+				[LogType_enum.question]:
+					log.questions[log.questions.length - 1].question ||
+					log.questions[log.questions.length - 1].answer,
+				[LogType_enum.important]: lastListItem,
+				[LogType_enum.time]: lastListItem,
+				[LogType_enum.list]: lastListItem
+			};
+
+			return !!itemValueType[log.type];
+		})();
+
+		if (!doesTheLastListItemHaveValue) return;
+
 		const addListItem = () =>
 			log.listItems && (log.listItems = [...log.listItems, { id: log.listItems.length, item: '' }]);
 
@@ -200,15 +218,14 @@
 			log.questions &&
 			(log.questions = [...log.questions, { id: log.questions.length, question: '', answer: '' }]);
 
+		const isCheckboxListType = log.listType === LogListType_enum.checkbox;
+
 		const addItemTypeMethods: Record<LogType_enum, () => void> = {
 			[LogType_enum.todo]: addCheckboxItem,
 			[LogType_enum.question]: addQuestionItem,
 			[LogType_enum.important]: addListItem,
 			[LogType_enum.time]: addListItem,
-			[LogType_enum.list]: () => {
-				if (log.listType === LogListType_enum.checkbox) addCheckboxItem();
-				else addListItem();
-			}
+			[LogType_enum.list]: isCheckboxListType ? addCheckboxItem : addListItem
 		};
 		addItemTypeMethods[log.type]();
 
@@ -225,19 +242,14 @@
 		const removeQuestionItem = () =>
 			log.questions && (log.questions = log.questions.filter((_, i) => i !== index));
 
+		const isCheckboxListType = log.listType === LogListType_enum.checkbox;
+
 		const removeItemTypeMethods: Record<LogType_enum, () => void> = {
-			[LogType_enum.todo]: () => {
-				removeCheckboxItem();
-			},
-			[LogType_enum.question]: () => {
-				removeQuestionItem();
-			},
+			[LogType_enum.todo]: removeCheckboxItem,
+			[LogType_enum.question]: removeQuestionItem,
 			[LogType_enum.important]: removeListItem,
 			[LogType_enum.time]: removeListItem,
-			[LogType_enum.list]: () => {
-				if (log.listType === LogListType_enum.checkbox) removeCheckboxItem();
-				else removeListItem();
-			}
+			[LogType_enum.list]: isCheckboxListType ? removeCheckboxItem : removeListItem
 		};
 		removeItemTypeMethods[log.type]();
 		focusElements = focusElements.filter((_, i) => i !== index + 2);
@@ -359,6 +371,14 @@
 			whichInputIsFocused.set(focusElements[indexOfNewFocusedElement]);
 		}
 	};
+
+	const incrementDecrementProps = $derived({
+		min: incrementDecrementPropValues[log.type].min,
+		max: incrementDecrementPropValues[log.type].max,
+		onIncrement,
+		onDecrement,
+		incrementDecrementValue: log.type === LogType_enum.time ? log.time : log.rating
+	});
 </script>
 
 <button onkeydown={onContainerKeydown} bind:this={container}>
@@ -437,13 +457,7 @@
 			</div>
 			<BottomOptions
 				bind:log
-				incrementDecrementProps={{
-					min: incrementDecrementPropValues[log.type].min,
-					max: incrementDecrementPropValues[log.type].max,
-					onIncrement,
-					onDecrement
-				}}
-				incrementDecrementValue={log.type === LogType_enum.time ? log.time : log.rating}
+				{incrementDecrementProps}
 				{isEditing}
 				{onAccept}
 				{onAddItem}
