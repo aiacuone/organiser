@@ -17,7 +17,7 @@
 		isEditing: boolean;
 		onDeleteQuestion: (index: number) => void;
 		focusElements: HTMLElement[];
-		onEdit: () => void;
+		onClickInput: (e: MouseEvent) => void;
 	}
 
 	let {
@@ -27,7 +27,7 @@
 		isEditing,
 		onDeleteQuestion,
 		focusElements = $bindable([]),
-		onEdit
+		onClickInput
 	}: Props = $props();
 
 	let isAnswering: undefined | number = $state();
@@ -51,6 +51,10 @@
 
 	const onTextareaChange = (e: Event, index: number) =>
 		onAnswerChange(index, (e.target as HTMLTextAreaElement).value);
+
+	const onClickTextarea = (e: MouseEvent) => {
+		onClickInput(e);
+	};
 </script>
 
 <ul class="ml-2 stack flex-1 gap-3">
@@ -71,6 +75,8 @@
 						className=""
 						_class="flex-1"
 						autofocus
+						isDisabled={!isEditing}
+						onclick={onClickTextarea}
 					/>
 				</div>
 				{#if questions[index].answer || isAnswering === index}
@@ -81,7 +87,7 @@
 							bind:onFocus={onFocusAnswerInput}
 							_class="flex-1"
 							onchange={(e:Event) => onTextareaChange(e, index)}
-							onclick={onEdit}
+							onclick={onClickTextarea}
 						/>
 					</div>
 				{/if}

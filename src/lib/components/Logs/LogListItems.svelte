@@ -17,7 +17,7 @@
 		logType: LogType_enum;
 		listType: LogListType_enum;
 		focusElements: HTMLElement[];
-		onEdit: () => void;
+		onClickInput: (e: MouseEvent) => void;
 	}
 
 	let {
@@ -28,7 +28,7 @@
 		logType,
 		listType,
 		focusElements = $bindable([]),
-		onEdit
+		onClickInput
 	}: Props = $props();
 
 	const bulletType: Record<
@@ -53,6 +53,10 @@
 			items = capitalizeFirstLetterOfMappedListItems(items);
 		}
 	});
+
+	const onClickTextArea = (e: MouseEvent) => {
+		onClickInput(e);
+	};
 </script>
 
 <ul class="ml-8 stack w-full" style={`list-style-type:${bulletType[listType]}`}>
@@ -71,7 +75,8 @@
 							onchange={(e:Event) => (items[index].item = (e.target as HTMLInputElement).value)}
 							{onEnterKeydown}
 							autofocus={index > 0}
-							onclick={onEdit}
+							onclick={onClickTextArea}
+							isDisabled={!isEditing}
 						/>
 					</div>
 					<div class="min-w-[40px] hidden sm:flex align-center relative">

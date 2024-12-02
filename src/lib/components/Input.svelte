@@ -24,6 +24,7 @@
 		onFocus?: () => void;
 		input: HTMLElement;
 		isEditing: boolean;
+		onclick: (e: MouseEvent) => void;
 	}
 
 	let {
@@ -39,7 +40,8 @@
 		onEnterKeydown = $bindable(),
 		onFocus,
 		input = $bindable(),
-		isEditing
+		isEditing,
+		onclick: _onclick
 	}: Props = $props();
 
 	let isInputFocused = false;
@@ -99,6 +101,11 @@
 	const _onFocus = () => {
 		isInputFocused = true;
 		onFocus && onFocus();
+	};
+
+	const onclick = (e: MouseEvent) => {
+		_onFocus();
+		_onclick(e);
 	};
 
 	let slicedAutofillValues: string[] = $state([]);
@@ -188,7 +195,8 @@
 		placeholder={isDisabled ? '' : placeholder}
 		oninput={onchange}
 		onkeydown={_onKeydown}
-		onclick={_onFocus}
+		{onclick}
+		readonly={isDisabled}
 	/>
 	<div class="relative z-50 {isEditing && isAutofillOpen ? 'flex' : 'hidden'}">
 		<div

@@ -16,6 +16,7 @@
 		onDeleteBullet: (index: number) => void;
 		focusElements: HTMLElement[];
 		onEdit: () => void;
+		onClickInput: (e: MouseEvent) => void;
 	}
 
 	let {
@@ -24,7 +25,8 @@
 		onEnterKeydown,
 		onDeleteBullet,
 		focusElements = $bindable([]),
-		onEdit
+		onEdit,
+		onClickInput: _onClickInput
 	}: Props = $props();
 
 	const onCheckboxesChange = () => onEdit();
@@ -34,6 +36,10 @@
 			checkboxes = capitalizeFirstLetterOfMappedCheckboxItems(checkboxes);
 		}
 	});
+
+	const onClickInput = (e: MouseEvent) => {
+		_onClickInput(e);
+	};
 </script>
 
 <ul class="ml-3 stack flex-1">
@@ -48,6 +54,7 @@
 					type="checkbox"
 					class="mr-[7px]"
 					onchange={onCheckboxesChange}
+					onclick={onClickInput}
 				/>
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="flex-1">
@@ -55,10 +62,11 @@
 							bind:textarea={focusElements[focusElements.length]}
 							bind:value={checkboxes[index].text}
 							onchange={(e:Event) => (checkboxes[index].text = (e.target as HTMLInputElement).value)}
-							className="flex-1 w-full"
+							_class="flex-1 w-full"
 							{onEnterKeydown}
 							autofocus={index > 0}
-							onclick={onEdit}
+							onclick={onClickInput}
+							isDisabled={!isEditing}
 						/>
 					</div>
 					<div class="min-w-[40px] hidden sm:flex align-center relative">

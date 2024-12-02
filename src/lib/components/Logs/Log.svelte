@@ -33,26 +33,73 @@
 	}
 
 	let { initialLog, editOnMount, inputAutoFocus }: Props = $props();
-
 	let log = $state(getMappedLog(initialLog));
+	let isAnotherCardEditing = $derived(!!$currentlyEditing && $currentlyEditing !== log.id);
+	let isEditing = $derived($currentlyEditing === log.id);
+	let container: HTMLButtonElement;
+	let focusElements: HTMLElement[] = $state([]);
+
+	const onEditLog = () => ($currentlyEditing = log.id);
+	const onStopEditing = () => ($currentlyEditing = null);
+	const onResetNewLogType: () => void = getContext('onResetNewLogType');
+	setContext('onEditLog', onEditLog);
+	setContext('isEditing', isEditing);
+
+	const onClickInput = (e: MouseEvent) => {
+		onEditLog();
+
+		const target = e.target as HTMLElement;
+		target.focus();
+	};
+
+	const onEdit = () => {
+		if (!isAnotherCardEditing) {
+			onEditLog();
+		}
+	};
+
+	let changeReferenceInputValue: ((value: string | undefined) => void) | undefined = $state();
+
+	let onFocusAnswerInput: () => void;
+	const _onFocusAnswerInput = () => {
+		onEditLog();
+		addToEndOfRaceCondition(onFocusAnswerInput);
+	};
+
+	const getHaveValuesChanged = () => !isEqual(getLogFromMappedLog(log), initialLog);
+
+	const onTitleAutoFill = (_title: string) => {
+		const correspondingReference = $titlesAndReferences.find((t) => t.title === _title)?.reference;
+
+		changeReferenceInputValue && changeReferenceInputValue(correspondingReference ?? undefined);
+	};
+
+	const onResetChange = () => {
+		onResetNewLogType && onResetNewLogType();
+		log = getMappedLog(initialLog);
+
+		onStopEditing();
+	};
+
+	const onTextareaEnterKeydown: () => void = () => {
+		onAddItem();
+	};
+
+	const onClickOutside = () => {
+		if (isEditing) {
+			const haveValuesChanged = getHaveValuesChanged();
+			if (haveValuesChanged && !isOpen && !$whichInputIsFocused) {
+				onOpen();
+			} else {
+				onStopEditing();
+			}
+		}
+	};
 
 	// todo: Monitor this. I dont see the value in this. Potentially remove.
 	// $effect(() => {
 	// 	log = getMappedLog(initialLog);
 	// });
-
-	let container: HTMLButtonElement;
-
-	const onEditLog = () => ($currentlyEditing = log.id);
-
-	const onStopEditing = () => ($currentlyEditing = null);
-
-	const onResetNewLogType: () => void = getContext('onResetNewLogType');
-	setContext('onEditLog', onEditLog);
-
-	let isEditing = $derived($currentlyEditing === log.id);
-
-	setContext('isEditing', isEditing);
 
 	const queryClient = useQueryClient();
 
@@ -110,29 +157,6 @@
 		addToEndOfRaceCondition(onStopEditing);
 	};
 
-	const onEdit = () => {
-		const isAnotherCardEditing = !!$currentlyEditing;
-		if (!isAnotherCardEditing) {
-			onEditLog();
-		}
-	};
-
-	let changeReferenceInputValue: ((value: string | undefined) => void) | undefined = $state();
-
-	const onTitleAutoFill = (_title: string) => {
-		const correspondingReference = $titlesAndReferences.find((t) => t.title === _title)?.reference;
-
-		changeReferenceInputValue && changeReferenceInputValue(correspondingReference ?? undefined);
-	};
-
-	let onFocusAnswerInput: () => void;
-	const _onFocusAnswerInput = () => {
-		onEditLog();
-		addToEndOfRaceCondition(onFocusAnswerInput);
-	};
-
-	const getHaveValuesChanged = () => !isEqual(getLogFromMappedLog(log), initialLog);
-
 	const onAccept = async () => {
 		const haveValuesChanged = getHaveValuesChanged();
 
@@ -159,8 +183,6 @@
 		addToEndOfRaceCondition(onStopEditing);
 	};
 
-	let focusElements: HTMLElement[] = $state([]);
-
 	const onAddItem = () => {
 		onEditLog();
 
@@ -179,12 +201,8 @@
 			(log.questions = [...log.questions, { id: log.questions.length, question: '', answer: '' }]);
 
 		const addItemTypeMethods: Record<LogType_enum, () => void> = {
-			[LogType_enum.todo]: () => {
-				addCheckboxItem();
-			},
-			[LogType_enum.question]: () => {
-				addQuestionItem();
-			},
+			[LogType_enum.todo]: addCheckboxItem,
+			[LogType_enum.question]: addQuestionItem,
 			[LogType_enum.important]: addListItem,
 			[LogType_enum.time]: addListItem,
 			[LogType_enum.list]: () => {
@@ -203,6 +221,7 @@
 
 		const removeCheckboxItem = () =>
 			log.checkboxItems && (log.checkboxItems = log.checkboxItems.filter((_, i) => i !== index));
+
 		const removeQuestionItem = () =>
 			log.questions && (log.questions = log.questions.filter((_, i) => i !== index));
 
@@ -222,17 +241,6 @@
 		};
 		removeItemTypeMethods[log.type]();
 		focusElements = focusElements.filter((_, i) => i !== index + 2);
-	};
-
-	const onResetChange = () => {
-		onResetNewLogType && onResetNewLogType();
-		log = getMappedLog(initialLog);
-
-		onStopEditing();
-	};
-
-	const onTextareaEnterKeydown: () => void = () => {
-		onAddItem();
 	};
 
 	onMount(() => {
@@ -263,17 +271,6 @@
 	} = useDisclosure();
 	let onOpen: () => void;
 	let isOpen: boolean;
-
-	const onClickOutside = () => {
-		if (isEditing) {
-			const haveValuesChanged = getHaveValuesChanged();
-			if (haveValuesChanged && !isOpen && !$whichInputIsFocused) {
-				onOpen();
-			} else {
-				onStopEditing();
-			}
-		}
-	};
 
 	const incrementDecrementPropValues: Record<LogType_enum, { min: number; max: number }> = {
 		[LogType_enum.todo]: { min: 0, max: 3 },
@@ -388,6 +385,7 @@
 						onAutoFill={onTitleAutoFill}
 						_class={!isEditing && !log.title ? 'hidden' : 'flex'}
 						{isEditing}
+						onclick={onClickInput}
 					/>
 					<Input
 						bind:value={log.reference}
@@ -397,6 +395,7 @@
 						isDisabled={!isEditing}
 						_class={!isEditing && !log.reference ? 'hidden' : 'flex'}
 						{isEditing}
+						onclick={onClickInput}
 					/>
 				</div>
 			</div>
@@ -410,6 +409,7 @@
 							onEnterKeydown={onTextareaEnterKeydown}
 							onDeleteBullet={onDeleteItem}
 							{onEdit}
+							{onClickInput}
 						/>
 					</div>
 				{:else if log.type === LogType_enum.question}
@@ -420,7 +420,7 @@
 						{isEditing}
 						onDeleteQuestion={onDeleteItem}
 						id={log.id}
-						{onEdit}
+						{onClickInput}
 					/>
 				{:else if log.type === LogType_enum.important || log.type === LogType_enum.time || (log.type === LogType_enum.list && log.listType !== LogListType_enum.checkbox)}
 					<ListItems
@@ -431,7 +431,7 @@
 						onEnterKeydown={onTextareaEnterKeydown}
 						{onDeleteItem}
 						logType={log.type}
-						{onEdit}
+						{onClickInput}
 					/>
 				{/if}
 			</div>
@@ -448,6 +448,8 @@
 				{onAccept}
 				{onAddItem}
 				{onDelete}
+				{onEditLog}
+				{onStopEditing}
 			/>
 		</div>
 	</div>

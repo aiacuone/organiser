@@ -21,7 +21,7 @@
 		onEnterKeydown,
 		onchange: _onchange,
 		value = $bindable(''),
-		onFocus = $bindable(),
+		onFocus: _onFocus = $bindable(),
 		textarea = $bindable(),
 		isDisabled = false,
 		onclick
@@ -64,8 +64,8 @@
 		};
 	});
 
-	const _onFocus = () => {
-		onFocus && onFocus();
+	const onfocus = () => {
+		_onFocus && _onFocus();
 	};
 </script>
 
@@ -75,8 +75,8 @@
 		bind:this={textarea}
 		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"
 		oninput={onchange}
-		onfocus={_onFocus}
-		disabled={isDisabled}
+		{onfocus}
+		readonly={isDisabled}
 		{onclick}
 	></textarea>
 </div>

@@ -27,6 +27,8 @@
 		isEditing: boolean;
 		incrementDecrementValue: number;
 		showIncrementDecrement?: boolean;
+		onEditLog: () => void;
+		onStopEditing: () => void;
 	}
 
 	let {
@@ -37,7 +39,9 @@
 		incrementDecrementProps,
 		isEditing,
 		incrementDecrementValue,
-		showIncrementDecrement = true
+		showIncrementDecrement = true,
+		onEditLog,
+		onStopEditing
 	}: Props = $props();
 
 	const { onOpen: onOpenDelete, onClose: onCloseDelete, isOpen: isOpenDelete } = useDisclosure();
@@ -75,7 +79,15 @@
 		[LogListType_enum.checkbox]: icons.checkboxList
 	};
 
+	const onClickEdit = () => {
+		isEditing ? onStopEditing() : onEditLog();
+	};
+
 	let buttons = $derived([
+		{
+			icon: icons.addList,
+			onclick: onAddItem
+		},
 		{
 			icon: icons.delete,
 			onclick: onOpenDelete,
@@ -87,13 +99,14 @@
 			isHidden: !isEditing
 		},
 		{
-			icon: icons.addList,
-			onclick: onAddItem
-		},
-		{
 			icon: listIcons[log.listType],
 			onclick: onChangeList,
 			isHidden: !isEditing || log.type !== LogType_enum.list
+		},
+		{
+			icon: icons.edit,
+			onclick: onClickEdit,
+			isHidden: isEditing
 		}
 	]);
 </script>
