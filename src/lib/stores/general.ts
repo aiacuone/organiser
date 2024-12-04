@@ -26,3 +26,5 @@ export const references = derived(titlesAndReferences, ($titlesAndReferences) =>
 });
 
 export const searchValue = writable('');
+
+export const spaces = writable([]);

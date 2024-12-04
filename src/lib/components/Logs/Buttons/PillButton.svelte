@@ -12,7 +12,7 @@
 	interface Props extends SvelteAllProps {
 		buttons: Button[];
 		capitalizeLabels?: boolean;
-		_class: string;
+		_class?: string;
 	}
 
 	// NOTE: this component is to be refactored once Svelte 5.0 releases. Use snippets to pass in buttons and their handlers

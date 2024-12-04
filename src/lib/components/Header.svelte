@@ -18,7 +18,8 @@
 		replaceAllHyphensWithSpaces,
 		replaceAllSpacesWithHyphens,
 		useDisclosure,
-		type LogNotification_int
+		type LogNotification_int,
+		spaces
 	} from '$lib';
 	import LogitLogo from '$lib/svg/logit-logo.svelte';
 	import AddSpace from './AddSpace.svelte';
@@ -46,17 +47,25 @@
 				.catch((err) => console.log(err));
 		},
 		{
-			refetchOnMount: false
+			refetchOnMount: false,
+			onSuccess: (data) => {
+				$spaces = data;
+			}
 		}
 	);
+
+	// I attempted to move both spacesQuery and allLogsNotificationsQuery to the layout component, but the token is not set when the layout component attempts to fetch the data.
 
 	const allLogsNotificationsQuery: UseQueryStoreResult<QueryKey, any, LogNotification_int[], any> =
 		useQuery(
 			`allLogNotifications`,
 			async () => {
 				if (!$isAuthenticated) return;
+
+				const params = { spaces: $spacesQuery.data };
+
 				return await axios
-					.get(`/log/notifications`, { params: { spaces: $spacesQuery.data } })
+					.get(`/log/notifications`, { params })
 					.then(({ data }) => data)
 					.catch((err) => console.log(err));
 			},
