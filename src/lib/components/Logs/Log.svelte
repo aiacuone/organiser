@@ -50,6 +50,8 @@
 	setContext('onEditLog', onEditLog);
 	setContext('isEditing', isEditing);
 
+	const invalidateLogs: () => Promise<void> = getContext('invalidateLogs');
+
 	const onClickInput = (e: MouseEvent) => {
 		onEditLog();
 
@@ -125,8 +127,7 @@
 			queryClient.setQueryData('logs', context?.previousLogs);
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries('logs');
-			queryClient.invalidateQueries('allLogNotifications');
+			invalidateLogs();
 		}
 	});
 
@@ -149,8 +150,7 @@
 			queryClient.setQueryData('logs', context?.previousLogs);
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries('logs');
-			queryClient.invalidateQueries('allLogNotifications');
+			invalidateLogs();
 		}
 	});
 

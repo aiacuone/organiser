@@ -149,7 +149,9 @@
 	);
 
 	const filteredAndSortedLogs = $derived(
-		filteredLogs.sort((a, b) => Date.parse(b.lastUpdated) - Date.parse(a.lastUpdated))
+		filteredLogs.sort(
+			(a: Log_int, b: Log_int) => Date.parse(b.lastUpdated) - Date.parse(a.lastUpdated)
+		)
 	);
 
 	const noteButtons: Record<LogType_enum, { label: string; icon: string; type: LogType_enum }> = {
