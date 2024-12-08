@@ -3,9 +3,9 @@
 
 	interface Props {
 		logs: Log_int[];
-		logKeyValueFilter: Record<Log_enum, boolean>;
+		logKeyValueFilter: Partial<Record<Log_enum, boolean>>;
 		logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number;
-		typeFilter: Record<LogType_enum, boolean>;
+		typeFilter: Partial<Record<LogType_enum, boolean>>;
 		showKeys: boolean;
 	}
 
@@ -20,18 +20,20 @@
 		if (key === Log_enum.checkboxItems) return value.some(({ text }: { text: string }) => text);
 		return logKeyValueFilter[key] && value;
 	});
+
+	const filteredLogs = $derived(logs.filter(({ type }) => typeFilter[type]));
 </script>
 
-{#each logs.filter(({ type }) => typeFilter[type]) as log}
+{#each filteredLogs as log}
 	<div class="stack gap-2 log-stack p-2">
-		{#each Object.entries(log).filter(logFilter).sort(logKeyValueSortFunction) as [key, value]}
-			{#if key === 'listItems'}
+		{#each (Object.entries(log) as [Log_enum,any][]).filter(logFilter).sort(logKeyValueSortFunction) as [key, value]}
+			{#if key === Log_enum.listItems}
 				<ul>
 					{#each value as listItem}
 						<li>{listItem}</li>
 					{/each}
 				</ul>
-			{:else if key === 'checkboxItems'}
+			{:else if key === Log_enum.checkboxItems}
 				<ul>
 					{#each value as { isChecked, text }}
 						<li class="{isChecked ? 'isChecked' : ''} checkbox">{text}</li>
@@ -40,7 +42,7 @@
 			{:else}
 				<p class="capitalize">
 					{#if showKeys}
-						<b>{logEnumNames[key]}</b>:
+						<b>{logEnumNames[key as keyof Log_int]}</b>:
 					{/if}
 					{value}
 				</p>

@@ -150,7 +150,9 @@
 
 	const filteredAndSortedLogs = $derived(
 		filteredLogs.sort(
-			(a: Log_int, b: Log_int) => Date.parse(b.lastUpdated) - Date.parse(a.lastUpdated)
+			(a: Log_int, b: Log_int) =>
+				Date.parse(b.lastUpdated?.toString() ?? new Date().toString()) -
+				Date.parse(a.lastUpdated?.toString() ?? new Date().toString())
 		)
 	);
 

@@ -23,7 +23,6 @@
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
 	import { onMount } from 'svelte';
-	import Log from '../Logs/Log.svelte';
 
 	interface Props extends SvelteAllProps {
 		isOpen: boolean;
@@ -51,19 +50,19 @@
 		getNextLogsPage
 	}: Props = $props();
 
-	let defaultLogKeyValueFilter: { [key: keyof Log]: boolean } = {
-		id: false,
-		date: true,
-		title: true,
-		reference: true,
-		time: false,
-		type: true,
-		space: false,
-		listItems: true,
-		checkboxItems: true,
-		lastUpdated: false,
-		rating: false,
-		questions: true
+	let defaultLogKeyValueFilter: Partial<Record<Log_enum, boolean>> = {
+		[Log_enum.id]: false,
+		[Log_enum.date]: true,
+		[Log_enum.title]: true,
+		[Log_enum.reference]: true,
+		[Log_enum.time]: false,
+		[Log_enum.type]: true,
+		[Log_enum.space]: false,
+		[Log_enum.listItems]: true,
+		[Log_enum.checkboxItems]: true,
+		[Log_enum.lastUpdated]: false,
+		[Log_enum.rating]: false,
+		[Log_enum.questions]: true
 	};
 
 	let logKeyValueFilter = $state({ ...defaultLogKeyValueFilter });
@@ -140,7 +139,6 @@
 	const onCsv = () => {
 		downloadAsCSV(logsContainer.innerText);
 	};
-	let dialog: HTMLDialogElement;
 
 	const onReset = () => {
 		const [storageLogKeyValueFilter, storageTypeFilter, storagePreferences] = getLocalStorage([
@@ -235,7 +233,7 @@
 			key: 'csv'
 		},
 		{
-			onclick: () => dialog.close(),
+			onclick: onClose,
 			label: 'Close',
 			key: 'close'
 		}
@@ -262,7 +260,7 @@
 					<div class="hstack gap-2">
 						<label>
 							{logEnumNames[key as Log_enum]}
-							<input bind:checked={logKeyValueFilter[key]} type="checkbox" />
+							<input bind:checked={logKeyValueFilter[key as keyof Log_int]} type="checkbox" />
 						</label>
 					</div>
 				{/each}

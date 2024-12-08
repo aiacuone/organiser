@@ -11,7 +11,7 @@
 		onFocus?: () => void;
 		textarea?: HTMLElement;
 		isDisabled?: boolean;
-		onclick?: () => void;
+		onclick?: (e: MouseEvent) => void;
 	}
 
 	let {

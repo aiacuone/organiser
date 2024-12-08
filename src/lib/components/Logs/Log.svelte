@@ -108,7 +108,7 @@
 	const updateLogMutation = useMutation(updateLogClient, {
 		onMutate: async (newOrUpdatedLog) => {
 			await queryClient.cancelQueries('logs');
-			const previousLogs = queryClient.getQueryData('logs');
+			const previousLogs: Log_int[] = queryClient.getQueryData('logs') ?? [];
 			queryClient.setQueryData('logs', ({ logs: previousLogs }) => {
 				const filteredLogs = previousLogs.filter((log: Log_int) => log.id !== newOrUpdatedLog.id);
 
@@ -172,7 +172,7 @@
 			log.date = _date;
 		}
 
-		log.lastUpdated = new Date().toISOString();
+		log.lastUpdated = new Date();
 		const updatedLog: Log_int = getLogFromMappedLog(log);
 
 		try {
