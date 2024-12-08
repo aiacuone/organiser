@@ -28,7 +28,7 @@
 
 	interface Props {
 		initialLog: Log_int;
-		editOnMount: boolean;
+		editOnMount?: boolean;
 		inputAutoFocus?: boolean;
 	}
 
@@ -38,6 +38,11 @@
 	let isEditing = $derived($currentlyEditing === log.id);
 	let container: HTMLButtonElement;
 	let focusElements: HTMLElement[] = $state([]);
+
+	$effect(() => {
+		// This exists because if the log is edited from outside the component, the log will not update. Example: When a log is changed and lastUpdated has been changed within a log, the logs will not order by lastUpdated as they should.
+		log = getMappedLog(initialLog);
+	});
 
 	const onEditLog = () => ($currentlyEditing = log.id);
 	const onStopEditing = () => ($currentlyEditing = null);
@@ -96,19 +101,16 @@
 		}
 	};
 
-	// todo: Monitor this. I dont see the value in this. Potentially remove.
-	// $effect(() => {
-	// 	log = getMappedLog(initialLog);
-	// });
-
 	const queryClient = useQueryClient();
 
 	const updateLogMutation = useMutation(updateLogClient, {
-		onMutate: async (newLog) => {
+		onMutate: async (newOrUpdatedLog) => {
 			await queryClient.cancelQueries('logs');
 			const previousLogs = queryClient.getQueryData('logs');
 			queryClient.setQueryData('logs', ({ logs: previousLogs }) => {
-				const updatedLogs = [...previousLogs, newLog];
+				const filteredLogs = previousLogs.filter((log: Log_int) => log.id !== newOrUpdatedLog.id);
+
+				const updatedLogs = [...filteredLogs, newOrUpdatedLog];
 
 				return {
 					logs: updatedLogs,
@@ -170,7 +172,7 @@
 			log.date = _date;
 		}
 
-		log.lastUpdated = new Date();
+		log.lastUpdated = new Date().toISOString();
 		const updatedLog: Log_int = getLogFromMappedLog(log);
 
 		try {

@@ -148,6 +148,10 @@
 			: $logs.data?.logs.filter((log: Log_int) => filters.includes(log.type))
 	);
 
+	const filteredAndSortedLogs = $derived(
+		filteredLogs.sort((a, b) => Date.parse(b.lastUpdated) - Date.parse(a.lastUpdated))
+	);
+
 	const noteButtons: Record<LogType_enum, { label: string; icon: string; type: LogType_enum }> = {
 		[LogType_enum.time]: {
 			label: 'log',
@@ -302,8 +306,8 @@
 				</div>
 			{:else if $logs.isError}
 				Error
-			{:else if filteredLogs}
-				{#each filteredLogs as log}
+			{:else if filteredAndSortedLogs}
+				{#each filteredAndSortedLogs as log}
 					<Log initialLog={log} />
 				{/each}
 			{/if}
