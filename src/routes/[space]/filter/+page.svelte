@@ -31,18 +31,24 @@
 
 	let filters = $derived(searchParams.array);
 
-	const onClearFilters = () => goto(`/${$page.params.space}/filter`);
+	const onClearFilters = () => goto(`/${$page.params.space}/filter`, { keepFocus: true });
 
 	const onAddFilter = (filter: [string, string]) =>
-		goto(`/${$page.params.space}/filter?${entriesArrayToSearchParamsString([...filters, filter])}`);
+		goto(
+			`/${$page.params.space}/filter?${entriesArrayToSearchParamsString([...filters, filter])}`,
+			{ keepFocus: true }
+		);
 
 	const onRemoveFilter = (filter: [string, string]) =>
 		goto(
-			`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters.filter((f) => !arraysAreEqual(f, filter)))}`
+			`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters.filter((f) => !arraysAreEqual(f, filter)))}`,
+			{ keepFocus: true }
 		);
 
 	const setFilters = (filters: [string, string][]) =>
-		goto(`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters)}`);
+		goto(`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters)}`, {
+			keepFocus: true
+		});
 
 	const onClickClear = () => {
 		onClearFilters();
@@ -131,7 +137,7 @@
 
 	onMount(() => {
 		const onKeydown = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') goto(`/${$page.params.space}`);
+			if (e.key === 'Escape') goto(`/${$page.params.space}`, { keepFocus: true });
 		};
 
 		document.addEventListener('keydown', onKeydown);
@@ -158,7 +164,8 @@
 	const onSearch = () => {
 		const removeAllSearchFilters = () =>
 			goto(
-				`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters.filter((filter) => filter[0] !== 'search'))}`
+				`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters.filter((filter) => filter[0] !== 'search'))}`,
+				{ keepFocus: true }
 			);
 
 		const isThereAnExistingSearchFilter = filters.some((filter) => filter[0] === 'search');
@@ -188,7 +195,7 @@
 	<div bind:clientHeight={headerContainerHeight} class="center stack gap-2">
 		<div class="hstack gap-3 flex-wrap center">
 			<div class="hstack gap-3 border border-gray-100 py-1 px-2 rounded-md flex-wrap center">
-				<Search value={$searchValue} onChange={onSearchChange} {onClickClear} showEnter={false} />
+				<Search value={$searchValue} onchange={onSearchChange} {onClickClear} showEnter={false} />
 				<div class="hstack gap-2 {$searchValue ? 'opacity-100' : 'opacity-20'}">
 					{#each searchableInputs as key}
 						<label class="capitalize text-xs center gap-1 hstack gap-[2px]">

@@ -21,9 +21,9 @@
 		onchange?: (event: Event) => void;
 		onEnterKeydown?: () => void;
 		onFocus?: () => void;
-		input: HTMLElement;
-		isEditing: boolean;
-		onclick: (e: MouseEvent) => void;
+		input?: HTMLElement;
+		isEditing?: boolean;
+		onclick?: (e: MouseEvent) => void;
 	}
 
 	let {
@@ -103,7 +103,7 @@
 
 	const onclick = (e: MouseEvent) => {
 		_onFocus();
-		_onclick(e);
+		_onclick && _onclick(e);
 	};
 
 	let slicedAutofillValues: string[] = $state([]);

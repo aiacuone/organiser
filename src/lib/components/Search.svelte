@@ -5,22 +5,37 @@
 	import Button from './Button.svelte';
 
 	interface Props {
-		value?: string;
+		value: string;
 		onchange?: (e: Event) => void;
 		onClickClear?: () => void;
 		onClickEnter?: () => void;
 		showEnter?: boolean;
 		onEnterKeydown?: () => void;
 		onFocus?: (() => void) | undefined;
+		searchInput?: HTMLElement;
 	}
 
-	let { value, onClickClear, onClickEnter, showEnter, onEnterKeydown, onchange }: Props = $props();
+	let {
+		value,
+		onClickClear,
+		onClickEnter,
+		showEnter,
+		onEnterKeydown,
+		onchange,
+		searchInput = $bindable()
+	}: Props = $props();
 </script>
 
 <div class="hstack">
 	<div class="hstack center gap-1 px-2 border border-gray-100 rounded-md">
 		<Icon icon={icons.search} class="text-gray-500" />
-		<Input bind:value bind:onEnterKeydown _class="outline-none" {onchange} />
+		<Input
+			bind:value
+			bind:onEnterKeydown
+			_class="outline-none"
+			{onchange}
+			bind:input={searchInput}
+		/>
 	</div>
 	{#if showEnter}
 		<button class="w-[30px] center" onclick={onClickEnter}>
