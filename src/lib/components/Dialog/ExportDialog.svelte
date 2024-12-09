@@ -24,6 +24,11 @@
 	import { icons } from '$lib/general/icons';
 	import { onMount } from 'svelte';
 
+	interface CheckboxProps {
+		object: Record<string, boolean>;
+		key: string;
+		label: string;
+	}
 	interface Props extends SvelteAllProps {
 		isOpen: boolean;
 		onOpen: () => void;
@@ -240,7 +245,26 @@
 	];
 
 	let isDefaultSelectionDialogOpen: boolean;
+
+	const logKeyValueFilterFilter = $derived(
+		(key: string) =>
+			![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(
+				key as keyof Log_int
+			)
+	);
 </script>
+
+{#snippet checkbox({object,key,label}:CheckboxProps)}
+	{@const checked = object[key]}
+	{@const onchange = () => (object[key] = !object[key])}
+
+	<div class="hstack gap-2">
+		<label class="capitalize">
+			{label}
+			<input {checked} type="checkbox" {onchange} />
+		</label>
+	</div>
+{/snippet}
 
 <Dialog
 	{isOpen}
@@ -252,37 +276,19 @@
 	<div bind:clientHeight={containerHeight} class="stack gap-3 w-full h-full text-sm">
 		<header bind:clientHeight={headerHeight} class="text-center">Export/Copy</header>
 		<div bind:clientHeight={buttonsContainerHeight} class="stack gap-2">
-			<!-- TODO: Svelte 5: use snippet for these, they are being repeated -->
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
-				{#each Object.keys(logKeyValueFilter).filter((key) => {
-					return ![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(key as keyof Log_int);
-				}) as key}
-					<div class="hstack gap-2">
-						<label>
-							{logEnumNames[key as Log_enum]}
-							<input bind:checked={logKeyValueFilter[key as keyof Log_int]} type="checkbox" />
-						</label>
-					</div>
+				{#each Object.keys(logKeyValueFilter).filter(logKeyValueFilterFilter) as key}
+					{@render checkbox({ object: logKeyValueFilter, key, label:logEnumNames[key as Log_enum] })}
 				{/each}
 			</div>
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
 				{#each Object.keys(typeFilter) as key}
-					<div class="hstack gap-2">
-						<label class="capitalize">
-							{logTypeEnumNames[key as LogType_enum]}
-							<input bind:checked={typeFilter[key as LogType_enum]} type="checkbox" />
-						</label>
-					</div>
+					{@render checkbox({ object: typeFilter, key, label:logTypeEnumNames[key as LogType_enum] })}
 				{/each}
 			</div>
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
 				{#each Object.keys(preferences) as key}
-					<div class="hstack gap-2">
-						<label class="capitalize">
-							{camelCaseToCapitalized(key)}
-							<input bind:checked={preferences[key]} type="checkbox" />
-						</label>
-					</div>
+					{@render checkbox({ object: preferences, key, label: camelCaseToCapitalized(key) })}
 				{/each}
 			</div>
 			<div class="hstack gap-3 center">
