@@ -6,7 +6,7 @@
 		unfocusStoreInput,
 		whichInputIsFocused
 	} from '$lib/stores';
-	import { onKeydown } from '$lib/utils';
+	import { addToEndOfRaceCondition, onKeydown } from '$lib/utils';
 	import { clickOutside } from '$lib/utils/clickAway';
 	import { onMount } from 'svelte';
 
@@ -76,7 +76,7 @@
 
 	onMount(() => {
 		if (autofocus) {
-			input && input.focus();
+			addToEndOfRaceCondition(() => input && input.focus());
 		}
 		return () => {
 			unfocusInput();

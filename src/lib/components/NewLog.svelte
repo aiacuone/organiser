@@ -31,4 +31,4 @@
 	};
 </script>
 
-<Log {initialLog} editOnMount />
+<Log {initialLog} editOnMount inputAutoFocus />
