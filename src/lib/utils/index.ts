@@ -1,5 +1,5 @@
 export * from './arrays';
-export * from './clickAway';
+export * from './clickAway.svelte';
 export * from './dates';
 export * from './download';
 export * from './general';

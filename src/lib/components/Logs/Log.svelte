@@ -73,7 +73,7 @@
 		addToEndOfRaceCondition(onFocusAnswerInput);
 	};
 
-	const getHaveValuesChanged = () => !isEqual(getLogFromMappedLog(log), initialLog);
+	let haveValuesChanged = $derived(!isEqual(getMappedLog(initialLog), log));
 
 	const onTitleAutoFill = (_title: string) => {
 		const correspondingReference = $titlesAndReferences.find((t) => t.title === _title)?.reference;
@@ -94,10 +94,13 @@
 
 	const onClickOutside = () => {
 		if (isEditing) {
-			const haveValuesChanged = getHaveValuesChanged();
-			if (haveValuesChanged && !isOpen && !$whichInputIsFocused) {
-				onOpen();
+			if (haveValuesChanged && !$isConfirmationDialogOpen && !$whichInputIsFocused) {
+				onOpenConfirmationDialog();
 			} else {
+				const isNewLogType = editOnMount;
+
+				if (isNewLogType) return onResetNewLogType();
+
 				onStopEditing();
 			}
 		}
@@ -145,7 +148,7 @@
 
 			return { previousLogs };
 		},
-		onError: (err, newTodo, context) => {
+		onError: (err, context) => {
 			console.error('There was an error deleting log', err);
 			queryClient.setQueryData('logs', context?.previousLogs);
 		},
@@ -160,8 +163,6 @@
 	};
 
 	const onAccept = async () => {
-		const haveValuesChanged = getHaveValuesChanged();
-
 		if (!haveValuesChanged) return onStopEditing();
 
 		if ($page.params.date && $page.params.date !== getHyphenatedStringFromDate(log.date)) {
@@ -286,8 +287,6 @@
 		isOpen: isConfirmationDialogOpen,
 		onClose: onCloseConfirmationModal
 	} = useDisclosure();
-	let onOpen: () => void;
-	let isOpen: boolean;
 
 	const incrementDecrementPropValues: Record<LogType_enum, { min: number; max: number }> = {
 		[LogType_enum.todo]: { min: 0, max: 3 },
@@ -386,16 +385,12 @@
 	});
 </script>
 
-<button onkeydown={onContainerKeydown} bind:this={container}>
-	<!-- todo:svelte 5 -->
-	<!-- <button
+<button
 	use:clickOutside
-	on:click_outside={onClickOutside}
-	class=""
-	onclick={onClickLog}
+	onclickOutside={onClickOutside}
 	onkeydown={onContainerKeydown}
 	bind:this={container}
-> -->
+>
 	<div class={containerClasses[log.type][0]}>
 		<div class="stack {containerClasses[log.type][1]}">
 			<div class={log.title || log.reference || isEditing ? 'flex' : 'hidden'}>

@@ -6,8 +6,7 @@
 		unfocusStoreInput,
 		whichInputIsFocused
 	} from '$lib/stores';
-	import { addToEndOfRaceCondition, onKeydown } from '$lib/utils';
-	import { clickOutside } from '$lib/utils/clickAway';
+	import { addToEndOfRaceCondition, clickOutside, onKeydown } from '$lib/utils';
 	import { onMount } from 'svelte';
 
 	interface Props {
@@ -89,12 +88,12 @@
 		onAutoFill && onAutoFill(_value);
 	};
 
-	// const onClickOutside = () => {
-	// 	if (isEditing && isInputFocused) {
-	// 		unfocusInput();
-	// 		onResetAutofill();
-	// 	}
-	// };
+	const onClickOutside = () => {
+		if (isEditing && isInputFocused) {
+			unfocusInput();
+			onResetAutofill();
+		}
+	};
 
 	const _onFocus = () => {
 		isInputFocused = true;
@@ -180,11 +179,7 @@
 	};
 </script>
 
-<div use:clickOutside class="relative">
-	<!-- todo: Look at how to use on:click_outside -->
-	<!-- <div use:clickOutside on:click_outside={onClickOutside} class="relative"> -->
-
-	<!-- cannot add on:focus to input because it is causing focusing issues -->
+<div use:clickOutside class="relative" onclickOutside={onClickOutside}>
 	<input
 		bind:value
 		bind:this={input}
