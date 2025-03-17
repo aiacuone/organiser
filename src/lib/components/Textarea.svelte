@@ -22,10 +22,13 @@
 		onchange: _onchange,
 		value = $bindable(''),
 		onFocus: _onFocus = $bindable(),
-		textarea = $bindable(),
+		textarea: bindableTextarea = $bindable(),
 		isDisabled = false,
 		onclick
 	}: Props = $props();
+
+	// Using this instead of the $bindable textarea because I do not seem to have access/control within the component
+	let textarea: null | HTMLElement;
 
 	const resize = () => {
 		if (!textarea) return;
@@ -44,6 +47,8 @@
 	});
 
 	onMount(() => {
+		textarea = document.getElementById('textarea');
+
 		if (!textarea) return;
 
 		autofocus && textarea.focus();
@@ -71,8 +76,9 @@
 
 <div class="w-full relative">
 	<textarea
+		id="textarea"
 		bind:value
-		bind:this={textarea}
+		bind:this={bindableTextarea}
 		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"
 		oninput={onchange}
 		{onfocus}
