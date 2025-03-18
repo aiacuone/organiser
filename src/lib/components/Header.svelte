@@ -7,7 +7,6 @@
 	import PillButton from './Logs/Buttons/PillButton.svelte';
 	import { derived } from 'svelte/store';
 	import { page } from '$app/stores';
-	import LogitLogoSimple from '$lib/svg/logit-logo-simple.svelte';
 	import {
 		LogType_enum,
 		axios,
@@ -21,7 +20,6 @@
 		type LogNotification_int,
 		spaces
 	} from '$lib';
-	import LogitLogo from '$lib/svg/logit-logo.svelte';
 	import AddSpace from './AddSpace.svelte';
 
 	interface Props extends SvelteAllProps {
@@ -192,7 +190,7 @@
 <header class="center py-2 px-3 bg-gray-200">
 	<div class="flex-1 max-w-screen-lg hstack">
 		<div class="flex-1">
-			<LogitLogoSimple height="30px" />
+			<img src="/logit-logo-symbol-light.svg" alt="Logit Logo" class="h-[30px]" />
 		</div>
 		{#if $isAuthenticated && space}
 			<div class="flex-1 center">
@@ -227,7 +225,7 @@
 
 <Dialog isOpen={$isSpaceDialogOpen} onClose={closeSpaceDialog}>
 	<div class="stack gap-3">
-		<LogitLogo height="30px" />
+		<img src="/logit-logo-light.svg" alt="Logit Logo" class="h-[60px]" />
 		<div class="stack gap-4 self-center">
 			{#each $pillButtons as pillButton}
 				<div class="hstack gap-2 items-center relative">
