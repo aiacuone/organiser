@@ -1,4 +1,4 @@
-import _axios from 'axios';
+import _axios, { type InternalAxiosRequestConfig } from 'axios';
 import { PUBLIC_BASE_URL } from '$env/static/public';
 import { createClient } from '$lib/clientServices';
 
@@ -11,7 +11,7 @@ export const axios = _axios.create({
 	}
 });
 
-axios.interceptors.request.use(async (config) => {
+axios.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
 	const sessionStorageToken = sessionStorage.getItem('token');
 	const doesSessionTokenExist = sessionStorageToken !== null && sessionStorageToken !== 'undefined';
 
@@ -28,11 +28,7 @@ axios.interceptors.request.use(async (config) => {
 		token = _token;
 	}
 
-	return {
-		...config,
-		headers: {
-			...config.headers,
-			Authorization: `Bearer ${token}`
-		}
-	};
+	config.headers.set('Authorization', `Bearer ${token}`);
+
+	return config;
 });

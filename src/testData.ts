@@ -1,7 +1,7 @@
-import { LogType_enum, type Space_int } from '$lib/types';
+import { LogType_enum } from '$lib/types';
 import { v4 as uuidv4 } from 'uuid';
 
-export const testSpaces: Array<Space_int> = [
+export const testSpaces = [
 	{
 		name: 'aventus',
 		href: 'aventus',

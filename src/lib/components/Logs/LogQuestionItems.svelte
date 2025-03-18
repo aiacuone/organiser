@@ -1,3 +1,4 @@
+<!-- todo: Refactor this into LogListItems along with LogCheckboxItems -->
 <script lang="ts">
 	import { currentlyEditing } from '$lib/stores';
 	import type { MappedQuestionItem } from '$lib/types';

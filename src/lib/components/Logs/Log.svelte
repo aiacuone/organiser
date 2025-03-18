@@ -150,7 +150,7 @@
 		},
 		onError: (err, context) => {
 			console.error('There was an error deleting log', err);
-			queryClient.setQueryData('logs', context?.previousLogs);
+			queryClient.setQueryData('logs', context?.previousLogs as Log_int[]);
 		},
 		onSettled: () => {
 			invalidateLogs();
@@ -419,6 +419,7 @@
 				</div>
 			</div>
 			<div class="hstack center gap-2">
+				<!-- todo: All 3 of these conditionally rendered items should reduce to one once LogQuestionItems and LogCheckboxItems has been refactored into LogListItems -->
 				{#if log.type === LogType_enum.todo || (log.type === LogType_enum.list && log.listType === LogListType_enum.checkbox)}
 					<div class="flex-1">
 						<CheckboxItems

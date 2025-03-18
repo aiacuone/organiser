@@ -73,7 +73,6 @@
 
 <div class="w-full relative" bind:this={container}>
 	<textarea
-		id="textarea"
 		bind:value
 		bind:this={bindableTextarea}
 		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"

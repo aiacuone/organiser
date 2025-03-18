@@ -3,8 +3,9 @@ import {
 	getAndCheckCollectionFromToken,
 	getSpaces
 } from '$lib/server/index.js';
+import type { RequestEvent } from '@sveltejs/kit';
 
-export const GET = async ({ request }) =>
+export const GET = async ({ request }: RequestEvent) =>
 	checkAccessTokenMiddleware(request, async () =>
 		getAndCheckCollectionFromToken(request, async (collection) => {
 			const spaces = await getSpaces(collection);

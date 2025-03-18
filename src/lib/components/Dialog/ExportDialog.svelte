@@ -244,8 +244,6 @@
 		}
 	];
 
-	let isDefaultSelectionDialogOpen: boolean;
-
 	const logKeyValueFilterFilter = $derived(
 		(key: string) =>
 			![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(
@@ -266,13 +264,7 @@
 	</div>
 {/snippet}
 
-<Dialog
-	{isOpen}
-	{onOpen}
-	{onClose}
-	_class="h-full w-full max-w-screen-lg"
-	preventClose={isDefaultSelectionDialogOpen}
->
+<Dialog {isOpen} {onOpen} {onClose} _class="h-full w-full max-w-screen-lg">
 	<div bind:clientHeight={containerHeight} class="stack gap-3 w-full h-full text-sm">
 		<header bind:clientHeight={headerHeight} class="text-center">Export/Copy</header>
 		<div bind:clientHeight={buttonsContainerHeight} class="stack gap-2">

@@ -1,4 +1,4 @@
-<!-- todo: combine this with LogCheckboxItems when svelte 5 is released -->
+<!-- todo: Refactor this into LogListItems along with LogQuestionItems -->
 <script lang="ts">
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
