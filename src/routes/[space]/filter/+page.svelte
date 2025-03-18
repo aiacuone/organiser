@@ -263,8 +263,6 @@
 	</div>
 </div>
 
-<!-- {@debug searchParams} -->
-<!-- {@debug filtersValues} -->
 <ExportDialog
 	isOpen={$isExportDialogOpen}
 	onOpen={openExportDialog}

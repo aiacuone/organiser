@@ -27,11 +27,10 @@
 		onclick
 	}: Props = $props();
 
-	// Using this instead of the $bindable textarea because I do not seem to have access/control within the component
-	let textarea: null | HTMLElement;
+	let container: HTMLElement;
+	let textarea: HTMLElement;
 
 	const resize = () => {
-		if (!textarea) return;
 		textarea.style.height = '20px';
 		if (textarea.scrollHeight > 20) textarea.style.height = textarea.scrollHeight + 'px';
 	};
@@ -47,9 +46,8 @@
 	});
 
 	onMount(() => {
-		textarea = document.getElementById('textarea');
-
-		if (!textarea) return;
+		// Using this because its not accessible within the component when $bindable is being used
+		textarea = container.children[0] as HTMLElement;
 
 		autofocus && textarea.focus();
 
@@ -64,7 +62,6 @@
 		textarea.addEventListener('keydown', keydown);
 
 		return () => {
-			if (!textarea) return;
 			textarea.removeEventListener('keydown', keydown);
 		};
 	});
@@ -74,7 +71,7 @@
 	};
 </script>
 
-<div class="w-full relative">
+<div class="w-full relative" bind:this={container}>
 	<textarea
 		id="textarea"
 		bind:value
