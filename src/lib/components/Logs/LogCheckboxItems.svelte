@@ -1,33 +1,46 @@
-<!-- todo: combine this with LogCheckboxItems when svelte 5 is released -->
+<!-- todo: Refactor this into LogListItems along with LogQuestionItems -->
 <script lang="ts">
-	import type { Readable, Writable } from 'svelte/store';
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
 	import type { MappedCheckboxItem } from '$lib/types';
-	import { dndzone } from 'svelte-dnd-action';
 	import {
 		areAnyCheckboxItemsNotCapitalised,
 		capitalizeFirstLetterOfMappedCheckboxItems
 	} from '$lib/utils';
+	import { dndzone } from 'svelte-dnd-action';
 
-	export let checkboxes: MappedCheckboxItem[];
-	export let isEditing: Readable<boolean>;
-	export let onEnterKeydown: () => void;
-	export let onDeleteBullet: (index: number) => void;
-	export let focusElements: Writable<HTMLElement[]>;
+	interface Props {
+		checkboxes: MappedCheckboxItem[];
+		isEditing: boolean;
+		onEnterKeydown: () => void;
+		onDeleteBullet: (index: number) => void;
+		focusElements: HTMLElement[];
+		onEdit: () => void;
+		onClickInput: (e: MouseEvent) => void;
+	}
 
-	export let onEdit: () => void;
+	let {
+		checkboxes = $bindable([]),
+		isEditing,
+		onEnterKeydown,
+		onDeleteBullet,
+		focusElements = $bindable([]),
+		onEdit,
+		onClickInput: _onClickInput
+	}: Props = $props();
 
-	const onCheckboxesChange = () => {
-		onEdit();
-	};
+	const onCheckboxesChange = () => onEdit();
 
-	$: {
+	$effect(() => {
 		if (areAnyCheckboxItemsNotCapitalised(checkboxes)) {
 			checkboxes = capitalizeFirstLetterOfMappedCheckboxItems(checkboxes);
 		}
-	}
+	});
+
+	const onClickInput = (e: MouseEvent) => {
+		_onClickInput(e);
+	};
 </script>
 
 <ul
@@ -36,44 +49,48 @@
 		items: checkboxes,
 		flipDurationMs: 300,
 		dropTargetStyle: {},
-		dragDisabled: !$isEditing
+		dragDisabled: !isEditing
 	}}
-	on:consider={(e) => (checkboxes = e.detail.items)}
-	on:finalize={(e) => (checkboxes = e.detail.items)}
+	onconsider={(e) => (checkboxes = e.detail.items)}
+	onfinalize={(e) => (checkboxes = e.detail.items)}
 >
 	{#each checkboxes as item, index (item.id)}
 		<li class="relative {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'}">
-			{#if $isEditing && checkboxes.length > 1}
+			{#if isEditing && checkboxes.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-[16px] top-1" />
 			{/if}
 			<div class="hstack">
 				<input
+					bind:checked={checkboxes[index].isChecked}
 					type="checkbox"
 					class="mr-[7px]"
-					on:change={onCheckboxesChange}
-					bind:checked={checkboxes[index].isChecked}
+					onchange={onCheckboxesChange}
+					onclick={onClickInput}
 				/>
 				<div class="flex gap-2 min-h-[20px] flex-1">
 					<div class="flex-1">
 						<Textarea
-							bind:textarea={$focusElements[index + 2]}
+							bind:textarea={focusElements[focusElements.length]}
 							bind:value={checkboxes[index].text}
-							className="flex-1 w-full"
+							onchange={(e:Event) => (checkboxes[index].text = (e.target as HTMLInputElement).value)}
+							_class="flex-1 w-full"
 							{onEnterKeydown}
 							autofocus={index > 0}
+							onclick={onClickInput}
+							isDisabled={!isEditing}
 						/>
 					</div>
 					<div class="min-w-[40px] hidden sm:flex align-center relative">
-						{#if $isEditing}
-							<button class=" absolute top-0" on:click={() => onDeleteBullet(index)}>
+						{#if isEditing}
+							<button class=" absolute top-0" onclick={() => onDeleteBullet(index)}>
 								<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 							</button>
 						{/if}
 					</div>
 				</div>
 				<div class="mt-1 flex sm:hidden">
-					{#if $isEditing}
-						<button class="flex sm:hidden" on:click={() => onDeleteBullet(index)}>
+					{#if isEditing}
+						<button class="flex sm:hidden" onclick={() => onDeleteBullet(index)}>
 							<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 						</button>
 					{/if}

@@ -16,7 +16,7 @@
 		getLocalStorage,
 		setLocalStorage
 	} from '$lib/utils';
-	import { viewport } from '$lib/hooks';
+	import { useDisclosure, viewport } from '$lib/hooks';
 	import type { InfiniteData } from '@sveltestack/svelte-query';
 	import type { AxiosResponse } from 'axios';
 	import ExportDialogLogs from './ExportDialogLogs.svelte';
@@ -24,44 +24,65 @@
 	import { icons } from '$lib/general/icons';
 	import { onMount } from 'svelte';
 
-	export let onOpen: () => void;
-	export let onClose: () => void;
-	export let isLoadingLogs: boolean;
-	export let isFetchingLogs: boolean;
-	export let isLogsError: boolean;
-	export let logsData: InfiniteData<AxiosResponse<any, any>> | undefined = undefined;
-	export let logs: Log_int[] | undefined = undefined;
-	export let hasNextLogsPage: boolean | undefined = undefined;
-	export let getNextLogsPage: (() => void) | undefined = undefined;
+	interface CheckboxProps {
+		object: Record<string, boolean>;
+		key: string;
+		label: string;
+	}
+	interface Props extends SvelteAllProps {
+		isOpen: boolean;
+		onOpen: () => void;
+		onClose: () => void;
+		isLoadingLogs: boolean;
+		isFetchingLogs: boolean;
+		isLogsError: boolean;
+		logsData?: InfiniteData<AxiosResponse<any, any>>;
+		logs?: Log_int[];
+		hasNextLogsPage?: boolean;
+		getNextLogsPage?: () => void;
+	}
+
+	let {
+		isOpen,
+		onOpen,
+		onClose,
+		isLoadingLogs,
+		isFetchingLogs,
+		isLogsError,
+		logsData,
+		logs,
+		hasNextLogsPage,
+		getNextLogsPage
+	}: Props = $props();
 
 	let defaultLogKeyValueFilter: Partial<Record<Log_enum, boolean>> = {
-		id: false,
-		date: true,
-		title: true,
-		reference: true,
-		time: false,
-		type: true,
-		space: false,
-		listItems: true,
-		checkboxItems: true,
-		lastUpdated: false,
-		rating: false,
-		questions: true
+		[Log_enum.id]: false,
+		[Log_enum.date]: true,
+		[Log_enum.title]: true,
+		[Log_enum.reference]: true,
+		[Log_enum.time]: false,
+		[Log_enum.type]: true,
+		[Log_enum.space]: false,
+		[Log_enum.listItems]: true,
+		[Log_enum.checkboxItems]: true,
+		[Log_enum.lastUpdated]: false,
+		[Log_enum.rating]: false,
+		[Log_enum.questions]: true
 	};
 
-	let logKeyValueFilter = { ...defaultLogKeyValueFilter };
+	let logKeyValueFilter = $state({ ...defaultLogKeyValueFilter });
 
 	const defaultTypeFilterData = Object.fromEntries(
 		Object.values(LogType_enum).map((type) => [type, true])
 	) as Partial<Record<LogType_enum, boolean>>;
 
-	let typeFilter = { ...defaultTypeFilterData };
+	let typeFilter = $state({ ...defaultTypeFilterData });
 
 	const defaultPreferences: Record<string, boolean> = {
 		showKeys: true
 	};
 
-	let preferences = { ...defaultPreferences };
+	let preferences = $state({ ...defaultPreferences });
 
 	onMount(() => {
 		const [storageLogKeyValueFilter, storageTypeFilter, storagePreferences] = getLocalStorage([
@@ -100,16 +121,17 @@
 	};
 
 	let logsContainer: HTMLDivElement;
-	let containerHeight: number;
-	let headerHeight: number;
-	let buttonsContainerHeight: number;
-	let footerButtonsContainerHeight: number;
+	let containerHeight: number = $state(0);
+	let headerHeight: number = $state(0);
+	let buttonsContainerHeight: number = $state(0);
+	let footerButtonsContainerHeight: number = $state(0);
 
-	$: containerHeight,
+	$effect(() => {
 		containerHeight &&
 			(logsContainer.style.height = `${
 				containerHeight - headerHeight - buttonsContainerHeight - footerButtonsContainerHeight
 			}px`);
+	});
 
 	const onCopy = (index: number) => {
 		copyToClipboard(logsContainer.innerText);
@@ -122,7 +144,6 @@
 	const onCsv = () => {
 		downloadAsCSV(logsContainer.innerText);
 	};
-	let dialog: HTMLDialogElement;
 
 	const onReset = () => {
 		const [storageLogKeyValueFilter, storageTypeFilter, storagePreferences] = getLocalStorage([
@@ -151,140 +172,130 @@
 	};
 
 	const onUnselectAll = () => {
-		const makeAllFalse = (object: Record<string, boolean>) => {
-			return Object.entries(object).reduce((acc, [key]) => {
-				acc[key] = false;
-				return acc;
-			}, {} as Record<string, boolean>);
-		};
+		const makeAllFalse = (object: Record<string, boolean>) =>
+			Object.keys(object).reduce((acc, key) => ({ ...acc, [key]: false }), {});
+
 		typeFilter = makeAllFalse({ ...typeFilter });
-		logKeyValueFilter = makeAllFalse({ ...logKeyValueFilter });
+		logKeyValueFilter = makeAllFalse({ ...logKeyValueFilter } as Record<Log_enum, boolean>);
 		preferences = makeAllFalse({ ...preferences });
 	};
 
 	const onSelectAll = () => {
-		const makeAllTrue = (object: Record<string, boolean>) => {
-			return Object.entries(object).reduce((acc, [key]) => {
-				acc[key] = true;
-				return acc;
-			}, {} as Record<string, boolean>);
-		};
+		const makeAllTrue = (object: Record<string, boolean>) =>
+			Object.keys(object).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+
 		typeFilter = makeAllTrue({ ...typeFilter });
-		logKeyValueFilter = makeAllTrue({ ...logKeyValueFilter });
+		logKeyValueFilter = makeAllTrue({ ...logKeyValueFilter } as Record<Log_enum, boolean>);
 		preferences = makeAllTrue({ ...preferences });
 	};
 
-	let onOpenDefaultSelection: () => void;
-	let onCloseDefaultSelection: () => void;
+	const {
+		isOpen: isDefaultSelectionOpen,
+		onOpen: onOpenDefaultSelection,
+		onClose: onCloseDefaultSelection
+	} = useDisclosure();
 
 	const selectButtons = [
 		{
 			icon: icons.all,
-			onClick: onSelectAll
+			onclick: onSelectAll
 		},
 		{
 			icon: icons.cross,
-			onClick: onUnselectAll
+			onclick: onUnselectAll
 		},
 		{
 			icon: icons.reset,
-			onClick: onReset
+			onclick: onReset
 		},
 		{
 			icon: icons.save,
-			onClick: () => onOpenDefaultSelection()
+			onclick: () => onOpenDefaultSelection()
 		}
 	];
 
 	const confirmSaveDefaultButtons = [
 		{
 			icon: icons.tick,
-			onClick: () => onConfirmSetDefault()
+			onclick: () => onConfirmSetDefault()
 		},
 		{
 			icon: icons.cross,
-			onClick: () => onCloseDefaultSelection()
+			onclick: () => onCloseDefaultSelection()
 		}
 	];
 
 	const footerButtons = [
 		{
-			onClick: onCopy,
+			onclick: onCopy,
 			label: 'Copy',
 			isAnimating: false,
 			animatingText: 'Copied ✅'
 		},
 		{
-			onClick: onCsv,
+			onclick: onCsv,
 			label: 'CSV',
 			key: 'csv'
 		},
 		{
-			onClick: () => dialog.close(),
+			onclick: onClose,
 			label: 'Close',
 			key: 'close'
 		}
 	];
 
-	let isDefaultSelectionDialogOpen: boolean;
+	const logKeyValueFilterFilter = $derived(
+		(key: string) =>
+			![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(
+				key as keyof Log_int
+			)
+	);
 </script>
 
-<Dialog
-	bind:dialog
-	bind:onOpen
-	bind:onClose
-	_class="h-full w-full max-w-screen-lg"
-	preventClose={isDefaultSelectionDialogOpen}
->
+{#snippet checkbox({object,key,label}:CheckboxProps)}
+	{@const checked = object[key]}
+	{@const onchange = () => (object[key] = !object[key])}
+
+	<div class="hstack gap-2">
+		<label class="capitalize">
+			{label}
+			<input {checked} type="checkbox" {onchange} />
+		</label>
+	</div>
+{/snippet}
+
+<Dialog {isOpen} {onOpen} {onClose} _class="h-full w-full max-w-screen-lg">
 	<div bind:clientHeight={containerHeight} class="stack gap-3 w-full h-full text-sm">
-		<header class="text-center" bind:clientHeight={headerHeight}>Export/Copy</header>
-		<div class="stack gap-2" bind:clientHeight={buttonsContainerHeight}>
-			<!-- TODO: Svelte 5: use snippet for these, they are being repeated -->
+		<header bind:clientHeight={headerHeight} class="text-center">Export/Copy</header>
+		<div bind:clientHeight={buttonsContainerHeight} class="stack gap-2">
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
-				{#each Object.keys(logKeyValueFilter).filter((key) => {
-					return ![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(key);
-				}) as key}
-					<div class="hstack gap-2">
-						<label>
-							{logEnumNames[key]}
-							<input type="checkbox" bind:checked={logKeyValueFilter[key]} />
-						</label>
-					</div>
+				{#each Object.keys(logKeyValueFilter).filter(logKeyValueFilterFilter) as key}
+					{@render checkbox({ object: logKeyValueFilter, key, label:logEnumNames[key as Log_enum] })}
 				{/each}
 			</div>
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
 				{#each Object.keys(typeFilter) as key}
-					<div class="hstack gap-2">
-						<label class="capitalize">
-							{logTypeEnumNames[key]}
-							<input type="checkbox" bind:checked={typeFilter[key]} />
-						</label>
-					</div>
+					{@render checkbox({ object: typeFilter, key, label:logTypeEnumNames[key as LogType_enum] })}
 				{/each}
 			</div>
 			<div class="flex flex-wrap gap-y-1 gap-x-2 center">
 				{#each Object.keys(preferences) as key}
-					<div class="hstack gap-2">
-						<label class="capitalize">
-							{camelCaseToCapitalized(key)}
-							<input type="checkbox" bind:checked={preferences[key]} />
-						</label>
-					</div>
+					{@render checkbox({ object: preferences, key, label: camelCaseToCapitalized(key) })}
 				{/each}
 			</div>
 			<div class="hstack gap-3 center">
-				{#each selectButtons as { icon, onClick }}
-					<Button {onClick}>
+				{#each selectButtons as { icon, onclick }}
+					<Button {onclick}>
 						<Icon {icon} class="text-gray-400" />
 					</Button>
 				{/each}
 			</div>
 		</div>
 
-		<div class="stack flex-1 overflow-y-scroll hide-scrollbar" bind:this={logsContainer}>
+		<div bind:this={logsContainer} class="stack flex-1 overflow-y-scroll hide-scrollbar">
 			{#if isLoadingLogs}
 				{#each Array(5) as _}
-					<div class="bg-neutral-100 rounded-sm h-[120px] w-full" />
+					<div class="bg-neutral-100 rounded-sm h-[120px] w-full"></div>
 				{/each}
 			{:else if isLogsError}
 				Error
@@ -302,7 +313,7 @@
 					{#if isFetchingLogs}
 						Loading more...
 					{:else if hasNextLogsPage}
-						<div use:viewport on:enterViewport={getNextLogsPage} class="h-10 w-full" />
+						<div use:viewport onenterViewport={getNextLogsPage} class="h-10 w-full"></div>
 					{:else}
 						{logsData.pages[0].data.total} Results
 					{/if}
@@ -317,9 +328,9 @@
 				/>
 			{/if}
 		</div>
-		<div class="hstack center gap-2" bind:clientHeight={footerButtonsContainerHeight}>
-			{#each footerButtons as { onClick, label }, index}
-				<Button onClick={() => onClick(index)}>
+		<div bind:clientHeight={footerButtonsContainerHeight} class="hstack center gap-2">
+			{#each footerButtons as { onclick, label }, index}
+				<Button onclick={() => onclick(index)}>
 					{#if footerButtons[index].isAnimating}
 						{footerButtons[index].animatingText}
 					{:else}
@@ -332,15 +343,15 @@
 </Dialog>
 
 <Dialog
-	bind:onOpen={onOpenDefaultSelection}
-	bind:onClose={onCloseDefaultSelection}
-	bind:isOpen={isDefaultSelectionDialogOpen}
+	onOpen={onOpenDefaultSelection}
+	onClose={onCloseDefaultSelection}
+	isOpen={$isDefaultSelectionOpen}
 >
 	<div class="stack gap-2">
 		<p>Are you sure you want to create a new default selection?</p>
 		<div class="hstack gap-5 center">
-			{#each confirmSaveDefaultButtons as { icon, onClick }}
-				<Button {onClick}>
+			{#each confirmSaveDefaultButtons as { icon, onclick }}
+				<Button {onclick}>
 					<Icon {icon} class="text-gray-400" />
 				</Button>
 			{/each}

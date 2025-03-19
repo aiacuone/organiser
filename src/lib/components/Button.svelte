@@ -1,18 +1,29 @@
 <script lang="ts">
-	export let onClick: (e: any) => void = () => {};
-	export let isDisabled: boolean = false;
-	export let className: string = '';
-	export let _class: string = '';
-	export let height = '28px';
+	interface Props extends SvelteAllProps {
+		onclick?: (e: any) => void;
+		isDisabled?: boolean;
+		className?: string;
+		_class?: string;
+		height?: string;
+	}
+
+	const {
+		onclick,
+		isDisabled = false,
+		className,
+		_class,
+		height = '28px',
+		children
+	}: Props = $props();
 </script>
 
 <button
-	on:click={onClick}
+	{onclick}
 	class=" text-sm shadow-md px-3 rounded {className} {_class} {isDisabled
 		? 'opacity-40'
 		: ''} {isDisabled ? 'cursor-not-allowed' : ''}"
 	disabled={isDisabled}
 	style={`height:${height}`}
 >
-	<slot />
+	{@render children()}
 </button>

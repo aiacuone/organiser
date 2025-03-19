@@ -7,7 +7,6 @@
 	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import { goto } from '$app/navigation';
 	import Search from '$lib/components/Search.svelte';
-	import { derived, writable, type Writable } from 'svelte/store';
 	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
 	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
 	import { browser } from '$app/environment';
@@ -28,18 +27,22 @@
 		getCapitalizedWords,
 		darkMode,
 		getHyphenatedStringFromDate,
-		getDayFromHyphenatedString
+		getDayFromHyphenatedString,
+		useDisclosure
 	} from '$lib';
 	import Log from '$lib/components/Logs/Log.svelte';
+	import type { ChangeEventHandler } from 'svelte/elements';
 
-	interface PageData extends SpaceData_int {
-		date: string;
-		space: string;
-		titles: string[];
-		references: string[];
+	interface Props extends SpaceData_int {
+		data: {
+			date: string;
+			space: string;
+			titles: string[];
+			references: string[];
+		};
 	}
 
-	export let data: PageData;
+	const { data }: Props = $props();
 
 	const queryClient = useQueryClient();
 
@@ -56,21 +59,16 @@
 
 	const logs = useQuery(
 		'logs',
-		() => {
-			return (
-				$selectedHyphenatedDateString &&
-				getLogsClient({
-					space: replaceAllSpacesWithHyphens(data.space),
-					date: $selectedDate
-				})
-			);
-		},
+		() =>
+			$selectedHyphenatedDateString &&
+			getLogsClient({
+				space: replaceAllSpacesWithHyphens(data.space),
+				date: $selectedDate
+			}),
 		{
-			onSuccess: () => {
-				if (browser) {
-					goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`);
-				}
-			}
+			onSuccess: () =>
+				browser &&
+				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`)
 		}
 	);
 
@@ -83,15 +81,24 @@
 		queryClient.invalidateQueries('titlesAndReferences');
 	};
 
-	$: $selectedDate, debounce(invalidateLogsAndTitlesAndReferences);
-	$: $page.params.space, invalidateLogsAndTitlesAndReferences();
-	$: $titlesAndReferencesQuery, ($titlesAndReferences = $titlesAndReferencesQuery.data);
+	$effect(() => {
+		$selectedDate && debounce(invalidateLogsAndTitlesAndReferences);
+	});
 
-	$: headerContainer = 0;
-	$: parentContainerHeight = 0;
-	$: logButtonsContainerHeight = 0;
-	$: notesContainerHeight =
-		parentContainerHeight - headerContainer - logButtonsContainerHeight - 55;
+	$effect(() => {
+		$page.params.space && invalidateLogsAndTitlesAndReferences();
+	});
+
+	$effect(() => {
+		$titlesAndReferencesQuery && ($titlesAndReferences = $titlesAndReferencesQuery.data);
+	});
+
+	let headerContainer = $state(0);
+	let parentContainerHeight = $state(0);
+	let logButtonsContainerHeight = $state(0);
+	const notesContainerHeight = $derived(
+		parentContainerHeight - headerContainer - logButtonsContainerHeight - 55
+	);
 
 	let exportedNotesModal: HTMLDialogElement;
 
@@ -105,11 +112,9 @@
 		dividers: false
 	};
 
-	let showInNotesModalCheckboxes: Record<string, boolean> = { ...defaultModalCheckboxes };
+	let showInNotesModalCheckboxes: Record<string, boolean> = $state({ ...defaultModalCheckboxes });
 
-	const resetCheckboxes = () => {
-		showInNotesModalCheckboxes = { ...defaultModalCheckboxes };
-	};
+	const resetCheckboxes = () => (showInNotesModalCheckboxes = { ...defaultModalCheckboxes });
 
 	let notesModalTextArea: HTMLDivElement;
 	const copy = () => {
@@ -119,26 +124,37 @@
 		navigator.clipboard.write([clipboardItem]);
 	};
 
-	$: modalContainerHeight = 0;
-	$: modalCheckboxContainerHeight = 0;
-	$: modalButtonContainerHeight = 0;
-	$: modalMainContentHeight =
-		modalContainerHeight - modalCheckboxContainerHeight - modalButtonContainerHeight - 20;
+	let modalContainerHeight = $state(0);
+	let modalCheckboxContainerHeight = $state(0);
+	let modalButtonContainerHeight = $state(0);
+	let modalMainContentHeight = $derived(
+		modalContainerHeight - modalCheckboxContainerHeight - modalButtonContainerHeight - 20
+	);
 
-	let notesContainer: HTMLDivElement;
-	let newLogType: LogType_enum | undefined;
+	let notesContainer: HTMLDivElement | undefined = $state();
+	let newLogType: LogType_enum | undefined = $state();
+	let isThereANewLog = $derived(!!newLogType);
 
 	const onNoteButtonClick = (logType: LogType_enum) => {
-		notesContainer.scrollTo(0, 0);
+		notesContainer?.scrollTo(0, 0);
 		newLogType = logType;
 	};
 
-	const filters: Writable<Array<LogType_enum>> = writable([]);
+	let filters: LogType_enum[] = $state([]);
 
-	const filteredLogs = derived([logs, filters], ([$logs, $filters]) => {
-		if ($filters.length === 0) return $logs.data?.logs;
-		return $logs.data?.logs.filter((log: Log_int) => $filters.includes(log.type));
-	});
+	const filteredLogs = $derived(
+		filters.length === 0
+			? $logs.data?.logs
+			: $logs.data?.logs.filter((log: Log_int) => filters.includes(log.type))
+	);
+
+	const filteredAndSortedLogs = $derived(
+		filteredLogs.sort(
+			(a: Log_int, b: Log_int) =>
+				Date.parse(b.lastUpdated?.toString() ?? new Date().toString()) -
+				Date.parse(a.lastUpdated?.toString() ?? new Date().toString())
+		)
+	);
 
 	const noteButtons: Record<LogType_enum, { label: string; icon: string; type: LogType_enum }> = {
 		[LogType_enum.time]: {
@@ -168,18 +184,16 @@
 		}
 	};
 
-	const onResetNewLogType = () => {
-		newLogType = undefined;
-	};
+	const onResetNewLogType = () => (newLogType = undefined);
 
 	setContext('onResetNewLogType', onResetNewLogType);
 
-	const onDateChange = (e) => {
-		$selectedDate = getDateFromHyphenatedString(e.target.value.split('-').reverse().join('-'));
+	const onDateChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+		const target = event.target as HTMLInputElement;
+		$selectedDate = getDateFromHyphenatedString(target.value.split('-').reverse().join('-'));
 	};
 
-	let searchValue: string;
-	let onSearchFocus: () => void;
+	let searchValue: string = $state('');
 
 	const onSearch = () => {
 		goto(`/${$page.params.space}/filter?search=${searchValue}`);
@@ -189,7 +203,6 @@
 		const keydown = (e: KeyboardEvent) => {
 			if (e.shiftKey && e.ctrlKey && e.key === 'S') {
 				e.preventDefault();
-				onSearchFocus();
 			}
 		};
 		document.addEventListener('keydown', keydown);
@@ -218,20 +231,23 @@
 
 	const onGotoTodaysDate = () => {
 		$selectedDate = new Date();
-		$filters = [];
+		filters = [];
 	};
 
-	const onClickClear = () => {
-		$filters = [];
-	};
+	const onClickClear = () => (filters = []);
 
-	let onOpenExport: () => void;
-	let onCloseExport: () => void;
+	const {
+		isOpen: isExportDialogOpen,
+		onOpen: openExportDialog,
+		onClose: onCloseExportDialog
+	} = useDisclosure();
+
+	const onSearchChange = (e: Event) => (searchValue = (e.target as HTMLTextAreaElement).value);
 </script>
 
-<div class="flex-1 center stack overflow-hidden" bind:clientHeight={parentContainerHeight}>
+<div bind:clientHeight={parentContainerHeight} class="flex-1 center stack overflow-hidden">
 	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full justify-center flex-1 py-1">
-		<div class="stack gap-2 center" bind:clientHeight={logButtonsContainerHeight}>
+		<div bind:clientHeight={logButtonsContainerHeight} class="stack gap-2 center">
 			<div class="hstack center gap-2 flex-wrap">
 				<div class="hstack gap-2 center">
 					<div class="center hstack gap-1 flex-wrap">
@@ -240,16 +256,16 @@
 						</p>
 						<p class="capitalize">{$selectedHyphenatedDateString ?? data.date}</p>
 					</div>
-					<input type="date" on:change={onDateChange} class="w-[20px]" />
+					<input type="date" onchange={onDateChange} class="w-[20px]" />
 				</div>
 				<Search
-					bind:onFocus={onSearchFocus}
-					bind:value={searchValue}
+					value={searchValue}
 					onClickEnter={onSearch}
 					onEnterKeydown={onSearch}
 					{onClickClear}
+					onchange={onSearchChange}
 				/>
-				<Button onClick={onOpenExport}>
+				<Button onclick={openExportDialog}>
 					<Icon icon={icons.export} height="20px" class="text-gray-400" />
 				</Button>
 			</div>
@@ -260,16 +276,16 @@
 						_class="w-[90px]"
 						buttons={[
 							{
-								onClick: () => onNoteButtonClick(type),
+								onclick: () => onNoteButtonClick(type),
 								icon,
 								_class: 'w-4/6'
 							},
 							{
-								onClick: () =>
-									$filters.includes(type)
-										? ($filters = $filters.filter((filter) => filter !== type))
-										: ($filters = [...$filters, type]),
-								_class: `w-2/6 ${$filters.includes(type) ? 'bg-neutral-100' : 'bg-white'}`
+								onclick: () =>
+									filters.includes(type)
+										? (filters = filters.filter((filter) => filter !== type))
+										: (filters = [...filters, type]),
+								_class: `w-2/6 ${filters.includes(type) ? 'bg-neutral-100' : 'bg-white'}`
 							}
 						]}
 					/>
@@ -277,32 +293,32 @@
 			</div>
 		</div>
 		<div
+			bind:this={notesContainer}
 			class="stack gap-6 hide-scrollbar flex-1 {!!$whichInputIsFocused
 				? 'overflow-y-hidden'
 				: 'overflow-y-scroll'}"
 			style="max-height:{notesContainerHeight}px"
-			bind:this={notesContainer}
 		>
-			{#if !!newLogType}
+			{#if isThereANewLog}
 				<NewLog type={newLogType} />
 			{/if}
 			{#if $logs.isLoading}
 				<div style="max-height:{notesContainerHeight}px" class="stack gap-6">
 					{#each Array(5) as _}
-						<div class="bg-neutral-100 rounded-sm h-[120px] w-full" />
+						<div class="bg-neutral-100 rounded-sm h-[120px] w-full"></div>
 					{/each}
 				</div>
 			{:else if $logs.isError}
 				Error
-			{:else if $filteredLogs}
-				{#each $filteredLogs as log}
+			{:else if filteredAndSortedLogs}
+				{#each filteredAndSortedLogs as log}
 					<Log initialLog={log} />
 				{/each}
 			{/if}
 		</div>
 		<div class="stack gap-2">
 			<div class="hstack center capitalize gap-5">
-				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickPreviousDay}>
+				<Button _class="bg-white bg-opacity-80 w-[50px] center" onclick={onClickPreviousDay}>
 					<Icon icon={icons.left} height="20px" class="text-gray-400" />
 				</Button>
 				<Button
@@ -310,10 +326,10 @@
 					$selectedHyphenatedDateString
 						? 'bg-opacity-80'
 						: 'bg-opacity-40'}"
-					onClick={onGotoTodaysDate}
-					><div class=" rounded-md border-2 w-[18px] h-[18px] border-gray-400" /></Button
+					onclick={onGotoTodaysDate}
+					><div class=" rounded-md border-2 w-[18px] h-[18px] border-gray-400"></div></Button
 				>
-				<Button _class="bg-white bg-opacity-80 w-[50px] center" onClick={onClickNextDay}>
+				<Button _class="bg-white bg-opacity-80 w-[50px] center" onclick={onClickNextDay}>
 					<Icon icon={icons.right} height="20px" class="text-gray-400" />
 				</Button>
 			</div>
@@ -326,7 +342,7 @@
 	class="w-full max-w-[800px] p-5 sm:p-10 rounded-md h-screen sm:h-[auto]"
 	style={$darkMode.boolean ? $darkMode.darkStyles.string : $darkMode.lightStyles.string}
 >
-	<div class="stack justify-end h-full gap-4" bind:clientHeight={modalContainerHeight}>
+	<div bind:clientHeight={modalContainerHeight} class="stack justify-end h-full gap-4">
 		<div class="stack gap-2">
 			<div
 				class="hstack gap-3 justify-end align-center text-xs flex-wrap"
@@ -336,21 +352,21 @@
 				{#each Object.keys(showInNotesModalCheckboxes) as checkbox}
 					<label class="center gap-1 capitalize">
 						{checkbox}
-						<input type="checkbox" bind:checked={showInNotesModalCheckboxes[checkbox]} />
+						<input bind:checked={showInNotesModalCheckboxes[checkbox]} type="checkbox" />
 					</label>
 				{/each}
 			</div>
-			<Button className="text-black text-xs self-end" onClick={resetCheckboxes}>Reset</Button>
+			<Button className="text-black text-xs self-end" onclick={resetCheckboxes}>Reset</Button>
 		</div>
 		<div
 			class="stack gap-10 center h-full overflow-y-scroll hide-scrollbar"
 			style="height:{modalMainContentHeight}px"
 		>
-			<div class="stack gap-2 sm:gap-4" bind:this={notesModalTextArea} />
+			<div bind:this={notesModalTextArea} class="stack gap-2 sm:gap-4"></div>
 		</div>
-		<div class="flex flex-wrap gap-4 center" bind:clientHeight={modalButtonContainerHeight}>
-			<Button onClick={copy} className="text-black">Copy</Button>
-			<Button onClick={() => exportedNotesModal.close()} className="text-black">Close</Button>
+		<div bind:clientHeight={modalButtonContainerHeight} class="flex flex-wrap gap-4 center">
+			<Button onclick={copy} className="text-black">Copy</Button>
+			<Button onclick={() => exportedNotesModal.close()} className="text-black">Close</Button>
 		</div>
 	</div>
 </dialog>
@@ -359,11 +375,12 @@
 	<title>{getCapitalizedWords(data.space)} - Organiser</title>
 </svelte:head>
 
-{#if $filteredLogs && $filteredLogs.length}
+{#if filteredLogs && filteredLogs.length}
 	<ExportDialog
-		bind:onClose={onCloseExport}
-		bind:onOpen={onOpenExport}
-		logs={$filteredLogs}
+		isOpen={$isExportDialogOpen}
+		onClose={onCloseExportDialog}
+		onOpen={openExportDialog}
+		logs={filteredLogs}
 		isLoadingLogs={$logs.isLoading}
 		isLogsError={$logs.isError}
 		isFetchingLogs={$logs.isFetching}

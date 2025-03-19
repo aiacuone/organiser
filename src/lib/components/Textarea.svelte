@@ -1,26 +1,53 @@
 <script lang="ts">
-	import { afterUpdate, onMount } from 'svelte';
-	import type { ChangeEventHandler } from 'svelte/elements';
-	export let value: string | string[];
-	export let className = '';
-	export let autofocus = false;
-	export let _class = '';
-	export let onEnterKeydown: () => void = () => {};
-	export let onChange: ChangeEventHandler<HTMLTextAreaElement> = () => {};
-	export let textarea: HTMLElement | undefined = undefined;
-	export let onFocus: (() => void) | undefined = undefined;
+	import { onMount, tick } from 'svelte';
+
+	interface Props {
+		value: string | string[];
+		className?: string;
+		autofocus?: boolean;
+		_class?: string;
+		onEnterKeydown?: () => void;
+		onchange: (e: Event) => void;
+		onFocus?: () => void;
+		textarea?: HTMLElement;
+		isDisabled?: boolean;
+		onclick?: (e: MouseEvent) => void;
+	}
+
+	let {
+		className,
+		autofocus,
+		_class,
+		onEnterKeydown,
+		onchange: _onchange,
+		value = $bindable(''),
+		onFocus: _onFocus = $bindable(),
+		textarea: bindableTextarea = $bindable(),
+		isDisabled = false,
+		onclick
+	}: Props = $props();
+
+	let container: HTMLElement;
+	let textarea: HTMLElement;
+
 	const resize = () => {
-		if (!textarea) return;
 		textarea.style.height = '20px';
 		if (textarea.scrollHeight > 20) textarea.style.height = textarea.scrollHeight + 'px';
 	};
 
-	afterUpdate(() => {
+	const onchange = (e: Event) => {
+		_onchange(e);
 		resize();
+	};
+
+	$effect.pre(() => {
+		// This is the same as 'afterUpdate' in SvelteKit
+		tick().then(() => resize());
 	});
 
 	onMount(() => {
-		if (!textarea) return;
+		// Using this because its not accessible within the component when $bindable is being used
+		textarea = container.children[0] as HTMLElement;
 
 		autofocus && textarea.focus();
 
@@ -28,32 +55,32 @@
 			if (e.key === 'Enter') {
 				if (e.metaKey || e.ctrlKey || e.altKey) return;
 				e.preventDefault();
-				onEnterKeydown();
+				onEnterKeydown && onEnterKeydown();
 			}
 		};
 
 		textarea.addEventListener('keydown', keydown);
 
 		return () => {
-			if (!textarea) return;
 			textarea.removeEventListener('keydown', keydown);
 		};
 	});
 
-	const _onFocus = () => {
-		onFocus && onFocus();
+	const onfocus = () => {
+		_onFocus && _onFocus();
 	};
 </script>
 
-<div class="w-full relative">
+<div class="w-full relative" bind:this={container}>
 	<textarea
 		bind:value
+		bind:this={bindableTextarea}
 		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"
-		bind:this={textarea}
-		on:input={resize}
-		on:change={onChange}
-		on:focus={_onFocus}
-	/>
+		oninput={onchange}
+		{onfocus}
+		readonly={isDisabled}
+		{onclick}
+	></textarea>
 </div>
 
-<svelte:window on:resize={resize} />
+<svelte:window onresize={resize} />

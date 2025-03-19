@@ -5,8 +5,9 @@ import {
 	getLogs,
 	updateLog
 } from '$lib/server';
+import type { RequestEvent } from '@sveltejs/kit';
 
-export const PATCH = async ({ request }) =>
+export const PATCH = async ({ request }: RequestEvent) =>
 	checkAccessTokenMiddleware(request, async () =>
 		getAndCheckCollectionFromToken(request, async (collection) => {
 			const data = await request.json();
@@ -16,7 +17,7 @@ export const PATCH = async ({ request }) =>
 		})
 	);
 
-export const DELETE = async ({ request }) =>
+export const DELETE = async ({ request }: RequestEvent) =>
 	checkAccessTokenMiddleware(request, async () =>
 		getAndCheckCollectionFromToken(request, async (collection) => {
 			const { id } = await request.json();
@@ -27,7 +28,7 @@ export const DELETE = async ({ request }) =>
 		})
 	);
 
-export const GET = async ({ request, url: { searchParams } }) =>
+export const GET = async ({ request, url: { searchParams } }: RequestEvent) =>
 	checkAccessTokenMiddleware(request, async () =>
 		getAndCheckCollectionFromToken(request, async (collection) => {
 			const objectSearchParams = Object.fromEntries(searchParams.entries());
@@ -41,21 +42,24 @@ export const GET = async ({ request, url: { searchParams } }) =>
 
 				objectSearchParams['json'] = JSON.parse(objectSearchParams['json']);
 
-				const reducedJsonParams = jsonArray.reduce((object, [key, value]) => {
-					const isMultiplesKey = ['type', 'searchType'].includes(key);
+				const reducedJsonParams = jsonArray.reduce(
+					(object: Record<string, string[] | string>, [key, value]: string[]) => {
+						const isMultiplesKey = ['type', 'searchType'].includes(key);
 
-					if (isMultiplesKey) {
-						if (object[key]) {
-							object[key] = [...object[key], value];
+						if (isMultiplesKey) {
+							if (object[key]) {
+								object[key] = [...object[key], value];
+							} else {
+								object[key] = [value];
+							}
 						} else {
-							object[key] = [value];
+							object[key] = value;
 						}
-					} else {
-						object[key] = value;
-					}
 
-					return object;
-				}, {} as Record<string, string[] | string>);
+						return object;
+					},
+					{} as Record<string, string[] | string>
+				);
 
 				delete objectSearchParams['json'];
 

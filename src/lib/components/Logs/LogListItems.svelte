@@ -1,23 +1,36 @@
-<!-- todo: combine this with LogListItems when svelte 5 is released -->
+<!-- todo: Refactor LogCheckboxItems && LogQuestionItems into this file-->
 <script lang="ts">
-	import type { Readable, Writable } from 'svelte/store';
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
-	import { dndzone } from 'svelte-dnd-action';
 	import { LogType_enum, LogListType_enum, type MappedListItem } from '$lib/types';
 	import {
 		areAnyListItemsNotCapitalised,
 		capitalizeFirstLetterOfMappedListItems
 	} from '$lib/utils';
+	import { dndzone } from 'svelte-dnd-action';
 
-	export let items: MappedListItem[];
-	export let isEditing: Readable<boolean>;
-	export let onEnterKeydown: () => void;
-	export let onDeleteItem: (index: number) => void;
-	export let logType: LogType_enum;
-	export let listType: LogListType_enum;
-	export let focusElements: Writable<HTMLElement[]>;
+	interface Props {
+		items: MappedListItem[];
+		isEditing: boolean;
+		onEnterKeydown: () => void;
+		onDeleteItem: (index: number) => void;
+		logType: LogType_enum;
+		listType: LogListType_enum;
+		focusElements: HTMLElement[];
+		onClickInput: (e: MouseEvent) => void;
+	}
+
+	let {
+		items = $bindable([]),
+		isEditing,
+		onEnterKeydown,
+		onDeleteItem,
+		logType,
+		listType,
+		focusElements = $bindable([]),
+		onClickInput
+	}: Props = $props();
 
 	const bulletType: Record<
 		LogListType_enum,
@@ -36,11 +49,15 @@
 		[LogType_enum.list]: 'bg-gray-100'
 	};
 
-	$: {
+	$effect(() => {
 		if (areAnyListItemsNotCapitalised(items)) {
 			items = capitalizeFirstLetterOfMappedListItems(items);
 		}
-	}
+	});
+
+	const onClickTextArea = (e: MouseEvent) => {
+		onClickInput(e);
+	};
 </script>
 
 <ul
@@ -50,14 +67,14 @@
 		items,
 		flipDurationMs: 300,
 		dropTargetStyle: {},
-		dragDisabled: !$isEditing
+		dragDisabled: !isEditing
 	}}
-	on:consider={(e) => (items = e.detail.items)}
-	on:finalize={(e) => (items = e.detail.items)}
+	onconsider={(e) => (items = e.detail.items)}
+	onfinalize={(e) => (items = e.detail.items)}
 >
 	{#each items as item, index (item.id)}
 		<li class="{index % 2 === 0 ? 'bg-transparent' : checkeredColor[logType]} relative">
-			{#if $isEditing && items.length > 1}
+			{#if isEditing && items.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-9 top-1" />
 			{/if}
 			<div class="hstack">
@@ -66,22 +83,25 @@
 						<Textarea
 							_class="w-full"
 							bind:value={items[index].item}
+							bind:textarea={focusElements[focusElements.length]}
+							onchange={(e:Event) => (items[index].item = (e.target as HTMLInputElement).value)}
 							{onEnterKeydown}
 							autofocus={index > 0}
-							bind:textarea={$focusElements[index + 2]}
+							onclick={onClickTextArea}
+							isDisabled={!isEditing}
 						/>
 					</div>
 					<div class="min-w-[40px] hidden sm:flex align-center relative">
-						{#if $isEditing}
-							<button class=" absolute top-0" on:click={() => onDeleteItem(index)}>
+						{#if isEditing}
+							<button class=" absolute top-0" onclick={() => onDeleteItem(index)}>
 								<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 							</button>
 						{/if}
 					</div>
 				</div>
 				<div class="mt-1 flex sm:hidden">
-					{#if $isEditing}
-						<button class="flex sm:hidden" on:click={() => onDeleteItem(index)}>
+					{#if isEditing}
+						<button class="flex sm:hidden" onclick={() => onDeleteItem(index)}>
 							<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 						</button>
 					{/if}

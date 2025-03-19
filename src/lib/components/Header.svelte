@@ -7,7 +7,6 @@
 	import PillButton from './Logs/Buttons/PillButton.svelte';
 	import { derived } from 'svelte/store';
 	import { page } from '$app/stores';
-	import LogitLogoSimple from '$lib/svg/logit-logo-simple.svelte';
 	import {
 		LogType_enum,
 		axios,
@@ -16,21 +15,25 @@
 		logIcons,
 		getHyphenatedStringFromDate,
 		replaceAllHyphensWithSpaces,
-		replaceAllSpacesWithHyphens
+		replaceAllSpacesWithHyphens,
+		useDisclosure,
+		type LogNotification_int,
+		spaces
 	} from '$lib';
-	import LogitLogo from '$lib/svg/logit-logo.svelte';
 	import AddSpace from './AddSpace.svelte';
 
-	export let space: string | undefined;
+	interface Props extends SvelteAllProps {
+		space: string | undefined;
+	}
 
-	let isAddingNewSpace: boolean = false;
-	let onOpen: () => void;
-	let dialog: HTMLDialogElement;
+	const { space }: Props = $props();
+	let isAddingNewSpace: boolean = $state(false);
 
-	const onDialogClose = () => {
-		isAddingNewSpace = false;
-		dialog.close();
-	};
+	const {
+		isOpen: isSpaceDialogOpen,
+		onOpen: openSpaceDialog,
+		onClose: closeSpaceDialog
+	} = useDisclosure();
 
 	const spacesQuery = useQuery(
 		`spaces`,
@@ -42,32 +45,32 @@
 				.catch((err) => console.log(err));
 		},
 		{
-			refetchOnMount: false
+			refetchOnMount: false,
+			onSuccess: (data) => {
+				$spaces = data;
+			}
 		}
 	);
 
-	const allLogsNotificationsQuery: UseQueryStoreResult<
-		QueryKey,
-		any,
-		{
-			space: string;
-			todo: number;
-			question: number;
-		}[],
-		any
-	> = useQuery(
-		`allLogNotifications`,
-		async () => {
-			if (!$isAuthenticated) return;
-			return await axios
-				.get(`/log/notifications`, { params: { spaces: $spacesQuery.data } })
-				.then(({ data }) => data)
-				.catch((err) => console.log(err));
-		},
-		{
-			refetchOnMount: false
-		}
-	);
+	// I attempted to move both spacesQuery and allLogsNotificationsQuery to the layout component, but the token is not set when the layout component attempts to fetch the data.
+
+	const allLogsNotificationsQuery: UseQueryStoreResult<QueryKey, any, LogNotification_int[], any> =
+		useQuery(
+			`allLogNotifications`,
+			async () => {
+				if (!$isAuthenticated) return;
+
+				const params = { spaces: $spacesQuery.data };
+
+				return await axios
+					.get(`/log/notifications`, { params })
+					.then(({ data }) => data)
+					.catch((err) => console.log(err));
+			},
+			{
+				refetchOnMount: false
+			}
+		);
 
 	const gotoLogType = (type: LogType_enum, hasNotification: boolean = false) => {
 		let url = `/${$page.params.space}/filter?type=${type}`;
@@ -82,32 +85,32 @@
 		LogType_enum,
 		{
 			icon: string;
-			onClick: (hasNotification?: boolean) => void;
+			onclick: (hasNotification?: boolean) => void;
 		}
 	> = {
 		[LogType_enum.time]: {
 			icon: logIcons.time,
-			onClick: () => gotoLogType(LogType_enum.time)
+			onclick: () => gotoLogType(LogType_enum.time)
 		},
 		[LogType_enum.todo]: {
 			icon: logIcons.todo,
-			onClick: (hasNotification?: boolean) => gotoLogType(LogType_enum.todo, hasNotification)
+			onclick: (hasNotification?: boolean) => gotoLogType(LogType_enum.todo, hasNotification)
 		},
 		[LogType_enum.important]: {
 			icon: logIcons.important,
-			onClick: () => gotoLogType(LogType_enum.important)
+			onclick: () => gotoLogType(LogType_enum.important)
 		},
 		[LogType_enum.question]: {
 			icon: logIcons.question,
-			onClick: (hasNotification?: boolean) => gotoLogType(LogType_enum.question, hasNotification)
+			onclick: (hasNotification?: boolean) => gotoLogType(LogType_enum.question, hasNotification)
 		},
 		[LogType_enum.list]: {
 			icon: logIcons.list,
-			onClick: () => gotoLogType(LogType_enum.list)
+			onclick: () => gotoLogType(LogType_enum.list)
 		}
 	};
 	const onAddSpace = () => {
-		onDialogClose();
+		closeSpaceDialog();
 	};
 
 	const pillButtons = derived(
@@ -124,16 +127,21 @@
 				: [...$allLogsNotificationsQuery.data, { space: $page.params.space, todo: 0, question: 0 }];
 
 			return pillButtonsWithNewSpace.map(({ space, todo, question }) => {
-				const result = [
+				const result: {
+					label?: string;
+					onclick: () => void;
+					notification: number;
+					icon?: string;
+				}[] = [
 					{
 						label: replaceAllHyphensWithSpaces(space),
-						onClick: () => {
+						onclick: () => {
 							goto(
 								`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(
 									new Date()
 								)}`
 							);
-							onDialogClose();
+							closeSpaceDialog();
 						},
 						notification: 0
 					}
@@ -142,8 +150,8 @@
 				if (todo)
 					result.push({
 						notification: todo,
-						onClick: () => {
-							onDialogClose();
+						onclick: () => {
+							closeSpaceDialog();
 							goto(`/${space}/filter?type=todo&isChecked=false`);
 						},
 						icon: icons.todo
@@ -152,8 +160,8 @@
 				if (question)
 					result.push({
 						notification: question,
-						onClick: () => {
-							onDialogClose();
+						onclick: () => {
+							closeSpaceDialog();
 							goto(`/${space}/filter?type=question&isAnswered=false`);
 						},
 						icon: icons.question
@@ -161,9 +169,9 @@
 
 				result.push({
 					icon: icons.moreVertical,
-					onClick: () => {
+					onclick: () => {
 						goto(`/${space}/overview`);
-						onDialogClose();
+						closeSpaceDialog();
 					},
 					notification: 0
 				});
@@ -172,28 +180,33 @@
 			});
 		}
 	);
+
+	const _openSpaceDialog = () => {
+		openSpaceDialog();
+		isAddingNewSpace = false;
+	};
 </script>
 
 <header class="center py-2 px-3 bg-gray-200">
 	<div class="flex-1 max-w-screen-lg hstack">
 		<div class="flex-1">
-			<LogitLogoSimple height="30px" />
+			<img src="/logit-logo-symbol-light.svg" alt="Logit Logo" class="h-[30px]" />
 		</div>
 		{#if $isAuthenticated && space}
 			<div class="flex-1 center">
-				<button on:click={onOpen} class="capitalize">
+				<button onclick={_openSpaceDialog} class="capitalize">
 					{space}
 				</button>
 			</div>
 			<div class="flex-1 hstack justify-end gap-5">
 				{#if $allLogsNotificationsQuery.data}
-					{#each Object.entries(headerButtons) as [type, { icon, onClick }]}
+					{#each Object.entries(headerButtons) as [type, { icon, onclick }]}
 						{@const spaceNotifications = $allLogsNotificationsQuery.data?.find(
 							({ space: _space }) => _space === space
 						)}
-						{@const notificationsCount = spaceNotifications?.[type]}
+						{@const notificationsCount = spaceNotifications?.[type as keyof LogNotification_int]}
 
-						<button on:click={() => onClick(!!notificationsCount)} class="relative">
+						<button onclick={() => onclick(!!notificationsCount)} class="relative">
 							<Icon {icon} class="text-gray-500" height="20px" />
 							{#if notificationsCount}
 								<div
@@ -210,9 +223,9 @@
 	</div>
 </header>
 
-<Dialog bind:onOpen onClose={onDialogClose} bind:dialog>
+<Dialog isOpen={$isSpaceDialogOpen} onClose={closeSpaceDialog}>
 	<div class="stack gap-3">
-		<LogitLogo height="30px" />
+		<img src="/logit-logo-light.svg" alt="Logit Logo" class="h-[60px]" />
 		<div class="stack gap-4 self-center">
 			{#each $pillButtons as pillButton}
 				<div class="hstack gap-2 items-center relative">
@@ -224,7 +237,7 @@
 			{#if isAddingNewSpace}
 				<AddSpace {onAddSpace} />
 			{:else}
-				<Button onClick={() => (isAddingNewSpace = true)}>Add</Button>
+				<Button onclick={() => (isAddingNewSpace = true)}>Add</Button>
 			{/if}
 		</div>
 	</div>

@@ -10,6 +10,7 @@
 	import { isAuthLoading, isAuthenticated, user } from '$lib/stores/auth';
 	import type { Auth0Client } from '@auth0/auth0-spa-js';
 	import Dialog from './Dialog/Dialog.svelte';
+	import { useDisclosure } from '$lib/hooks';
 
 	const footerButtons = [
 		{
@@ -58,13 +59,15 @@
 		logout(auth0Client);
 	};
 
+	const {
+		isOpen: isAvatarMenuOpen,
+		onOpen: onOpenAvatarMenu,
+		onClose: onCloseAvatarMenu
+	} = useDisclosure();
+
 	const onClickAvatar = () => {
 		onOpenAvatarMenu();
 	};
-
-	let onOpenAvatarMenu: () => void;
-	let onCloseAvatarMenu: () => void;
-	let dialog: HTMLDialogElement;
 </script>
 
 <footer class="py-2 bg-gray-300 px-3 center min-h-[50px]">
@@ -72,7 +75,7 @@
 		{#if $isAuthenticated}
 			<div class="hstack center capitalize gap-5">
 				{#each footerButtons as footerButton}
-					<Button _class="bg-white bg-opacity-80" onClick={footerButton.onClick}>
+					<Button _class="bg-white bg-opacity-80" onclick={footerButton.onClick}>
 						<Icon icon={footerButton.icon} />
 					</Button>
 				{/each}
@@ -82,13 +85,13 @@
 			{#if !$isAuthLoading}
 				{#if $isAuthenticated && $user.given_name && $user.family_name}
 					<button
-						on:click={onClickAvatar}
+						onclick={onClickAvatar}
 						class="rounded-full bg-neutral-500 h-[30px] w-[30px] center text-white"
 					>
 						{`${$user.given_name[0]}${$user.family_name[0]}`}
 					</button>
 				{:else}
-					<button on:click={login} class="rounded-lg bg-neutral-500 h-[30px] px-2 center text-white"
+					<button onclick={login} class="rounded-lg bg-neutral-500 h-[30px] px-2 center text-white"
 						>Login</button
 					>
 				{/if}
@@ -97,6 +100,6 @@
 	</div>
 </footer>
 
-<Dialog bind:dialog bind:onClose={onCloseAvatarMenu} bind:onOpen={onOpenAvatarMenu}>
-	<Button onClick={_logout}>Logout</Button>
+<Dialog isOpen={$isAvatarMenuOpen} onClose={onCloseAvatarMenu}>
+	<Button onclick={_logout}>Logout</Button>
 </Dialog>

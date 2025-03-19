@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { icons } from '$lib/general/icons';
 	import Icon from '@iconify/svelte';
-	export let rating: number;
-	export let icon: string;
-	export let ratingSize: number | string = 5;
-	export let iconSize: string = '30px';
+
+	interface Props {
+		rating: number;
+		icon: string;
+		ratingSize: number | string;
+		iconSize: string;
+	}
+
+	const { rating, icon, ratingSize = 5, iconSize = '30px' }: Props = $props();
 </script>
 
 <div class="relative">

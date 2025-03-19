@@ -11,48 +11,64 @@
 	import { icons } from '$lib/general/icons';
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import LogButton from './Buttons/LogButton.svelte';
-	import type { Writable } from 'svelte/store';
+	import { useDisclosure } from '$lib/hooks';
 
-	export let onDelete: () => void;
-	export let onAccept: () => void;
-	export let onAddItem: () => void;
-	export let incrementDecrementProps:
-		| {
-				onIncrement: () => void;
-				onDecrement: () => void;
-				max: number;
-				min: number;
-		  }
-		| undefined = undefined;
-	export let isEditing: boolean;
-	export let incrementDecrementValue: number | undefined = undefined;
-	export let showIncrementDecrement: boolean = true;
-	export let log: Writable<MappedLog_int>;
+	interface Props {
+		log: MappedLog_int;
+		onDelete: () => void;
+		onAccept: () => void;
+		onAddItem: () => void;
+		incrementDecrementProps: {
+			onIncrement: () => void;
+			onDecrement: () => void;
+			max: number;
+			min: number;
+			incrementDecrementValue: number;
+		};
+		isEditing: boolean;
+		showIncrementDecrement?: boolean;
+		onEditLog: () => void;
+		onStopEditing: () => void;
+	}
 
-	let onOpenDelete: () => void;
+	let {
+		log = $bindable(),
+		onDelete,
+		onAccept,
+		onAddItem,
+		incrementDecrementProps,
+		isEditing,
+		showIncrementDecrement = true,
+		onEditLog,
+		onStopEditing
+	}: Props = $props();
 
-	$: dateValues = getDayMonthYearFromDate($log.date);
-	$: lastUpdatedDateValues = $log.lastUpdated && getDayMonthYearFromDate($log.lastUpdated);
+	const { onOpen: onOpenDelete, onClose: onCloseDelete, isOpen: isOpenDelete } = useDisclosure();
+
+	const dateValues = $derived(getDayMonthYearFromDate(log.date));
+	const lastUpdatedDateValues = $derived(
+		log.lastUpdated && getDayMonthYearFromDate(log.lastUpdated)
+	);
 
 	const onConfirmDelete: () => void = () => {
 		onDelete();
 	};
 
 	const onChangeList = () => {
-		const indexOfListType = allLogListTypes.indexOf($log.listType);
+		const indexOfListType = allLogListTypes.indexOf(log.listType);
 		const nextIndex = indexOfListType + 1 > allLogListTypes.length - 1 ? 0 : indexOfListType + 1;
 
-		$log.listType = allLogListTypes[nextIndex];
+		log.listType = allLogListTypes[nextIndex];
 
 		const nextIndexListType = allLogListTypes[nextIndex];
 		const currentIndexListType = allLogListTypes[indexOfListType];
 
 		if (nextIndexListType === LogListType_enum.checkbox) {
-			$log.checkboxItems = getCheckboxItemsFromMappedListItems($log.listItems);
-			$log.listItems = [];
+			log.checkboxItems = getCheckboxItemsFromMappedListItems(log.listItems);
+			log.listItems = [];
 		} else if (currentIndexListType === LogListType_enum.checkbox) {
-			$log.listItems = getListItemsFromMappedCheckboxItems($log.checkboxItems);
-			$log.checkboxItems = [];
+			log.listItems = getListItemsFromMappedCheckboxItems(log.checkboxItems);
+			log.checkboxItems = [];
 		}
 	};
 
@@ -62,34 +78,43 @@
 		[LogListType_enum.checkbox]: icons.checkboxList
 	};
 
-	$: buttons = [
+	const onClickEdit = () => {
+		isEditing ? onStopEditing() : onEditLog();
+	};
+
+	let buttons = $derived([
+		{
+			icon: icons.addList,
+			onclick: onAddItem
+		},
 		{
 			icon: icons.delete,
-			onClick: onOpenDelete,
+			onclick: onOpenDelete,
 			isHidden: !isEditing
 		},
 		{
 			icon: icons.tick,
-			onClick: onAccept,
+			onclick: onAccept,
 			isHidden: !isEditing
 		},
 		{
-			icon: icons.addList,
-			onClick: onAddItem
+			icon: listIcons[log.listType],
+			onclick: onChangeList,
+			isHidden: !isEditing || log.type !== LogType_enum.list
 		},
 		{
-			icon: listIcons[$log.listType],
-			onClick: onChangeList,
-			isHidden: !isEditing || $log.type !== LogType_enum.list
+			icon: icons.edit,
+			onclick: onClickEdit,
+			isHidden: isEditing
 		}
-	];
+	]);
 </script>
 
 <div class="w-full hstack">
 	<div class="flex flex-wrap place-items-center gap-2">
 		<Icon
-			icon={logIcons[$log.type]}
-			height={$log.type === LogType_enum.important ? '30px' : '25px'}
+			icon={logIcons[log.type]}
+			height={log.type === LogType_enum.important ? '30px' : '25px'}
 			class="text-gray-300"
 		/>
 		{#each buttons as { icon, isHidden, ...rest }}
@@ -99,8 +124,11 @@
 				</LogButton>
 			{/if}
 		{/each}
-		{#if isEditing || (incrementDecrementProps && showIncrementDecrement && incrementDecrementValue)}
-			<IncrementDecrement {...incrementDecrementProps} value={incrementDecrementValue} />
+		{#if isEditing || (incrementDecrementProps && showIncrementDecrement && incrementDecrementProps.incrementDecrementValue)}
+			<IncrementDecrement
+				{...incrementDecrementProps}
+				value={incrementDecrementProps.incrementDecrementValue}
+			/>
 		{/if}
 		<div class="stack">
 			<p class="text-xs text-gray-200 text-black">
@@ -115,6 +143,9 @@
 	</div>
 </div>
 
-<ConfirmationDialog bind:onOpen={onOpenDelete} onConfirm={onConfirmDelete}
-	>Are you sure you want to delete?</ConfirmationDialog
+<ConfirmationDialog
+	onOpen={onOpenDelete}
+	onConfirm={onConfirmDelete}
+	onClose={onCloseDelete}
+	isOpen={$isOpenDelete}>Are you sure you want to delete?</ConfirmationDialog
 >

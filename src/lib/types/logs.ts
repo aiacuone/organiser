@@ -154,3 +154,9 @@ export interface MappedLog_int extends LogBase_int {
 	editOnMount?: boolean;
 	listType: LogListType_enum;
 }
+
+export interface LogNotification_int {
+	space: string;
+	todo: number;
+	question: number;
+}

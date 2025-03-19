@@ -1,29 +1,38 @@
+<!-- todo: Refactor this into LogListItems along with LogCheckboxItems -->
 <script lang="ts">
 	import { currentlyEditing } from '$lib/stores';
 	import type { MappedQuestionItem } from '$lib/types';
 	import Button from '../Button.svelte';
 	import Textarea from '../Textarea.svelte';
-	import { dndzone } from 'svelte-dnd-action';
-	import type { Readable } from 'svelte/motion';
 	import Icon from '@iconify/svelte';
 	import { icons } from '$lib/general/icons';
 	import {
 		areAnyQuestionsNotCapitalised,
 		capitalizeFirstLetterOfMappedQuestions
 	} from '$lib/utils';
-	import type { Writable } from 'svelte/store';
+	import { dndzone } from 'svelte-dnd-action';
 
-	export let questions: MappedQuestionItem[];
-	export let onFocusAnswerInput: () => void;
-	export let id: string;
-	export const onReset: () => void = () => {
-		isAnswering = undefined;
-	};
-	export let isEditing: Readable<boolean>;
-	export let onDeleteQuestion: (index: number) => void;
-	export let focusElements: Writable<HTMLElement[]>;
+	interface Props {
+		questions: MappedQuestionItem[];
+		onFocusAnswerInput: () => void;
+		id: string;
+		isEditing: boolean;
+		onDeleteQuestion: (index: number) => void;
+		focusElements: HTMLElement[];
+		onClickInput: (e: MouseEvent) => void;
+	}
 
-	let isAnswering: undefined | number = undefined;
+	let {
+		questions = $bindable([{ question: '', answer: '', id: 0 }]),
+		onFocusAnswerInput,
+		id,
+		isEditing,
+		onDeleteQuestion,
+		focusElements = $bindable([]),
+		onClickInput
+	}: Props = $props();
+
+	let isAnswering: undefined | number = $state();
 
 	const _onFocusAnswerInput = (index: number) => {
 		$currentlyEditing = id;
@@ -34,15 +43,20 @@
 		}, 0);
 	};
 
-	const onAnswerChange = (index: number, value: string) => {
-		questions[index].answer = value;
-	};
+	const onAnswerChange = (index: number, value: string) => (questions[index].answer = value);
 
-	$: {
+	$effect(() => {
 		if (areAnyQuestionsNotCapitalised(questions)) {
 			questions = capitalizeFirstLetterOfMappedQuestions(questions);
 		}
-	}
+	});
+
+	const onTextareaChange = (e: Event, index: number) =>
+		onAnswerChange(index, (e.target as HTMLTextAreaElement).value);
+
+	const onClickTextarea = (e: MouseEvent) => {
+		onClickInput(e);
+	};
 </script>
 
 <ul
@@ -51,27 +65,30 @@
 		items: questions,
 		flipDurationMs: 300,
 		dropTargetStyle: {},
-		dragDisabled: !$isEditing
+		dragDisabled: !isEditing
 	}}
-	on:consider={(e) => (questions = e.detail.items)}
-	on:finalize={(e) => (questions = e.detail.items)}
+	onconsider={(e) => (questions = e.detail.items)}
+	onfinalize={(e) => (questions = e.detail.items)}
 >
 	{#each questions as item, index (item.id)}
 		<li
 			class="hstack {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'} px-2 py-1 rounded relative"
 		>
-			{#if $isEditing && questions.length > 1}
+			{#if isEditing && questions.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-4 top-6" />
 			{/if}
 			<div class="stack gap-1 w-full">
 				<div class="hstack text-sm gap-1">
 					<p class="text-neutral-400">Question:</p>
 					<Textarea
-						bind:textarea={$focusElements[index + 2]}
+						bind:textarea={focusElements[focusElements.length]}
 						bind:value={questions[index].question}
+						onchange={(e:Event) => (questions[index].question = (e.target as HTMLInputElement).value)}
 						className=""
 						_class="flex-1"
 						autofocus
+						isDisabled={!isEditing}
+						onclick={onClickTextarea}
 					/>
 				</div>
 				{#if questions[index].answer || isAnswering === index}
@@ -79,9 +96,10 @@
 						<p class="text-neutral-400">Answer:</p>
 						<Textarea
 							bind:value={questions[index].answer}
-							_class="flex-1"
-							onChange={(e) => onAnswerChange(index, e.target?.value)}
 							bind:onFocus={onFocusAnswerInput}
+							_class="flex-1"
+							onchange={(e:Event) => onTextareaChange(e, index)}
+							onclick={onClickTextarea}
 						/>
 					</div>
 				{/if}
@@ -90,13 +108,13 @@
 						_class="self-start text-xs bg-white {questions[index].answer || isAnswering === index
 							? 'hidden'
 							: 'block'}"
-						onClick={() => _onFocusAnswerInput(index)}>Answer</Button
+						onclick={() => _onFocusAnswerInput(index)}>Answer</Button
 					>
 				{/if}
 			</div>
 			<div class="center">
-				{#if $isEditing}
-					<button class="flex" on:click={() => onDeleteQuestion(index)}>
+				{#if isEditing}
+					<button class="flex" onclick={() => onDeleteQuestion(index)}>
 						<Icon icon={icons.delete} class="text-gray-300" height="18px" />
 					</button>
 				{/if}

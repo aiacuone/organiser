@@ -5,7 +5,6 @@
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { selectedDate } from '$lib/stores/dates';
 	import Header from '$lib/components/Header.svelte';
-	import { Toaster } from 'svelte-french-toast';
 	import Footer from '$lib/components/Footer.svelte';
 	import { isAuthLoading, isAuthenticated } from '$lib/stores';
 	import Button from '$lib/components/Button.svelte';
@@ -15,15 +14,17 @@
 	import { axios, getHyphenatedStringFromDate, replaceAllSpacesWithHyphens } from '$lib';
 	import { goto } from '$app/navigation';
 
+	let { children } = $props();
+
 	const getDateFromHyphenatedString = (dateString: string) => {
 		const [day, month, year] = dateString.split('-').map(Number);
 
 		return new Date(Date.UTC(year, month - 1, day));
 	};
 
-	const urlSpace = $page.params.space;
+	let urlSpace = $derived($page.params.space);
 
-	$: {
+	$effect(() => {
 		const getSpaces = async () => {
 			const spaces = await axios.get('/spaces').then((response) => response.data);
 			const areThereAnySpaces = spaces.length > 0;
@@ -37,7 +38,7 @@
 		if ($isAuthenticated) {
 			void getSpaces();
 		}
-	}
+	});
 
 	onMount(() => {
 		if ($page.params.date) {
@@ -47,7 +48,7 @@
 	});
 
 	onMount(() => {
-		const onKeydown = (e) => {
+		const onKeydown = (e: KeyboardEvent) => {
 			switch (true) {
 				case e.ctrlKey && e.shiftKey && e.code === 'Space':
 					onGotoTodaysDate();
@@ -74,9 +75,8 @@
 		};
 
 		document.addEventListener('keydown', onKeydown);
-		return () => {
-			document.removeEventListener('keydown', onKeydown);
-		};
+
+		return () => document.removeEventListener('keydown', onKeydown);
 	});
 
 	const onClickPreviousDay = () => {
@@ -114,7 +114,7 @@
 		loginWithRedirect(client);
 	};
 
-	$: space = $page.params.space;
+	let space = $derived($page.params.space);
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -129,11 +129,11 @@
 					<AddSpace />
 				</div>
 			{:else if $isAuthenticated}
-				<slot />
+				{@render children()}
 			{:else}
 				<div class="w-full h-full stack center gap-3">
 					<div class="hstack center gap-1 text-xl">Welcome to <LogitLogo height="35px" /></div>
-					<Button onClick={onLogin}>Login</Button>
+					<Button onclick={onLogin}>Login</Button>
 				</div>
 			{/if}
 			<div class="flex justify-end" />
@@ -141,5 +141,3 @@
 		<Footer />
 	</div>
 </QueryClientProvider>
-
-<Toaster />

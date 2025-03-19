@@ -2,9 +2,13 @@
 	import { v4 as uuidv4 } from 'uuid';
 	import { page } from '$app/stores';
 	import Log from './Logs/Log.svelte';
-	import type { LogType_enum, Log_int } from '$lib/types';
+	import { LogType_enum, type Log_int } from '$lib/types';
 
-	export let type: LogType_enum;
+	interface Props extends SvelteAllProps {
+		type?: LogType_enum;
+	}
+
+	const { type }: Props = $props();
 
 	const [day, month] = $page.params.date.split('-');
 
@@ -23,8 +27,8 @@
 		checkboxItems: [{ text: '', isChecked: false }],
 		questions: [{ question: '', answer: '' }],
 		space: $page.params.space,
-		type: type
+		type: type ?? LogType_enum.time
 	};
 </script>
 
-<Log {initialLog} editOnMount />
+<Log {initialLog} editOnMount inputAutoFocus />

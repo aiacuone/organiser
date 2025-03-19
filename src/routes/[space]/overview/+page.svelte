@@ -7,13 +7,18 @@
 	import { useMutation } from '@sveltestack/svelte-query';
 
 	import { getContext } from 'svelte';
-	import toast from 'svelte-french-toast';
 
-	export let data;
-	let dialog: HTMLDialogElement;
+	interface OverviewPageProps {
+		data: {
+			space: string;
+		};
+	}
 
-	let onOpen: () => void;
-	let onClose: () => void;
+	const { data }: OverviewPageProps = $props();
+	let dialog: HTMLDialogElement | undefined = $state();
+
+	let onOpen: () => void = $state(() => {});
+	let onClose: () => void = $state(() => {});
 
 	const invalidateLogs: () => void = getContext('invalidateLogs');
 
@@ -30,14 +35,13 @@
 		try {
 			await $deleteSpaceMutation.mutate(data.space);
 			onClose();
-			toast.success('Space deleted');
 			goto('/');
 		} catch (error) {
-			toast.error('Error deleting space');
+			console.error('Error deleting space');
 		}
 	};
 
-	let inputValue: string;
+	let inputValue: string = $state('');
 </script>
 
 <div class="center">
@@ -45,7 +49,7 @@
 		<header class="capitalize mb-6">
 			{data.space}
 		</header>
-		<Button _class="bg-red-500" onClick={onOpen}>Delete Space</Button>
+		<Button _class="bg-red-500" onclick={onOpen}>Delete Space</Button>
 	</div>
 </div>
 
@@ -55,13 +59,17 @@
 
 		<div class="stack gap-2">
 			<p>Please enter the name <b>{data.space}</b> of the space to delete</p>
-			<Input placeholder={`Enter ${data.space} here to delete`} bind:value={inputValue} />
+			<Input
+				bind:value={inputValue}
+				placeholder={`Enter ${data.space} here to delete`}
+				onchange={(e:Event)=>inputValue=(e.target as HTMLInputElement).value}
+			/>
 			<Button
-				onClick={onConfirmDelete}
+				onclick={onConfirmDelete}
 				_class="self-center bg-red-500"
 				isDisabled={inputValue !== data.space}>Confirm Delete</Button
 			>
 		</div>
-		<Button onClick={onClose} _class="self-center">Close</Button>
+		<Button onclick={onClose} _class="self-center">Close</Button>
 	</div>
 </Dialog>

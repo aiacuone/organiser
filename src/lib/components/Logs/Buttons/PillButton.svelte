@@ -1,32 +1,37 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 
-	export let capitalizeLabels: boolean = true;
-
-	// NOTE: this component is to be refactored once Svelte 5.0 releases. Use snippets to pass in buttons and their handlers
-	export let buttons: {
-		label?: string;
-		onClick: () => void;
+	interface Button {
+		onclick: () => void;
 		icon?: string;
 		_class?: string;
+		label?: string;
 		notification?: number;
-	}[] = [];
+	}
 
-	let containerHeight: number = 0;
-	export let _class: string = '';
+	interface Props extends SvelteAllProps {
+		buttons: Button[];
+		capitalizeLabels?: boolean;
+		_class?: string;
+	}
+
+	// NOTE: this component is to be refactored once Svelte 5.0 releases. Use snippets to pass in buttons and their handlers
+	const { buttons, capitalizeLabels, _class }: Props = $props();
+
+	let containerHeight: number = $state(0);
 </script>
 
 <div
 	bind:clientHeight={containerHeight}
 	class="pill-button hstack shadow-md min-h-[30px] rounded-r-[4px] rounded-l-[4px] text-sm center relative {_class}"
 >
-	{#each buttons as { label, onClick, icon, _class, notification }, index}
+	{#each buttons as { label, onclick, icon, _class, notification }, index}
 		<button
 			class="center {index === 0 ? 'rounded-l-[4px]' : ''} {index === buttons.length - 1
 				? 'rounded-r-[4px]'
 				: ''} gap-2 px-2 {_class} {capitalizeLabels ? 'capitalize' : ''} relative"
 			style={`height: ${containerHeight}px;`}
-			on:click={onClick}
+			{onclick}
 		>
 			{#if icon}
 				<Icon {icon} class="text-gray-300" height="20px" />
