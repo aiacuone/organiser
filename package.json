@@ -47,6 +47,7 @@
 		"jsonwebtoken": "^9.0.2",
 		"lodash.isequal": "^4.5.0",
 		"mongodb": "^6.1.0",
+		"svelte-dnd-action": "^0.9.60",
 		"uuid": "^9.0.0"
 	}
 }

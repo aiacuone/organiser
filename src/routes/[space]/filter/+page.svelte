@@ -69,7 +69,7 @@
 
 	let timer: any = $state(undefined);
 
-	const debounce = (fn: () => any, delay = 500) => {
+	const debounce = (fn: () => void, delay = 500) => {
 		const timeout = () => {
 			clearTimeout(timer);
 			timer = setTimeout(() => {

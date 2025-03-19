@@ -10,6 +10,7 @@
 		areAnyQuestionsNotCapitalised,
 		capitalizeFirstLetterOfMappedQuestions
 	} from '$lib/utils';
+	import { dndzone } from 'svelte-dnd-action';
 
 	interface Props {
 		questions: MappedQuestionItem[];
@@ -58,7 +59,17 @@
 	};
 </script>
 
-<ul class="ml-2 stack flex-1 gap-3">
+<ul
+	class="ml-2 stack flex-1 gap-3"
+	use:dndzone={{
+		items: questions,
+		flipDurationMs: 300,
+		dropTargetStyle: {},
+		dragDisabled: !isEditing
+	}}
+	onconsider={(e) => (questions = e.detail.items)}
+	onfinalize={(e) => (questions = e.detail.items)}
+>
 	{#each questions as item, index (item.id)}
 		<li
 			class="hstack {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'} px-2 py-1 rounded relative"

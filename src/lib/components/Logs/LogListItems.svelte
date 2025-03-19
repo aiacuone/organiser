@@ -8,6 +8,7 @@
 		areAnyListItemsNotCapitalised,
 		capitalizeFirstLetterOfMappedListItems
 	} from '$lib/utils';
+	import { dndzone } from 'svelte-dnd-action';
 
 	interface Props {
 		items: MappedListItem[];
@@ -59,7 +60,18 @@
 	};
 </script>
 
-<ul class="ml-8 stack w-full" style={`list-style-type:${bulletType[listType]}`}>
+<ul
+	class="ml-8 stack w-full"
+	style={`list-style-type:${bulletType[listType]}`}
+	use:dndzone={{
+		items,
+		flipDurationMs: 300,
+		dropTargetStyle: {},
+		dragDisabled: !isEditing
+	}}
+	onconsider={(e) => (items = e.detail.items)}
+	onfinalize={(e) => (items = e.detail.items)}
+>
 	{#each items as item, index (item.id)}
 		<li class="{index % 2 === 0 ? 'bg-transparent' : checkeredColor[logType]} relative">
 			{#if isEditing && items.length > 1}

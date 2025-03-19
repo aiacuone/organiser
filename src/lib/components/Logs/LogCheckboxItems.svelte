@@ -8,6 +8,7 @@
 		areAnyCheckboxItemsNotCapitalised,
 		capitalizeFirstLetterOfMappedCheckboxItems
 	} from '$lib/utils';
+	import { dndzone } from 'svelte-dnd-action';
 
 	interface Props {
 		checkboxes: MappedCheckboxItem[];
@@ -42,7 +43,17 @@
 	};
 </script>
 
-<ul class="ml-3 stack flex-1">
+<ul
+	class="ml-3 stack flex-1"
+	use:dndzone={{
+		items: checkboxes,
+		flipDurationMs: 300,
+		dropTargetStyle: {},
+		dragDisabled: !isEditing
+	}}
+	onconsider={(e) => (checkboxes = e.detail.items)}
+	onfinalize={(e) => (checkboxes = e.detail.items)}
+>
 	{#each checkboxes as item, index (item.id)}
 		<li class="relative {index % 2 === 0 ? 'bg-transparent' : 'bg-gray-50'}">
 			{#if isEditing && checkboxes.length > 1}
