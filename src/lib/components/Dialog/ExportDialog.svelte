@@ -313,8 +313,7 @@
 					{#if isFetchingLogs}
 						Loading more...
 					{:else if hasNextLogsPage}
-						<!-- todo: use different method to trigger next page svelte 5 -->
-						<!-- <div use:viewport onenterViewport={getNextLogsPage} class="h-10 w-full"></div> -->
+						<div use:viewport onenterViewport={getNextLogsPage} class="h-10 w-full"></div>
 					{:else}
 						{logsData.pages[0].data.total} Results
 					{/if}

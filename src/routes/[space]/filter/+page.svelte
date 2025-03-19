@@ -19,7 +19,7 @@
 	import { useInfiniteQuery, useQueryClient } from '@sveltestack/svelte-query';
 	import { onMount } from 'svelte';
 	import { axios } from '$lib/general';
-	import { useDisclosure } from '$lib';
+	import { useDisclosure, viewport } from '$lib';
 
 	const queryClient = useQueryClient();
 	const _searchParams = $derived(new URLSearchParams($page.url.searchParams));
@@ -252,8 +252,7 @@
 					{#if $filteredLogsQuery.isFetching}
 						Loading more...
 					{:else if $filteredLogsQuery.hasNextPage}
-						<!-- todo:svelte 5 -->
-						<!-- <div use:viewport on:enterViewport={onGetNextPage} class="h-10 w-full" /> -->
+						<div use:viewport onenterViewport={onGetNextPage} class="h-10 w-full" />
 					{:else}
 						{$filteredLogsQuery.data.pages[0].data.total} Results
 					{/if}
