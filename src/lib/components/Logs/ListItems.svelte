@@ -1,4 +1,3 @@
-<!-- todo: Refactor LogCheckboxItems && LogQuestionItems into this file-->
 <script lang="ts">
 	import Textarea from '../Textarea.svelte';
 	import Icon from '@iconify/svelte';

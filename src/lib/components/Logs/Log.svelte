@@ -19,7 +19,7 @@
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import Input from '../Input.svelte';
 	import BottomOptions from './BottomOptions.svelte';
-	import ListItems from './LogListItems.svelte';
+	import ListItems from './ListItems.svelte';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import isEqual from 'lodash.isequal';
 	import { useDisclosure } from '$lib/hooks';
