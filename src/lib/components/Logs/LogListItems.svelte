@@ -72,12 +72,6 @@
 		onClickInput(e);
 	};
 
-	const onChangeOrder = (items: (MappedListItem | MappedCheckboxItem | MappedQuestionItem)[]) => {
-		if (log.listItems) log.listItems = items as MappedListItem[];
-		if (log.questions) log.questions = items as MappedQuestionItem[];
-		if (log.checkboxItems) log.checkboxItems = items as MappedCheckboxItem[];
-	};
-
 	let isAnswering: undefined | number = $state();
 	const onCheckboxesChange = () => onEdit();
 
@@ -99,22 +93,28 @@
 
 	const onAnswerChange = (index: number, value: string) => (log.questions[index].answer = value);
 
-	const showListItems = $derived(
+	const hasListItems = $derived(
 		log.type === LogType_enum.important ||
 			log.type === LogType_enum.time ||
 			(log.type === LogType_enum.list && log.listType !== LogListType_enum.checkbox)
 	);
 
-	const showCheckboxes = $derived(
+	const hasCheckboxes = $derived(
 		log.type === LogType_enum.todo ||
 			(log.type === LogType_enum.list && log.listType === LogListType_enum.checkbox)
 	);
 
-	const showQuestions = $derived(log.type === LogType_enum.question);
+	const hasQuestions = $derived(log.type === LogType_enum.question);
 
 	const items: (MappedListItem | MappedCheckboxItem | MappedQuestionItem)[] = $derived(
-		showListItems ? log.listItems : showCheckboxes ? log.checkboxItems : log.questions
+		hasListItems ? log.listItems : hasCheckboxes ? log.checkboxItems : log.questions
 	);
+
+	const onChangeOrder = (items: (MappedListItem | MappedCheckboxItem | MappedQuestionItem)[]) => {
+		if (hasListItems) log.listItems = items as MappedListItem[];
+		if (hasQuestions) log.questions = items as MappedQuestionItem[];
+		if (hasCheckboxes) log.checkboxItems = items as MappedCheckboxItem[];
+	};
 </script>
 
 <ul
@@ -135,7 +135,7 @@
 				<Icon icon={icons.vertical} class="absolute -left-9 top-1" />
 			{/if}
 			<div class="flex {log.questions ? 'flex-col gap-1 w-full' : 'flex-row'}">
-				{#if showListItems}
+				{#if hasListItems}
 					<div class="flex gap-2 min-h-[20px] flex-1">
 						<div class="flex-1">
 							<Textarea
@@ -149,7 +149,7 @@
 							/>
 						</div>
 					</div>
-				{:else if showCheckboxes}
+				{:else if hasCheckboxes}
 					<input
 						bind:checked={log.checkboxItems[index].isChecked}
 						type="checkbox"
@@ -170,7 +170,7 @@
 							/>
 						</div>
 					</div>
-				{:else if showQuestions}
+				{:else if hasQuestions}
 					<div class="hstack text-sm gap-1">
 						<p class="text-neutral-400">Question:</p>
 						<Textarea
