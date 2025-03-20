@@ -7,11 +7,11 @@
 		autofocus?: boolean;
 		_class?: string;
 		onEnterKeydown?: () => void;
-		onchange: (e: Event) => void;
 		onFocus?: () => void;
 		textarea?: HTMLElement;
 		isDisabled?: boolean;
 		onclick?: (e: MouseEvent) => void;
+		onchange?: (e: Event) => void;
 	}
 
 	let {
@@ -19,12 +19,12 @@
 		autofocus,
 		_class,
 		onEnterKeydown,
-		onchange: _onchange,
 		value = $bindable(''),
 		onFocus: _onFocus = $bindable(),
 		textarea: bindableTextarea = $bindable(),
 		isDisabled = false,
-		onclick
+		onclick,
+		onchange: _onchange
 	}: Props = $props();
 
 	let container: HTMLElement;
@@ -36,7 +36,7 @@
 	};
 
 	const onchange = (e: Event) => {
-		_onchange(e);
+		_onchange?.(e);
 		resize();
 	};
 

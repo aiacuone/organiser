@@ -20,8 +20,6 @@
 	import Input from '../Input.svelte';
 	import BottomOptions from './BottomOptions.svelte';
 	import ListItems from './LogListItems.svelte';
-	import CheckboxItems from './LogCheckboxItems.svelte';
-	import LogQuestionItems from './LogQuestionItems.svelte';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import isEqual from 'lodash.isequal';
 	import { useDisclosure } from '$lib/hooks';
@@ -419,41 +417,16 @@
 				</div>
 			</div>
 			<div class="hstack center gap-2">
-				<!-- todo: All 3 of these conditionally rendered items should reduce to one once LogQuestionItems and LogCheckboxItems has been refactored into LogListItems -->
-				{#if log.type === LogType_enum.todo || (log.type === LogType_enum.list && log.listType === LogListType_enum.checkbox)}
-					<div class="flex-1">
-						<CheckboxItems
-							bind:checkboxes={log.checkboxItems}
-							bind:focusElements
-							{isEditing}
-							onEnterKeydown={onTextareaEnterKeydown}
-							onDeleteBullet={onDeleteItem}
-							{onEdit}
-							{onClickInput}
-						/>
-					</div>
-				{:else if log.type === LogType_enum.question}
-					<LogQuestionItems
-						bind:questions={log.questions}
-						bind:focusElements
-						onFocusAnswerInput={_onFocusAnswerInput}
-						{isEditing}
-						onDeleteQuestion={onDeleteItem}
-						id={log.id}
-						{onClickInput}
-					/>
-				{:else if log.type === LogType_enum.important || log.type === LogType_enum.time || (log.type === LogType_enum.list && log.listType !== LogListType_enum.checkbox)}
-					<ListItems
-						bind:items={log.listItems}
-						bind:focusElements
-						listType={log.listType}
-						{isEditing}
-						onEnterKeydown={onTextareaEnterKeydown}
-						{onDeleteItem}
-						logType={log.type}
-						{onClickInput}
-					/>
-				{/if}
+				<ListItems
+					bind:focusElements
+					bind:log
+					{isEditing}
+					onEnterKeydown={onTextareaEnterKeydown}
+					{onDeleteItem}
+					{onClickInput}
+					{onEdit}
+					onFocusAnswerInput={_onFocusAnswerInput}
+				/>
 			</div>
 			<BottomOptions
 				bind:log
