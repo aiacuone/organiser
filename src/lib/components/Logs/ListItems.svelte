@@ -16,7 +16,7 @@
 		checkAndCapitalizeFirstLetterOfMappedListItems,
 		checkAndCapitalizeFirstLetterOfMappedQuestions
 	} from '$lib/utils';
-	import { dndzone } from 'svelte-dnd-action';
+	import { dndzone, type DndEvent } from 'svelte-dnd-action';
 	import Button from '../Button.svelte';
 	import { currentlyEditing } from '$lib/stores';
 
@@ -59,16 +59,12 @@
 		[LogType_enum.list]: 'bg-gray-100'
 	};
 
-	const onClickTextArea = (e: MouseEvent) => {
-		onClickInput(e);
-	};
+	const onClickTextArea = (e: MouseEvent) => onClickInput(e);
 
 	let isAnswering: undefined | number = $state();
 	const onCheckboxesChange = () => onEdit();
 
-	const onClickTextarea = (e: MouseEvent) => {
-		onClickInput(e);
-	};
+	const onClickTextarea = (e: MouseEvent) => onClickInput(e);
 
 	const onTextareaChange = (e: Event, index: number) =>
 		onAnswerChange(index, (e.target as HTMLTextAreaElement).value);
@@ -110,7 +106,9 @@
 			log.checkboxItems = checkAndCapitalizeFirstLetterOfMappedCheckboxes(log.checkboxItems);
 	});
 
-	const onChangeOrder = (items: (MappedListItem | MappedCheckboxItem | MappedQuestionItem)[]) => {
+	const onChangeOrder = ({
+		detail: { items }
+	}: CustomEvent<DndEvent<MappedQuestionItem | MappedListItem | MappedCheckboxItem>>) => {
 		if (hasListItems) log.listItems = items as MappedListItem[];
 		if (hasQuestions) log.questions = items as MappedQuestionItem[];
 		if (hasCheckboxes) log.checkboxItems = items as MappedCheckboxItem[];
@@ -126,8 +124,8 @@
 		dropTargetStyle: {},
 		dragDisabled: !isEditing
 	}}
-	onconsider={(e) => onChangeOrder(e.detail.items)}
-	onfinalize={(e) => onChangeOrder(e.detail.items)}
+	onconsider={onChangeOrder}
+	onfinalize={onChangeOrder}
 >
 	{#each items as item, index (item.id)}
 		<li class="{index % 2 === 0 ? 'bg-transparent' : checkeredColor[log.type]} relative">
