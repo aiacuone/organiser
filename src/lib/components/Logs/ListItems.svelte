@@ -59,15 +59,6 @@
 		[LogType_enum.list]: 'bg-gray-100'
 	};
 
-	$effect(() => {
-		if (log.listItems)
-			log.listItems = checkAndCapitalizeFirstLetterOfMappedListItems(log.listItems);
-		if (log.questions)
-			log.questions = checkAndCapitalizeFirstLetterOfMappedQuestions(log.questions);
-		if (log.checkboxItems)
-			log.checkboxItems = checkAndCapitalizeFirstLetterOfMappedCheckboxes(log.checkboxItems);
-	});
-
 	const onClickTextArea = (e: MouseEvent) => {
 		onClickInput(e);
 	};
@@ -106,9 +97,18 @@
 
 	const doesQuestionHaveAnswer = (index: number) => log.questions[index].answer;
 
+	const isQuestionBeingAnswered = (index: number) => isAnswering === index;
+
 	const items: (MappedListItem | MappedCheckboxItem | MappedQuestionItem)[] = $derived(
 		hasListItems ? log.listItems : hasCheckboxes ? log.checkboxItems : log.questions
 	);
+
+	$effect(() => {
+		if (hasListItems) log.listItems = checkAndCapitalizeFirstLetterOfMappedListItems(log.listItems);
+		if (hasQuestions) log.questions = checkAndCapitalizeFirstLetterOfMappedQuestions(log.questions);
+		if (hasCheckboxes)
+			log.checkboxItems = checkAndCapitalizeFirstLetterOfMappedCheckboxes(log.checkboxItems);
+	});
 
 	const onChangeOrder = (items: (MappedListItem | MappedCheckboxItem | MappedQuestionItem)[]) => {
 		if (hasListItems) log.listItems = items as MappedListItem[];
@@ -183,7 +183,7 @@
 							onclick={onClickTextarea}
 						/>
 					</div>
-					{#if doesQuestionHaveAnswer(index) || isAnswering === index}
+					{#if doesQuestionHaveAnswer(index) || isQuestionBeingAnswered(index)}
 						<div class="text-sm gap-1 flex-1 flex">
 							<p class="text-neutral-400">Answer:</p>
 							<Textarea
@@ -198,7 +198,7 @@
 					{#if !doesQuestionHaveAnswer(index)}
 						<Button
 							_class="self-start text-xs bg-white {doesQuestionHaveAnswer(index) ||
-							isAnswering === index
+							isQuestionBeingAnswered(index)
 								? 'hidden'
 								: 'block'}"
 							onclick={() => _onFocusAnswerInput(index)}>Answer</Button
