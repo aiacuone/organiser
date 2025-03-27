@@ -11,6 +11,7 @@
 		type MappedLog_int
 	} from '$lib/types';
 	import {
+		addToEndOfRaceCondition,
 		checkAndCapitalizeFirstLetterOfMappedCheckboxes,
 		checkAndCapitalizeFirstLetterOfMappedListItems,
 		checkAndCapitalizeFirstLetterOfMappedQuestions
@@ -85,9 +86,7 @@
 		$currentlyEditing = log.id;
 		isAnswering = index;
 		//this is a hack to make sure the answer input is focused
-		setTimeout(() => {
-			onFocusAnswerInput();
-		}, 0);
+		addToEndOfRaceCondition(onFocusAnswerInput);
 	};
 
 	const onAnswerChange = (index: number, value: string) => (log.questions[index].answer = value);
@@ -104,6 +103,8 @@
 	);
 
 	const hasQuestions = $derived(log.type === LogType_enum.question);
+
+	const doesQuestionHaveAnswer = (index: number) => log.questions[index].answer;
 
 	const items: (MappedListItem | MappedCheckboxItem | MappedQuestionItem)[] = $derived(
 		hasListItems ? log.listItems : hasCheckboxes ? log.checkboxItems : log.questions
@@ -133,7 +134,7 @@
 			{#if isEditing && items.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-9 top-1" />
 			{/if}
-			<div class="flex {log.questions ? 'flex-col gap-1 w-full' : 'flex-row'}">
+			<div class="flex {hasQuestions ? 'flex-col gap-1 w-full' : 'flex-row'}">
 				{#if hasListItems}
 					<div class="flex gap-2 min-h-[20px] flex-1">
 						<div class="flex-1">
@@ -182,7 +183,7 @@
 							onclick={onClickTextarea}
 						/>
 					</div>
-					{#if log.questions[index].answer || isAnswering === index}
+					{#if doesQuestionHaveAnswer(index) || isAnswering === index}
 						<div class="text-sm gap-1 flex-1 flex">
 							<p class="text-neutral-400">Answer:</p>
 							<Textarea
@@ -194,9 +195,9 @@
 							/>
 						</div>
 					{/if}
-					{#if !log.questions[index].answer}
+					{#if !doesQuestionHaveAnswer(index)}
 						<Button
-							_class="self-start text-xs bg-white {log.questions[index].answer ||
+							_class="self-start text-xs bg-white {doesQuestionHaveAnswer(index) ||
 							isAnswering === index
 								? 'hidden'
 								: 'block'}"
@@ -204,10 +205,10 @@
 						>
 					{/if}
 				{/if}
-				<div class="mt-1 flex sm:hidden">
+				<div class="mt-1 flex">
 					{#if isEditing}
-						<button class="flex sm:hidden" onclick={() => onDeleteItem(index)}>
-							<Icon icon={icons.delete} class="text-gray-300" height="18px" />
+						<button class="flex" onclick={() => onDeleteItem(index)}>
+							<Icon icon={icons.delete} class="text-gray-300" height="16px" />
 						</button>
 					{/if}
 				</div>
