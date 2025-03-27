@@ -59,12 +59,11 @@
 		[LogType_enum.list]: 'bg-gray-100'
 	};
 
-	const onClickTextArea = (e: MouseEvent) => onClickInput(e);
+	const onClickTextarea = (e: MouseEvent) => onClickInput(e);
 
 	let isAnswering: undefined | number = $state();
-	const onCheckboxesChange = () => onEdit();
 
-	const onClickTextarea = (e: MouseEvent) => onClickInput(e);
+	const onCheckboxesChange = () => onEdit();
 
 	const onTextareaChange = (e: Event, index: number) =>
 		onAnswerChange(index, (e.target as HTMLTextAreaElement).value);
@@ -142,7 +141,7 @@
 								bind:textarea={focusElements[focusElements.length]}
 								{onEnterKeydown}
 								autofocus={index > 0}
-								onclick={onClickTextArea}
+								onclick={onClickTextarea}
 								isDisabled={!isEditing}
 							/>
 						</div>
