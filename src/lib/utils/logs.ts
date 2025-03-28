@@ -91,58 +91,56 @@ export const getLogFromMappedLog = (mappedLog: MappedLog_int): Log_int => {
 	} as Log_int;
 };
 
-export const areAnyListItemsNotCapitalised = (items: ListItem_int[]) =>
-	items.some((item) => item.item && item.item[0] !== item.item[0].toUpperCase());
-
-export const capitalizeFirstLetterOfMappedListItems = (items: MappedListItem[]) =>
-	items.map((item) => ({
-		...item,
-		item: capitalizeFirstLetter(item.item)
-	}));
-
 export const checkAndCapitalizeFirstLetterOfMappedListItems = (items: MappedListItem_int[]) => {
-	if (areAnyListItemsNotCapitalised(items)) return capitalizeFirstLetterOfMappedListItems(items);
+	const areAnyListItemsNotCapitalised = (items: ListItem_int[]) =>
+		items.some((item) => item.item && item.item[0] !== item.item[0].toUpperCase());
 
-	return items;
+	const capitalizeFirstLetterOfMappedListItems = (items: MappedListItem[]) =>
+		items.map((item) => ({
+			...item,
+			item: capitalizeFirstLetter(item.item)
+		}));
+
+	return areAnyListItemsNotCapitalised(items)
+		? capitalizeFirstLetterOfMappedListItems(items)
+		: items;
 };
-
-export const areAnyQuestionsNotCapitalised = (questions: QuestionItem_int[]) =>
-	questions.some(
-		(question) =>
-			(question.question && question.question[0] !== question.question[0].toUpperCase()) ||
-			(question.answer && question.answer[0] !== question.answer[0].toUpperCase())
-	);
-
-export const capitalizeFirstLetterOfMappedQuestions = (questions: MappedQuestionItem[]) =>
-	questions.map((question) => ({
-		...question,
-		question: capitalizeFirstLetter(question.question),
-		answer: capitalizeFirstLetter(question.answer)
-	}));
 
 export const checkAndCapitalizeFirstLetterOfMappedQuestions = (
 	questions: MappedQuestionItem_int[]
 ) => {
-	if (areAnyQuestionsNotCapitalised(questions))
-		return capitalizeFirstLetterOfMappedQuestions(questions);
+	const areAnyQuestionsNotCapitalised = (questions: QuestionItem_int[]) =>
+		questions.some(
+			(question) =>
+				(question.question && question.question[0] !== question.question[0].toUpperCase()) ||
+				(question.answer && question.answer[0] !== question.answer[0].toUpperCase())
+		);
 
-	return questions;
+	const capitalizeFirstLetterOfMappedQuestions = (questions: MappedQuestionItem[]) =>
+		questions.map((question) => ({
+			...question,
+			question: capitalizeFirstLetter(question.question),
+			answer: capitalizeFirstLetter(question.answer)
+		}));
+
+	return areAnyQuestionsNotCapitalised(questions)
+		? capitalizeFirstLetterOfMappedQuestions(questions)
+		: questions;
 };
-
-export const areAnyCheckboxItemsNotCapitalised = (checkboxItems: MappedCheckboxItem[]) =>
-	checkboxItems.some((item) => item.text && item.text[0] !== item.text[0].toUpperCase());
-
-export const capitalizeFirstLetterOfMappedCheckboxItems = (checkboxItems: MappedCheckboxItem[]) =>
-	checkboxItems.map((item) => ({
-		...item,
-		text: capitalizeFirstLetter(item.text)
-	}));
 
 export const checkAndCapitalizeFirstLetterOfMappedCheckboxes = (
 	checkboxes: MappedCheckboxItem[]
 ) => {
-	if (areAnyCheckboxItemsNotCapitalised(checkboxes))
-		return capitalizeFirstLetterOfMappedCheckboxItems(checkboxes);
+	const areAnyCheckboxItemsNotCapitalized = (checkboxItems: MappedCheckboxItem[]) =>
+		checkboxItems.some((item) => item.text && item.text[0] !== item.text[0].toUpperCase());
 
-	return checkboxes;
+	const capitalizeFirstLetterOfMappedCheckboxItems = (checkboxItems: MappedCheckboxItem[]) =>
+		checkboxItems.map((item) => ({
+			...item,
+			text: capitalizeFirstLetter(item.text)
+		}));
+
+	return areAnyCheckboxItemsNotCapitalized(checkboxes)
+		? capitalizeFirstLetterOfMappedCheckboxItems(checkboxes)
+		: checkboxes;
 };
