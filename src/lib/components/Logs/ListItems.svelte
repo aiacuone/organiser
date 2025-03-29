@@ -131,7 +131,7 @@
 			{#if isEditing && items.length > 1}
 				<Icon icon={icons.vertical} class="absolute -left-9 top-1" />
 			{/if}
-			<div class="flex {hasQuestions ? 'flex-col gap-1 w-full' : 'flex-row'}">
+			<div class="flex">
 				{#if hasListItems}
 					<div class="flex gap-2 min-h-[20px] flex-1">
 						<div class="flex-1">
@@ -147,13 +147,15 @@
 						</div>
 					</div>
 				{:else if hasCheckboxes}
-					<input
-						bind:checked={log.checkboxItems[index].isChecked}
-						type="checkbox"
-						class="mr-[7px]"
-						onchange={onCheckboxesChange}
-						onclick={onClickInput}
-					/>
+					<div class="center">
+						<input
+							bind:checked={log.checkboxItems[index].isChecked}
+							type="checkbox"
+							class="mr-[7px]"
+							onchange={onCheckboxesChange}
+							onclick={onClickInput}
+						/>
+					</div>
 					<div class="flex gap-2 min-h-[20px] flex-1">
 						<div class="flex-1">
 							<Textarea
@@ -168,39 +170,41 @@
 						</div>
 					</div>
 				{:else if hasQuestions}
-					<div class="hstack text-sm gap-1">
-						<p class="text-neutral-400">Question:</p>
-						<Textarea
-							bind:textarea={focusElements[focusElements.length]}
-							bind:value={log.questions[index].question}
-							className=""
-							_class="flex-1"
-							autofocus
-							isDisabled={!isEditing}
-							onclick={onClickTextarea}
-						/>
-					</div>
-					{#if doesQuestionHaveAnswer(index) || isQuestionBeingAnswered(index)}
-						<div class="text-sm gap-1 flex-1 flex">
-							<p class="text-neutral-400">Answer:</p>
+					<div class="stack w-full">
+						<div class="hstack text-sm gap-1">
+							<p class="text-neutral-400">Question:</p>
 							<Textarea
-								bind:value={log.questions[index].answer}
-								bind:onFocus={onFocusAnswerInput}
+								bind:textarea={focusElements[focusElements.length]}
+								bind:value={log.questions[index].question}
+								className=""
 								_class="flex-1"
-								onchange={(e:Event) => onTextareaChange(e, index)}
+								autofocus
+								isDisabled={!isEditing}
 								onclick={onClickTextarea}
 							/>
 						</div>
-					{/if}
-					{#if !doesQuestionHaveAnswer(index)}
-						<Button
-							_class="self-start text-xs bg-white {doesQuestionHaveAnswer(index) ||
-							isQuestionBeingAnswered(index)
-								? 'hidden'
-								: 'block'}"
-							onclick={() => _onFocusAnswerInput(index)}>Answer</Button
-						>
-					{/if}
+						{#if doesQuestionHaveAnswer(index) || isQuestionBeingAnswered(index)}
+							<div class="text-sm gap-1 flex-1 flex">
+								<p class="text-neutral-400">Answer:</p>
+								<Textarea
+									bind:value={log.questions[index].answer}
+									bind:onFocus={onFocusAnswerInput}
+									_class="flex-1"
+									onchange={(e:Event) => onTextareaChange(e, index)}
+									onclick={onClickTextarea}
+								/>
+							</div>
+						{/if}
+						{#if !doesQuestionHaveAnswer(index)}
+							<Button
+								_class="self-start text-xs bg-white {doesQuestionHaveAnswer(index) ||
+								isQuestionBeingAnswered(index)
+									? 'hidden'
+									: 'block'}"
+								onclick={() => _onFocusAnswerInput(index)}>Answer</Button
+							>
+						{/if}
+					</div>
 				{/if}
 				<div class="mt-1 flex">
 					{#if isEditing}
