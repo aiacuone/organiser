@@ -14,8 +14,15 @@
 	import { page } from '$app/stores';
 	import { getContext, onMount, setContext } from 'svelte';
 	import { deleteLogClient, updateLogClient } from '$lib/api/logsLocalApi';
-	import { isAnAutofillOpen, unfocusStoreInput, whichInputIsFocused } from '$lib/stores';
-	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
+	import {
+		isAnAutofillOpen,
+		unfocusStoreInput,
+		whichInputIsFocused,
+		currentlyEditing,
+		titlesAndReferences,
+		titles
+	} from '$lib/stores';
+
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import Input from '../Input.svelte';
 	import BottomOptions from './BottomOptions.svelte';
@@ -46,7 +53,7 @@
 	const onStopEditing = () => ($currentlyEditing = null);
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 	setContext('onEditLog', onEditLog);
-	setContext('isEditing', isEditing);
+	setContext('isEditing', () => isEditing);
 
 	const invalidateLogs: () => Promise<void> = getContext('invalidateLogs');
 
@@ -87,7 +94,7 @@
 	};
 
 	const onTextareaEnterKeydown: () => void = () => {
-		onAddItem();
+		// onAddItem();
 	};
 
 	const onClickOutside = () => {
@@ -260,24 +267,16 @@
 	};
 
 	onMount(() => {
+		if (editOnMount) onEditLog();
+
 		const keydown = (e: KeyboardEvent) => {
-			if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
-				onAccept();
-			}
-			if (e.ctrlKey && e.shiftKey && e.key === '.') {
-				onAddItem();
-			}
+			if (e.ctrlKey && e.shiftKey && e.key === 'Enter') onAccept();
+			if (e.ctrlKey && e.shiftKey && (e.key === '.' || e.key === '>')) onAddItem();
 		};
 
 		container.addEventListener('keydown', keydown);
 
 		return () => container.removeEventListener('keydown', keydown);
-	});
-
-	onMount(() => {
-		if (editOnMount) {
-			onEditLog();
-		}
 	});
 
 	const {
@@ -345,18 +344,12 @@
 
 		onKeydown(e, {
 			ArrowUp: () => {
-				if (indexOfFocusedElement === 0) {
-					indexOfNewFocusedElement = focusElements.length - 1;
-				} else {
-					indexOfNewFocusedElement = indexOfFocusedElement - 1;
-				}
+				if (indexOfFocusedElement === 0) indexOfNewFocusedElement = focusElements.length - 1;
+				else indexOfNewFocusedElement = indexOfFocusedElement - 1;
 			},
 			ArrowDown: () => {
-				if (indexOfFocusedElement === focusElements.length - 1) {
-					indexOfNewFocusedElement = 0;
-				} else {
-					indexOfNewFocusedElement = indexOfFocusedElement + 1;
-				}
+				if (indexOfFocusedElement === focusElements.length - 1) indexOfNewFocusedElement = 0;
+				else indexOfNewFocusedElement = indexOfFocusedElement + 1;
 			},
 			Tab: function () {
 				// Requires old style function due to referring to 'this'
