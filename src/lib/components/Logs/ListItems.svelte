@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Textarea from '../Textarea.svelte';
-	import Icon from '@iconify/svelte';
-	import { icons } from '$lib/general/icons';
+	import Textarea from '../Textarea.svelte'
+	import Icon from '@iconify/svelte'
+	import { icons } from '$lib/general/icons'
 	import {
 		LogType_enum,
 		LogListType_enum,
@@ -9,26 +9,26 @@
 		type MappedCheckboxItem,
 		type MappedQuestionItem,
 		type MappedLog_int
-	} from '$lib/types';
+	} from '$lib/types'
 	import {
 		addToEndOfRaceCondition,
 		checkAndCapitalizeFirstLetterOfMappedCheckboxes,
 		checkAndCapitalizeFirstLetterOfMappedListItems,
 		checkAndCapitalizeFirstLetterOfMappedQuestions
-	} from '$lib/utils';
-	import { dndzone, type DndEvent } from 'svelte-dnd-action';
-	import Button from '../Button.svelte';
-	import { currentlyEditing } from '$lib/stores';
+	} from '$lib/utils'
+	import { dndzone, type DndEvent } from 'svelte-dnd-action'
+	import Button from '../Button.svelte'
+	import { currentlyEditing } from '$lib/stores'
 
 	interface Props {
-		isEditing: boolean;
-		onEnterKeydown: () => void;
-		onDeleteItem: (index: number) => void;
-		focusElements: HTMLElement[];
-		onClickInput: (e: MouseEvent) => void;
-		onEdit: () => void;
-		onFocusAnswerInput: () => void;
-		log: MappedLog_int;
+		isEditing: boolean
+		onEnterKeydown: () => void
+		onDeleteItem: (index: number) => void
+		focusElements: HTMLElement[]
+		onClickInput: (e: MouseEvent) => void
+		onEdit: () => void
+		onFocusAnswerInput: () => void
+		log: MappedLog_int
 	}
 
 	let {
@@ -40,7 +40,7 @@
 		onEdit,
 		onFocusAnswerInput,
 		log = $bindable()
-	}: Props = $props();
+	}: Props = $props()
 
 	const bulletType: Record<
 		LogListType_enum,
@@ -49,7 +49,7 @@
 		[LogListType_enum.ordered]: 'decimal',
 		[LogListType_enum.unordered]: 'disc',
 		[LogListType_enum.checkbox]: 'checkbox'
-	};
+	}
 
 	const checkeredColor: Record<LogType_enum, string> = {
 		[LogType_enum.important]: 'bg-gray-50',
@@ -57,61 +57,61 @@
 		[LogType_enum.todo]: 'bg-gray-50',
 		[LogType_enum.time]: 'bg-gray-50',
 		[LogType_enum.list]: 'bg-gray-100'
-	};
+	}
 
-	const onClickTextarea = (e: MouseEvent) => onClickInput(e);
+	const onClickTextarea = (e: MouseEvent) => onClickInput(e)
 
-	let isAnswering: undefined | number = $state();
+	let isAnswering: undefined | number = $state()
 
-	const onCheckboxesChange = () => onEdit();
+	const onCheckboxesChange = () => onEdit()
 
 	const onTextareaChange = (e: Event, index: number) =>
-		onAnswerChange(index, (e.target as HTMLTextAreaElement).value);
+		onAnswerChange(index, (e.target as HTMLTextAreaElement).value)
 
 	const _onFocusAnswerInput = (index: number) => {
-		$currentlyEditing = log.id;
-		isAnswering = index;
+		$currentlyEditing = log.id
+		isAnswering = index
 		//this is a hack to make sure the answer input is focused
-		addToEndOfRaceCondition(onFocusAnswerInput);
-	};
+		addToEndOfRaceCondition(onFocusAnswerInput)
+	}
 
-	const onAnswerChange = (index: number, value: string) => (log.questions[index].answer = value);
+	const onAnswerChange = (index: number, value: string) => (log.questions[index].answer = value)
 
 	const hasListItems = $derived(
 		log.type === LogType_enum.important ||
 			log.type === LogType_enum.time ||
 			(log.type === LogType_enum.list && log.listType !== LogListType_enum.checkbox)
-	);
+	)
 
 	const hasCheckboxes = $derived(
 		log.type === LogType_enum.todo ||
 			(log.type === LogType_enum.list && log.listType === LogListType_enum.checkbox)
-	);
+	)
 
-	const hasQuestions = $derived(log.type === LogType_enum.question);
+	const hasQuestions = $derived(log.type === LogType_enum.question)
 
-	const doesQuestionHaveAnswer = (index: number) => log.questions[index].answer;
+	const doesQuestionHaveAnswer = (index: number) => log.questions[index].answer
 
-	const isQuestionBeingAnswered = (index: number) => isAnswering === index;
+	const isQuestionBeingAnswered = (index: number) => isAnswering === index
 
 	const items: (MappedListItem | MappedCheckboxItem | MappedQuestionItem)[] = $derived(
 		hasListItems ? log.listItems : hasCheckboxes ? log.checkboxItems : log.questions
-	);
+	)
 
 	$effect(() => {
-		if (hasListItems) log.listItems = checkAndCapitalizeFirstLetterOfMappedListItems(log.listItems);
-		if (hasQuestions) log.questions = checkAndCapitalizeFirstLetterOfMappedQuestions(log.questions);
+		if (hasListItems) log.listItems = checkAndCapitalizeFirstLetterOfMappedListItems(log.listItems)
+		if (hasQuestions) log.questions = checkAndCapitalizeFirstLetterOfMappedQuestions(log.questions)
 		if (hasCheckboxes)
-			log.checkboxItems = checkAndCapitalizeFirstLetterOfMappedCheckboxes(log.checkboxItems);
-	});
+			log.checkboxItems = checkAndCapitalizeFirstLetterOfMappedCheckboxes(log.checkboxItems)
+	})
 
 	const onChangeOrder = ({
 		detail: { items }
 	}: CustomEvent<DndEvent<MappedQuestionItem | MappedListItem | MappedCheckboxItem>>) => {
-		if (hasListItems) log.listItems = items as MappedListItem[];
-		if (hasQuestions) log.questions = items as MappedQuestionItem[];
-		if (hasCheckboxes) log.checkboxItems = items as MappedCheckboxItem[];
-	};
+		if (hasListItems) log.listItems = items as MappedListItem[]
+		if (hasQuestions) log.questions = items as MappedQuestionItem[]
+		if (hasCheckboxes) log.checkboxItems = items as MappedCheckboxItem[]
+	}
 </script>
 
 <ul

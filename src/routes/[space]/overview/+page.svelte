@@ -1,47 +1,47 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import Button from '$lib/components/Button.svelte';
-	import Dialog from '$lib/components/Dialog/Dialog.svelte';
-	import Input from '$lib/components/Input.svelte';
-	import { axios } from '$lib/general';
-	import { useMutation } from '@sveltestack/svelte-query';
+	import { goto } from '$app/navigation'
+	import Button from '$lib/components/Button.svelte'
+	import Dialog from '$lib/components/Dialog/Dialog.svelte'
+	import Input from '$lib/components/Input.svelte'
+	import { axios } from '$lib/general'
+	import { useMutation } from '@sveltestack/svelte-query'
 
-	import { getContext } from 'svelte';
+	import { getContext } from 'svelte'
 
 	interface OverviewPageProps {
 		data: {
-			space: string;
-		};
+			space: string
+		}
 	}
 
-	const { data }: OverviewPageProps = $props();
-	let dialog: HTMLDialogElement | undefined = $state();
+	const { data }: OverviewPageProps = $props()
+	let dialog: HTMLDialogElement | undefined = $state()
 
-	let onOpen: () => void = $state(() => {});
-	let onClose: () => void = $state(() => {});
+	let onOpen: () => void = $state(() => {})
+	let onClose: () => void = $state(() => {})
 
-	const invalidateLogs: () => void = getContext('invalidateLogs');
+	const invalidateLogs: () => void = getContext('invalidateLogs')
 
 	export const deleteSpaceMutation = useMutation(
 		async (space: string) => await axios.delete(`/${space}`),
 		{
 			onSuccess: () => {
-				invalidateLogs();
+				invalidateLogs()
 			}
 		}
-	);
+	)
 
 	const onConfirmDelete = async () => {
 		try {
-			await $deleteSpaceMutation.mutate(data.space);
-			onClose();
-			goto('/');
+			await $deleteSpaceMutation.mutate(data.space)
+			onClose()
+			goto('/')
 		} catch (error) {
-			console.error('Error deleting space');
+			console.error('Error deleting space')
 		}
-	};
+	}
 
-	let inputValue: string = $state('');
+	let inputValue: string = $state('')
 </script>
 
 <div class="center">

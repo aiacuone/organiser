@@ -1,83 +1,83 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import Button from '$lib/components/Button.svelte';
-	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
-	import Log from '$lib/components/Logs/Log.svelte';
-	import Search from '$lib/components/Search.svelte';
-	import { icons } from '$lib/general/icons';
-	import { searchValue, whichInputIsFocused } from '$lib/stores';
-	import { allLogs, searchableInputs } from '$lib/types';
-	import { arraysAreEqual } from '$lib/utils/arrays';
+	import { goto } from '$app/navigation'
+	import { page } from '$app/stores'
+	import Button from '$lib/components/Button.svelte'
+	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte'
+	import Log from '$lib/components/Logs/Log.svelte'
+	import Search from '$lib/components/Search.svelte'
+	import { icons } from '$lib/general/icons'
+	import { searchValue, whichInputIsFocused } from '$lib/stores'
+	import { allLogs, searchableInputs } from '$lib/types'
+	import { arraysAreEqual } from '$lib/utils/arrays'
 	import {
 		entriesArrayToSearchParamsString,
 		searchParamsStringToEntriesArray,
 		replaceAllSpacesWithHyphens,
 		camelCaseToLower
-	} from '$lib/utils/strings';
-	import Icon from '@iconify/svelte';
-	import { useInfiniteQuery, useQueryClient } from '@sveltestack/svelte-query';
-	import { onMount } from 'svelte';
-	import { axios } from '$lib/general';
-	import { useDisclosure, viewport } from '$lib';
+	} from '$lib/utils/strings'
+	import Icon from '@iconify/svelte'
+	import { useInfiniteQuery, useQueryClient } from '@sveltestack/svelte-query'
+	import { onMount } from 'svelte'
+	import { axios } from '$lib/general'
+	import { useDisclosure, viewport } from '$lib'
 
-	const queryClient = useQueryClient();
-	const _searchParams = $derived(new URLSearchParams($page.url.searchParams));
+	const queryClient = useQueryClient()
+	const _searchParams = $derived(new URLSearchParams($page.url.searchParams))
 
 	let searchParams = $derived({
 		string: _searchParams.toString(),
 		array: searchParamsStringToEntriesArray(_searchParams)
-	});
+	})
 
-	let filters = $derived(searchParams.array);
+	let filters = $derived(searchParams.array)
 
-	const onClearFilters = () => goto(`/${$page.params.space}/filter`, { keepFocus: true });
+	const onClearFilters = () => goto(`/${$page.params.space}/filter`, { keepFocus: true })
 
 	const onAddFilter = (filter: [string, string]) =>
 		goto(
 			`/${$page.params.space}/filter?${entriesArrayToSearchParamsString([...filters, filter])}`,
 			{ keepFocus: true }
-		);
+		)
 
 	const onRemoveFilter = (filter: [string, string]) =>
 		goto(
 			`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters.filter((f) => !arraysAreEqual(f, filter)))}`,
 			{ keepFocus: true }
-		);
+		)
 
 	const setFilters = (filters: [string, string][]) =>
 		goto(`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters)}`, {
 			keepFocus: true
-		});
+		})
 
 	const onClickClear = () => {
-		onClearFilters();
-		queryClient.invalidateQueries('filteredLogs');
-		$searchValue = '';
-	};
+		onClearFilters()
+		queryClient.invalidateQueries('filteredLogs')
+		$searchValue = ''
+	}
 
-	let hasPageLoaded = $state(false);
+	let hasPageLoaded = $state(false)
 
 	onMount(() => {
-		hasPageLoaded = true;
-		const hasSearchQuery = $page.url.searchParams.has('search');
+		hasPageLoaded = true
+		const hasSearchQuery = $page.url.searchParams.has('search')
 
 		if (hasSearchQuery) {
-			$searchValue = $page.url.searchParams.get('search') ?? '';
+			$searchValue = $page.url.searchParams.get('search') ?? ''
 		}
-	});
+	})
 
-	let timer: any = $state(undefined);
+	let timer: any = $state(undefined)
 
 	const debounce = (fn: () => void, delay = 500) => {
 		const timeout = () => {
-			clearTimeout(timer);
+			clearTimeout(timer)
 			timer = setTimeout(() => {
-				fn();
-			}, delay);
-		};
-		timeout();
-	};
+				fn()
+			}, delay)
+		}
+		timeout()
+	}
 
 	// I dont know what this is for. It may have something to do with the filter page being loaded with a search query. I think come back to this once you have a better understanding of the codebase.
 
@@ -106,89 +106,89 @@
 				skip,
 				json: JSON.stringify(searchParams.array)
 			}
-		});
+		})
 
-		return result;
-	};
+		return result
+	}
 
 	const filteredLogsQuery = useInfiniteQuery('filteredLogs', fetchFilteredLogs, {
 		getNextPageParam: (lastGroup) => {
-			const skip = 10;
-			const total = lastGroup.data.total;
-			const nextSkip = lastGroup.config.params.skip + skip;
-			const hasNextPage = nextSkip < total;
-			return hasNextPage ? nextSkip : undefined;
+			const skip = 10
+			const total = lastGroup.data.total
+			const nextSkip = lastGroup.config.params.skip + skip
+			const hasNextPage = nextSkip < total
+			return hasNextPage ? nextSkip : undefined
 		}
-	});
+	})
 
 	$effect(() => {
 		const updatedStateAndInvalidate = () => {
-			setFilters(searchParams.array);
-			queryClient.invalidateQueries('filteredLogs');
-		};
+			setFilters(searchParams.array)
+			queryClient.invalidateQueries('filteredLogs')
+		}
 
-		$page.url && updatedStateAndInvalidate();
-	});
+		$page.url && updatedStateAndInvalidate()
+	})
 
-	let headerContainerHeight: number = $state(0);
-	let parentContainerHeight: number = $state(0);
+	let headerContainerHeight: number = $state(0)
+	let parentContainerHeight: number = $state(0)
 
-	const logContainerHeight: number = $derived(parentContainerHeight - headerContainerHeight - 20);
+	const logContainerHeight: number = $derived(parentContainerHeight - headerContainerHeight - 20)
 
 	onMount(() => {
 		const onKeydown = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') goto(`/${$page.params.space}`, { keepFocus: true });
-		};
+			if (e.key === 'Escape') goto(`/${$page.params.space}`, { keepFocus: true })
+		}
 
-		document.addEventListener('keydown', onKeydown);
+		document.addEventListener('keydown', onKeydown)
 
-		return () => document.removeEventListener('keydown', onKeydown);
-	});
+		return () => document.removeEventListener('keydown', onKeydown)
+	})
 
 	const onGetNextPage = () => {
 		if (!$filteredLogsQuery.isFetching) {
-			$filteredLogsQuery.fetchNextPage();
+			$filteredLogsQuery.fetchNextPage()
 		}
-	};
+	}
 
 	const onFilterChange = (filterValue: string[]) => {
-		const hasMatchingFilter = filters.some((filter) => arraysAreEqual(filter, filterValue));
+		const hasMatchingFilter = filters.some((filter) => arraysAreEqual(filter, filterValue))
 
 		if (hasMatchingFilter) {
-			onRemoveFilter(filterValue as [string, string]);
+			onRemoveFilter(filterValue as [string, string])
 		} else {
-			onAddFilter(filterValue as [string, string]);
+			onAddFilter(filterValue as [string, string])
 		}
-	};
+	}
 
 	const onSearch = () => {
 		const removeAllSearchFilters = () =>
 			goto(
 				`/${$page.params.space}/filter?${entriesArrayToSearchParamsString(filters.filter((filter) => filter[0] !== 'search'))}`,
 				{ keepFocus: true }
-			);
+			)
 
-		const isThereAnExistingSearchFilter = filters.some((filter) => filter[0] === 'search');
+		const isThereAnExistingSearchFilter = filters.some((filter) => filter[0] === 'search')
 
-		if (isThereAnExistingSearchFilter) removeAllSearchFilters();
+		if (isThereAnExistingSearchFilter) removeAllSearchFilters()
 
-		if ($searchValue) onAddFilter(['search', $searchValue]);
-		else removeAllSearchFilters();
-	};
+		if ($searchValue) onAddFilter(['search', $searchValue])
+		else removeAllSearchFilters()
+	}
 
 	const {
 		isOpen: isExportDialogOpen,
 		onOpen: openExportDialog,
 		onClose: closeExportDialog
-	} = useDisclosure();
+	} = useDisclosure()
 
 	const onSearchChange = (e: Event) => {
-		const target = e.target as HTMLInputElement;
-		const newValue = target.value;
-		$searchValue = newValue;
+		const target = e.target as HTMLInputElement
+		const newValue = target.value
+		$searchValue = newValue
 
-		debounce(() => onSearch());
-	};
+		debounce(() => onSearch())
+	}
 </script>
 
 <div bind:clientHeight={parentContainerHeight} class="stack flex-1 gap-3">

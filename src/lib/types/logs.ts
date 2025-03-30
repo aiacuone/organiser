@@ -1,8 +1,8 @@
 export interface SpaceData_int {
-	spaces: string[];
-	space: string;
-	date: string;
-	initialLogNotifications: Log_int[];
+	spaces: string[]
+	space: string
+	date: string
+	initialLogNotifications: Log_int[]
 }
 
 export enum Log_enum {
@@ -22,19 +22,19 @@ export enum Log_enum {
 }
 
 export interface Log_int {
-	[Log_enum.id]: string;
-	[Log_enum.date]: Date;
-	[Log_enum.title]?: string;
-	[Log_enum.reference]?: string;
-	[Log_enum.time]?: number;
-	[Log_enum.type]: LogType_enum;
-	[Log_enum.space]: string;
-	[Log_enum.listItems]?: string[];
-	[Log_enum.checkboxItems]?: CheckboxItem_int[];
-	[Log_enum.lastUpdated]?: Date;
-	[Log_enum.rating]?: 1 | 2 | 3;
-	[Log_enum.questions]?: QuestionItem_int[];
-	[Log_enum.listType]?: LogListType_enum;
+	[Log_enum.id]: string
+	[Log_enum.date]: Date
+	[Log_enum.title]?: string
+	[Log_enum.reference]?: string
+	[Log_enum.time]?: number
+	[Log_enum.type]: LogType_enum
+	[Log_enum.space]: string
+	[Log_enum.listItems]?: string[]
+	[Log_enum.checkboxItems]?: CheckboxItem_int[]
+	[Log_enum.lastUpdated]?: Date
+	[Log_enum.rating]?: 1 | 2 | 3
+	[Log_enum.questions]?: QuestionItem_int[]
+	[Log_enum.listType]?: LogListType_enum
 }
 
 export const logEnumNames: Record<Log_enum, string> = {
@@ -51,7 +51,7 @@ export const logEnumNames: Record<Log_enum, string> = {
 	[Log_enum.checkboxItems]: 'Checkbox Items',
 	[Log_enum.questions]: 'Questions',
 	[Log_enum.listType]: 'List Type'
-};
+}
 
 export enum LogType_enum {
 	time = 'time',
@@ -67,53 +67,53 @@ export const logTypeEnumNames: Record<LogType_enum, string> = {
 	important: 'Important',
 	question: 'Question',
 	list: 'List'
-};
+}
 
-export const allLogs = Object.keys(LogType_enum).map((key) => key);
+export const allLogs = Object.keys(LogType_enum).map((key) => key)
 
 export interface LogBase_int {
-	[Log_enum.id]: string;
-	[Log_enum.date]: Date;
-	[Log_enum.space]: string;
-	[Log_enum.title]: string;
-	[Log_enum.reference]: string;
-	[Log_enum.time]: number;
-	[Log_enum.type]: LogType_enum;
-	[Log_enum.lastUpdated]?: Date;
+	[Log_enum.id]: string
+	[Log_enum.date]: Date
+	[Log_enum.space]: string
+	[Log_enum.title]: string
+	[Log_enum.reference]: string
+	[Log_enum.time]: number
+	[Log_enum.type]: LogType_enum
+	[Log_enum.lastUpdated]?: Date
 }
 
 export interface ListItem_int {
-	item: string;
+	item: string
 }
 
 export interface CheckboxItem_int {
-	isChecked: boolean;
-	text: string;
+	isChecked: boolean
+	text: string
 }
 
 export interface QuestionItem_int {
-	question: string;
-	answer: string;
+	question: string
+	answer: string
 }
 
 export interface TodoLog_int extends LogBase_int {
-	[Log_enum.type]: LogType_enum.todo;
-	[Log_enum.listItems]: CheckboxItem_int[];
-	[Log_enum.rating]: 1 | 2 | 3;
+	[Log_enum.type]: LogType_enum.todo
+	[Log_enum.listItems]: CheckboxItem_int[]
+	[Log_enum.rating]: 1 | 2 | 3
 }
 export interface TimeLog_int extends LogBase_int {
-	[Log_enum.type]: LogType_enum.time;
-	[Log_enum.listItems]: string[];
+	[Log_enum.type]: LogType_enum.time
+	[Log_enum.listItems]: string[]
 }
 
 export interface Important_int extends LogBase_int {
-	[Log_enum.type]: LogType_enum.important;
-	[Log_enum.listItems]: string[];
-	[Log_enum.rating]: 1 | 2 | 3;
+	[Log_enum.type]: LogType_enum.important
+	[Log_enum.listItems]: string[]
+	[Log_enum.rating]: 1 | 2 | 3
 }
 export interface Question_int extends LogBase_int {
-	[Log_enum.type]: LogType_enum.question;
-	[Log_enum.rating]: 1 | 2 | 3;
+	[Log_enum.type]: LogType_enum.question
+	[Log_enum.rating]: 1 | 2 | 3
 }
 
 export const searchableInputs = [
@@ -123,12 +123,12 @@ export const searchableInputs = [
 	Log_enum.listItems,
 	Log_enum.checkboxItems
 	// todo: add list items some how?
-];
+]
 
-export const allLogInputs = searchableInputs.map((key) => key as Log_enum);
+export const allLogInputs = searchableInputs.map((key) => key as Log_enum)
 
 export interface BaseMappedListItem_int {
-	id: number;
+	id: number
 }
 
 export enum LogListType_enum {
@@ -137,26 +137,24 @@ export enum LogListType_enum {
 	ordered = 'ordered'
 }
 
-export const allLogListTypes = Object.values(LogListType_enum).map(
-	(key) => key as LogListType_enum
-);
+export const allLogListTypes = Object.values(LogListType_enum).map((key) => key as LogListType_enum)
 
-export type MappedCheckboxItem = BaseMappedListItem_int & CheckboxItem_int;
-export type MappedListItem = BaseMappedListItem_int & ListItem_int;
-export type MappedQuestionItem = BaseMappedListItem_int & QuestionItem_int;
+export type MappedCheckboxItem = BaseMappedListItem_int & CheckboxItem_int
+export type MappedListItem = BaseMappedListItem_int & ListItem_int
+export type MappedQuestionItem = BaseMappedListItem_int & QuestionItem_int
 
 export interface MappedLog_int extends LogBase_int {
-	[Log_enum.listItems]: MappedListItem[];
-	[Log_enum.checkboxItems]: MappedCheckboxItem[];
-	[Log_enum.questions]: MappedQuestionItem[];
-	[Log_enum.rating]: 1 | 2 | 3;
-	inputAutoFocus: boolean;
-	editOnMount?: boolean;
-	listType: LogListType_enum;
+	[Log_enum.listItems]: MappedListItem[]
+	[Log_enum.checkboxItems]: MappedCheckboxItem[]
+	[Log_enum.questions]: MappedQuestionItem[]
+	[Log_enum.rating]: 1 | 2 | 3
+	inputAutoFocus: boolean
+	editOnMount?: boolean
+	listType: LogListType_enum
 }
 
 export interface LogNotification_int {
-	space: string;
-	todo: number;
-	question: number;
+	space: string
+	todo: number
+	question: number
 }

@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { onMount, tick } from 'svelte'
 
 	interface Props {
-		value: string | string[];
-		className?: string;
-		autofocus?: boolean;
-		_class?: string;
-		onEnterKeydown?: () => void;
-		onFocus?: () => void;
-		textarea?: HTMLElement;
-		isDisabled?: boolean;
-		onclick?: (e: MouseEvent) => void;
-		onchange?: (e: Event) => void;
+		value: string | string[]
+		className?: string
+		autofocus?: boolean
+		_class?: string
+		onEnterKeydown?: () => void
+		onFocus?: () => void
+		textarea?: HTMLElement
+		isDisabled?: boolean
+		onclick?: (e: MouseEvent) => void
+		onchange?: (e: Event) => void
 	}
 
 	let {
@@ -25,50 +25,50 @@
 		isDisabled = false,
 		onclick,
 		onchange: _onchange
-	}: Props = $props();
+	}: Props = $props()
 
-	let container: HTMLElement;
-	let textarea: HTMLElement;
+	let container: HTMLElement
+	let textarea: HTMLElement
 
 	const resize = () => {
-		textarea.style.height = '20px';
-		if (textarea.scrollHeight > 20) textarea.style.height = textarea.scrollHeight + 'px';
-	};
+		textarea.style.height = '20px'
+		if (textarea.scrollHeight > 20) textarea.style.height = textarea.scrollHeight + 'px'
+	}
 
 	const onchange = (e: Event) => {
-		_onchange?.(e);
-		resize();
-	};
+		_onchange?.(e)
+		resize()
+	}
 
 	$effect.pre(() => {
 		// This is the same as 'afterUpdate' in SvelteKit
-		tick().then(() => resize());
-	});
+		tick().then(() => resize())
+	})
 
 	onMount(() => {
 		// Using this because its not accessible within the component when $bindable is being used
-		textarea = container.children[0] as HTMLElement;
+		textarea = container.children[0] as HTMLElement
 
-		autofocus && textarea.focus();
+		autofocus && textarea.focus()
 
 		const keydown = (e: KeyboardEvent) => {
 			if (e.key === 'Enter') {
-				if (e.metaKey || e.ctrlKey || e.altKey) return;
-				e.preventDefault();
-				onEnterKeydown && onEnterKeydown();
+				if (e.metaKey || e.ctrlKey || e.altKey) return
+				e.preventDefault()
+				onEnterKeydown && onEnterKeydown()
 			}
-		};
+		}
 
-		textarea.addEventListener('keydown', keydown);
+		textarea.addEventListener('keydown', keydown)
 
 		return () => {
-			textarea.removeEventListener('keydown', keydown);
-		};
-	});
+			textarea.removeEventListener('keydown', keydown)
+		}
+	})
 
 	const onfocus = () => {
-		_onFocus?.();
-	};
+		_onFocus?.()
+	}
 </script>
 
 <div class="w-full relative" bind:this={container}>

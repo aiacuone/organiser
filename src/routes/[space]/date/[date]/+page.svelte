@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { onMount, setContext } from 'svelte';
-	import { page } from '$app/stores';
-	import Button from '$lib/components/Button.svelte';
-	import Icon from '@iconify/svelte';
-	import NewLog from '$lib/components/NewLog.svelte';
-	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
-	import { goto } from '$app/navigation';
-	import Search from '$lib/components/Search.svelte';
-	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte';
-	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte';
-	import { browser } from '$app/environment';
+	import { onMount, setContext } from 'svelte'
+	import { page } from '$app/stores'
+	import Button from '$lib/components/Button.svelte'
+	import Icon from '@iconify/svelte'
+	import NewLog from '$lib/components/NewLog.svelte'
+	import { useQuery, useQueryClient } from '@sveltestack/svelte-query'
+	import { goto } from '$app/navigation'
+	import Search from '$lib/components/Search.svelte'
+	import PillButton from '$lib/components/Logs/Buttons/PillButton.svelte'
+	import ExportDialog from '$lib/components/Dialog/ExportDialog.svelte'
+	import { browser } from '$app/environment'
 	import {
 		getLogsClient,
 		getTitlesAndReferencesClient,
@@ -29,33 +29,33 @@
 		getHyphenatedStringFromDate,
 		getDayFromHyphenatedString,
 		useDisclosure
-	} from '$lib';
-	import Log from '$lib/components/Logs/Log.svelte';
-	import type { ChangeEventHandler } from 'svelte/elements';
+	} from '$lib'
+	import Log from '$lib/components/Logs/Log.svelte'
+	import type { ChangeEventHandler } from 'svelte/elements'
 
 	interface Props extends SpaceData_int {
 		data: {
-			date: string;
-			space: string;
-			titles: string[];
-			references: string[];
-		};
+			date: string
+			space: string
+			titles: string[]
+			references: string[]
+		}
 	}
 
-	const { data }: Props = $props();
+	const { data }: Props = $props()
 
-	const queryClient = useQueryClient();
+	const queryClient = useQueryClient()
 
-	let timer: any;
+	let timer: any
 	const debounce = (fn: () => any, delay = 500) => {
 		const timeout = () => {
-			clearTimeout(timer);
+			clearTimeout(timer)
 			timer = setTimeout(() => {
-				fn();
-			}, delay);
-		};
-		timeout();
-	};
+				fn()
+			}, delay)
+		}
+		timeout()
+	}
 
 	const logs = useQuery(
 		'logs',
@@ -70,37 +70,37 @@
 				browser &&
 				goto(`/${replaceAllSpacesWithHyphens(data.space)}/date/${$selectedHyphenatedDateString}`)
 		}
-	);
+	)
 
 	const titlesAndReferencesQuery = useQuery('titlesAndReferences', () =>
 		getTitlesAndReferencesClient(replaceAllSpacesWithHyphens(data.space))
-	);
+	)
 
 	const invalidateLogsAndTitlesAndReferences = async () => {
-		queryClient.invalidateQueries('logs');
-		queryClient.invalidateQueries('titlesAndReferences');
-	};
+		queryClient.invalidateQueries('logs')
+		queryClient.invalidateQueries('titlesAndReferences')
+	}
 
 	$effect(() => {
-		$selectedDate && debounce(invalidateLogsAndTitlesAndReferences);
-	});
+		$selectedDate && debounce(invalidateLogsAndTitlesAndReferences)
+	})
 
 	$effect(() => {
-		$page.params.space && invalidateLogsAndTitlesAndReferences();
-	});
+		$page.params.space && invalidateLogsAndTitlesAndReferences()
+	})
 
 	$effect(() => {
-		$titlesAndReferencesQuery && ($titlesAndReferences = $titlesAndReferencesQuery.data);
-	});
+		$titlesAndReferencesQuery && ($titlesAndReferences = $titlesAndReferencesQuery.data)
+	})
 
-	let headerContainer = $state(0);
-	let parentContainerHeight = $state(0);
-	let logButtonsContainerHeight = $state(0);
+	let headerContainer = $state(0)
+	let parentContainerHeight = $state(0)
+	let logButtonsContainerHeight = $state(0)
 	const notesContainerHeight = $derived(
 		parentContainerHeight - headerContainer - logButtonsContainerHeight - 55
-	);
+	)
 
-	let exportedNotesModal: HTMLDialogElement;
+	let exportedNotesModal: HTMLDialogElement
 
 	const defaultModalCheckboxes = {
 		bullets: true,
@@ -110,43 +110,43 @@
 		times: false,
 		dates: false,
 		dividers: false
-	};
+	}
 
-	let showInNotesModalCheckboxes: Record<string, boolean> = $state({ ...defaultModalCheckboxes });
+	let showInNotesModalCheckboxes: Record<string, boolean> = $state({ ...defaultModalCheckboxes })
 
-	const resetCheckboxes = () => (showInNotesModalCheckboxes = { ...defaultModalCheckboxes });
+	const resetCheckboxes = () => (showInNotesModalCheckboxes = { ...defaultModalCheckboxes })
 
-	let notesModalTextArea: HTMLDivElement;
+	let notesModalTextArea: HTMLDivElement
 	const copy = () => {
 		const clipboardItem = new ClipboardItem({
 			'text/plain': new Blob([notesModalTextArea.innerText.trim()], { type: 'text/plain' })
-		});
-		navigator.clipboard.write([clipboardItem]);
-	};
+		})
+		navigator.clipboard.write([clipboardItem])
+	}
 
-	let modalContainerHeight = $state(0);
-	let modalCheckboxContainerHeight = $state(0);
-	let modalButtonContainerHeight = $state(0);
+	let modalContainerHeight = $state(0)
+	let modalCheckboxContainerHeight = $state(0)
+	let modalButtonContainerHeight = $state(0)
 	let modalMainContentHeight = $derived(
 		modalContainerHeight - modalCheckboxContainerHeight - modalButtonContainerHeight - 20
-	);
+	)
 
-	let notesContainer: HTMLDivElement | undefined = $state();
-	let newLogType: LogType_enum | undefined = $state();
-	let isThereANewLog = $derived(!!newLogType);
+	let notesContainer: HTMLDivElement | undefined = $state()
+	let newLogType: LogType_enum | undefined = $state()
+	let isThereANewLog = $derived(!!newLogType)
 
 	const onNoteButtonClick = (logType: LogType_enum) => {
-		notesContainer?.scrollTo(0, 0);
-		newLogType = logType;
-	};
+		notesContainer?.scrollTo(0, 0)
+		newLogType = logType
+	}
 
-	let filters: LogType_enum[] = $state([]);
+	let filters: LogType_enum[] = $state([])
 
 	const filteredLogs = $derived(
 		filters.length === 0
 			? $logs.data?.logs
 			: $logs.data?.logs.filter((log: Log_int) => filters.includes(log.type))
-	);
+	)
 
 	const filteredAndSortedLogs = $derived(
 		filteredLogs.sort(
@@ -154,7 +154,7 @@
 				Date.parse(b.lastUpdated?.toString() ?? new Date().toString()) -
 				Date.parse(a.lastUpdated?.toString() ?? new Date().toString())
 		)
-	);
+	)
 
 	const noteButtons: Record<LogType_enum, { label: string; icon: string; type: LogType_enum }> = {
 		[LogType_enum.time]: {
@@ -182,67 +182,67 @@
 			icon: icons.list,
 			type: LogType_enum.list
 		}
-	};
+	}
 
-	const onResetNewLogType = () => (newLogType = undefined);
+	const onResetNewLogType = () => (newLogType = undefined)
 
-	setContext('onResetNewLogType', onResetNewLogType);
+	setContext('onResetNewLogType', onResetNewLogType)
 
 	const onDateChange: ChangeEventHandler<HTMLInputElement> = (event) => {
-		const target = event.target as HTMLInputElement;
-		$selectedDate = getDateFromHyphenatedString(target.value.split('-').reverse().join('-'));
-	};
+		const target = event.target as HTMLInputElement
+		$selectedDate = getDateFromHyphenatedString(target.value.split('-').reverse().join('-'))
+	}
 
-	let searchValue: string = $state('');
+	let searchValue: string = $state('')
 
 	const onSearch = () => {
-		goto(`/${$page.params.space}/filter?search=${searchValue}`);
-	};
+		goto(`/${$page.params.space}/filter?search=${searchValue}`)
+	}
 
 	onMount(() => {
 		const keydown = (e: KeyboardEvent) => {
 			if (e.shiftKey && e.ctrlKey && e.key === 'S') {
-				e.preventDefault();
+				e.preventDefault()
 			}
-		};
-		document.addEventListener('keydown', keydown);
+		}
+		document.addEventListener('keydown', keydown)
 		return () => {
-			document.removeEventListener('keydown', keydown);
-		};
-	});
+			document.removeEventListener('keydown', keydown)
+		}
+	})
 
 	const onClickPreviousDay = () => {
 		const getPreviousDate = (date: Date) => {
-			const _date = new Date(date);
-			_date.setDate(_date.getDate() - 1);
-			return _date;
-		};
-		$selectedDate = getPreviousDate($selectedDate);
-	};
+			const _date = new Date(date)
+			_date.setDate(_date.getDate() - 1)
+			return _date
+		}
+		$selectedDate = getPreviousDate($selectedDate)
+	}
 
 	const onClickNextDay = () => {
 		const getPreviousDate = (date: Date) => {
-			const _date = new Date(date);
-			_date.setDate(_date.getDate() + 1);
-			return _date;
-		};
-		$selectedDate = getPreviousDate($selectedDate);
-	};
+			const _date = new Date(date)
+			_date.setDate(_date.getDate() + 1)
+			return _date
+		}
+		$selectedDate = getPreviousDate($selectedDate)
+	}
 
 	const onGotoTodaysDate = () => {
-		$selectedDate = new Date();
-		filters = [];
-	};
+		$selectedDate = new Date()
+		filters = []
+	}
 
-	const onClickClear = () => (filters = []);
+	const onClickClear = () => (filters = [])
 
 	const {
 		isOpen: isExportDialogOpen,
 		onOpen: openExportDialog,
 		onClose: onCloseExportDialog
-	} = useDisclosure();
+	} = useDisclosure()
 
-	const onSearchChange = (e: Event) => (searchValue = (e.target as HTMLTextAreaElement).value);
+	const onSearchChange = (e: Event) => (searchValue = (e.target as HTMLTextAreaElement).value)
 </script>
 
 <div bind:clientHeight={parentContainerHeight} class="flex-1 center stack overflow-hidden">

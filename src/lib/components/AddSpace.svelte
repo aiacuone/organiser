@@ -1,30 +1,30 @@
 <script lang="ts">
-	import Icon from '@iconify/svelte';
-	import Input from './Input.svelte';
-	import { icons } from '$lib/general';
-	import { selectedDate } from '$lib/stores';
-	import { goto } from '$app/navigation';
-	import { getHyphenatedStringFromDate, replaceAllSpacesWithHyphens } from '$lib/utils';
+	import Icon from '@iconify/svelte'
+	import Input from './Input.svelte'
+	import { icons } from '$lib/general'
+	import { selectedDate } from '$lib/stores'
+	import { goto } from '$app/navigation'
+	import { getHyphenatedStringFromDate, replaceAllSpacesWithHyphens } from '$lib/utils'
 
 	interface Props {
-		onAddSpace?: () => void;
+		onAddSpace?: () => void
 	}
 
-	const { onAddSpace }: Props = $props();
+	const { onAddSpace }: Props = $props()
 
-	let addInputValue: string = $state('');
+	let addInputValue: string = $state('')
 
 	const _onAddSpace = () => {
 		goto(
 			`/${replaceAllSpacesWithHyphens(
 				addInputValue.toLowerCase()
 			)}/date/${getHyphenatedStringFromDate(new Date())}`
-		);
+		)
 
-		addInputValue = '';
-		$selectedDate = new Date();
-		onAddSpace && onAddSpace();
-	};
+		addInputValue = ''
+		$selectedDate = new Date()
+		onAddSpace && onAddSpace()
+	}
 </script>
 
 <div class="hstack gap-2">

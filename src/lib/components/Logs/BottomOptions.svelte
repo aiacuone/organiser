@@ -1,34 +1,34 @@
 <script lang="ts">
-	import IncrementDecrement from './Buttons/IncrementDecrement.svelte';
+	import IncrementDecrement from './Buttons/IncrementDecrement.svelte'
 	import {
 		getCheckboxItemsFromMappedListItems,
 		getDayMonthYearFromDate,
 		getListItemsFromMappedCheckboxItems,
 		logIcons
-	} from '$lib/utils';
-	import Icon from '@iconify/svelte';
-	import { LogListType_enum, LogType_enum, allLogListTypes, type MappedLog_int } from '$lib/types';
-	import { icons } from '$lib/general/icons';
-	import ConfirmationDialog from '../ConfirmationDialog.svelte';
-	import LogButton from './Buttons/LogButton.svelte';
-	import { useDisclosure } from '$lib/hooks';
+	} from '$lib/utils'
+	import Icon from '@iconify/svelte'
+	import { LogListType_enum, LogType_enum, allLogListTypes, type MappedLog_int } from '$lib/types'
+	import { icons } from '$lib/general/icons'
+	import ConfirmationDialog from '../ConfirmationDialog.svelte'
+	import LogButton from './Buttons/LogButton.svelte'
+	import { useDisclosure } from '$lib/hooks'
 
 	interface Props {
-		log: MappedLog_int;
-		onDelete: () => void;
-		onAccept: () => void;
-		onAddItem: () => void;
+		log: MappedLog_int
+		onDelete: () => void
+		onAccept: () => void
+		onAddItem: () => void
 		incrementDecrementProps: {
-			onIncrement: () => void;
-			onDecrement: () => void;
-			max: number;
-			min: number;
-			incrementDecrementValue: number;
-		};
-		isEditing: boolean;
-		showIncrementDecrement?: boolean;
-		onEditLog: () => void;
-		onStopEditing: () => void;
+			onIncrement: () => void
+			onDecrement: () => void
+			max: number
+			min: number
+			incrementDecrementValue: number
+		}
+		isEditing: boolean
+		showIncrementDecrement?: boolean
+		onEditLog: () => void
+		onStopEditing: () => void
 	}
 
 	let {
@@ -41,46 +41,46 @@
 		showIncrementDecrement = true,
 		onEditLog,
 		onStopEditing
-	}: Props = $props();
+	}: Props = $props()
 
-	const { onOpen: onOpenDelete, onClose: onCloseDelete, isOpen: isOpenDelete } = useDisclosure();
+	const { onOpen: onOpenDelete, onClose: onCloseDelete, isOpen: isOpenDelete } = useDisclosure()
 
-	const dateValues = $derived(getDayMonthYearFromDate(log.date));
+	const dateValues = $derived(getDayMonthYearFromDate(log.date))
 	const lastUpdatedDateValues = $derived(
 		log.lastUpdated && getDayMonthYearFromDate(log.lastUpdated)
-	);
+	)
 
 	const onConfirmDelete: () => void = () => {
-		onDelete();
-	};
+		onDelete()
+	}
 
 	const onChangeList = () => {
-		const indexOfListType = allLogListTypes.indexOf(log.listType);
-		const nextIndex = indexOfListType + 1 > allLogListTypes.length - 1 ? 0 : indexOfListType + 1;
+		const indexOfListType = allLogListTypes.indexOf(log.listType)
+		const nextIndex = indexOfListType + 1 > allLogListTypes.length - 1 ? 0 : indexOfListType + 1
 
-		log.listType = allLogListTypes[nextIndex];
+		log.listType = allLogListTypes[nextIndex]
 
-		const nextIndexListType = allLogListTypes[nextIndex];
-		const currentIndexListType = allLogListTypes[indexOfListType];
+		const nextIndexListType = allLogListTypes[nextIndex]
+		const currentIndexListType = allLogListTypes[indexOfListType]
 
 		if (nextIndexListType === LogListType_enum.checkbox) {
-			log.checkboxItems = getCheckboxItemsFromMappedListItems(log.listItems);
-			log.listItems = [];
+			log.checkboxItems = getCheckboxItemsFromMappedListItems(log.listItems)
+			log.listItems = []
 		} else if (currentIndexListType === LogListType_enum.checkbox) {
-			log.listItems = getListItemsFromMappedCheckboxItems(log.checkboxItems);
-			log.checkboxItems = [];
+			log.listItems = getListItemsFromMappedCheckboxItems(log.checkboxItems)
+			log.checkboxItems = []
 		}
-	};
+	}
 
 	const listIcons: Record<LogListType_enum, string> = {
 		[LogListType_enum.unordered]: icons.unorderedList,
 		[LogListType_enum.ordered]: icons.orderedList,
 		[LogListType_enum.checkbox]: icons.checkboxList
-	};
+	}
 
 	const onClickEdit = () => {
-		isEditing ? onStopEditing() : onEditLog();
-	};
+		isEditing ? onStopEditing() : onEditLog()
+	}
 
 	let buttons = $derived([
 		{
@@ -107,7 +107,7 @@
 			onclick: onClickEdit,
 			isHidden: isEditing
 		}
-	]);
+	])
 </script>
 
 <div class="w-full hstack">

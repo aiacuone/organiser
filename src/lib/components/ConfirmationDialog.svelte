@@ -1,20 +1,20 @@
 <script lang="ts">
-	import Button from './Button.svelte';
-	import Dialog from './Dialog/Dialog.svelte';
+	import Button from './Button.svelte'
+	import Dialog from './Dialog/Dialog.svelte'
 
 	interface Props extends SvelteAllProps {
-		onOpen: () => void;
-		onConfirm: () => void;
-		isOpen: boolean;
-		onClose: () => void;
+		onOpen: () => void
+		onConfirm: () => void
+		isOpen: boolean
+		onClose: () => void
 	}
 
-	const { onConfirm, isOpen, onClose, children }: Props = $props();
+	const { onConfirm, isOpen, onClose, children }: Props = $props()
 
 	const _onConfirm: (() => void) | undefined = () => {
-		onClose();
-		onConfirm();
-	};
+		onClose()
+		onConfirm()
+	}
 </script>
 
 <Dialog {isOpen} {onClose}>

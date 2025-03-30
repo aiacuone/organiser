@@ -1,5 +1,5 @@
-import { authConfig } from '$lib/config';
-import { Auth0Client, createAuth0Client } from '@auth0/auth0-spa-js';
+import { authConfig } from '$lib/config'
+import { Auth0Client, createAuth0Client } from '@auth0/auth0-spa-js'
 
 export const createClient = async () => {
 	const auth0Client = await createAuth0Client({
@@ -7,10 +7,10 @@ export const createClient = async () => {
 		clientId: authConfig.clientId,
 		useRefreshTokens: true,
 		cacheLocation: 'localstorage'
-	});
+	})
 
-	return auth0Client;
-};
+	return auth0Client
+}
 
 export const loginWithRedirect = async (client: Auth0Client) => {
 	try {
@@ -18,16 +18,16 @@ export const loginWithRedirect = async (client: Auth0Client) => {
 			authorizationParams: {
 				redirect_uri: window.location.origin
 			}
-		});
+		})
 	} catch (e) {
-		console.error(e);
+		console.error(e)
 	}
-};
+}
 
 export const logout = (client: Auth0Client) => {
 	return client.logout({
 		logoutParams: {
 			returnTo: window.location.origin
 		}
-	});
-};
+	})
+}

@@ -1,2 +1,2 @@
-export * from './useViewportAction';
-export * from './useDisclosure';
+export * from './useViewportAction'
+export * from './useDisclosure'

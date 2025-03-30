@@ -1,2 +1,2 @@
-export * from './axios';
-export * from './icons';
+export * from './axios'
+export * from './icons'

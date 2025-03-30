@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Button from '../Button.svelte';
-	import Dialog from './Dialog.svelte';
+	import Button from '../Button.svelte'
+	import Dialog from './Dialog.svelte'
 	import {
 		logEnumNames,
 		Log_enum,
@@ -8,38 +8,38 @@
 		LogType_enum,
 		LocalStorage_enum,
 		logTypeEnumNames
-	} from '$lib/types';
+	} from '$lib/types'
 	import {
 		camelCaseToCapitalized,
 		copyToClipboard,
 		downloadAsCSV,
 		getLocalStorage,
 		setLocalStorage
-	} from '$lib/utils';
-	import { useDisclosure, viewport } from '$lib/hooks';
-	import type { InfiniteData } from '@sveltestack/svelte-query';
-	import type { AxiosResponse } from 'axios';
-	import ExportDialogLogs from './ExportDialogLogs.svelte';
-	import Icon from '@iconify/svelte';
-	import { icons } from '$lib/general/icons';
-	import { onMount } from 'svelte';
+	} from '$lib/utils'
+	import { useDisclosure, viewport } from '$lib/hooks'
+	import type { InfiniteData } from '@sveltestack/svelte-query'
+	import type { AxiosResponse } from 'axios'
+	import ExportDialogLogs from './ExportDialogLogs.svelte'
+	import Icon from '@iconify/svelte'
+	import { icons } from '$lib/general/icons'
+	import { onMount } from 'svelte'
 
 	interface CheckboxProps {
-		object: Record<string, boolean>;
-		key: string;
-		label: string;
+		object: Record<string, boolean>
+		key: string
+		label: string
 	}
 	interface Props extends SvelteAllProps {
-		isOpen: boolean;
-		onOpen: () => void;
-		onClose: () => void;
-		isLoadingLogs: boolean;
-		isFetchingLogs: boolean;
-		isLogsError: boolean;
-		logsData?: InfiniteData<AxiosResponse<any, any>>;
-		logs?: Log_int[];
-		hasNextLogsPage?: boolean;
-		getNextLogsPage?: () => void;
+		isOpen: boolean
+		onOpen: () => void
+		onClose: () => void
+		isLoadingLogs: boolean
+		isFetchingLogs: boolean
+		isLogsError: boolean
+		logsData?: InfiniteData<AxiosResponse<any, any>>
+		logs?: Log_int[]
+		hasNextLogsPage?: boolean
+		getNextLogsPage?: () => void
 	}
 
 	let {
@@ -53,7 +53,7 @@
 		logs,
 		hasNextLogsPage,
 		getNextLogsPage
-	}: Props = $props();
+	}: Props = $props()
 
 	let defaultLogKeyValueFilter: Partial<Record<Log_enum, boolean>> = {
 		[Log_enum.id]: false,
@@ -68,33 +68,33 @@
 		[Log_enum.lastUpdated]: false,
 		[Log_enum.rating]: false,
 		[Log_enum.questions]: true
-	};
+	}
 
-	let logKeyValueFilter = $state({ ...defaultLogKeyValueFilter });
+	let logKeyValueFilter = $state({ ...defaultLogKeyValueFilter })
 
 	const defaultTypeFilterData = Object.fromEntries(
 		Object.values(LogType_enum).map((type) => [type, true])
-	) as Partial<Record<LogType_enum, boolean>>;
+	) as Partial<Record<LogType_enum, boolean>>
 
-	let typeFilter = $state({ ...defaultTypeFilterData });
+	let typeFilter = $state({ ...defaultTypeFilterData })
 
 	const defaultPreferences: Record<string, boolean> = {
 		showKeys: true
-	};
+	}
 
-	let preferences = $state({ ...defaultPreferences });
+	let preferences = $state({ ...defaultPreferences })
 
 	onMount(() => {
 		const [storageLogKeyValueFilter, storageTypeFilter, storagePreferences] = getLocalStorage([
 			LocalStorage_enum.exportLogKeyValueFilterDefaults,
 			LocalStorage_enum.exportTypeFilterDefaults,
 			LocalStorage_enum.exportPreferenceDefaults
-		]);
+		])
 
-		storageLogKeyValueFilter && (logKeyValueFilter = storageLogKeyValueFilter);
-		storageTypeFilter && (typeFilter = storageTypeFilter);
-		storagePreferences && (preferences = storagePreferences);
-	});
+		storageLogKeyValueFilter && (logKeyValueFilter = storageLogKeyValueFilter)
+		storageTypeFilter && (typeFilter = storageTypeFilter)
+		storagePreferences && (preferences = storagePreferences)
+	})
 
 	const logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number = (
 		[keyA],
@@ -113,87 +113,87 @@
 			Log_enum.time,
 			Log_enum.lastUpdated,
 			Log_enum.id
-		];
-		const indexA = keyOrder.indexOf(keyA);
-		const indexB = keyOrder.indexOf(keyB);
+		]
+		const indexA = keyOrder.indexOf(keyA)
+		const indexB = keyOrder.indexOf(keyB)
 
-		return indexA - indexB;
-	};
+		return indexA - indexB
+	}
 
-	let logsContainer: HTMLDivElement;
-	let containerHeight: number = $state(0);
-	let headerHeight: number = $state(0);
-	let buttonsContainerHeight: number = $state(0);
-	let footerButtonsContainerHeight: number = $state(0);
+	let logsContainer: HTMLDivElement
+	let containerHeight: number = $state(0)
+	let headerHeight: number = $state(0)
+	let buttonsContainerHeight: number = $state(0)
+	let footerButtonsContainerHeight: number = $state(0)
 
 	$effect(() => {
 		containerHeight &&
 			(logsContainer.style.height = `${
 				containerHeight - headerHeight - buttonsContainerHeight - footerButtonsContainerHeight
-			}px`);
-	});
+			}px`)
+	})
 
 	const onCopy = (index: number) => {
-		copyToClipboard(logsContainer.innerText);
-		footerButtons[index].isAnimating = true;
+		copyToClipboard(logsContainer.innerText)
+		footerButtons[index].isAnimating = true
 		setTimeout(() => {
-			footerButtons[index].isAnimating = false;
-		}, 1500);
-	};
+			footerButtons[index].isAnimating = false
+		}, 1500)
+	}
 
 	const onCsv = () => {
-		downloadAsCSV(logsContainer.innerText);
-	};
+		downloadAsCSV(logsContainer.innerText)
+	}
 
 	const onReset = () => {
 		const [storageLogKeyValueFilter, storageTypeFilter, storagePreferences] = getLocalStorage([
 			LocalStorage_enum.exportLogKeyValueFilterDefaults,
 			LocalStorage_enum.exportTypeFilterDefaults,
 			LocalStorage_enum.exportPreferenceDefaults
-		]);
+		])
 
-		const resetLogKeyValueFilter = storageLogKeyValueFilter ?? defaultLogKeyValueFilter;
-		const resetTypeFilter = storageTypeFilter ?? defaultTypeFilterData;
-		const resetPreferences = storagePreferences ?? defaultPreferences;
+		const resetLogKeyValueFilter = storageLogKeyValueFilter ?? defaultLogKeyValueFilter
+		const resetTypeFilter = storageTypeFilter ?? defaultTypeFilterData
+		const resetPreferences = storagePreferences ?? defaultPreferences
 
-		typeFilter = { ...resetTypeFilter };
-		logKeyValueFilter = { ...resetLogKeyValueFilter };
-		preferences = { ...resetPreferences };
-	};
+		typeFilter = { ...resetTypeFilter }
+		logKeyValueFilter = { ...resetLogKeyValueFilter }
+		preferences = { ...resetPreferences }
+	}
 
 	const onConfirmSetDefault = () => {
 		setLocalStorage([
 			{ key: LocalStorage_enum.exportLogKeyValueFilterDefaults, value: logKeyValueFilter },
 			{ key: LocalStorage_enum.exportTypeFilterDefaults, value: typeFilter },
 			{ key: LocalStorage_enum.exportPreferenceDefaults, value: preferences }
-		]);
+		])
 
-		onCloseDefaultSelection();
-	};
+		onCloseDefaultSelection()
+	}
 
 	const onUnselectAll = () => {
 		const makeAllFalse = (object: Record<string, boolean>) =>
-			Object.keys(object).reduce((acc, key) => ({ ...acc, [key]: false }), {});
+			Object.keys(object).reduce((acc, key) => ({ ...acc, [key]: false }), {})
 
-		typeFilter = makeAllFalse({ ...typeFilter });
-		logKeyValueFilter = makeAllFalse({ ...logKeyValueFilter } as Record<Log_enum, boolean>);
-		preferences = makeAllFalse({ ...preferences });
-	};
+		typeFilter = makeAllFalse({ ...typeFilter })
+		logKeyValueFilter = makeAllFalse({ ...logKeyValueFilter } as Record<Log_enum, boolean>)
+		preferences = makeAllFalse({ ...preferences })
+	}
 
 	const onSelectAll = () => {
 		const makeAllTrue = (object: Record<string, boolean>) =>
-			Object.keys(object).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+			Object.keys(object).reduce((acc, key) => ({ ...acc, [key]: true }), {})
 
-		typeFilter = makeAllTrue({ ...typeFilter });
-		logKeyValueFilter = makeAllTrue({ ...logKeyValueFilter } as Record<Log_enum, boolean>);
-		preferences = makeAllTrue({ ...preferences });
-	};
+		typeFilter = makeAllTrue({ ...typeFilter })
+		logKeyValueFilter = makeAllTrue({ ...logKeyValueFilter } as Record<Log_enum, boolean>)
+		preferences = makeAllTrue({ ...preferences })
+	}
 
 	const {
 		isOpen: isDefaultSelectionOpen,
 		onOpen: onOpenDefaultSelection,
 		onClose: onCloseDefaultSelection
-	} = useDisclosure();
+	} = useDisclosure()
 
 	const selectButtons = [
 		{
@@ -212,7 +212,7 @@
 			icon: icons.save,
 			onclick: () => onOpenDefaultSelection()
 		}
-	];
+	]
 
 	const confirmSaveDefaultButtons = [
 		{
@@ -223,7 +223,7 @@
 			icon: icons.cross,
 			onclick: () => onCloseDefaultSelection()
 		}
-	];
+	]
 
 	const footerButtons = [
 		{
@@ -242,14 +242,14 @@
 			label: 'Close',
 			key: 'close'
 		}
-	];
+	]
 
 	const logKeyValueFilterFilter = $derived(
 		(key: string) =>
 			![Log_enum.id, Log_enum.lastUpdated, Log_enum.rating, Log_enum.space, Log_enum.time].includes(
 				key as keyof Log_int
 			)
-	);
+	)
 </script>
 
 {#snippet checkbox({object,key,label}:CheckboxProps)}

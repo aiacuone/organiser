@@ -1,5 +1,5 @@
 export interface titlesAndReferences_int {
-	title?: string;
-	reference?: string;
-	date: Date;
+	title?: string
+	reference?: string
+	date: Date
 }

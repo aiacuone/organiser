@@ -1,27 +1,27 @@
 <script lang="ts">
-	import { logEnumNames, type Log_int, LogType_enum, Log_enum } from '$lib/types';
+	import { logEnumNames, type Log_int, LogType_enum, Log_enum } from '$lib/types'
 
 	interface Props {
-		logs: Log_int[];
-		logKeyValueFilter: Partial<Record<Log_enum, boolean>>;
-		logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number;
-		typeFilter: Partial<Record<LogType_enum, boolean>>;
-		showKeys: boolean;
+		logs: Log_int[]
+		logKeyValueFilter: Partial<Record<Log_enum, boolean>>
+		logKeyValueSortFunction: (a: [Log_enum, boolean], b: [Log_enum, boolean]) => number
+		typeFilter: Partial<Record<LogType_enum, boolean>>
+		showKeys: boolean
 	}
 
-	let { logs, logKeyValueFilter, logKeyValueSortFunction, typeFilter, showKeys }: Props = $props();
+	let { logs, logKeyValueFilter, logKeyValueSortFunction, typeFilter, showKeys }: Props = $props()
 
 	const logFilter = $derived(([key, value]: [Log_enum, any]) => {
-		if (key === Log_enum.listItems) return value.length > 0;
+		if (key === Log_enum.listItems) return value.length > 0
 		if (key === Log_enum.questions)
 			return value.some(
 				({ question, answer }: { question: string; answer: string }) => answer || question
-			);
-		if (key === Log_enum.checkboxItems) return value.some(({ text }: { text: string }) => text);
-		return logKeyValueFilter[key] && value;
-	});
+			)
+		if (key === Log_enum.checkboxItems) return value.some(({ text }: { text: string }) => text)
+		return logKeyValueFilter[key] && value
+	})
 
-	const filteredLogs = $derived(logs.filter(({ type }) => typeFilter[type]));
+	const filteredLogs = $derived(logs.filter(({ type }) => typeFilter[type]))
 </script>
 
 {#each filteredLogs as log}

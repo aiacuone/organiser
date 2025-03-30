@@ -1,5 +1,5 @@
-import { LogType_enum, Log_enum } from '$lib/types';
-import type { Collection } from 'mongodb';
+import { LogType_enum, Log_enum } from '$lib/types'
+import type { Collection } from 'mongodb'
 
 export const getLogs = async (
 	{
@@ -13,26 +13,26 @@ export const getLogs = async (
 		search,
 		searchType
 	}: {
-		space?: string;
-		date?: string | Date;
-		isChecked?: 'true' | 'false';
-		isAnswered?: 'true' | 'false';
-		limit?: string;
-		skip?: string;
-		search?: string;
-		searchType?: string[];
-		type?: string[];
+		space?: string
+		date?: string | Date
+		isChecked?: 'true' | 'false'
+		isAnswered?: 'true' | 'false'
+		limit?: string
+		skip?: string
+		search?: string
+		searchType?: string[]
+		type?: string[]
 	},
 	collection: Collection
 ) => {
-	const baseQuery: Array<any> = [{ $project: { _id: 0 } }, { $sort: { date: -1 } }];
+	const baseQuery: Array<any> = [{ $project: { _id: 0 } }, { $sort: { date: -1 } }]
 
 	if (space) {
-		baseQuery.push({ $match: { space } });
+		baseQuery.push({ $match: { space } })
 	}
 
 	if (date) {
-		const _date = new Date(date);
+		const _date = new Date(date)
 		baseQuery.push({
 			$match: {
 				$or: [
@@ -53,7 +53,7 @@ export const getLogs = async (
 					}
 				]
 			}
-		});
+		})
 	}
 
 	if (search) {
@@ -68,36 +68,36 @@ export const getLogs = async (
 			],
 			[Log_enum.title]: [{ title: { $regex: search, $options: 'i' } }],
 			[Log_enum.reference]: [{ reference: { $regex: search, $options: 'i' } }]
-		};
+		}
 
 		if (search && searchType && searchType.length) {
-			const orArray = [];
+			const orArray = []
 			if (searchType.includes(Log_enum.questions)) {
-				orArray.push(...searchTypeArrays[Log_enum.questions]);
+				orArray.push(...searchTypeArrays[Log_enum.questions])
 			}
 			if (searchType.includes(Log_enum.listItems)) {
-				orArray.push(...searchTypeArrays[Log_enum.listItems]);
+				orArray.push(...searchTypeArrays[Log_enum.listItems])
 			}
 			if (searchType.includes(Log_enum.checkboxItems)) {
-				orArray.push(...searchTypeArrays[Log_enum.checkboxItems]);
+				orArray.push(...searchTypeArrays[Log_enum.checkboxItems])
 			}
 			if (searchType.includes(Log_enum.title)) {
-				orArray.push(...searchTypeArrays[Log_enum.title]);
+				orArray.push(...searchTypeArrays[Log_enum.title])
 			}
 			if (searchType.includes(Log_enum.reference)) {
-				orArray.push(...searchTypeArrays[Log_enum.reference]);
+				orArray.push(...searchTypeArrays[Log_enum.reference])
 			}
 			baseQuery.push({
 				$match: {
 					$or: orArray
 				}
-			});
+			})
 		} else {
 			baseQuery.push({
 				$match: {
 					$or: Object.values(searchTypeArrays).flat()
 				}
-			});
+			})
 		}
 	}
 
@@ -109,23 +109,23 @@ export const getLogs = async (
 						type: {
 							$eq: t
 						}
-					};
+					}
 				})
 			}
-		});
+		})
 	}
 
 	if (isChecked) {
-		const parsedBoolean = JSON.parse(isChecked);
+		const parsedBoolean = JSON.parse(isChecked)
 		baseQuery.push({
 			$match: {
 				'checkboxItems.isChecked': { $eq: parsedBoolean }
 			}
-		});
+		})
 	}
 
 	if (isAnswered) {
-		const parsedBoolean = JSON.parse(isAnswered);
+		const parsedBoolean = JSON.parse(isAnswered)
 		baseQuery.push({
 			$match: {
 				$or: [
@@ -145,17 +145,17 @@ export const getLogs = async (
 					}
 				]
 			}
-		});
+		})
 	}
 
-	const logQuery = [...baseQuery];
+	const logQuery = [...baseQuery]
 
 	if (skip) {
-		logQuery.push({ $skip: parseInt(skip) });
+		logQuery.push({ $skip: parseInt(skip) })
 	}
 
 	if (limit) {
-		logQuery.push({ $limit: parseInt(limit) });
+		logQuery.push({ $limit: parseInt(limit) })
 	}
 
 	const countQuery = [
@@ -163,7 +163,7 @@ export const getLogs = async (
 		{
 			$count: 'total'
 		}
-	];
+	]
 
 	const queryWithTotal: Array<any> = [
 		{
@@ -172,45 +172,45 @@ export const getLogs = async (
 				total: countQuery
 			}
 		}
-	];
+	]
 
-	const result = await collection.aggregate(queryWithTotal).toArray();
-	const logs = result[0].logs;
-	const total = result[0].total[0]?.total ?? 0;
+	const result = await collection.aggregate(queryWithTotal).toArray()
+	const logs = result[0].logs
+	const total = result[0].total[0]?.total ?? 0
 
-	return { logs, total };
-};
+	return { logs, total }
+}
 
 export const updateLog = async (
 	values: {
-		id: string;
-		date: Date;
-		title?: string;
-		reference?: string;
-		time?: number;
-		importance?: number;
-		priority?: number;
-		type: LogType_enum;
-		space: string;
-		lastUpdated: Date;
-		question?: string;
-		answer?: string;
+		id: string
+		date: Date
+		title?: string
+		reference?: string
+		time?: number
+		importance?: number
+		priority?: number
+		type: LogType_enum
+		space: string
+		lastUpdated: Date
+		question?: string
+		answer?: string
 	},
 	collection: Collection
 ) => {
-	const { date, lastUpdated, ...rest } = values;
+	const { date, lastUpdated, ...rest } = values
 	await collection.updateOne(
 		{ id: values.id },
 		{
 			$set: { date: new Date(date), lastUpdated: new Date(lastUpdated), ...rest }
 		},
 		{ upsert: true }
-	);
-};
+	)
+}
 
 export const deleteLog = async (id: string, collection: Collection) => {
-	await collection.deleteOne({ id });
-};
+	await collection.deleteOne({ id })
+}
 
 export const getTitlesAndReferences = async (space: string, collection: Collection) => {
 	const result = await collection
@@ -233,10 +233,10 @@ export const getTitlesAndReferences = async (space: string, collection: Collecti
 				}
 			}
 		])
-		.toArray();
+		.toArray()
 
-	return result;
-};
+	return result
+}
 
 export const getAllLogNotifications = async (spaces: string[], collection: Collection) => {
 	const facet = spaces.reduce(
@@ -299,7 +299,7 @@ export const getAllLogNotifications = async (spaces: string[], collection: Colle
 			]
 		}),
 		{}
-	);
+	)
 
 	const counts =
 		Object.entries(facet).length > 0 &&
@@ -309,28 +309,35 @@ export const getAllLogNotifications = async (spaces: string[], collection: Colle
 					$facet: facet
 				}
 			])
-			.toArray());
+			.toArray())
 
 	const mappedCounts = counts
 		? Object.entries(counts[0])
 				.map(([key, countArray]) => {
-					const count = countArray[0]?.count ?? 0;
-					const [space, type] = key.split('/');
+					const count = countArray[0]?.count ?? 0
+					const [space, type] = key.split('/')
 					return {
 						space,
 						type,
 						count
-					};
+					}
 				})
-				.reduce((result, { space, type, count }) => {
-					const indexOfExistingSpace = result.findIndex((group) => group.space === space);
-					result[indexOfExistingSpace] = { ...result[indexOfExistingSpace], [type]: count ?? 0 };
+				.reduce(
+					(result, { space, type, count }) => {
+						const indexOfExistingSpace = result.findIndex((group) => group.space === space)
+						result[indexOfExistingSpace] = { ...result[indexOfExistingSpace], [type]: count ?? 0 }
 
-					return result;
-				}, spaces.map((space) => ({ space })) as Array<{ space: string; type: string; count: number }>)
-		: [];
+						return result
+					},
+					spaces.map((space) => ({ space })) as Array<{
+						space: string
+						type: string
+						count: number
+					}>
+				)
+		: []
 
-	const result = mappedCounts ?? 0;
+	const result = mappedCounts ?? 0
 
-	return result;
-};
+	return result
+}

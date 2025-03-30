@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let height: string = '50px';
+	export let height: string = '50px'
 </script>
 
 <svg

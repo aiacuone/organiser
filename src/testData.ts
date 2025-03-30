@@ -1,5 +1,5 @@
-import { LogType_enum } from '$lib/types';
-import { v4 as uuidv4 } from 'uuid';
+import { LogType_enum } from '$lib/types'
+import { v4 as uuidv4 } from 'uuid'
 
 export const testSpaces = [
 	{
@@ -206,4 +206,4 @@ export const testSpaces = [
 			}
 		]
 	}
-];
+]

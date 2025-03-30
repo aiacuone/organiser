@@ -5,24 +5,24 @@
 		isAnAutofillOpen,
 		unfocusStoreInput,
 		whichInputIsFocused
-	} from '$lib/stores';
-	import { addToEndOfRaceCondition, clickOutside, onKeydown } from '$lib/utils';
-	import { onMount } from 'svelte';
+	} from '$lib/stores'
+	import { addToEndOfRaceCondition, clickOutside, onKeydown } from '$lib/utils'
+	import { onMount } from 'svelte'
 
 	interface Props {
-		value: string;
-		placeholder?: string;
-		autofocus?: boolean;
-		autofillValues?: (string | undefined)[];
-		isDisabled?: boolean;
-		onAutoFill?: (value: string) => void;
-		_class?: string;
-		onchange?: (event: Event) => void;
-		onEnterKeydown?: () => void;
-		onFocus?: () => void;
-		input?: HTMLElement;
-		isEditing?: boolean;
-		onclick?: (e: MouseEvent) => void;
+		value: string
+		placeholder?: string
+		autofocus?: boolean
+		autofillValues?: (string | undefined)[]
+		isDisabled?: boolean
+		onAutoFill?: (value: string) => void
+		_class?: string
+		onchange?: (event: Event) => void
+		onEnterKeydown?: () => void
+		onFocus?: () => void
+		input?: HTMLElement
+		isEditing?: boolean
+		onclick?: (e: MouseEvent) => void
 	}
 
 	let {
@@ -39,107 +39,107 @@
 		input = $bindable(),
 		isEditing,
 		onclick: _onclick
-	}: Props = $props();
+	}: Props = $props()
 
-	let isInputFocused = false;
+	let isInputFocused = false
 
-	let isAutofillOpen = $state(isEditing && isInputFocused && autofillValues.length > 0);
+	let isAutofillOpen = $state(isEditing && isInputFocused && autofillValues.length > 0)
 
 	$effect(() => {
 		if (isAutofillOpen) {
-			$whichAutofillIsOpen = input;
+			$whichAutofillIsOpen = input
 		}
-	});
+	})
 
 	$effect(() => {
-		if ($whichInputIsFocused === input) isInputFocused = true;
-		else isInputFocused = false;
-	});
+		if ($whichInputIsFocused === input) isInputFocused = true
+		else isInputFocused = false
+	})
 
 	const unfocusInput = () => {
 		// todo: Svelte 5, Check if this is fixed with svelte 5
 		//Unfortunately I needed to have 2 sources of truth, 1 in the component and 1 in the store. The reason for this is because on the first click of the app, if the item was an input, the item wouldnt focus. This may be fixed in svelte 5?
-		isInputFocused = false;
-		unfocusStoreInput();
-	};
+		isInputFocused = false
+		unfocusStoreInput()
+	}
 
-	let selectedAutofill = $state({ isUsingArrows: false, selected: -1 });
+	let selectedAutofill = $state({ isUsingArrows: false, selected: -1 })
 
 	const onResetAutofill = () => {
-		selectedAutofill = { isUsingArrows: false, selected: -1 };
-	};
+		selectedAutofill = { isUsingArrows: false, selected: -1 }
+	}
 
 	const onSelectAutofill = (index: number) => {
-		selectedAutofill = { isUsingArrows: true, selected: index };
-	};
+		selectedAutofill = { isUsingArrows: true, selected: index }
+	}
 
 	onMount(() => {
 		if (autofocus) {
-			addToEndOfRaceCondition(() => input && input.focus());
+			addToEndOfRaceCondition(() => input && input.focus())
 		}
 		return () => {
-			unfocusInput();
-		};
-	});
+			unfocusInput()
+		}
+	})
 
 	const onClickAutofill = (_value: string) => {
-		value = _value;
-		unfocusInput();
-		onAutoFill && onAutoFill(_value);
-	};
+		value = _value
+		unfocusInput()
+		onAutoFill && onAutoFill(_value)
+	}
 
 	const onClickOutside = () => {
 		if (isEditing && isInputFocused) {
-			unfocusInput();
-			onResetAutofill();
+			unfocusInput()
+			onResetAutofill()
 		}
-	};
+	}
 
 	const _onFocus = () => {
-		isInputFocused = true;
-		onFocus && onFocus();
-	};
+		isInputFocused = true
+		onFocus && onFocus()
+	}
 
 	const onclick = (e: MouseEvent) => {
-		_onFocus();
-		_onclick && _onclick(e);
-	};
+		_onFocus()
+		_onclick && _onclick(e)
+	}
 
-	let slicedAutofillValues: string[] = $state([]);
+	let slicedAutofillValues: string[] = $state([])
 
 	let filteredAutofillValues = $state(
 		autofillValues.filter(
 			(autofillValue) => autofillValue && autofillValue.includes(value)
 		) as string[]
-	);
+	)
 
 	$effect(() => {
-		value && onResetAutofill();
-	});
+		value && onResetAutofill()
+	})
 
 	$effect(() => {
 		if (selectedAutofill.selected <= 9) {
-			slicedAutofillValues = filteredAutofillValues.slice(0, 10);
+			slicedAutofillValues = filteredAutofillValues.slice(0, 10)
 		} else if (selectedAutofill.selected > 9) {
 			slicedAutofillValues = filteredAutofillValues.slice(
 				selectedAutofill.selected + 1 - 10,
 				selectedAutofill.selected + 1
-			);
+			)
 		}
-	});
+	})
 
 	const _onKeydown = (e: KeyboardEvent) => {
 		onKeydown(e, {
 			ArrowUp: () => {
-				e.preventDefault();
+				e.preventDefault()
 				if (selectedAutofill.selected > 0) {
-					onSelectAutofill(selectedAutofill.selected - 1);
+					onSelectAutofill(selectedAutofill.selected - 1)
 				}
 			},
 			ArrowDown: () => {
-				e.preventDefault();
+				e.preventDefault()
 				if (selectedAutofill.selected < filteredAutofillValues.length - 1) {
-					onSelectAutofill(selectedAutofill.selected + 1);
+					onSelectAutofill(selectedAutofill.selected + 1)
 				}
 			},
 			Backspace: _onFocus,
@@ -147,36 +147,36 @@
 				const isAutofillValueBeingSelected =
 					selectedAutofill !== undefined &&
 					selectedAutofill.selected !== undefined &&
-					isAutofillOpen;
+					isAutofillOpen
 
 				if (isAutofillValueBeingSelected) {
-					onClickAutofill(filteredAutofillValues[selectedAutofill.selected as number]);
+					onClickAutofill(filteredAutofillValues[selectedAutofill.selected as number])
 				} else {
-					onEnterKeydown && onEnterKeydown();
+					onEnterKeydown && onEnterKeydown()
 				}
 			},
 			Escape: () => {
-				unfocusInput();
-				$isAnAutofillOpen && closeAutofill();
+				unfocusInput()
+				$isAnAutofillOpen && closeAutofill()
 			}
-		});
-	};
+		})
+	}
 
 	const onAutofillWheeldown = (e: WheelEvent) => {
-		const isWheelUp = e.deltaY < 0;
-		const indexOfFirstItem = filteredAutofillValues.indexOf(slicedAutofillValues[0]);
+		const isWheelUp = e.deltaY < 0
+		const indexOfFirstItem = filteredAutofillValues.indexOf(slicedAutofillValues[0])
 
 		if (isWheelUp) {
-			if (indexOfFirstItem === 0) return;
-			const result = filteredAutofillValues.slice(indexOfFirstItem - 1, indexOfFirstItem - 1 + 10);
-			slicedAutofillValues = result;
+			if (indexOfFirstItem === 0) return
+			const result = filteredAutofillValues.slice(indexOfFirstItem - 1, indexOfFirstItem - 1 + 10)
+			slicedAutofillValues = result
 		} else {
-			const areThereAnyMoreItems = filteredAutofillValues.length > indexOfFirstItem + 10 + 1;
-			if (!areThereAnyMoreItems) return;
-			const result = filteredAutofillValues.slice(indexOfFirstItem + 1, indexOfFirstItem + 1 + 10);
-			slicedAutofillValues = result;
+			const areThereAnyMoreItems = filteredAutofillValues.length > indexOfFirstItem + 10 + 1
+			if (!areThereAnyMoreItems) return
+			const result = filteredAutofillValues.slice(indexOfFirstItem + 1, indexOfFirstItem + 1 + 10)
+			slicedAutofillValues = result
 		}
-	};
+	}
 </script>
 
 <div use:clickOutside class="relative" onclickOutside={onClickOutside}>

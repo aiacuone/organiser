@@ -1,1 +1,1 @@
-export * from './logsLocalApi';
+export * from './logsLocalApi'

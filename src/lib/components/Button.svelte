@@ -1,10 +1,10 @@
 <script lang="ts">
 	interface Props extends SvelteAllProps {
-		onclick?: (e: any) => void;
-		isDisabled?: boolean;
-		className?: string;
-		_class?: string;
-		height?: string;
+		onclick?: (e: any) => void
+		isDisabled?: boolean
+		className?: string
+		_class?: string
+		height?: string
 	}
 
 	const {
@@ -14,7 +14,7 @@
 		_class,
 		height = '28px',
 		children
-	}: Props = $props();
+	}: Props = $props()
 </script>
 
 <button

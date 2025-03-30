@@ -38,4 +38,4 @@ export const icons = {
 	unorderedList: 'ion:list',
 	orderedList: 'fa-solid:list-ol',
 	checkboxList: 'icon-park-outline:list-checkbox'
-};
+}

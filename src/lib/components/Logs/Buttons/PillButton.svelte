@@ -1,24 +1,24 @@
 <script lang="ts">
-	import Icon from '@iconify/svelte';
+	import Icon from '@iconify/svelte'
 
 	interface Button {
-		onclick: () => void;
-		icon?: string;
-		_class?: string;
-		label?: string;
-		notification?: number;
+		onclick: () => void
+		icon?: string
+		_class?: string
+		label?: string
+		notification?: number
 	}
 
 	interface Props extends SvelteAllProps {
-		buttons: Button[];
-		capitalizeLabels?: boolean;
-		_class?: string;
+		buttons: Button[]
+		capitalizeLabels?: boolean
+		_class?: string
 	}
 
 	// NOTE: this component is to be refactored once Svelte 5.0 releases. Use snippets to pass in buttons and their handlers
-	const { buttons, capitalizeLabels, _class }: Props = $props();
+	const { buttons, capitalizeLabels, _class }: Props = $props()
 
-	let containerHeight: number = $state(0);
+	let containerHeight: number = $state(0)
 </script>
 
 <div

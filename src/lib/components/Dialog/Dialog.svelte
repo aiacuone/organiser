@@ -1,32 +1,32 @@
 <script lang="ts">
 	interface Props extends SvelteAllProps {
-		overlayClickClose?: boolean;
-		dialog?: HTMLDialogElement;
-		preventClose?: boolean;
-		onOpen?: () => void;
-		onClose: () => void;
-		isOpen: boolean;
-		_class?: string;
+		overlayClickClose?: boolean
+		dialog?: HTMLDialogElement
+		preventClose?: boolean
+		onOpen?: () => void
+		onClose: () => void
+		isOpen: boolean
+		_class?: string
 	}
 
-	const { preventClose, isOpen, _class, children, onClose }: Props = $props();
+	const { preventClose, isOpen, _class, children, onClose }: Props = $props()
 
-	let dialog: HTMLDialogElement | undefined;
+	let dialog: HTMLDialogElement | undefined
 
 	$effect(() => {
 		if (isOpen) {
-			dialog?.showModal();
+			dialog?.showModal()
 		} else {
-			if (!preventClose) dialog?.close();
+			if (!preventClose) dialog?.close()
 		}
-	});
+	})
 
 	const onkeydown = (e: KeyboardEvent) => {
 		if (e.key === 'Escape') {
-			e.preventDefault();
-			onClose();
+			e.preventDefault()
+			onClose()
 		}
-	};
+	}
 </script>
 
 <svelte:window {onkeydown} />

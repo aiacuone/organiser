@@ -1,18 +1,18 @@
 <script lang="ts">
-	import Icon from '@iconify/svelte';
-	import Input from './Input.svelte';
-	import { icons } from '$lib/general/icons';
-	import Button from './Button.svelte';
+	import Icon from '@iconify/svelte'
+	import Input from './Input.svelte'
+	import { icons } from '$lib/general/icons'
+	import Button from './Button.svelte'
 
 	interface Props {
-		value: string;
-		onchange?: (e: Event) => void;
-		onClickClear?: () => void;
-		onClickEnter?: () => void;
-		showEnter?: boolean;
-		onEnterKeydown?: () => void;
-		onFocus?: (() => void) | undefined;
-		searchInput?: HTMLElement;
+		value: string
+		onchange?: (e: Event) => void
+		onClickClear?: () => void
+		onClickEnter?: () => void
+		showEnter?: boolean
+		onEnterKeydown?: () => void
+		onFocus?: (() => void) | undefined
+		searchInput?: HTMLElement
 	}
 
 	let {
@@ -23,7 +23,7 @@
 		onEnterKeydown,
 		onchange,
 		searchInput = $bindable()
-	}: Props = $props();
+	}: Props = $props()
 </script>
 
 <div class="hstack">

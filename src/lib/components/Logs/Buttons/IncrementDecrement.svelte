@@ -1,28 +1,28 @@
 <script lang="ts">
-	import { icons } from '$lib/general/icons';
-	import Icon from '@iconify/svelte';
+	import { icons } from '$lib/general/icons'
+	import Icon from '@iconify/svelte'
 
 	interface Props {
-		value: number;
-		min: number;
-		max: number;
-		onIncrement: () => void;
-		onDecrement: () => void;
+		value: number
+		min: number
+		max: number
+		onIncrement: () => void
+		onDecrement: () => void
 	}
 
-	let { value, min, max, onIncrement, onDecrement }: Props = $props();
+	let { value, min, max, onIncrement, onDecrement }: Props = $props()
 
 	const _onIncrement = () => {
 		if (value < max) {
-			onIncrement();
+			onIncrement()
 		}
-	};
+	}
 
 	const _onDecrement = () => {
 		if (value > min) {
-			onDecrement();
+			onDecrement()
 		}
-	};
+	}
 </script>
 
 <div class="hstack h-[30px]">

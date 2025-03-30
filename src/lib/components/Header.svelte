@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import Icon from '@iconify/svelte';
-	import Button from './Button.svelte';
-	import Dialog from './Dialog/Dialog.svelte';
-	import { useQuery, type QueryKey, type UseQueryStoreResult } from '@sveltestack/svelte-query';
-	import PillButton from './Logs/Buttons/PillButton.svelte';
-	import { derived } from 'svelte/store';
-	import { page } from '$app/stores';
+	import { goto } from '$app/navigation'
+	import Icon from '@iconify/svelte'
+	import Button from './Button.svelte'
+	import Dialog from './Dialog/Dialog.svelte'
+	import { useQuery, type QueryKey, type UseQueryStoreResult } from '@sveltestack/svelte-query'
+	import PillButton from './Logs/Buttons/PillButton.svelte'
+	import { derived } from 'svelte/store'
+	import { page } from '$app/stores'
 	import {
 		LogType_enum,
 		axios,
@@ -19,38 +19,38 @@
 		useDisclosure,
 		type LogNotification_int,
 		spaces
-	} from '$lib';
-	import AddSpace from './AddSpace.svelte';
+	} from '$lib'
+	import AddSpace from './AddSpace.svelte'
 
 	interface Props extends SvelteAllProps {
-		space: string | undefined;
+		space: string | undefined
 	}
 
-	const { space }: Props = $props();
-	let isAddingNewSpace: boolean = $state(false);
+	const { space }: Props = $props()
+	let isAddingNewSpace: boolean = $state(false)
 
 	const {
 		isOpen: isSpaceDialogOpen,
 		onOpen: openSpaceDialog,
 		onClose: closeSpaceDialog
-	} = useDisclosure();
+	} = useDisclosure()
 
 	const spacesQuery = useQuery(
 		`spaces`,
 		async () => {
-			if (!$isAuthenticated) return;
+			if (!$isAuthenticated) return
 			return await axios
 				.get(`/spaces`)
 				.then(({ data }) => data)
-				.catch((err) => console.log(err));
+				.catch((err) => console.log(err))
 		},
 		{
 			refetchOnMount: false,
 			onSuccess: (data) => {
-				$spaces = data;
+				$spaces = data
 			}
 		}
-	);
+	)
 
 	// I attempted to move both spacesQuery and allLogsNotificationsQuery to the layout component, but the token is not set when the layout component attempts to fetch the data.
 
@@ -58,34 +58,34 @@
 		useQuery(
 			`allLogNotifications`,
 			async () => {
-				if (!$isAuthenticated) return;
+				if (!$isAuthenticated) return
 
-				const params = { spaces: $spacesQuery.data };
+				const params = { spaces: $spacesQuery.data }
 
 				return await axios
 					.get(`/log/notifications`, { params })
 					.then(({ data }) => data)
-					.catch((err) => console.log(err));
+					.catch((err) => console.log(err))
 			},
 			{
 				refetchOnMount: false
 			}
-		);
+		)
 
 	const gotoLogType = (type: LogType_enum, hasNotification: boolean = false) => {
-		let url = `/${$page.params.space}/filter?type=${type}`;
+		let url = `/${$page.params.space}/filter?type=${type}`
 		if (hasNotification) {
-			if (type === LogType_enum.todo) url = `${url}&isChecked=false`;
-			if (type === LogType_enum.question) url = `${url}&isAnswered=false`;
+			if (type === LogType_enum.todo) url = `${url}&isChecked=false`
+			if (type === LogType_enum.question) url = `${url}&isAnswered=false`
 		}
-		goto(url);
-	};
+		goto(url)
+	}
 
 	const headerButtons: Record<
 		LogType_enum,
 		{
-			icon: string;
-			onclick: (hasNotification?: boolean) => void;
+			icon: string
+			onclick: (hasNotification?: boolean) => void
 		}
 	> = {
 		[LogType_enum.time]: {
@@ -108,30 +108,30 @@
 			icon: logIcons.list,
 			onclick: () => gotoLogType(LogType_enum.list)
 		}
-	};
+	}
 	const onAddSpace = () => {
-		closeSpaceDialog();
-	};
+		closeSpaceDialog()
+	}
 
 	const pillButtons = derived(
 		[allLogsNotificationsQuery, page],
 		([$allLogsNotificationsQuery, $page]) => {
-			if (!$allLogsNotificationsQuery?.data) return [];
+			if (!$allLogsNotificationsQuery?.data) return []
 
 			const doesSpaceExistInDb = $allLogsNotificationsQuery.data.some(
 				({ space }) => space === $page.params.space
-			);
+			)
 
 			const pillButtonsWithNewSpace = doesSpaceExistInDb
 				? $allLogsNotificationsQuery.data
-				: [...$allLogsNotificationsQuery.data, { space: $page.params.space, todo: 0, question: 0 }];
+				: [...$allLogsNotificationsQuery.data, { space: $page.params.space, todo: 0, question: 0 }]
 
 			return pillButtonsWithNewSpace.map(({ space, todo, question }) => {
 				const result: {
-					label?: string;
-					onclick: () => void;
-					notification: number;
-					icon?: string;
+					label?: string
+					onclick: () => void
+					notification: number
+					icon?: string
 				}[] = [
 					{
 						label: replaceAllHyphensWithSpaces(space),
@@ -140,51 +140,51 @@
 								`/${replaceAllSpacesWithHyphens(space)}/date/${getHyphenatedStringFromDate(
 									new Date()
 								)}`
-							);
-							closeSpaceDialog();
+							)
+							closeSpaceDialog()
 						},
 						notification: 0
 					}
-				];
+				]
 
 				if (todo)
 					result.push({
 						notification: todo,
 						onclick: () => {
-							closeSpaceDialog();
-							goto(`/${space}/filter?type=todo&isChecked=false`);
+							closeSpaceDialog()
+							goto(`/${space}/filter?type=todo&isChecked=false`)
 						},
 						icon: icons.todo
-					});
+					})
 
 				if (question)
 					result.push({
 						notification: question,
 						onclick: () => {
-							closeSpaceDialog();
-							goto(`/${space}/filter?type=question&isAnswered=false`);
+							closeSpaceDialog()
+							goto(`/${space}/filter?type=question&isAnswered=false`)
 						},
 						icon: icons.question
-					});
+					})
 
 				result.push({
 					icon: icons.moreVertical,
 					onclick: () => {
-						goto(`/${space}/overview`);
-						closeSpaceDialog();
+						goto(`/${space}/overview`)
+						closeSpaceDialog()
 					},
 					notification: 0
-				});
+				})
 
-				return result;
-			});
+				return result
+			})
 		}
-	);
+	)
 
 	const _openSpaceDialog = () => {
-		openSpaceDialog();
-		isAddingNewSpace = false;
-	};
+		openSpaceDialog()
+		isAddingNewSpace = false
+	}
 </script>
 
 <header class="center py-2 px-3 bg-gray-200">
