@@ -196,16 +196,17 @@
 		onEditLog();
 
 		const doesTheLastListItemHaveValue = (() => {
-			const lastListItem = log.listItems[log.listItems.length - 1].item;
+			const lastListItem = log.listItems[log.listItems.length - 1]?.item;
+			const lastCheckboxItem = log.checkboxItems[log.checkboxItems.length - 1]?.text;
 
 			const itemValueType: Record<LogType_enum, string | number> = {
-				[LogType_enum.todo]: log.checkboxItems[log.checkboxItems.length - 1].text,
+				[LogType_enum.todo]: lastCheckboxItem,
 				[LogType_enum.question]:
 					log.questions[log.questions.length - 1].question ||
 					log.questions[log.questions.length - 1].answer,
 				[LogType_enum.important]: lastListItem,
 				[LogType_enum.time]: lastListItem,
-				[LogType_enum.list]: lastListItem
+				[LogType_enum.list]: log.listType === 'checkbox' ? lastCheckboxItem : lastListItem
 			};
 
 			return !!itemValueType[log.type];
