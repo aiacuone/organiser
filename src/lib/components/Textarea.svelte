@@ -67,7 +67,7 @@
 	});
 
 	const onfocus = () => {
-		_onFocus && _onFocus();
+		_onFocus?.();
 	};
 </script>
 

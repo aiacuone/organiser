@@ -72,10 +72,8 @@
 
 	let changeReferenceInputValue: ((value: string | undefined) => void) | undefined = $state();
 
-	let onFocusAnswerInput: () => void;
 	const _onFocusAnswerInput = () => {
 		onEditLog();
-		addToEndOfRaceCondition(onFocusAnswerInput);
 	};
 
 	let haveValuesChanged = $derived(!isEqual(getMappedLog(initialLog), log));
