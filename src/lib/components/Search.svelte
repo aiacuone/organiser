@@ -32,7 +32,7 @@
 		<Input
 			bind:value
 			bind:onEnterKeydown
-			_class="outline-none"
+			_class="outline-hidden"
 			{onchange}
 			bind:input={searchInput}
 		/>

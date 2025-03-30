@@ -264,7 +264,7 @@
 	</div>
 {/snippet}
 
-<Dialog {isOpen} {onOpen} {onClose} _class="h-full w-full max-w-screen-lg">
+<Dialog {isOpen} {onOpen} {onClose} _class="h-full w-full max-w-(--breakpoint-lg)">
 	<div bind:clientHeight={containerHeight} class="stack gap-3 w-full h-full text-sm">
 		<header bind:clientHeight={headerHeight} class="text-center">Export/Copy</header>
 		<div bind:clientHeight={buttonsContainerHeight} class="stack gap-2">
@@ -295,7 +295,7 @@
 		<div bind:this={logsContainer} class="stack flex-1 overflow-y-scroll hide-scrollbar">
 			{#if isLoadingLogs}
 				{#each Array(5) as _}
-					<div class="bg-neutral-100 rounded-sm h-[120px] w-full"></div>
+					<div class="bg-neutral-100 rounded-xs h-[120px] w-full"></div>
 				{/each}
 			{:else if isLogsError}
 				Error

@@ -188,7 +188,7 @@
 </script>
 
 <header class="center py-2 px-3 bg-gray-200">
-	<div class="flex-1 max-w-screen-lg hstack">
+	<div class="flex-1 max-w-(--breakpoint-lg) hstack">
 		<div class="flex-1">
 			<img src="/logit-logo-symbol-light.svg" alt="Logit Logo" class="h-[30px]" />
 		</div>

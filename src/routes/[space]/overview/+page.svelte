@@ -45,7 +45,7 @@
 </script>
 
 <div class="center">
-	<div class="max-w-screen-lg center stack">
+	<div class="max-w-(--breakpoint-lg) center stack">
 		<header class="capitalize mb-6">
 			{data.space}
 		</header>

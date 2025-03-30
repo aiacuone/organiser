@@ -246,7 +246,7 @@
 </script>
 
 <div bind:clientHeight={parentContainerHeight} class="flex-1 center stack overflow-hidden">
-	<div class="stack gap-4 w-full px-2 max-w-screen-lg h-full justify-center flex-1 py-1">
+	<div class="stack gap-4 w-full px-2 max-w-(--breakpoint-lg) h-full justify-center flex-1 py-1">
 		<div bind:clientHeight={logButtonsContainerHeight} class="stack gap-2 center">
 			<div class="hstack center gap-2 flex-wrap">
 				<div class="hstack gap-2 center">
@@ -305,7 +305,7 @@
 			{#if $logs.isLoading}
 				<div style="max-height:{notesContainerHeight}px" class="stack gap-6">
 					{#each Array(5) as _}
-						<div class="bg-neutral-100 rounded-sm h-[120px] w-full"></div>
+						<div class="bg-neutral-100 rounded-xs h-[120px] w-full"></div>
 					{/each}
 				</div>
 			{:else if $logs.isError}
@@ -318,18 +318,18 @@
 		</div>
 		<div class="stack gap-2">
 			<div class="hstack center capitalize gap-5">
-				<Button _class="bg-white bg-opacity-80 w-[50px] center" onclick={onClickPreviousDay}>
+				<Button _class="bg-white/80 w-[50px] center" onclick={onClickPreviousDay}>
 					<Icon icon={icons.left} height="20px" class="text-gray-400" />
 				</Button>
 				<Button
 					_class="bg-white {getHyphenatedStringFromDate(new Date()) ===
 					$selectedHyphenatedDateString
-						? 'bg-opacity-80'
-						: 'bg-opacity-40'}"
+						? 'bg-white/80'
+						: 'bg-white/40'}"
 					onclick={onGotoTodaysDate}
 					><div class=" rounded-md border-2 w-[18px] h-[18px] border-gray-400"></div></Button
 				>
-				<Button _class="bg-white bg-opacity-80 w-[50px] center" onclick={onClickNextDay}>
+				<Button _class="bg-white/80 w-[50px] center" onclick={onClickNextDay}>
 					<Icon icon={icons.right} height="20px" class="text-gray-400" />
 				</Button>
 			</div>

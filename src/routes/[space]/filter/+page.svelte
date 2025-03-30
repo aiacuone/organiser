@@ -231,14 +231,14 @@
 	</div>
 	<div class="center">
 		<div
-			class="stack gap-6 hide-scrollbar flex-1 max-w-screen-lg {!!$whichInputIsFocused
+			class="stack gap-6 hide-scrollbar flex-1 max-w-(--breakpoint-lg) {!!$whichInputIsFocused
 				? 'overflow-y-hidden'
 				: 'overflow-y-scroll'}"
 			style={`max-height:${logContainerHeight}px`}
 		>
 			{#if $filteredLogsQuery.isLoading}
 				{#each Array(5) as _}
-					<div class="bg-neutral-100 rounded-sm h-[120px] w-full"></div>
+					<div class="bg-neutral-100 rounded-xs h-[120px] w-full"></div>
 				{/each}
 			{:else if $filteredLogsQuery.isError}
 				Error

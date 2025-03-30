@@ -76,7 +76,7 @@
 		bind:this={bindableTextarea}
 		class={twMerge(
 			_class,
-			`resize-none text-sm center bg-transparent h-[20px] px-2 w-full outline-none`
+			`resize-none text-sm center bg-transparent h-[20px] px-2 w-full outline-hidden`
 		)}
 		oninput={onchange}
 		{onfocus}

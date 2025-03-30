@@ -71,11 +71,11 @@
 </script>
 
 <footer class="py-2 bg-gray-300 px-3 center min-h-[50px]">
-	<div class="hstack max-w-screen-lg flex-1">
+	<div class="hstack max-w-(--breakpoint-lg) flex-1">
 		{#if $isAuthenticated}
 			<div class="hstack center capitalize gap-5">
 				{#each footerButtons as footerButton}
-					<Button _class="bg-white bg-opacity-80" onclick={footerButton.onClick}>
+					<Button _class="bg-white/80" onclick={footerButton.onClick}>
 						<Icon icon={footerButton.icon} />
 					</Button>
 				{/each}

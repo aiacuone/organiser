@@ -185,7 +185,7 @@
 		bind:value
 		bind:this={input}
 		type="text"
-		class={twMerge(_class, 'placeholder-gray-300 w-full bg-transparent text-sm outline-none')}
+		class={twMerge(_class, 'placeholder-gray-300 w-full bg-transparent text-sm outline-hidden')}
 		placeholder={isDisabled ? '' : placeholder}
 		oninput={onchange}
 		onkeydown={_onKeydown}
