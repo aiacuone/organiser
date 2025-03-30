@@ -14,14 +14,19 @@
 	import { page } from '$app/stores';
 	import { getContext, onMount, setContext } from 'svelte';
 	import { deleteLogClient, updateLogClient } from '$lib/api/logsLocalApi';
-	import { isAnAutofillOpen, unfocusStoreInput, whichInputIsFocused } from '$lib/stores';
-	import { currentlyEditing, titlesAndReferences, titles } from '$lib/stores';
+	import {
+		isAnAutofillOpen,
+		unfocusStoreInput,
+		whichInputIsFocused,
+		currentlyEditing,
+		titlesAndReferences,
+		titles
+	} from '$lib/stores';
+
 	import ConfirmationDialog from '../ConfirmationDialog.svelte';
 	import Input from '../Input.svelte';
 	import BottomOptions from './BottomOptions.svelte';
-	import ListItems from './LogListItems.svelte';
-	import CheckboxItems from './LogCheckboxItems.svelte';
-	import LogQuestionItems from './LogQuestionItems.svelte';
+	import ListItems from './ListItems.svelte';
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query';
 	import isEqual from 'lodash.isequal';
 	import { useDisclosure } from '$lib/hooks';
@@ -48,7 +53,7 @@
 	const onStopEditing = () => ($currentlyEditing = null);
 	const onResetNewLogType: () => void = getContext('onResetNewLogType');
 	setContext('onEditLog', onEditLog);
-	setContext('isEditing', isEditing);
+	setContext('isEditing', () => isEditing);
 
 	const invalidateLogs: () => Promise<void> = getContext('invalidateLogs');
 
@@ -67,10 +72,8 @@
 
 	let changeReferenceInputValue: ((value: string | undefined) => void) | undefined = $state();
 
-	let onFocusAnswerInput: () => void;
 	const _onFocusAnswerInput = () => {
 		onEditLog();
-		addToEndOfRaceCondition(onFocusAnswerInput);
 	};
 
 	let haveValuesChanged = $derived(!isEqual(getMappedLog(initialLog), log));
@@ -89,7 +92,7 @@
 	};
 
 	const onTextareaEnterKeydown: () => void = () => {
-		onAddItem();
+		// onAddItem();
 	};
 
 	const onClickOutside = () => {
@@ -191,16 +194,17 @@
 		onEditLog();
 
 		const doesTheLastListItemHaveValue = (() => {
-			const lastListItem = log.listItems[log.listItems.length - 1].item;
+			const lastListItem = log.listItems[log.listItems.length - 1]?.item;
+			const lastCheckboxItem = log.checkboxItems[log.checkboxItems.length - 1]?.text;
 
 			const itemValueType: Record<LogType_enum, string | number> = {
-				[LogType_enum.todo]: log.checkboxItems[log.checkboxItems.length - 1].text,
+				[LogType_enum.todo]: lastCheckboxItem,
 				[LogType_enum.question]:
 					log.questions[log.questions.length - 1].question ||
 					log.questions[log.questions.length - 1].answer,
 				[LogType_enum.important]: lastListItem,
 				[LogType_enum.time]: lastListItem,
-				[LogType_enum.list]: lastListItem
+				[LogType_enum.list]: log.listType === 'checkbox' ? lastCheckboxItem : lastListItem
 			};
 
 			return !!itemValueType[log.type];
@@ -262,24 +266,16 @@
 	};
 
 	onMount(() => {
+		if (editOnMount) onEditLog();
+
 		const keydown = (e: KeyboardEvent) => {
-			if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
-				onAccept();
-			}
-			if (e.ctrlKey && e.shiftKey && e.key === '.') {
-				onAddItem();
-			}
+			if (e.ctrlKey && e.shiftKey && e.key === 'Enter') onAccept();
+			if (e.ctrlKey && e.shiftKey && (e.key === '.' || e.key === '>')) onAddItem();
 		};
 
 		container.addEventListener('keydown', keydown);
 
 		return () => container.removeEventListener('keydown', keydown);
-	});
-
-	onMount(() => {
-		if (editOnMount) {
-			onEditLog();
-		}
 	});
 
 	const {
@@ -347,18 +343,12 @@
 
 		onKeydown(e, {
 			ArrowUp: () => {
-				if (indexOfFocusedElement === 0) {
-					indexOfNewFocusedElement = focusElements.length - 1;
-				} else {
-					indexOfNewFocusedElement = indexOfFocusedElement - 1;
-				}
+				if (indexOfFocusedElement === 0) indexOfNewFocusedElement = focusElements.length - 1;
+				else indexOfNewFocusedElement = indexOfFocusedElement - 1;
 			},
 			ArrowDown: () => {
-				if (indexOfFocusedElement === focusElements.length - 1) {
-					indexOfNewFocusedElement = 0;
-				} else {
-					indexOfNewFocusedElement = indexOfFocusedElement + 1;
-				}
+				if (indexOfFocusedElement === focusElements.length - 1) indexOfNewFocusedElement = 0;
+				else indexOfNewFocusedElement = indexOfFocusedElement + 1;
 			},
 			Tab: function () {
 				// Requires old style function due to referring to 'this'
@@ -419,41 +409,16 @@
 				</div>
 			</div>
 			<div class="hstack center gap-2">
-				<!-- todo: All 3 of these conditionally rendered items should reduce to one once LogQuestionItems and LogCheckboxItems has been refactored into LogListItems -->
-				{#if log.type === LogType_enum.todo || (log.type === LogType_enum.list && log.listType === LogListType_enum.checkbox)}
-					<div class="flex-1">
-						<CheckboxItems
-							bind:checkboxes={log.checkboxItems}
-							bind:focusElements
-							{isEditing}
-							onEnterKeydown={onTextareaEnterKeydown}
-							onDeleteBullet={onDeleteItem}
-							{onEdit}
-							{onClickInput}
-						/>
-					</div>
-				{:else if log.type === LogType_enum.question}
-					<LogQuestionItems
-						bind:questions={log.questions}
-						bind:focusElements
-						onFocusAnswerInput={_onFocusAnswerInput}
-						{isEditing}
-						onDeleteQuestion={onDeleteItem}
-						id={log.id}
-						{onClickInput}
-					/>
-				{:else if log.type === LogType_enum.important || log.type === LogType_enum.time || (log.type === LogType_enum.list && log.listType !== LogListType_enum.checkbox)}
-					<ListItems
-						bind:items={log.listItems}
-						bind:focusElements
-						listType={log.listType}
-						{isEditing}
-						onEnterKeydown={onTextareaEnterKeydown}
-						{onDeleteItem}
-						logType={log.type}
-						{onClickInput}
-					/>
-				{/if}
+				<ListItems
+					bind:focusElements
+					bind:log
+					{isEditing}
+					onEnterKeydown={onTextareaEnterKeydown}
+					{onDeleteItem}
+					{onClickInput}
+					{onEdit}
+					onFocusAnswerInput={_onFocusAnswerInput}
+				/>
 			</div>
 			<BottomOptions
 				bind:log
