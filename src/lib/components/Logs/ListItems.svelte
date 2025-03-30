@@ -176,7 +176,6 @@
 							<Textarea
 								bind:textarea={focusElements[focusElements.length]}
 								bind:value={log.questions[index].question}
-								className=""
 								_class="flex-1"
 								autofocus
 								isDisabled={!isEditing}

@@ -8,6 +8,7 @@
 	} from '$lib/stores'
 	import { addToEndOfRaceCondition, clickOutside, onKeydown } from '$lib/utils'
 	import { onMount } from 'svelte'
+	import { twMerge } from 'tailwind-merge'
 
 	interface Props {
 		value: string
@@ -184,14 +185,14 @@
 		bind:value
 		bind:this={input}
 		type="text"
-		class="placeholder-gray-300 w-full bg-transparent text-sm outline-none {_class}"
+		class={twMerge(_class, 'placeholder-gray-300 w-full bg-transparent text-sm outline-none')}
 		placeholder={isDisabled ? '' : placeholder}
 		oninput={onchange}
 		onkeydown={_onKeydown}
 		{onclick}
 		readonly={isDisabled}
 	/>
-	<div class="relative z-50 {isEditing && isAutofillOpen ? 'flex' : 'hidden'}">
+	<div class={twMerge(isEditing && isAutofillOpen ? 'flex' : 'hidden', 'relative z-50')}>
 		<div
 			class="absolute stack bg-white border-l border-r border-b rounded-b-md w-full"
 			onwheel={onAutofillWheeldown}

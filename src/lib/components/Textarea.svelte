@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte'
+	import { twMerge } from 'tailwind-merge'
 
 	interface Props {
 		value: string | string[]
-		className?: string
 		autofocus?: boolean
 		_class?: string
 		onEnterKeydown?: () => void
@@ -15,7 +15,6 @@
 	}
 
 	let {
-		className,
 		autofocus,
 		_class,
 		onEnterKeydown,
@@ -75,7 +74,10 @@
 	<textarea
 		bind:value
 		bind:this={bindableTextarea}
-		class="resize-none {className} text-sm center bg-transparent h-[20px] px-2 w-full outline-none {_class}"
+		class={twMerge(
+			_class,
+			`resize-none text-sm center bg-transparent h-[20px] px-2 w-full outline-none`
+		)}
 		oninput={onchange}
 		{onfocus}
 		readonly={isDisabled}

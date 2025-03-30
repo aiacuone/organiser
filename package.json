@@ -48,6 +48,7 @@
 		"lodash.isequal": "^4.5.0",
 		"mongodb": "^6.1.0",
 		"svelte-dnd-action": "^0.9.60",
+		"tailwind-merge": "^3.0.2",
 		"uuid": "^9.0.0"
 	}
 }

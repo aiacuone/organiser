@@ -30,6 +30,7 @@
 	import { useMutation, useQueryClient } from '@sveltestack/svelte-query'
 	import isEqual from 'lodash.isequal'
 	import { useDisclosure } from '$lib/hooks'
+	import { twMerge } from 'tailwind-merge'
 
 	interface Props {
 		initialLog: Log_int
@@ -193,6 +194,8 @@
 	const onAddItem = () => {
 		onEditLog()
 
+		const isCheckboxListType = log.listType === LogListType_enum.checkbox
+
 		const doesTheLastListItemHaveValue = (() => {
 			const lastListItem = log.listItems[log.listItems.length - 1]?.item
 			const lastCheckboxItem = log.checkboxItems[log.checkboxItems.length - 1]?.text
@@ -204,7 +207,7 @@
 					log.questions[log.questions.length - 1].answer,
 				[LogType_enum.important]: lastListItem,
 				[LogType_enum.time]: lastListItem,
-				[LogType_enum.list]: log.listType === 'checkbox' ? lastCheckboxItem : lastListItem
+				[LogType_enum.list]: isCheckboxListType ? lastCheckboxItem : lastListItem
 			}
 
 			return !!itemValueType[log.type]
@@ -225,8 +228,6 @@
 		const addQuestionItem = () =>
 			log.questions &&
 			(log.questions = [...log.questions, { id: log.questions.length, question: '', answer: '' }])
-
-		const isCheckboxListType = log.listType === LogListType_enum.checkbox
 
 		const addItemTypeMethods: Record<LogType_enum, () => void> = {
 			[LogType_enum.todo]: addCheckboxItem,
@@ -382,7 +383,7 @@
 	bind:this={container}
 >
 	<div class={containerClasses[log.type][0]}>
-		<div class="stack {containerClasses[log.type][1]}">
+		<div class={twMerge(containerClasses[log.type][1], 'stack')}>
 			<div class={log.title || log.reference || isEditing ? 'flex' : 'hidden'}>
 				<div class="stack gap-1 w-full">
 					<Input

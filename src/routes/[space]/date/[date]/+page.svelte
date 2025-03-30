@@ -356,7 +356,7 @@
 					</label>
 				{/each}
 			</div>
-			<Button className="text-black text-xs self-end" onclick={resetCheckboxes}>Reset</Button>
+			<Button _class="text-black text-xs self-end" onclick={resetCheckboxes}>Reset</Button>
 		</div>
 		<div
 			class="stack gap-10 center h-full overflow-y-scroll hide-scrollbar"
@@ -365,8 +365,8 @@
 			<div bind:this={notesModalTextArea} class="stack gap-2 sm:gap-4"></div>
 		</div>
 		<div bind:clientHeight={modalButtonContainerHeight} class="flex flex-wrap gap-4 center">
-			<Button onclick={copy} className="text-black">Copy</Button>
-			<Button onclick={() => exportedNotesModal.close()} className="text-black">Close</Button>
+			<Button onclick={copy} _class="text-black">Copy</Button>
+			<Button onclick={() => exportedNotesModal.close()} _class="text-black">Close</Button>
 		</div>
 	</div>
 </dialog>

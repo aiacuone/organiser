@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte'
+	import { twMerge } from 'tailwind-merge'
 
 	interface Button {
 		onclick: () => void
@@ -23,13 +24,19 @@
 
 <div
 	bind:clientHeight={containerHeight}
-	class="pill-button hstack shadow-md min-h-[30px] rounded-r-[4px] rounded-l-[4px] text-sm center relative {_class}"
+	class={twMerge(
+		_class,
+		`pill-button hstack shadow-md min-h-[30px] rounded-r-[4px] rounded-l-[4px] text-sm center relative`
+	)}
 >
 	{#each buttons as { label, onclick, icon, _class, notification }, index}
 		<button
-			class="center {index === 0 ? 'rounded-l-[4px]' : ''} {index === buttons.length - 1
-				? 'rounded-r-[4px]'
-				: ''} gap-2 px-2 {_class} {capitalizeLabels ? 'capitalize' : ''} relative"
+			class={twMerge(
+				_class,
+				`center ${index === 0 ? 'rounded-l-[4px]' : ''} ${
+					index === buttons.length - 1 ? 'rounded-r-[4px]' : ''
+				} gap-2 px-2 ${capitalizeLabels ? 'capitalize' : ''} relative`
+			)}
 			style={`height: ${containerHeight}px;`}
 			{onclick}
 		>

@@ -1,5 +1,3 @@
-import type { ListItem_int, MappedListItem, QuestionItem_int } from '$lib/types'
-
 export const getHyphenatedStringFromDate = (date: Date) => {
 	const _date = new Date(date)
 	return _date.toISOString().split('T')[0].replace(/-/g, '-').split('-').reverse().join('-')

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { twMerge } from 'tailwind-merge'
+
 	interface Props extends SvelteAllProps {
 		overlayClickClose?: boolean
 		dialog?: HTMLDialogElement
@@ -31,7 +33,7 @@
 
 <svelte:window {onkeydown} />
 
-<dialog bind:this={dialog} class="p-4 shadow-md rounded-sm w-full max-w-[500px] {_class}">
+<dialog bind:this={dialog} class={twMerge(_class, `p-4 shadow-md rounded-sm w-full max-w-[500px]`)}>
 	<div class="w-full h-full center">
 		{@render children()}
 	</div>
