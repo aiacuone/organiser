@@ -11,28 +11,33 @@
 	import { createClient, loginWithRedirect } from '$lib/clientServices'
 	import LogitLogo from '$lib/svg/logit-logo.svelte'
 	import AddSpace from '$lib/components/AddSpace.svelte'
-	import { axios, getHyphenatedStringFromDate, replaceAllSpacesWithHyphens } from '$lib'
+	import {
+		axios,
+		getDateFromHyphenatedString,
+		getHyphenatedStringFromDate,
+		replaceAllSpacesWithHyphens
+	} from '$lib'
 	import { goto } from '$app/navigation'
 
 	let { children } = $props()
 
-	const getDateFromHyphenatedString = (dateString: string) => {
-		const [day, month, year] = dateString.split('-').map(Number)
-
-		return new Date(Date.UTC(year, month - 1, day))
-	}
-
 	let urlSpace = $derived($page.params.space)
+	let isGettingSpaces = $state(false)
 
 	$effect(() => {
 		const getSpaces = async () => {
+			isGettingSpaces = true
+
 			const spaces = await axios.get('/spaces').then((response) => response.data)
 			const areThereAnySpaces = spaces.length > 0
+
 			if (areThereAnySpaces) {
 				const date = getHyphenatedStringFromDate(new Date())
 				const space = urlSpace || spaces[0]
 				goto(`/${replaceAllSpacesWithHyphens(space)}/date/${date}`)
 			}
+
+			isGettingSpaces = false
 		}
 
 		if ($isAuthenticated) {
@@ -41,9 +46,11 @@
 	})
 
 	onMount(() => {
-		if ($page.params.date) {
+		const doesUrlHaveDate = $page.params.date
+
+		if (doesUrlHaveDate)
 			return ($selectedDate = new Date(getDateFromHyphenatedString($page.params.date)))
-		}
+
 		$selectedDate = new Date()
 	})
 
@@ -121,7 +128,7 @@
 	<div class="stack" style={'height:100dvh'}>
 		<Header {space} />
 		<main class="flex-1 p-1 flex flex-col overflow-hidden">
-			{#if $isAuthLoading}
+			{#if $isAuthLoading || isGettingSpaces}
 				<div class="w-full h-full center">Loading...</div>
 			{:else if $isAuthenticated && !space}
 				<div class="h-full w-full center stack gap-2">
@@ -136,7 +143,7 @@
 					<Button onclick={onLogin}>Login</Button>
 				</div>
 			{/if}
-			<div class="flex justify-end" />
+			<div class="flex justify-end"></div>
 		</main>
 		<Footer />
 	</div>
