@@ -1,42 +1,29 @@
 import type { Handle } from '@sveltejs/kit'
-import jwt from 'jsonwebtoken'
-import { PUBLIC_AUTH0_DOMAIN, PUBLIC_AUTH0_CLIENT_ID } from '$env/static/public'
-import { createAuth0Client } from '@auth0/auth0-spa-js'
 import { dbCollections, setCollection } from '$lib/server'
 
-export const authConfig = {
-	domain: PUBLIC_AUTH0_DOMAIN,
-	clientId: PUBLIC_AUTH0_CLIENT_ID
-}
-
-export const createClient = async () => {
-	const auth0Client = await createAuth0Client({
-		domain: authConfig.domain,
-		clientId: authConfig.clientId,
-		useRefreshTokens: true,
-		cacheLocation: 'localstorage'
-	})
-
-	return auth0Client
-}
-
 export const handle: Handle = async ({ resolve, event }) => {
-	const { request } = event
-	const token = event.request.headers.get('Authorization')?.substring(7) ?? null
-	const decodedToken = token && jwt.decode(token)
-	const userSocialId = decodedToken?.sub as string
+	// const { request } = event
+	// const token = event.request.headers.get('Authorization')?.substring(7) ?? null
+	// const decodedToken = token && jwt.decode(token)
 
-	const requestWithNoBody = new Request(request.url, {
-		...request,
-		body: null
-	})
+	//todo: change this back when complete
+	// const userSocialId = decodedToken?.sub as string
+	const userSocialId = 'google-oauth2|115454758242624071339' as string
 
-	if (!token) {
-		event.request = requestWithNoBody
-		return resolve(event)
-	}
+	// const requestWithNoBody = new Request(request.url, {
+	// 	...request,
+	// 	body: null
+	// })
 
-	const doesCollectionExist = !!dbCollections[userSocialId]
+	// if (!token) {
+	// 	event.request = requestWithNoBody
+	// 	return resolve(event)
+	// }
+	const collection = dbCollections[userSocialId]
+	const doesCollectionExist = !!collection
+
+	if (!event.locals.collection) event.locals.collection = collection
+	if (!event.locals.userSocialId) event.locals.userSocialId = userSocialId
 
 	if (!doesCollectionExist) {
 		console.log('New collection created for user')

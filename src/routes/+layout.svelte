@@ -8,7 +8,6 @@
 	import Footer from '$lib/components/Footer.svelte'
 	import { isAuthLoading, isAuthenticated } from '$lib/stores'
 	import Button from '$lib/components/Button.svelte'
-	import { createClient, loginWithRedirect } from '$lib/clientServices'
 	import LogitLogo from '$lib/svg/logit-logo.svelte'
 	import AddSpace from '$lib/components/AddSpace.svelte'
 	import {
@@ -117,8 +116,7 @@
 	const queryClient = new QueryClient()
 
 	const onLogin = async () => {
-		const client = await createClient()
-		loginWithRedirect(client)
+		// todo: Add login
 	}
 
 	let space = $derived($page.params.space)
@@ -128,7 +126,9 @@
 	<div class="stack" style={'height:100dvh'}>
 		<Header {space} />
 		<main class="flex-1 p-1 flex flex-col overflow-hidden">
-			{#if $isAuthLoading || isGettingSpaces}
+			{#if isGettingSpaces}
+				<!-- todo: Restore this -->
+				<!-- {#if $isAuthLoading || isGettingSpaces} -->
 				<div class="w-full h-full center">Loading...</div>
 			{:else if $isAuthenticated && !space}
 				<div class="h-full w-full center stack gap-2">

@@ -1,75 +1,64 @@
-import {
-	checkAccessTokenMiddleware,
-	deleteLog,
-	getAndCheckCollectionFromToken,
-	getLogs,
-	updateLog
-} from '$lib/server'
+import { deleteLog, getLogs, updateLog } from '$lib/server'
 import type { RequestEvent } from '@sveltejs/kit'
 
-export const PATCH = async ({ request }: RequestEvent) =>
-	checkAccessTokenMiddleware(request, async () =>
-		getAndCheckCollectionFromToken(request, async (collection) => {
-			const data = await request.json()
-			await updateLog(data, collection)
+export const PATCH = async ({ request, locals }: RequestEvent) => {
+	const data = await request.json()
+	const { collection } = locals
 
-			return new Response(JSON.stringify(''), { status: 200 })
-		})
-	)
+	await updateLog(data, collection)
 
-export const DELETE = async ({ request }: RequestEvent) =>
-	checkAccessTokenMiddleware(request, async () =>
-		getAndCheckCollectionFromToken(request, async (collection) => {
-			const { id } = await request.json()
+	return new Response(JSON.stringify(''), { status: 200 })
+}
 
-			await deleteLog(id, collection)
+export const DELETE = async ({ request, locals }: RequestEvent) => {
+	const { id } = await request.json()
+	const { collection } = locals
 
-			return new Response(JSON.stringify(''), { status: 200 })
-		})
-	)
+	await deleteLog(id, collection)
 
-export const GET = async ({ request, url: { searchParams } }: RequestEvent) =>
-	checkAccessTokenMiddleware(request, async () =>
-		getAndCheckCollectionFromToken(request, async (collection) => {
-			const objectSearchParams = Object.fromEntries(searchParams.entries())
-			const json = objectSearchParams['json']
+	return new Response(JSON.stringify(''), { status: 200 })
+}
 
-			let logs
-			let total
+export const GET = async ({ url: { searchParams }, locals }: RequestEvent) => {
+	const objectSearchParams = Object.fromEntries(searchParams.entries())
+	const json = objectSearchParams['json']
+	const { collection } = locals
 
-			if (json) {
-				const jsonArray = JSON.parse(objectSearchParams['json'])
+	let logs
+	let total
 
-				objectSearchParams['json'] = JSON.parse(objectSearchParams['json'])
+	if (json) {
+		const jsonArray = JSON.parse(objectSearchParams['json'])
 
-				const reducedJsonParams = jsonArray.reduce(
-					(object: Record<string, string[] | string>, [key, value]: string[]) => {
-						const isMultiplesKey = ['type', 'searchType'].includes(key)
+		objectSearchParams['json'] = JSON.parse(objectSearchParams['json'])
 
-						if (isMultiplesKey) {
-							if (object[key]) {
-								object[key] = [...object[key], value]
-							} else {
-								object[key] = [value]
-							}
-						} else {
-							object[key] = value
-						}
+		const reducedJsonParams = jsonArray.reduce(
+			(object: Record<string, string[] | string>, [key, value]: string[]) => {
+				const isMultiplesKey = ['type', 'searchType'].includes(key)
 
-						return object
-					},
-					{} as Record<string, string[] | string>
-				)
+				if (isMultiplesKey) {
+					if (object[key]) {
+						object[key] = [...object[key], value]
+					} else {
+						object[key] = [value]
+					}
+				} else {
+					object[key] = value
+				}
 
-				delete objectSearchParams['json']
+				return object
+			},
+			{} as Record<string, string[] | string>
+		)
 
-				const params = { ...objectSearchParams, ...reducedJsonParams }
+		delete objectSearchParams['json']
 
-				;({ logs, total } = await getLogs(params, collection))
-			} else {
-				;({ logs, total } = await getLogs(objectSearchParams, collection))
-			}
+		const params = { ...objectSearchParams, ...reducedJsonParams }
 
-			return new Response(JSON.stringify({ logs, total }), { status: 200 })
-		})
-	)
+		;({ logs, total } = await getLogs(params, collection))
+	} else {
+		;({ logs, total } = await getLogs(objectSearchParams, collection))
+	}
+
+	return new Response(JSON.stringify({ logs, total }), { status: 200 })
+}

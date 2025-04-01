@@ -1,6 +1,6 @@
-import _axios, { type InternalAxiosRequestConfig } from 'axios'
+import _axios from 'axios'
+// import _axios, { type InternalAxiosRequestConfig } from 'axios'
 import { PUBLIC_BASE_URL } from '$env/static/public'
-import { createClient } from '$lib/clientServices'
 
 export const axios = _axios.create({
 	baseURL: PUBLIC_BASE_URL,
@@ -11,24 +11,25 @@ export const axios = _axios.create({
 	}
 })
 
-axios.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
-	const sessionStorageToken = sessionStorage.getItem('token')
-	const doesSessionTokenExist = sessionStorageToken !== null && sessionStorageToken !== 'undefined'
+// todo: Restore this
+// axios.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+// 	const sessionStorageToken = sessionStorage.getItem('token')
+// 	const doesSessionTokenExist = sessionStorageToken !== null && sessionStorageToken !== 'undefined'
 
-	let token
+// 	let token
 
-	if (doesSessionTokenExist) {
-		token = JSON.parse(sessionStorageToken as string)
-	} else {
-		const client = await createClient()
-		const response = await client.getIdTokenClaims()
-		const _token = response?.__raw
+// 	if (doesSessionTokenExist) {
+// 		token = JSON.parse(sessionStorageToken as string)
+// 	} else {
+// 		const client = await createClient()
+// 		const response = await client.getIdTokenClaims()
+// 		const _token = response?.__raw
 
-		sessionStorage.setItem('token', JSON.stringify(_token))
-		token = _token
-	}
+// 		sessionStorage.setItem('token', JSON.stringify(_token))
+// 		token = _token
+// 	}
 
-	config.headers.set('Authorization', `Bearer ${token}`)
+// 	config.headers.set('Authorization', `Bearer ${token}`)
 
-	return config
-})
+// 	return config
+// })
