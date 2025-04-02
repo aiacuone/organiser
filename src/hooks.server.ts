@@ -1,38 +1,33 @@
 import type { Handle } from '@sveltejs/kit'
-import { dbCollections, setCollection } from '$lib/server'
+import { setCollection } from '$lib/server'
+import { handle as authHandle } from './auth'
+import { sequence } from '@sveltejs/kit/hooks'
+import { getCollection } from './lib/server/database/common'
 
-export const handle: Handle = async ({ resolve, event }) => {
-	// const { request } = event
-	// const token = event.request.headers.get('Authorization')?.substring(7) ?? null
-	// const decodedToken = token && jwt.decode(token)
+const customHandle: Handle = async ({ resolve, event }) => {
+	const session = await event.locals.getSession()
 
-	//todo: change this back when complete
-	// const userSocialId = decodedToken?.sub as string
-	const userSocialId = 'google-oauth2|115454758242624071339' as string
-
-	// const requestWithNoBody = new Request(request.url, {
-	// 	...request,
-	// 	body: null
-	// })
-
-	// if (!token) {
-	// 	event.request = requestWithNoBody
-	// 	return resolve(event)
-	// }
-
-	const collection = dbCollections[userSocialId]
-
-	if (!event.locals.collection) event.locals.collection = collection
-	if (!event.locals.userSocialId) event.locals.userSocialId = userSocialId
-
-	if (!collection) {
-		console.error('Error: No collection found for user social ID:', userSocialId)
-
-		await setCollection(userSocialId)
+	if (!session) {
+		event.request = requestWithNoBody
 		return resolve(event)
 	}
 
-	if (!userSocialId) {
+	const userSub = session?.user?.sub as string
+
+	const collection = await getCollection(userSub)
+
+	if (!event.locals.collection) event.locals.collection = collection
+	if (!event.locals.userSub) event.locals.userSub = userSub
+
+	if (!collection) {
+		await setCollection(userSub)
+
+		console.log('Collection created for user social ID:', userSub)
+
+		return resolve(event)
+	}
+
+	if (!userSub) {
 		console.error('Error: No user social ID found')
 
 		return resolve(event)
@@ -58,3 +53,5 @@ export const handle: Handle = async ({ resolve, event }) => {
 	}
 	return response
 }
+
+export const handle = sequence(authHandle, customHandle)

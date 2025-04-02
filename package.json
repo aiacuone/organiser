@@ -41,6 +41,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@auth/sveltekit": "^1.8.0",
 		"@sveltestack/svelte-query": "^1.6.0",
 		"axios": "^1.5.0",
 		"jsonwebtoken": "^9.0.2",

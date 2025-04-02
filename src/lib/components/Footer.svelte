@@ -8,6 +8,8 @@
 	import { isAuthLoading, isAuthenticated, user } from '$lib/stores/auth'
 	import Dialog from './Dialog/Dialog.svelte'
 	import { useDisclosure } from '$lib/hooks'
+	import { signIn, signOut } from '@auth/sveltekit/client'
+	import { SignIn } from '@auth/sveltekit/components'
 
 	const footerButtons = [
 		{
@@ -32,9 +34,13 @@
 	const onClickAvatar = () => {
 		onOpenAvatarMenu()
 	}
-	//todo: Sort these
-	const login = () => {}
-	const logout = () => {}
+
+	const login = () => {
+		signIn()
+	}
+	const logout = () => {
+		signOut()
+	}
 </script>
 
 <footer class="py-2 bg-gray-300 px-3 center min-h-[50px]">
@@ -58,9 +64,9 @@
 						{`${$user.given_name[0]}${$user.family_name[0]}`}
 					</button>
 				{:else}
-					<button onclick={login} class="rounded-lg bg-neutral-500 h-[30px] px-2 center text-white"
-						>Login</button
-					>
+					<SignIn>
+						<button class="rounded-lg bg-neutral-500 h-[30px] px-2 center text-white">Login</button>
+					</SignIn>
 				{/if}
 			{/if}
 		</div>

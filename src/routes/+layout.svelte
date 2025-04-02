@@ -17,6 +17,8 @@
 		replaceAllSpacesWithHyphens
 	} from '$lib'
 	import { goto } from '$app/navigation'
+	import { signIn } from '@auth/sveltekit/client'
+	import { SignIn } from '@auth/sveltekit/components'
 
 	let { children } = $props()
 
@@ -116,7 +118,7 @@
 	const queryClient = new QueryClient()
 
 	const onLogin = async () => {
-		// todo: Add login
+		signIn()
 	}
 
 	let space = $derived($page.params.space)
@@ -140,7 +142,9 @@
 			{:else}
 				<div class="w-full h-full stack center gap-3">
 					<div class="hstack center gap-1 text-xl">Welcome to <LogitLogo height="35px" /></div>
-					<Button onclick={onLogin}>Login</Button>
+					<SignIn>
+						<Button>Login</Button>
+					</SignIn>
 				</div>
 			{/if}
 			<div class="flex justify-end"></div>
