@@ -19,15 +19,22 @@ export const handle: Handle = async ({ resolve, event }) => {
 	// 	event.request = requestWithNoBody
 	// 	return resolve(event)
 	// }
+
 	const collection = dbCollections[userSocialId]
-	const doesCollectionExist = !!collection
 
 	if (!event.locals.collection) event.locals.collection = collection
 	if (!event.locals.userSocialId) event.locals.userSocialId = userSocialId
 
-	if (!doesCollectionExist) {
-		console.log('New collection created for user')
+	if (!collection) {
+		console.error('Error: No collection found for user social ID:', userSocialId)
+
 		await setCollection(userSocialId)
+		return resolve(event)
+	}
+
+	if (!userSocialId) {
+		console.error('Error: No user social ID found')
+
 		return resolve(event)
 	}
 
